@@ -47,8 +47,8 @@ def create_app() -> object:
     else:
         print(email_server_status(email_server_probe[0], email_server_probe[1]))
 
-    show_stats(f":: JS : {settings['frameworks']['js']} ::")
-    show_stats(f":: CSS : {settings['frameworks']['css']} ::")
+    show_stats(f":: GLOBAL JS : {settings['frameworks']['global_js']} ::")
+    show_stats(f":: GLOBAL CSS : {settings['frameworks']['global_css']} ::")
     show_stats(" ")
 
     with main.app_context():
@@ -62,29 +62,29 @@ def create_app() -> object:
                         f"{app_name}.blueprints.{bp_name}.routes.pre_post")
                     try:
                         import_object = getattr(blueprint_route_module, "bp")
-                        main.register_blueprint(import_object, name=f"route.{bp_name}.pre_post")
-                        show_stats(f":+ ROUTE REGISTERED [route.{bp_name}.pre_post] +:")
+                        main.register_blueprint(import_object, name=f"{bp_name}.pre_post")
+                        show_stats(f":+ ROUTE REGISTERED [{bp_name}.pre_post] +:")
                         found_blueprint_routes.remove("pre_post")
                     except AttributeError:
                         show_stats(
-                            f":! ERROR REGISTERING ROUTE [route.{bp_name}.pre_post]: No import attribute found !:")
+                            f":! ERROR REGISTERING ROUTE [{bp_name}.pre_post]: No import attribute found !:")
 
                 for route in found_blueprint_routes:
                     route_module = import_module(f"{app_name}.blueprints.{bp_name}.routes.{route}")
                     try:
                         import_object = getattr(route_module, "bp")
-                        main.register_blueprint(import_object, name=f"route.{bp_name}.{route}")
-                        show_stats(f":+ ROUTE REGISTERED [route.{bp_name}.{route}] +:")
+                        main.register_blueprint(import_object, name=f"{bp_name}.{route}")
+                        show_stats(f":+ ROUTE REGISTERED [{bp_name}.{route}] +:")
                     except AttributeError:
                         show_stats(
-                            f":! ERROR REGISTERING ROUTE [route.{bp_name}.{route}]: No import attribute found !:")
+                            f":! ERROR REGISTERING ROUTE [{bp_name}.{route}]: No import attribute found !:")
 
                 if path.isfile(f"{app_root}/blueprints/{bp_name}/models.py"):
                     models_module = import_module(f"{app_name}.blueprints.{bp_name}.models")
                     try:
                         import_object = getattr(models_module, "db")
                         import_object.init_app(main)
-                        show_stats(f":+ MODEL REGISTERED [models.{bp_name}] +:")
+                        show_stats(f":+ MODEL REGISTERED [{bp_name}.models] +:")
                     except AttributeError:
                         show_stats(f":! ERROR REGISTERING MODEL [models.{bp_name}]: No import attribute found !:")
 
@@ -98,19 +98,19 @@ def create_app() -> object:
                     try:
                         import_object = getattr(api_route_module, "api")
                         import_object.init_app(main)
-                        show_stats(f":+ API ROUTES REGISTERED [api.route.{api_name}.{route}] +:")
+                        show_stats(f":+ API ROUTES REGISTERED [{api_name}.{route}] +:")
                     except AttributeError:
                         show_stats(
-                            f":! ERROR REGISTERING ROUTE [api.route.{api_name}.{route}]: No import attribute found !:")
+                            f":! ERROR REGISTERING ROUTE [{api_name}.{route}]: No import attribute found !:")
 
                 if path.isfile(f"{app_root}/apis/{api_name}/models.py"):
                     models_module = import_module(f"{app_name}.apis.{api_name}.models")
                     try:
                         import_object = getattr(models_module, "db")
                         import_object.init_app(main)
-                        show_stats(f":+ MODEL REGISTERED [api.models.{api_name}] +:")
+                        show_stats(f":+ MODEL REGISTERED [{api_name}] +:")
                     except AttributeError:
-                        show_stats(f":! ERROR REGISTERING MODEL [api.models.{api_name}]: No import attribute found !:")
+                        show_stats(f":! ERROR REGISTERING MODEL [{api_name}]: No import attribute found !:")
 
         load_apis()
         load_blueprints()
