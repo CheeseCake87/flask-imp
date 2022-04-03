@@ -25,7 +25,9 @@ pip install -r requirements.txt
 Run with : flask run :
 
 export FLASK_APP=main
+
 flask run
+
 
 Run with : gunicorn :
 
