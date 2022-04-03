@@ -30,7 +30,7 @@ flask run
 Run with : gunicorn :
 
 - Accept connections from all IPs
-- 
+
 gunicorn -b 0.0.0.0:5000 -w 3 run:app
 
 - Accept connections only from localhost
