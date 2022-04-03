@@ -1,0 +1,69 @@
+{# ------------------
+
+Input field:
+
+{{ input_field(
+label="label",
+name="name",
+class="class"
+placeholder="placeholder",
+required=True/False,
+value="value",
+autocomplete=True/False,
+read_only=True/False,
+disabled=Truse/False)
+}}
+
+required 1: applies the required attribute to the textarea tag
+required 2: applies both the attribute to the textarea tag and a class called form_required the the class attribute
+
+NONE = do not include the attribute in the call
+
+#}
+
+{% macro input_field(name="", label="", type="text", class="", placeholder="", required=False, value="",
+autocomplete=False, read_only=False, disabled=False) %}
+
+    <div class="form-group">
+
+    {% if label != "" %}
+        <label for="{{ name }}">{{ label }}</label>
+    {% endif %}
+
+    <input
+    type="{{ type }}"
+
+    name="{{ name }}"
+
+    id="{{ name }}"
+
+    class="{{ class }}{% if required %} form_required{% endif %}"
+
+    value="{{ value }}"
+
+    {% if not autocomplete %}
+        autocomplete="off"
+    {% endif %}
+
+    {% if placeholder != "" %}
+        placeholder="{{ placeholder }}"
+    {% endif %}
+
+    {% if required %}
+        required
+    {% endif %}
+
+    {% if read_only %}
+        readonly
+    {% endif %}
+
+    {% if disabled %}
+        disabled
+    {% endif %}
+    />
+
+    </div>
+
+{% endmacro %}
+
+{# ------------------ #}

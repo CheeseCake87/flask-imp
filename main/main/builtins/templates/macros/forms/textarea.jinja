@@ -1,0 +1,39 @@
+{# ------------------
+
+Textarea field:
+
+{{ textarea_field(label="label", name="name", placeholder="placeholder", required=True/False, value="value" }}
+
+required 1: applies the required attribute to the textarea tag
+required 2: applies both the attribute to the textarea tag and a class called form_required the the class attribute
+
+#}
+
+{% macro textarea_field(
+name="",
+label="",
+height=200,
+class="",
+placeholder="",
+required=False,
+value="",
+read_only=False,
+disabled=False
+) %}
+    <div class="form-group">
+        {% if label != "" %}
+            <label for="{{ name }}">{{ label }}</label>
+        {% endif %}
+        <textarea
+                name="{{ name }}"
+                id="{{ name }}"
+                style="min-height:{{ height }}px!important;"
+                class="{{ class }} {% if required %}form_required{% endif %}"
+                placeholder="{{ placeholder }}"
+                {% if required %} required {% endif %}
+                {% if read_only %} readonly {% endif %}
+        >{{ value }}</textarea>
+    </div>
+{% endmacro %}
+
+{# ------------------ #}

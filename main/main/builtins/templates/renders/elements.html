@@ -1,0 +1,30 @@
+{% extends structure %}
+{% from 'macros/forms/input.jinja' import input_field %}
+{% from 'macros/wrappers/bluebox.jinja' import bluebox %}
+
+
+{% block page_content %}
+    {% if debug %}
+        <h1>Debug</h1>
+        {{ this_path }}
+    {% endif %}
+
+    <h1>Element test</h1>
+
+    <h2>Standard include:</h2>
+    {%  include 'includes/blocks/blue_box.html' %}
+
+    <h2>Macro wrapper</h2>
+    <h3>Wrapped content</h3>
+    {{ bluebox('top') | deco }}
+        <p>content inside macro wrapper</p>
+    {{ bluebox('bot') | deco }}
+    <h3>Empty set wrapper</h3>
+    {{ bluebox() | deco }}
+
+
+    <h2>Macro forms:</h2>
+    <h3>input</h3>
+    {{ input_field(name="example_input", label="input") | deco }}
+
+{% endblock page_content %}

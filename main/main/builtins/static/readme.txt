@@ -1,0 +1,1 @@
+All standard static files in here for the default options.

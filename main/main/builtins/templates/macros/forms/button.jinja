@@ -1,0 +1,33 @@
+{# ------------------
+
+Submit button:
+
+{{ button.submit_field(name="name", value="button_text", class="class") }}
+
+#}
+{% macro submit_field(name="", class="", value="") %}
+    <input type="submit"
+    name="{{ name }}"
+    id="{{ name }}"
+    class="{{ class }}"
+    value="{{ value }}"
+    />
+{% endmacro %}
+
+{# ------------------ #}
+
+{# ------------------
+
+Submit button link:
+
+{{ button.submit_field_link(name="name_name", label="Name Name",
+button_type="button-primary", link="http://www.go.com/") }}
+
+#}
+{% macro submit_field_link(label="", name="", button_type="", link="") %}
+    <a class="button {{ button_type }}" href="{{ link }}" id="{{ name }}">
+        {{ label }}
+    </a>
+{% endmacro %}
+
+{# ------------------ #}

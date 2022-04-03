@@ -1,0 +1,11 @@
+{% macro bluebox(part="none") %}
+    {% if part == "none" %}
+        <p>No option chosen for bluebox</p>
+    {% endif %}
+    {% if part == "top" %}
+        <div style="width: 100%; height: 40px; background-color: #889be7">
+    {% endif %}
+    {% if part == "bot" %}
+        </div>
+    {% endif %}
+{% endmacro %}

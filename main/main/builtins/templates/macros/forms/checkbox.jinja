@@ -1,0 +1,28 @@
+{# ------------------
+
+Check box:
+
+{{ input_checkbox(label="label", name="name", checked="True/False") }}
+
+#}
+
+{% macro input_checkbox(
+name="",
+label="",
+checked=False
+) %}
+
+    <div class="form-group">
+        <label for="{{ name }}" class="checkbox-container">{{ label }}
+            <input type="checkbox"
+                   name="{{ name }}"
+                   id="{{ name }}"
+                   {%- if checked -%}checked
+                   {%- endif -%}
+            />
+            <span class="checkmark"></span>
+        </label>
+    </div>
+{% endmacro %}
+
+{# ------------------ #}

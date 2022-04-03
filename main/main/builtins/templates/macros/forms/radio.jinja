@@ -1,0 +1,35 @@
+{# ------------------
+
+Radio field dumb:
+
+{{ input_radio_dumb(label="label", name="name", options=options) }}
+
+
+Set options like (this is done on the template page, just before calling the macro):
+
+{% set options = {"key": "value", 2: "2", "3": 3} %}
+
+#}
+
+{% macro input_radio_dumb(name="", label="", class="", options=None, selected=None) %}
+    <div class="form-group">
+    {% if options == None %}
+        {% set options = {} %}
+    {% endif %}
+
+    {% if label != '' %}
+        <label>{{ label }}</label>
+    {% endif %}
+
+    <div class="form-group">
+    {% for key, value in options.items() %}
+        <div class="form-radio">
+            <input type="radio" id="{{ key }}" name="{{ name }}" value="{{ key }}">
+            <label for="{{ key }}">{{ value }}</label>
+        </div>
+    {% endfor %}
+    </div>
+    </div>
+{% endmacro %}
+
+{# ------------------ #}

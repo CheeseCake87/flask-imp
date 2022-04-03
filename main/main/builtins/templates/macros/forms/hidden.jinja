@@ -1,0 +1,18 @@
+{# ------------------
+
+Hidden field:
+
+{{ input_hidden(name="name", value="value" }}
+
+#}
+
+{% macro input_hidden(name="", value="") %}
+    <input
+    type="hidden"
+    name="{{ name }}"
+    id="{{ name }}"
+    value="{{ value | safe }}"
+    />
+{% endmacro %}
+
+{# ------------------ #}
