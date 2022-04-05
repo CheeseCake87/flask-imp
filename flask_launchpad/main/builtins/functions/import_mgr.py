@@ -34,7 +34,7 @@ def load_modules(module_folder: str) -> list:
         if enabled == "no":
             show_stats(f":| {deco_dir_name} DISABLED [{module}] v{version} |:")
             continue
-
+        show_stats(" ")
         show_stats(f":| {deco_dir_name} FOUND [{module}] v{version} |:")
         modules.append(module)
 

@@ -18,10 +18,12 @@ app_root = settings["app"]["root"]
 
 
 class Config(object):
+    APP_NAME = app_name
     SECRET_KEY = settings["app"]["secret_key"]
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=int(settings["app"]["session_time"]))
     DEBUG = settings["app"]["debug"]
     TESTING = settings["app"]["testing"]
+    UPLOAD_FOLDER = f"{app_root}/uploads"
     if settings["database"]["enabled"]:
         _db = settings["database"]["name"]
         _u = settings["database"]["username"]
@@ -49,35 +51,18 @@ def create_app() -> object:
 
     show_stats(f":: GLOBAL JS : {settings['frameworks']['global_js']} ::")
     show_stats(f":: GLOBAL CSS : {settings['frameworks']['global_css']} ::")
-    show_stats(" ")
 
     with main.app_context():
         def load_blueprints() -> None:
-            found_blueprints = load_modules(module_folder="blueprints")
-            for bp_name in found_blueprints:
-                found_blueprint_routes = import_routes(module_folder="blueprints", module=bp_name)
-
-                if "pre_post" in found_blueprint_routes:
-                    blueprint_route_module = import_module(
-                        f"{app_name}.blueprints.{bp_name}.routes.pre_post")
-                    try:
-                        import_object = getattr(blueprint_route_module, "bp")
-                        main.register_blueprint(import_object, name=f"{bp_name}.pre_post")
-                        show_stats(f":+ ROUTE REGISTERED [{bp_name}.pre_post] +:")
-                        found_blueprint_routes.remove("pre_post")
-                    except AttributeError:
-                        show_stats(
-                            f":! ERROR REGISTERING ROUTE [{bp_name}.pre_post]: No import attribute found !:")
-
-                for route in found_blueprint_routes:
-                    route_module = import_module(f"{app_name}.blueprints.{bp_name}.routes.{route}")
-                    try:
-                        import_object = getattr(route_module, "bp")
-                        main.register_blueprint(import_object, name=f"{bp_name}.{route}")
-                        show_stats(f":+ ROUTE REGISTERED [{bp_name}.{route}] +:")
-                    except AttributeError:
-                        show_stats(
-                            f":! ERROR REGISTERING ROUTE [{bp_name}.{route}]: No import attribute found !:")
+            for bp_name in load_modules(module_folder="blueprints"):
+                try:
+                    blueprint_module = import_module(f"{app_name}.blueprints.{bp_name}")
+                    blueprint_object = getattr(blueprint_module, "bp")
+                    main.register_blueprint(blueprint_object, name=f"{bp_name}")
+                    show_stats(f":+ BLUEPRINT REGISTERED [{bp_name}] +:")
+                except AttributeError:
+                    show_stats(f":! ERROR REGISTERING BLUEPRINT [{bp_name}]: No import attribute found !:")
+                    continue
 
                 if path.isfile(f"{app_root}/blueprints/{bp_name}/models.py"):
                     models_module = import_module(f"{app_name}.blueprints.{bp_name}.models")

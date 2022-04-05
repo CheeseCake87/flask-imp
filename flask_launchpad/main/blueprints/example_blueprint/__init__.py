@@ -1,5 +1,8 @@
 from ...builtins.functions.import_mgr import load_config
+from ...builtins.functions.import_mgr import import_routes
+from importlib import import_module
 from flask import Blueprint
+from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 
@@ -18,3 +21,9 @@ db = SQLAlchemy()
 
 # Create session object
 sql_do = db.session
+
+# Import routes
+for route in import_routes(module_folder="blueprints", module=config["settings"]["name"]):
+    route_module = import_module(
+        f"{current_app.config['APP_NAME']}.blueprints.{config['settings']['name']}.routes.{route}"
+    )
