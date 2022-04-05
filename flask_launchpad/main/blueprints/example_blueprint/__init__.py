@@ -6,24 +6,22 @@ from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 
-# Get the path of the Blueprint
-this_path = path.dirname(path.realpath(__file__))
+"""
+This is an example blueprint init file.
+1. Config file is loaded into a dict and the arguments are passed direct to the blueprint object
+2. Root path is set to allow the static url path to work
+3. SQLAlchemy object is created
+4. database session is set to sql_do to make it easier to read and use in sql action files
+5. routes in the routes folder of the blueprint are imported
+"""
 
-# Load the Blueprint config
-config = load_config(from_file_dir=this_path)
-
-# Create the Blueprint object (root_path needs to be set as the style of auto
-# import breaks the auto-detection of template folders)
-bp = Blueprint(**config["settings"], root_path=this_path)
-
-# Create the SQLAlchemy object
+config = load_config(from_file_dir=path.dirname(path.realpath(__file__)))
+bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file__)))
 db = SQLAlchemy()
-
-# Create session object
 sql_do = db.session
 
-# Import routes
 for route in import_routes(module_folder="blueprints", module=config["settings"]["name"]):
     route_module = import_module(
-        f"{current_app.config['APP_NAME']}.blueprints.{config['settings']['name']}.routes.{route}"
-    )
+        f"{current_app.config['APP_NAME']}.blueprints.{config['settings']['name']}.routes.{route}")
+
+
