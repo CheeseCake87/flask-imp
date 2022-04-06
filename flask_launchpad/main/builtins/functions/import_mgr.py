@@ -74,7 +74,10 @@ def import_routes(module_folder: str = None, module: str = None) -> list:
     deco_dir_name = module_folder[:-1].upper()
     routes_raw, routes_clean, display_module = "", [], ""
 
-    routes_raw = listdir(f"{app_root}/{module_folder}/{module}/routes")
+    if module_folder == "builtins":
+        routes_raw = listdir(f"{app_root}/{module_folder}/{module}")
+    else:
+        routes_raw = listdir(f"{app_root}/{module_folder}/{module}/routes")
 
     for item in routes_raw:
         if "__" in item:

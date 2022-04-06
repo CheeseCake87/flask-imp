@@ -1,6 +1,7 @@
 from main import create_app
 
-main = create_app()
-
 if __name__ == '__main__':
-    main.run(host="localhost", port=5000)
+    create_app = create_app()
+    create_app.run()
+else:
+    flask_launchpad = create_app()

@@ -78,15 +78,15 @@ def create_app() -> object:
             for api_name in found_apis:
                 found_api_routes = import_routes(module_folder="apis", module=api_name)
 
-                for route in found_api_routes:
-                    api_route_module = import_module(f"{app_name}.apis.{api_name}.routes.{route}")
+                for api_route in found_api_routes:
+                    api_route_module = import_module(f"{app_name}.apis.{api_name}.routes.{api_route}")
                     try:
                         import_object = getattr(api_route_module, "api")
                         import_object.init_app(main)
-                        show_stats(f":+ API ROUTES REGISTERED [{api_name}.{route}] +:")
+                        show_stats(f":+ API ROUTES REGISTERED [{api_name}.{api_route}] +:")
                     except AttributeError:
                         show_stats(
-                            f":! ERROR REGISTERING ROUTE [{api_name}.{route}]: No import attribute found !:")
+                            f":! ERROR REGISTERING ROUTE [{api_name}.{api_route}]: No import attribute found !:")
 
                 if path.isfile(f"{app_root}/apis/{api_name}/models.py"):
                     models_module = import_module(f"{app_name}.apis.{api_name}.models")
@@ -97,18 +97,16 @@ def create_app() -> object:
                     except AttributeError:
                         show_stats(f":! ERROR REGISTERING MODEL [{api_name}]: No import attribute found !:")
 
+        # Load APIs & Blueprints
         load_apis()
         load_blueprints()
-        show_stats(" ")
-        from .builtins.extend_jinja import filters
-        show_stats(":+ BUILTIN CUSTOM JINJA FILTERS LOADED +:")
-        from .builtins.routes import __pre_post__
-        show_stats(":+ BUILTIN ROUTE REGISTERED [builtin___pre_post__] +:")
-        from .builtins.routes import errors
-        show_stats(":+ BUILTIN ROUTE REGISTERED [errors] +:")
-        from .builtins.routes import system
-        show_stats(":+ BUILTIN ROUTE REGISTERED [system] +:")
+
+        # Load builtins
+        for route in import_routes(module_folder="builtins", module="routes"):
+            import_module(f"{app_name}.builtins.routes.{route}")
+        for route in import_routes(module_folder="builtins", module="extend_jinja"):
+            import_module(f"{app_name}.builtins.extend_jinja.{route}")
+
         show_stats("!! VISIT <url>/system/endpoints TO GET A LIST OF ENDPOINTS !!")
         print(rocket_launched())
-        print(" ")
     return main

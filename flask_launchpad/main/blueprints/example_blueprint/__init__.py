@@ -21,7 +21,4 @@ db = SQLAlchemy()
 sql_do = db.session
 
 for route in import_routes(module_folder="blueprints", module=config["settings"]["name"]):
-    route_module = import_module(
-        f"{current_app.config['APP_NAME']}.blueprints.{config['settings']['name']}.routes.{route}")
-
-
+    import_module(f"{current_app.config['APP_NAME']}.blueprints.{config['settings']['name']}.routes.{route}")
