@@ -1,3 +1,5 @@
+from functools import wraps
+from flask_restx import abort
 from .. import config
 
 
@@ -15,8 +17,6 @@ def check_http_auth(request_authorization) -> bool:
     return True
 
 
-def public_key_correct(public_api_key: str) -> bool:
-    type(config["api"]['public_key'])
-    if public_api_key == config["api"]['public_key']:
-        return True
-    return False
+def public_key_required(pk: str) -> None:
+    if not pk == config["public_key"]['public_key']:
+        return abort(404)

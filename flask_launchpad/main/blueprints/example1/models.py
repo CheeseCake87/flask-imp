@@ -3,8 +3,8 @@ from . import db
 sql_do = db.session
 
 
-class ExampleAccount(db.Model):
-    __tablename__ = "example_account"
+class Example1(db.Model):
+    __tablename__ = "example1"
     account_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(256), nullable=False)
     password = db.Column(db.String(512), nullable=False)

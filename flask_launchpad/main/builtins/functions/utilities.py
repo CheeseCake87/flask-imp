@@ -36,17 +36,13 @@ def rocket_launched() -> str:
 >>>> ROCKET LAUNCHED :rocket:""")
 
 
-def email_server_status(status: bool, status_message: str) -> str:
+def email_server_status(status: bool) -> str:
     if status:
         return emoji.emojize(f"""
->>>> EMAIL SERVER :e-mail: :green_circle:
->> {status_message}
-""")
+>>>> EMAIL SERVER DISABLED :e-mail: :blue_circle:""")
 
     return emoji.emojize(f"""
->>>> EMAIL SERVER STATUS :e-mail: :red_circle:
->> {status_message}
-""")
+>>>> EMAIL SERVER DISABLED :e-mail: :red_circle:""")
 
 
 def remove_escapes(string: str, remove: list = None) -> str:

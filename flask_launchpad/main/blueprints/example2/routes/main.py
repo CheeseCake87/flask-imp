@@ -12,7 +12,7 @@ def index():
 
 
 @bp.route("/no-endpoint-login-required", methods=["GET"])
-@login_required(session_bool_key="auth", on_error_endpoint="nothere")
+@login_required(session_bool_key="example2_auth", on_error_endpoint="nothere")
 def locked_page():
     """
     Used to test the error catching ability of the system if a non-existent endpoint is used.
@@ -23,7 +23,7 @@ def locked_page():
 @bp.route("/logout", methods=["GET", "POST"])
 def logout():
     session["auth"] = False
-    return redirect(url_for("example_blueprint.login"))
+    return redirect(url_for("example1.login"))
 
 
 @bp.route("/login", methods=["GET", "POST"])
@@ -33,7 +33,7 @@ def login():
     """
     if request.method == "POST":
         session["auth"] = True
-        return redirect(url_for("example_blueprint.account"))
+        return redirect(url_for("example2.account"))
 
     print(session)
     return f""" 
@@ -53,7 +53,7 @@ def login():
 
 
 @bp.route("/account", methods=["GET"])
-@login_required(session_bool_key="auth", on_error_endpoint="example_blueprint.login")
+@login_required(session_bool_key="example1_auth", on_error_endpoint="example2.login")
 def account():
     """
     This page is protected by the login_required decorator, with the login page endpoint set.

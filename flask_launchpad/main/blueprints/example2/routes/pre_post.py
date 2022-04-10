@@ -10,7 +10,7 @@ pre_post.py is just shorter, but before_after_request.py makes more sense
 @bp.before_app_request
 def before_app_request():
     if "auth" not in session:
-        session['auth'] = False
+        session['example2_auth'] = False
     pass
 
 

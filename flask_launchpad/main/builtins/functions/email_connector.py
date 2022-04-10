@@ -46,23 +46,12 @@ def test_email_server_connection() -> list:
     Used to test the settings of the smtp settings.
     :return list[bool, status]:
     """
-    if not settings["enabled"]:
-        return [False, "SERVER DISABLED"]
-    if settings["server"] == "":
-        return [False, "NO SMTP SERVER CONFIGURED"]
-    if settings["port"] == 0 or settings["port"] is None:
-        return [False, "NO SMTP PORT CONFIGURED"]
-    if settings["username"] == "":
-        return [False, "NO SMTP USERNAME CONFIGURED"]
-    if settings["password"] == "":
-        return [False, "NO SMTP PASSWORD CONFIGURED"]
-
     try:
         ssl_context = create_default_context()
         with SMTP(settings["server"], settings["port"]) as connection:
             connection.starttls(context=ssl_context)
             connection.login(settings["username"], settings["password"])
-    except SMTPException:
-        return [False, "AUTHENTICATION OR CONNECTION ISSUE"]
+    except SMTPException as error:
+        return [False, "AUTHENTICATION OR CONNECTION ISSUE", error]
 
-    return [True, "ENABLED AND READY"]
+    return [True, "ENABLED AND READY", None]

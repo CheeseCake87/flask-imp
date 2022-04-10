@@ -14,7 +14,10 @@ def load_modules(module_folder: str) -> list:
     :param module_folder:
     :return list[enabled & valid module names]:
     """
-    deco_dir_name = module_folder[:-1].upper()
+    if module_folder[-1:] == "s":
+        deco_dir_name = module_folder[:-1].upper()
+    else:
+        deco_dir_name = module_folder.upper()
     modules = []
     for module in find_modules(module_folder=module_folder):
         # passes config file find to load_import_config
@@ -100,11 +103,12 @@ def import_routes(module_folder: str = None, module: str = None) -> list:
 
 
 def load_config(module_folder: str = None, module: str = None, from_file_dir: str = None,
-                app_config: bool = False) -> dict:
+                app_config: bool = False, api_config: bool = False) -> dict:
     """
     Takes in the current working directory of the import, then returns
     the config file values in its directory as a dict
     :param app_config:
+    :param api_config:
     :param module_folder:
     :param module:
     :param from_file_dir:
@@ -134,6 +138,13 @@ def load_config(module_folder: str = None, module: str = None, from_file_dir: st
 
             doctored_settings["app"]["root"] = get_app_root()
             return doctored_settings
+
+    if api_config:
+        if path.isfile(f"{app_root}/api/config.ini"):
+            config = ConfigParser()
+            config.read(f"{app_root}/api/config.ini")
+            config_to_dict = config.__dict__['_sections']
+            return config_to_dict
 
     if from_file_dir is not None:
         if path.isfile(f"{from_file_dir}/config.ini"):
