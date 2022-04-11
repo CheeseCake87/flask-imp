@@ -1,9 +1,9 @@
-from flask import current_app
-from flask import g
-from markupsafe import Markup
-from flask import render_template
 from ..functions.auth import generate_password
 from ..functions.email_connector import test_email_server_connection
+from flask import current_app
+from flask import render_template
+from flask_sqlalchemy import SQLAlchemy
+from markupsafe import Markup
 
 
 @current_app.route('/core/func-test', endpoint="core.func_test")
@@ -23,7 +23,7 @@ def element_test():
 
     def args() -> dict:
         render_args['template_name_or_list'] = "renders/elements.html"
-        render_args['structure'] = "structures/default.html"
+        render_args['structure'] = "structures/system.html"
         render_args['title'] = "Element Overview"
         render_args['keywords'] = "element, overview"
         render_args['description'] = "Contains examples of all the Elements that can be made"
@@ -59,24 +59,9 @@ def display_endpoints():
 
 @current_app.route('/core/database', endpoint="core.database")
 def database():
-    endpoints = {}
-    endpoint_text = ""
-    for rule in current_app.url_map.iter_rules():
-        endpoints[rule.endpoint] = rule.rule
+    for module_name, module in current_app.config["SHARED_MODELS"].items():
+        SQLAlchemy.drop_all(module)
 
-    for endpoint, url in sorted(endpoints.items()):
-        endpoint_text += f"""
-        <tr>
-        <td style="text-align:right;">{endpoint}</td>
-        <td> : </td>
-        <td>{url}</td>
-        </tr>
-        """
-
-    table = f"""
-    <h1>Available Endpoints</h1>
-    <table>
-    {endpoint_text}
-    </table>
-    """
-    return Markup(table)
+    for module_name, module in current_app.config["SHARED_MODELS"].items():
+        SQLAlchemy.create_all(module)
+    return """Database reset"""

@@ -1,4 +1,4 @@
-from ...builtins.functions.import_mgr import load_config
+from ...builtins.functions.import_mgr import read_config
 from ...builtins.functions.import_mgr import import_routes
 from importlib import import_module
 from flask import Blueprint
@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 
 # Load the config for this API
-config = load_config(from_file_dir=path.dirname(path.realpath(__file__)))
+config = read_config(from_file_dir=path.dirname(path.realpath(__file__)))
 
 # Create a Flask blueprint for this api
 bp = Blueprint(
@@ -25,11 +25,12 @@ db = SQLAlchemy()
 sql_do = db.session
 
 # init a dict variable to get external model attributes
-extattr = {}
+extmod = {}
 
-# Pull api enabled blueprints models from the current app config, import and store in dict
-for ext_bp, model in current_app.config["API_MODELS"].items():
-    extattr[ext_bp] = import_module(f"{current_app.config['APP_NAME']}.blueprints.{ext_bp}.models")
+# Pull blueprint models from the current app config, import and store in dict
+for module_name, module in current_app.config["SHARED_MODELS"].items():
+    if module_name != config['settings']['import_name']:
+        extmod[module_name] = module
 
 # Import the routes from the route folder
 for route in import_routes(module_folder="api", module=config["settings"]["import_name"]):

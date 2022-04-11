@@ -7,19 +7,16 @@ from flask import render_template
 
 @current_app.errorhandler(404)
 def request_404(error):
-    render_args = {
-        "template_name_or_list": "renders/error.html",
-        "structure": "structures/default.html",
-        "title": "404 Error! Page not found",
-        "keywords": "Error, Page, Not, Found",
-        "description": "Error, page not found"
-    }
+    render = "renders/error.html"
+    extend = "themes/system/page_message.html"
+    set_theme = "system"
+
     debug_args = {
         "debug": session,
         "error": error,
         "this_path": request.path
     }
-    return render_template(**render_args, **debug_args), 404
+    return render_template(render, extend=extend, set_theme=set_theme, **debug_args), 404
 
 
 @current_app.errorhandler(401)

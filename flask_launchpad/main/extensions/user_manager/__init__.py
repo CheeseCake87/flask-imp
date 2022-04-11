@@ -1,5 +1,5 @@
-from ...builtins.functions.import_mgr import read_config
-from ...builtins.functions.import_mgr import import_routes
+from flask_launchpad.main.builtins.functions.import_mgr import read_config
+from flask_launchpad.main.builtins.functions.import_mgr import import_routes
 from importlib import import_module
 from flask import Blueprint
 from flask import current_app
@@ -29,5 +29,5 @@ for module_name, module in current_app.config["SHARED_MODELS"].items():
     if module_name != config['settings']['import_name']:
         extmod[module_name] = module
 
-for route in import_routes(module_folder="blueprints", module=config["settings"]["name"]):
-    import_module(f"{current_app.config['APP_NAME']}.blueprints.{config['settings']['name']}.routes.{route}")
+for route in import_routes(module_folder="extensions", module=config["settings"]["name"]):
+    import_module(f"{current_app.config['APP_NAME']}.extensions.{config['settings']['name']}.routes.{route}")

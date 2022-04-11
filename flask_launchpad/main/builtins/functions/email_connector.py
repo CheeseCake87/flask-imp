@@ -3,9 +3,9 @@ from ssl import create_default_context
 from smtplib import SMTPException
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from .import_mgr import load_config
+from .import_mgr import read_config
 
-settings = load_config(app_config=True)["smtp"]
+settings = read_config(app_config=True)["smtp"]
 
 
 def send_email(subject: str, email_to: str, email_body: str) -> list:

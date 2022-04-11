@@ -55,7 +55,7 @@ def generate_pepper(password: str):
 def sha_password(password: str, salt: str, encrypt: int = 512) -> str:
     """
     Takes user's password, peppers in, salts it, then converts it to sha
-    Can set encryption to 256/512 - 256 is default
+    Can set encryption to 256/512 - 256 is system
     :param password:
     :param salt:
     :param encrypt:
@@ -71,7 +71,7 @@ def auth_password(input_password: str, database_password: str, database_salt: st
     Takes user's password (input_password), loops over all possible ascii_letters joining
     to the password as a pepper, then salts using salt value in the database, then converts it
     to sha, then compares that loop result to the database password to find a match
-    Can set encryption to 256/512 - 256 is default
+    Can set encryption to 256/512 - 256 is system
     :param input_password: str
     :param database_password: str
     :param database_salt: str

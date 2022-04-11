@@ -1,7 +1,7 @@
 from .builtins.functions.email_connector import test_email_server_connection
 from .builtins.functions.email_connector import send_email
 from .builtins.functions.import_mgr import show_stats
-from .builtins.functions.import_mgr import load_config
+from .builtins.functions.import_mgr import read_config
 from .builtins.functions.import_mgr import load_modules
 from .builtins.functions.import_mgr import import_routes
 from .builtins.functions.utilities import building_rocket
@@ -10,11 +10,9 @@ from .builtins.functions.utilities import email_server_status
 from importlib import import_module
 from datetime import timedelta
 from flask import Flask
-from flask import g
-from flask_sqlalchemy import SQLAlchemy
 from os import path
 
-settings = load_config(app_config=True)
+settings = read_config(app_config=True)
 app_name = settings["app"]["name"]
 app_root = settings["app"]["root"]
 
@@ -27,8 +25,8 @@ class Config(object):
     TESTING = settings["app"]["testing"]
     UPLOAD_FOLDER = f"{app_root}/uploads"
     ERROR_404_HELP = settings["app"]["error_404_help"]
-    CORE_OPERATIONS = settings["app"]["core_operations"]
-    API_MODELS = {}
+    CORE_OPERATIONS = settings["builtins_enabled"]["core"]
+    SHARED_MODELS = {}
     if settings["database"]["enabled"]:
         _db = settings["database"]["name"]
         _u = settings["database"]["username"]
@@ -72,12 +70,37 @@ def create_app(live: bool):
                     try:
                         import_object = getattr(models_module, "db")
                         import_object.init_app(main)
-                        bp_config = load_config(module_folder="blueprints", module=bp_name)
-                        if bp_config["api"]["enabled"]:
-                            main.config["API_MODELS"][bp_name] = import_object
-                        show_stats(f":+ MODEL REGISTERED [{bp_name}.models] +:", live)
+                        bp_config = read_config(module_folder="blueprints", module=bp_name)
+                        if bp_config["init"]["share_models"]:
+                            main.config["SHARED_MODELS"][bp_name] = import_object
+                        show_stats(f":+ BLUEPRINT MODEL REGISTERED [{bp_name}.models] +:", live)
                     except AttributeError:
-                        show_stats(f":! ERROR REGISTERING MODEL [models.{bp_name}]: No import attribute found !:", live)
+                        show_stats(
+                            f":! ERROR REGISTERING BLUEPRINT MODEL [models.{bp_name}]: No import attribute found !:",
+                            live)
+
+        def load_extensions() -> None:
+            for ex_name in load_modules(module_folder="extensions"):
+                try:
+                    extension_module = import_module(f"{app_name}.extensions.{ex_name}")
+                    extension_object = getattr(extension_module, "bp")
+                    main.register_blueprint(extension_object, name=f"{ex_name}")
+                    show_stats(f":+ EXTENSION REGISTERED [{ex_name}] +:", live)
+                except AttributeError:
+                    show_stats(f":! ERROR REGISTERING EXTENSION [{ex_name}]: No import attribute found !:")
+                    continue
+
+                if path.isfile(f"{app_root}/extensions/{ex_name}/models.py"):
+                    models_module = import_module(f"{app_name}.extensions.{ex_name}.models")
+                    try:
+                        import_object = getattr(models_module, "db")
+                        import_object.init_app(main)
+                        main.config["SHARED_MODELS"][ex_name] = import_object
+                        show_stats(f":+ EXTENSION MODEL REGISTERED [{ex_name}.models] +:", live)
+                    except AttributeError:
+                        show_stats(
+                            f":! ERROR REGISTERING EXTENSION MODEL [models.{ex_name}]: No import attribute found !:",
+                            live)
 
         def load_apis() -> None:
             found_apis = load_modules(module_folder="api")
@@ -93,6 +116,7 @@ def create_app(live: bool):
 
         # Load Blueprints
         load_blueprints()
+        load_extensions()
         load_apis()
 
         # Load builtins
@@ -107,9 +131,9 @@ def create_app(live: bool):
 
 
 """
-Below is code for singular API loading
+Below is code for singular API loading.
 
-        api_config = load_config(api_config=True)
+        api_config = read_config(api_config=True)
         if api_config["init"]["enabled"]:
             api_module = import_module(f"{app_name}.api")
 
@@ -117,6 +141,5 @@ Below is code for singular API loading
             main.register_blueprint(api_bp_object)
 
             show_stats(f":+ API ENABLED +:", live)
-
 
 """

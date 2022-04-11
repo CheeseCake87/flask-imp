@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 from pytz import timezone
 from json import load, dumps
 from os import path
+from os import mkdir
+from os import remove
 from re import sub
 import emoji
 
@@ -39,10 +41,17 @@ def rocket_launched() -> str:
 def email_server_status(status: bool) -> str:
     if status:
         return emoji.emojize(f"""
->>>> EMAIL SERVER DISABLED :e-mail: :blue_circle:""")
+>>>> EMAIL SERVER ENABLED :e-mail: :blue_circle:""")
 
     return emoji.emojize(f"""
 >>>> EMAIL SERVER DISABLED :e-mail: :red_circle:""")
+
+
+def sqlite_detected() -> str:
+    return emoji.emojize(f"""
+>>>> SQLITE TYPE DETECTED :information:
+>> VISIT http://127.0.0.1:5000/reset-sqlite TO DROP AND RECREATE THE DATABASE
+>> """)
 
 
 def remove_escapes(string: str, remove: list = None) -> str:
@@ -77,6 +86,28 @@ def find_illegal_dir_char(name: str) -> bool:
         if char in name:
             return True
     return False
+
+
+def regular_datetime(delta: int = 0) -> datetime:
+    local_timestamp = timezone("Europe/London")
+    if delta < 0:
+        apply_delta = (datetime.now(local_timestamp) - timedelta(days=delta)).strftime("%Y-%m-%d %H:%M:%S")
+        return datetime.strptime(apply_delta, "%Y-%m-%d %H:%M:%S")
+    if delta > 0:
+        apply_delta = (datetime.now(local_timestamp) + timedelta(days=delta)).strftime("%Y-%m-%d %H:%M:%S")
+        return datetime.strptime(apply_delta, "%Y-%m-%d %H:%M:%S")
+    return datetime.strptime(datetime.now(local_timestamp).strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
+
+
+def regular_date(delta: int = 0) -> datetime:
+    local_timestamp = timezone("Europe/London")
+    if delta < 0:
+        apply_delta = (datetime.now(local_timestamp) - timedelta(days=delta)).strftime("%Y-%m-%d")
+        return datetime.strptime(apply_delta, "%Y-%m-%d")
+    if delta > 0:
+        apply_delta = (datetime.now(local_timestamp) + timedelta(days=delta)).strftime("%Y-%m-%d")
+        return datetime.strptime(apply_delta, "%Y-%m-%d")
+    return datetime.strptime(datetime.now(local_timestamp).strftime("%Y-%m-%d"), "%Y-%m-%d")
 
 
 def regular_datetime_string(delta: int = 0) -> str:
@@ -160,3 +191,71 @@ def url_var(string: str) -> str:
     for char in replace:
         string = string.replace(char, "-")
     return f"?r={string.lower()}"
+
+
+def get_file_extension(file: str) -> str:
+    return file.rsplit('.', 1)[1].lower()
+
+
+def get_filename_without_extension(file: str) -> str:
+    return get_file_extension(path.basename(file))
+
+
+def get_filename_with_extension(file: str) -> str:
+    return path.basename(file)
+
+
+def convert_sql_to_list_dict(query, return_only_these_fields: list = None) -> list:
+    return_list = []
+    for value in query:
+        temp_dict = {}
+        vars_dict = vars(value)
+        for inner_key, inner_value in vars_dict.items():
+            if isinstance(return_only_these_fields, list):
+                if inner_key in return_only_these_fields:
+                    temp_dict[inner_key] = inner_value
+            else:
+                temp_dict[inner_key] = inner_value
+        return_list.append(temp_dict)
+    return return_list
+
+
+def convert_sql_to_dict(query, return_only_these_fields: list = None) -> dict:
+    for value in query:
+        temp_dict = {}
+        vars_dict = vars(value)
+        for inner_key, inner_value in vars_dict.items():
+            if isinstance(return_only_these_fields, list):
+                if inner_key in return_only_these_fields:
+                    temp_dict[inner_key] = inner_value
+            else:
+                temp_dict[inner_key] = inner_value
+        return temp_dict
+
+
+def create_folder_if_not_found(folder_path: str) -> str:
+    if path.exists(folder_path):
+        return folder_path
+    try:
+        mkdir(folder_path)
+    except OSError:
+        return "none"
+    return folder_path
+
+
+def path_exists(folder_path: str) -> bool:
+    if path.exists(folder_path):
+        return True
+    return False
+
+
+def delete_file(file_path: str) -> bool:
+    if path.isfile(file_path):
+        remove(file_path)
+    return True
+
+
+def is_file(file_path: str) -> bool:
+    if path.isfile(file_path):
+        return True
+    return False

@@ -2,46 +2,10 @@ from .utilities import find_illegal_dir_char
 from .utilities import show_stats
 from .utilities import get_app_root
 from configparser import ConfigParser
-from os import path, listdir
+from os import path
+from os import listdir
 
 app_root = get_app_root()
-
-
-def load_modules(module_folder: str) -> list:
-    """
-    takes in a module folder name, reads the config of module, if enabled and no errors adds the name to the list
-    to import.
-    :param module_folder:
-    :return list[enabled & valid module names]:
-    """
-    if module_folder[-1:] == "s":
-        deco_dir_name = module_folder[:-1].upper()
-    else:
-        deco_dir_name = module_folder.upper()
-    modules = []
-    for module in find_modules(module_folder=module_folder):
-        # passes config file find to load_import_config
-        module_config = load_config(module_folder=module_folder, module=module)
-        if "error" in module_config:
-            show_stats(f":| ERROR LOADING CONFIG FOR [{module}] |:")
-            continue
-
-        config_type = module_config['init']['type']
-        version = module_config['init']['version']
-        enabled = module_config['init']['enabled']
-
-        if config_type != deco_dir_name.lower():
-            show_stats(f":| YOU HAVE NON {deco_dir_name} MODULE TYPE IN THE {module_folder} FOLDER |:")
-            continue
-
-        if enabled == "no":
-            show_stats(f":| {deco_dir_name} DISABLED [{module}] v{version} |:")
-            continue
-        show_stats(" ")
-        show_stats(f":| {deco_dir_name} FOUND [{module}] v{version} |:")
-        modules.append(module)
-
-    return modules
 
 
 def find_modules(module_folder: str) -> list:
@@ -66,6 +30,48 @@ def find_modules(module_folder: str) -> list:
             dir_clean.append(item)
 
     return dir_clean
+
+
+def load_modules(module_folder: str, builtin: bool = False) -> list:
+    """
+    takes in a module folder name, reads the config of module, if enabled and no errors adds the name to the list
+    to import.
+    :param module_folder:
+    :param builtin:
+    :return list[enabled & valid module names]:
+    """
+    if module_folder[-1:] == "s":
+        deco_dir_name = module_folder[:-1].upper()
+    else:
+        deco_dir_name = module_folder.upper()
+
+    if builtin:
+        module_folder = f"builtins/{module_folder}"
+
+    modules = []
+    for module in find_modules(module_folder=module_folder):
+        # passes config file find to load_import_config
+        module_config = read_config(module_folder=module_folder, module=module)
+        if "error" in module_config:
+            show_stats(f":| ERROR LOADING CONFIG FOR [{module}] |:")
+            continue
+
+        config_type = module_config['init']['type']
+        version = module_config['init']['version']
+        enabled = module_config['init']['enabled']
+
+        if config_type != deco_dir_name.lower():
+            show_stats(f":| YOU HAVE NON {deco_dir_name} MODULE TYPE IN THE {module_folder} FOLDER |:")
+            continue
+
+        if enabled == "no":
+            show_stats(f":| {deco_dir_name} DISABLED [{module}] v{version} |:")
+            continue
+        show_stats(" ")
+        show_stats(f":| {deco_dir_name} FOUND [{module}] v{version} |:")
+        modules.append(module)
+
+    return modules
 
 
 def import_routes(module_folder: str = None, module: str = None) -> list:
@@ -102,7 +108,7 @@ def import_routes(module_folder: str = None, module: str = None) -> list:
     return routes_clean
 
 
-def load_config(module_folder: str = None, module: str = None, from_file_dir: str = None,
+def read_config(module_folder: str = None, module: str = None, from_file_dir: str = None,
                 app_config: bool = False, api_config: bool = False) -> dict:
     """
     Takes in the current working directory of the import, then returns
