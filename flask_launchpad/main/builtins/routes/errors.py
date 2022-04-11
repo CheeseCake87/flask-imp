@@ -8,7 +8,7 @@ from flask import render_template
 @current_app.errorhandler(404)
 def request_404(error):
     render = "renders/error.html"
-    extend = "themes/system/page_message.html"
+    extend = "structures/system/page_message.html"
     set_theme = "system"
 
     debug_args = {

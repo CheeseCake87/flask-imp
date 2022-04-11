@@ -23,6 +23,12 @@ bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file
 db = SQLAlchemy()
 sql_do = db.session
 
+
+class Structure:
+    name = config["structure"]["name"]
+    location = f"structures/{config['structure']['name']}/"
+
+
 extmod = {}
 
 for module_name, module in current_app.config["SHARED_MODELS"].items():

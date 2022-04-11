@@ -1,5 +1,6 @@
 from flask_launchpad.main.builtins.functions.security import login_required
 from .. import bp
+from .. import Structure
 from .. import extmod
 from flask import render_template
 from flask import request
@@ -11,9 +12,9 @@ from flask import url_for
 @bp.route("/", methods=["GET"])
 def index():
     render = "renders/_index.html"
-    extend = "themes/system/system.html"
+    extend = Structure.location + "base.html"
 
-    return render_template(render, extend=extend)
+    return render_template(render, structure=Structure.name, extend=extend)
 
 
 @bp.route("/logout", methods=["GET", "POST"])
