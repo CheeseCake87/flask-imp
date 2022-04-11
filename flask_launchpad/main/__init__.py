@@ -28,6 +28,7 @@ class Config(object):
     UPLOAD_FOLDER = f"{app_root}/uploads"
     ERROR_404_HELP = settings["app"]["error_404_help"]
     CORE_OPERATIONS = settings["app"]["core_operations"]
+    API_MODELS = {}
     if settings["database"]["enabled"]:
         _db = settings["database"]["name"]
         _u = settings["database"]["username"]
@@ -55,8 +56,6 @@ def create_app(live: bool):
     show_stats(f":: GLOBAL CSS : {settings['frameworks']['global_css']} ::", live)
 
     with main.app_context():
-        g.models = {}
-
         def load_blueprints() -> None:
             for bp_name in load_modules(module_folder="blueprints"):
                 try:
@@ -73,7 +72,9 @@ def create_app(live: bool):
                     try:
                         import_object = getattr(models_module, "db")
                         import_object.init_app(main)
-                        g.models[bp_name] = import_object
+                        bp_config = load_config(module_folder="blueprints", module=bp_name)
+                        if bp_config["api"]["enabled"]:
+                            main.config["API_MODELS"][bp_name] = import_object
                         show_stats(f":+ MODEL REGISTERED [{bp_name}.models] +:", live)
                     except AttributeError:
                         show_stats(f":! ERROR REGISTERING MODEL [models.{bp_name}]: No import attribute found !:", live)
