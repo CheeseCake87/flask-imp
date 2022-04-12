@@ -3,8 +3,8 @@ from . import db
 sql_do = db.session
 
 
-class UserManagerAccount(db.Model):
-    __tablename__ = "user_manager_account"
+class FlAccount(db.Model):
+    __tablename__ = "fl_account"
     account_id = db.Column(db.Integer, primary_key=True)
     account_permissions = db.Column(db.Text)
     account_type = db.Column(db.Text)
@@ -14,8 +14,8 @@ class UserManagerAccount(db.Model):
     private_key = db.Column(db.String(256), nullable=False)
 
 
-class UserManagerGroup(db.Model):
-    __tablename__ = "user_manager_group"
+class FlGroup(db.Model):
+    __tablename__ = "fl_group"
     group_id = db.Column(db.Integer, primary_key=True)
     account_id = db.Column(db.Integer)
     group_permissions = db.Column(db.Text)

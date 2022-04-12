@@ -11,7 +11,7 @@ from flask import url_for
 
 @bp.route("/", methods=["GET"])
 def index():
-    render = "renders/_index.html"
+    render = "renders/account.html"
     extend = Structure.location + "base.html"
 
     return render_template(render, structure=Structure.name, extend=extend)

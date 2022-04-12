@@ -5,6 +5,16 @@ from flask import current_app
 
 
 @current_app.route("/structures/<structure>/<filename>", methods=["GET"])
+def structure_js(structure, filename):
+    file_location = f"{get_app_root()}/builtins/templates/structures/{structure}/js"
+    if is_file(f"{file_location}/{filename}"):
+        return send_from_directory(
+            directory=file_location,
+            path=filename
+        )
+
+
+@current_app.route("/structures/<structure>/<filename>", methods=["GET"])
 def structure_css(structure, filename):
     file_location = f"{get_app_root()}/builtins/templates/structures/{structure}/css"
     if is_file(f"{file_location}/{filename}"):

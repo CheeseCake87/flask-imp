@@ -2,8 +2,6 @@ from functools import wraps
 from flask import session
 from flask import url_for
 from flask import redirect
-from flask import request
-from flask import current_app
 from werkzeug.routing import BuildError
 
 
