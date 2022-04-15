@@ -1,5 +1,7 @@
-from flask_launchpad.main.builtins.functions.import_mgr import read_config
-from flask_launchpad.main.builtins.functions.import_mgr import import_routes
+from ...builtins.functions.import_mgr import read_config
+from ...builtins.functions.import_mgr import import_routes
+from ...builtins.functions.structure import StructureBuilder
+from ...builtins.functions.database import find_model_location
 from importlib import import_module
 from flask import Blueprint
 from flask import current_app
@@ -23,17 +25,12 @@ bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file
 db = SQLAlchemy()
 sql_do = db.session
 
+account_model = import_module(find_model_location("account"))
+FlUser = getattr(account_model, "FlUser")
+FlGroup = getattr(account_model, "FlGroup")
+FlMembership = getattr(account_model, "FlMembership")
 
-class Structure:
-    name = config["structure"]["name"]
-    location = f"structures/{config['structure']['name']}/"
-
-
-extmod = {}
-
-for module_name, module in current_app.config["SHARED_MODELS"].items():
-    if module_name != config['settings']['import_name']:
-        extmod[module_name] = module
+struc = StructureBuilder(current_app.config["STRUCTURE"])
 
 for route in import_routes(module_folder="extensions", module=config["settings"]["name"]):
     import_module(f"{current_app.config['APP_NAME']}.extensions.{config['settings']['name']}.routes.{route}")

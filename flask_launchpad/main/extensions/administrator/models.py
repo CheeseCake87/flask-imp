@@ -4,7 +4,6 @@ sql_do = db.session
 
 
 class FlAdministrator(db.Model):
-    __tablename__ = "fl_administrator_permissions"
+    __tablename__ = "fl_administrator"
     administrator_id = db.Column(db.Integer, primary_key=True)
-    account_id = db.Column(db.Integer)
-
+    user_id = db.Column(db.Integer)

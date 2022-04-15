@@ -19,13 +19,14 @@ app_root = settings["app"]["root"]
 
 class Config(object):
     APP_NAME = app_name
+    VERSION = settings["frameworks"]["launchpad"]
     SECRET_KEY = settings["app"]["secret_key"]
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=int(settings["app"]["session_time"]))
     DEBUG = settings["app"]["debug"]
     TESTING = settings["app"]["testing"]
     UPLOAD_FOLDER = f"{app_root}/uploads"
     ERROR_404_HELP = settings["app"]["error_404_help"]
-    CORE_OPERATIONS = settings["builtins_enabled"]["core"]
+    STRUCTURE = settings["app"]["structure"]
     SHARED_MODELS = {}
     if settings["database"]["enabled"]:
         _db = settings["database"]["name"]
@@ -128,18 +129,3 @@ def create_app(live: bool):
         show_stats(rocket_launched(), live)
 
     return main
-
-
-"""
-Below is code for singular API loading.
-
-        api_config = read_config(api_config=True)
-        if api_config["init"]["enabled"]:
-            api_module = import_module(f"{app_name}.api")
-
-            api_bp_object = getattr(api_module, "bp")
-            main.register_blueprint(api_bp_object)
-
-            show_stats(f":+ API ENABLED +:", live)
-
-"""

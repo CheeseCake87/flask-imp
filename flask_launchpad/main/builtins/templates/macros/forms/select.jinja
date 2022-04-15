@@ -2,7 +2,7 @@
 
 Select field dumb:
 
-{{ input_select_dumb(label="label", name="name", options=options) }}
+{{ select.input_select_dumb(label="label", name="name", options=options) }}
 
 Set options like (this is done on the template page, just before calling the macro):
 
@@ -15,32 +15,34 @@ Set options like (this is done on the template page, just before calling the mac
 #}
 
 {% macro input_select_dumb(
+div=True,
 name="",
 label="",
 class="",
 options=None,
 selected=None
 ) %}
-    <div class="form-group">
-        {% if options == None %}
-            {% set options = {} %}
-        {% endif %}
+    {% if div %}
+        <div class="form-element">
+    {% endif %}
+{% if options == None %}
+    {% set options = {} %}
+{% endif %}
 
-        {% if label != '' %}
-            <label for="{{ name }}">{{ label }}</label>
-        {% endif %}
+{% if label != '' %}
+    <label for="{{ name }}">{{ label }}</label>
+{% endif %}
 
-        <select name="{{ name }}" id="{{ name }}">
-            {% for key, value in options.items() %}
-                <option
-                        value="{{ key }}"
-                        {%- if selected == key -%}selected="selected"{%- endif -%}
-                >
-                    {{ value }}
-                </option>
-            {% endfor %}
-        </select>
+<select name="{{ name }}" id="{{ name }}">
+    {% for key, value in options.items() %}
+        <option value="{{ key }}" {%- if selected == key -%}selected="selected"{%- endif -%}>
+            {{ value }}
+        </option>
+    {% endfor %}
+</select>
+{% if div %}
     </div>
+{% endif %}
 {% endmacro %}
 
 {# ------------------ #}

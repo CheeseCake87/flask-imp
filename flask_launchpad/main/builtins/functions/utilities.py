@@ -5,13 +5,14 @@ from os import path
 from os import mkdir
 from os import remove
 from re import sub
+from flask import session
 import emoji
 
 
 def get_app_root() -> str:
     """
     Finds the root folder of the app.
-    :return str: /app/folder/location
+    :return str: /app/folder/extend
     """
     strip = path.dirname(path.realpath(__file__)).split("/")[1:-2]
     return "/" + "/".join(strip)
@@ -26,6 +27,14 @@ def show_stats(print_this: str, enabled: bool = True) -> None:
     """
     if enabled:
         print(print_this)
+
+
+def clear_error() -> None:
+    session["error"] = None
+
+
+def clear_message() -> None:
+    session["message"] = None
 
 
 def building_rocket() -> str:
@@ -198,39 +207,16 @@ def get_file_extension(file: str) -> str:
 
 
 def get_filename_without_extension(file: str) -> str:
-    return get_file_extension(path.basename(file))
+    return path.basename(file).rsplit('.', 1)[0].lower()
 
 
 def get_filename_with_extension(file: str) -> str:
     return path.basename(file)
 
 
-def convert_sql_to_list_dict(query, return_only_these_fields: list = None) -> list:
-    return_list = []
-    for value in query:
-        temp_dict = {}
-        vars_dict = vars(value)
-        for inner_key, inner_value in vars_dict.items():
-            if isinstance(return_only_these_fields, list):
-                if inner_key in return_only_these_fields:
-                    temp_dict[inner_key] = inner_value
-            else:
-                temp_dict[inner_key] = inner_value
-        return_list.append(temp_dict)
-    return return_list
-
-
-def convert_sql_to_dict(query, return_only_these_fields: list = None) -> dict:
-    for value in query:
-        temp_dict = {}
-        vars_dict = vars(value)
-        for inner_key, inner_value in vars_dict.items():
-            if isinstance(return_only_these_fields, list):
-                if inner_key in return_only_these_fields:
-                    temp_dict[inner_key] = inner_value
-            else:
-                temp_dict[inner_key] = inner_value
-        return temp_dict
+def make_filename_safe(file: str):
+    safe_filename = sub('\W+', '_', get_filename_without_extension(file))
+    return f"{safe_filename}.{get_file_extension(file)}"
 
 
 def create_folder_if_not_found(folder_path: str) -> str:
@@ -259,3 +245,37 @@ def is_file(file_path: str) -> bool:
     if path.isfile(file_path):
         return True
     return False
+
+
+def is_dir(dir_path: str) -> bool:
+    if path.isdir(dir_path):
+        return True
+    return False
+
+
+def convert_sql_to_list_dict(query, return_only_these_fields: list = None) -> list:
+    return_list = []
+    for value in query:
+        temp_dict = {}
+        vars_dict = vars(value)
+        for inner_key, inner_value in vars_dict.items():
+            if isinstance(return_only_these_fields, list):
+                if inner_key in return_only_these_fields:
+                    temp_dict[inner_key] = inner_value
+            else:
+                temp_dict[inner_key] = inner_value
+        return_list.append(temp_dict)
+    return return_list
+
+
+def convert_sql_to_dict(query, return_only_these_fields: list = None) -> dict:
+    for value in query:
+        temp_dict = {}
+        vars_dict = vars(value)
+        for inner_key, inner_value in vars_dict.items():
+            if isinstance(return_only_these_fields, list):
+                if inner_key in return_only_these_fields:
+                    temp_dict[inner_key] = inner_value
+            else:
+                temp_dict[inner_key] = inner_value
+        return temp_dict

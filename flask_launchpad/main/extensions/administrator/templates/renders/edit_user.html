@@ -1,0 +1,128 @@
+{% extends extend %}
+{% import 'macros/forms/input.jinja' as input %}
+{% import 'macros/forms/button.jinja' as button %}
+{% import 'macros/forms/select.jinja' as select %}
+
+{% block _title %}
+    Administrator | Users
+{% endblock %}
+
+{% block _container %}
+    <div class="flex-container">
+        {{ button.submit_link(
+div=True,
+name="back_to_users",
+label="< Back",
+button_type="button button-outline",
+link=url_for('administrator.users'),
+onclick="" ) }}
+    </div>
+
+    <form method="post" class="no-margin">
+        <div class="form-container-inline">
+
+            {{ input.input(
+div=True,
+type="text",
+label="Username",
+name="username",
+class="",
+placeholder="",
+required=True,
+value=user.username,
+autocomplete=False,
+read_only=False,
+disabled=False
+)|deco }}
+
+            {{ input.input(
+div=True,
+type="password",
+label="New Password",
+name="new_password",
+class="",
+placeholder="Leave blank to change username",
+required=False,
+value="",
+autocomplete=False,
+read_only=False,
+disabled=False
+)|deco }}
+            {{ button.submit(div=True, name="update_user", value="Upadte User", class="button-100") }}
+
+        </div>
+    </form>
+
+    <div class="form-container">
+        <div class="form-element"></div>
+        <div class="form-container-no-stretch">
+
+            {% if user.disabled %}
+
+                <div class="user-disabled">Login Disabled</div>
+
+                {{ button.submit_link(
+div=True,
+name="enable_user",
+label="Enable",
+button_type="button",
+link=url_for('administrator.enable_user', user_id=user.user_id),
+onclick="" ) }}
+
+            {% else %}
+
+                <div class="user-enabled">Login Enabled</div>
+
+                {{ button.submit_link(
+div=True,
+name="disable_user",
+label="Disable",
+button_type="button",
+link=url_for('administrator.disable_user', user_id=user.user_id),
+onclick="" ) }}
+
+            {% endif %}
+
+        </div>
+        <div class="form-element"></div>
+    </div>
+
+
+    <div class="flex-container-inline">
+
+
+        <form method="post" class="no-margin width-100p">
+            <div class="form-container">
+                {% set add_group_disabled = False %}
+                {% if not all_groups %}
+                    {% set all_groups, add_group_disabled = {"no_groups": "No Groups Available"}, True %}
+                {% endif %}
+
+                {{ select.input_select_dumb(div=True, label="Available Groups", name="group_id", options=all_groups) }}
+
+                {{ button.submit(name="add_group", value="Add User to Group", class="", disabled=add_group_disabled) }}
+            </div>
+        </form>
+
+        <div class="form-element width-100p">
+            <label>In Group(s)</label>
+            {% for value in user.groups %}
+                <div class="group-box">
+                    <span>{{ value[1] }}</span>
+                    {{ button.submit_link(
+div=False,
+name="delete_group_from_user",
+label="Delete",
+button_type="button button-danger button-small",
+link=url_for('administrator.delete_group_from_user', user_id=user.user_id, group_id=value[0]),
+onclick="" ) }}
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block _footer %}
+
+{% endblock %}

@@ -2,7 +2,7 @@
 
 Input field:
 
-{{ input_field(
+{{ input.input(
 label="label",
 name="name",
 class="class"
@@ -21,49 +21,50 @@ NONE = do not include the attribute in the call
 
 #}
 
-{% macro input_field(name="", label="", type="text", class="", placeholder="", required=False, value="",
+{% macro input(div=True, name="", label="", type="text", class="", placeholder="", required=False, value="",
 autocomplete=False, read_only=False, disabled=False) %}
-
-    <div class="form-group">
-
-    {% if label != "" %}
-        <label for="{{ name }}">{{ label }}</label>
+    {% if div %}
+        <div class="form-element">
     {% endif %}
 
-    <input
-    type="{{ type }}"
+{% if label != "" %}
+    <label for="{{ name }}">{{ label }}</label>
+{% endif %}
 
-    name="{{ name }}"
+<input
+        type="{{ type }}"
 
-    id="{{ name }}"
+        name="{{ name }}"
 
-    class="{{ class }}{% if required %} form_required{% endif %}"
+        id="{{ name }}"
 
-    value="{{ value }}"
+        class="{{ class }}{% if required %} form_required{% endif %}"
 
-    {% if not autocomplete %}
+        value="{{ value }}"
+
+        {% if not autocomplete %}
         autocomplete="off"
-    {% endif %}
+        {% endif %}
 
-    {% if placeholder != "" %}
+        {% if placeholder != "" %}
         placeholder="{{ placeholder }}"
-    {% endif %}
+        {% endif %}
 
-    {% if required %}
+        {% if required %}
         required
-    {% endif %}
+        {% endif %}
 
-    {% if read_only %}
+        {% if read_only %}
         readonly
-    {% endif %}
+        {% endif %}
 
-    {% if disabled %}
+        {% if disabled %}
         disabled
-    {% endif %}
-    />
-
+        {% endif %}
+/>
+{% if div %}
     </div>
-
+{% endif %}
 {% endmacro %}
 
 {# ------------------ #}

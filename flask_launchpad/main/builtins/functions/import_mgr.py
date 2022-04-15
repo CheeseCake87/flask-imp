@@ -1,9 +1,14 @@
 from .utilities import find_illegal_dir_char
 from .utilities import show_stats
 from .utilities import get_app_root
+from .database import has_table
 from configparser import ConfigParser
+from flask import current_app
+from inspect import getmembers
+from inspect import isclass
 from os import path
 from os import listdir
+from sys import modules
 
 app_root = get_app_root()
 

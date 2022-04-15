@@ -2,11 +2,11 @@
 
 Hidden field:
 
-{{ input_hidden(name="name", value="value" }}
+{{ hidden(name="name", value="value" }}
 
 #}
 
-{% macro input_hidden(name="", value="") %}
+{% macro hidden(name="", value="") %}
     <input
     type="hidden"
     name="{{ name }}"

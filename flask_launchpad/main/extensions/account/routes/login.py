@@ -1,58 +1,65 @@
-from flask_launchpad.main.builtins.functions.security import login_required
+from ....builtins.functions.security import logged_in_check
+from ....builtins.functions.utilities import clear_error
+from ....builtins.functions.utilities import clear_message
+from ....builtins.functions.auth import safe_username
+from ....builtins.functions.auth import auth_password
 from .. import bp
-from .. import Structure
-from .. import extmod
+from .. import struc
+from .. import sql_do
+from .. import FlUser
+from sqlalchemy.orm.exc import NoResultFound
 from flask import render_template
-from flask import request
 from flask import session
 from flask import redirect
+from flask import request
 from flask import url_for
 
 
-@bp.route("/", methods=["GET"])
-def index():
-    render = "renders/account.html"
-    extend = Structure.location + "base.html"
-
-    return render_template(render, structure=Structure.name, extend=extend)
-
-
-@bp.route("/logout", methods=["GET", "POST"])
-def logout():
-    session["example1_auth"] = False
-    return redirect(url_for("example1.login"))
-
-
 @bp.route("/login", methods=["GET", "POST"])
+@logged_in_check(session_bool_key="auth", on_true_endpoint="account.dashboard")
 def login():
-    """
-    Used to test the session set for the login_required decorator.
-    """
+    error = session["error"]
+    message = session["message"]
+    render = "renders/login.html"
+    structure = struc.name()
+    extend = struc.extend("backend.html")
+    footer = struc.include("footer.html")
+
     if request.method == "POST":
-        session["auth"] = True
-        return redirect(url_for("example1.account"))
+        if not safe_username(request.form["username"]):
+            session["error"] = "Username or password incorrect"
+            return redirect(url_for("account.login"))
+        try:
+            query_user = sql_do.query(
+                FlUser
+            ).filter(
+                FlUser.username == request.form["username"]
+            ).first()
+        except NoResultFound:
+            session["error"] = "Username or password incorrect"
+            return redirect(url_for("account.login"))
+        if query_user is None:
+            session["error"] = "Username or password incorrect"
+            return redirect(url_for("account.login"))
 
-    print(session)
-    return f""" 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Title</title>
-</head>
-<body>
-<form method='post'>
-<input type='submit' value='login'/>
-</form>
-</body>
-</html>
-    """
+        if auth_password(input_password=request.form["password"],
+                         database_password=query_user.password,
+                         database_salt=query_user.salt):
+            session["auth"] = True
+            session["user_id"] = query_user.user_id
+            session["username"] = query_user.username
+            return redirect(url_for("account.dashboard"))
 
+        return redirect(url_for("account.login"))
 
-@bp.route("/account", methods=["GET"])
-@login_required(session_bool_key="auth", on_error_endpoint="example1.login")
-def account():
-    """
-    This page is protected by the login_required decorator, with the login page endpoint set.
-    """
-    return f"""Account Page {session}"""
+    return render_template(
+        render,
+        structure=structure,
+        extend=extend,
+        footer=footer,
+        error=error,
+        clear_error=clear_error(),
+        message=message,
+        clear_message=clear_message(),
+        form_elements=["input"]
+    )

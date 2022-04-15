@@ -1,0 +1,51 @@
+{% extends extend %}
+{% import 'macros/forms/button.jinja' as button %}
+
+{% block _title %}
+    System | Database
+{% endblock %}
+
+{% block _container %}
+    <table>
+        <thead>
+        <tr>
+            <th>Module</th>
+            <th>Model(s)</th>
+            <th style="text-align: center">&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for key, value in models.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>
+                    {% for v in value %}
+                        <p>{{ v[0] }}: <span style="font-style: italic">exists {{ v[1] }}</span></p>
+                    {% endfor %}
+                </td>
+                <td>
+                    <div class="table-buttons">
+                        {{ button.submit_link(
+                    div=False,
+                    name="drop_tables",
+                    label="Drop Tables",
+                    button_type="button button-small",
+                    link=url_for('system.database_drop', module=key)) }}
+
+                        {{ button.submit_link(
+                    div=False,
+                    name="create_tables",
+                    label="Create Tables",
+                    button_type="button button-small",
+                    link=url_for('system.database_create', module=key)) }}
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block _footer %}
+    {% include footer %}
+{% endblock %}

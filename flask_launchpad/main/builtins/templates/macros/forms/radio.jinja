@@ -12,7 +12,7 @@ Set options like (this is done on the template page, just before calling the mac
 #}
 
 {% macro input_radio_dumb(name="", label="", class="", options=None, selected=None) %}
-    <div class="form-group">
+    <div class="form-element">
     {% if options == None %}
         {% set options = {} %}
     {% endif %}

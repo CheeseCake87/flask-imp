@@ -6,6 +6,17 @@ from random import randrange
 from datetime import datetime
 
 
+def safe_username(username: str) -> bool:
+    """
+    Checks username for any special characters.
+    :param username:
+    :return bool:
+    """
+    if username.isalnum():
+        return True
+    return False
+
+
 def generate_form_token() -> str:
     """
     Generates a SHA1 using todays date and time.
