@@ -13,7 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 @bp.route("/", methods=["GET", "POST"])
-def setup():
+def uploads():
     error = session["error"]
     message = session["message"]
     render = "renders/setup.html"

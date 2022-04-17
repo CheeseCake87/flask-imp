@@ -63,22 +63,32 @@ def sqlite_detected() -> str:
 >> """)
 
 
-def remove_escapes(string: str, remove: list = None) -> str:
+def set_session_init(session_keys: dict) -> None:
+    for key, value in session_keys.items():
+        if key not in session:
+            if value == "False":
+                value = False
+            if value == "True":
+                value = True
+            session[key] = value
+
+
+def remove_escapes(string: str, remove_these: list = None) -> str:
     """
     Used to remove escapes like \n and \t in a string value.
     Takes in a list of predefined removables, can add more if needed.
     See [if remove is none] in code to see available removables.
     :param string:
-    :param remove:
+    :param remove_these:
     :return:
     """
-    if remove is None:
-        remove = ['new_line', 'tab', 'dead_space']
-    if "tab" in remove:
+    if remove_these is None:
+        remove_these = ['new_line', 'tab', 'dead_space']
+    if "tab" in remove_these:
         string = sub(r'^[ \t]+|[ \t]', ' ', string)
-    if "new_line" in remove:
+    if "new_line" in remove_these:
         string = sub(r'^[ \n]+|[ \n]', ' ', string)
-    if "dead_space" in remove:
+    if "dead_space" in remove_these:
         string = sub(r' +', ' ', string)
     return string
 
@@ -215,7 +225,7 @@ def get_filename_with_extension(file: str) -> str:
 
 
 def make_filename_safe(file: str):
-    safe_filename = sub('\W+', '_', get_filename_without_extension(file))
+    safe_filename = sub("\W+", "_", get_filename_without_extension(file))
     return f"{safe_filename}.{get_file_extension(file)}"
 
 
