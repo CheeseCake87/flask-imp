@@ -49,7 +49,7 @@ disabled=False
         <tr>
             <th>Group ID</th>
             <th>Name</th>
-            <th>Custom Type</th>
+            <th>Type</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -61,43 +61,57 @@ disabled=False
                 <td>{{ values.group_type }}</td>
                 <td>
                     <div class="table-buttons">
-                        {% set group_delete_show = "javascript:showEle('group_delete_" + group|string + "','table-row');" %}
-                        {% set group_delete_hide = "javascript:hideEle('group_delete_" + group|string + "','table-row');" %}
-                        {{ button.submit_link(
+
+{% if values.group_type != "system" %}
+
+{% set group_delete_show = "javascript:showEle('group_delete_" + group|string + "','table-row');" %}
+{% set group_delete_hide = "javascript:hideEle('group_delete_" + group|string + "','table-row');" %}
+{{ button.submit_link(
 div=False,
 name="delete_user",
 label="Delete",
 button_type="button button-small button-danger",
 link="",
 onclick=group_delete_show ) }}
+
+{% endif %}
                     </div>
                 </td>
             </tr>
+
+{% if values.group_type != "system" %}
+
             <tr id="group_delete_{{ group|string }}" style="display: none">
                 <td colspan="100%">
                     <div class="table-row-action">
                         <div>Are you sure you want to delete this group?</div> &nbsp;
                         <div>
-                            {{ button.submit_link(
+
+{{ button.submit_link(
 div=False,
 name="yes_delete_group",
 label="Yes",
 button_type="button button-small button-danger",
 link=url_for("administrator.delete_group", group_id=group),
 onclick="" ) }}
+
                         </div>
                         <div>
-                            {{ button.submit_link(
+
+{{ button.submit_link(
 div=False,
 name="no_delete_group",
 label="No",
 button_type="button button-small",
 link="",
 onclick=group_delete_hide ) }}
+
                         </div>
                     </div>
                 </td>
             </tr>
+
+{% endif %}
 
         {% endfor %}
         </tbody>

@@ -1,0 +1,13 @@
+{
+  "frontend": {},
+  "backend": {
+    "section_title": "Assets",
+    "global_view_group": "assets",
+    "items": {
+      "Uploads": {
+        "url_for": "assets.index",
+        "view_group": "uploader"
+      }
+    }
+  }
+}

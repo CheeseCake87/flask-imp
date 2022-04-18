@@ -10,12 +10,12 @@ pre_post.py is just shorter, but before_after_request.py makes more sense
 
 @bp.before_app_first_request
 def before_app_first_request():
-    set_session_init(config["session_init"])
+    pass
 
 
 @bp.before_app_request
 def before_app_request():
-    pass
+    set_session_init(config)
 
 
 @bp.after_app_request

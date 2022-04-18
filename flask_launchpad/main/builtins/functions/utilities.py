@@ -5,6 +5,7 @@ from os import path
 from os import mkdir
 from os import remove
 from re import sub
+from distutils import util
 from flask import session
 import emoji
 
@@ -63,14 +64,15 @@ def sqlite_detected() -> str:
 >> """)
 
 
-def set_session_init(session_keys: dict) -> None:
-    for key, value in session_keys.items():
-        if key not in session:
-            if value == "False":
-                value = False
-            if value == "True":
-                value = True
-            session[key] = value
+def set_session_init(config: dict) -> None:
+    if "init_session" in config:
+        for key, value in config["init_session"].items():
+            if key not in session:
+                if value == "False":
+                    value = False
+                if value == "True":
+                    value = True
+                session[key] = value
 
 
 def remove_escapes(string: str, remove_these: list = None) -> str:
@@ -263,29 +265,14 @@ def is_dir(dir_path: str) -> bool:
     return False
 
 
-def convert_sql_to_list_dict(query, return_only_these_fields: list = None) -> list:
-    return_list = []
-    for value in query:
-        temp_dict = {}
-        vars_dict = vars(value)
-        for inner_key, inner_value in vars_dict.items():
-            if isinstance(return_only_these_fields, list):
-                if inner_key in return_only_these_fields:
-                    temp_dict[inner_key] = inner_value
-            else:
-                temp_dict[inner_key] = inner_value
-        return_list.append(temp_dict)
-    return return_list
+def string_to_bool(bool_str: str) -> bool:
+    return bool(util.strtobool(bool_str))
 
 
-def convert_sql_to_dict(query, return_only_these_fields: list = None) -> dict:
-    for value in query:
-        temp_dict = {}
-        vars_dict = vars(value)
-        for inner_key, inner_value in vars_dict.items():
-            if isinstance(return_only_these_fields, list):
-                if inner_key in return_only_these_fields:
-                    temp_dict[inner_key] = inner_value
-            else:
-                temp_dict[inner_key] = inner_value
-        return temp_dict
+def is_string_bool(bool_str: str) -> bool:
+    try:
+        v = util.strtobool(bool_str)
+        if isinstance(v, int):
+            return True
+    except ValueError:
+        return False                                                                                               

@@ -1,21 +1,20 @@
-from flask_launchpad.main.builtins.functions.security import login_required
-from ....builtins.functions.utilities import clear_error
-from ....builtins.functions.utilities import clear_message
-from .. import bp
-from .. import struc
-from .. import sql_do
-from .. import FlUser
-from .. import FlGroup
-from .. import FlMembership
+from flask import redirect
 from flask import render_template
-from sqlalchemy import desc
 from flask import request
 from flask import session
-from flask import redirect
 from flask import url_for
+
+from flask_launchpad.main.builtins.functions.security import login_required
+from .. import FlGroup
+from .. import bp
+from .. import sql_do
+from .. import struc
+from ....builtins.functions.utilities import clear_error
+from ....builtins.functions.utilities import clear_message
 
 
 @bp.route("/groups", methods=["GET", "POST"])
+@login_required("auth", "account.login")
 def groups():
     error = session["error"]
     message = session["message"]

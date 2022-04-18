@@ -1,0 +1,21 @@
+{
+  "frontend": {},
+  "backend": {
+    "section_title": "System",
+    "global_view_group": "system",
+    "items": {
+      "Endpoints": {
+        "url_for": "system.endpoints",
+        "view_group": "system"
+      },
+      "Database": {
+        "url_for": "system.database",
+        "view_group": "system"
+      },
+      "Clear Session": {
+        "url_for": "system.clear_session",
+        "view_group": "system"
+      }
+    }
+  }
+}

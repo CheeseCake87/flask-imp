@@ -1,3 +1,11 @@
+.form-section {
+    margin: 15px 0;
+}
+.form-section h1 {
+    padding-top: 20px;
+    margin-bottom: 5px;
+    font-size: 2.4rem;
+}
 .form-container {
     display: flex;
     flex-flow: column wrap;
@@ -11,6 +19,22 @@
 }
 .form-container-inline .form-element {
     width: 100%;
+}
+.form-container-inline a {
+    margin: 0;
+}
+.form-container-inline-buttons {
+    display: flex;
+    flex-flow: row;
+    align-items: end;
+    width: 100%;
+    gap: 10px;
+}
+.form-container-inline-buttons a {
+    margin: 0;
+}
+.buttons-space-out {
+    justify-content: space-between;
 }
 .form-container-no-stretch {
     display: flex;

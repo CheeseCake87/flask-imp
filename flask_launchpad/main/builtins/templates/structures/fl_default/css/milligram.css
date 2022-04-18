@@ -643,22 +643,30 @@ td > form {
     margin: 0;
 }
 
-.button-small {
+.button-small input[type='submit'] {
     font-size: .9rem;
     height: 2.9rem;
     line-height: 2.8rem;
     padding: 0.2rem 1.5rem;
-    margin-bottom: 0; !important;
+}
+
+.button-small a {
+    font-size: .9rem;
+    height: 2.9rem;
+    line-height: 2.8rem;
+    padding: 0.2rem 1.5rem;
 }
 
 .button-danger {
     background-color: #963a3a;
     border: #852222;
 }
+
 .button-danger:hover {
     background-color: #852222;
     border: #852222;
 }
+
 .button-danger:focus {
     background-color: #852222;
     border: #852222;
@@ -668,10 +676,12 @@ td > form {
     background-color: #51963a;
     border: #3b8522;
 }
+
 .button-safe:hover {
     background-color: #3b8522;
     border: #3b8522;
 }
+
 .button-safe:focus {
     background-color: #3b8522;
     border: #3b8522;

@@ -1,25 +1,31 @@
-from ....builtins.functions.security import login_required
-from ....builtins.functions.auth import sha_password
-from ....builtins.functions.auth import generate_salt
-from ....builtins.functions.auth import generate_private_key
-from ....builtins.functions.auth import safe_username
-from ....builtins.functions.utilities import clear_error
-from ....builtins.functions.utilities import clear_message
-from ....builtins.functions.database import get_tables
-from .. import bp
-from .. import struc
-from .. import sql_do
+from flask import current_app
+from flask import redirect
+from flask import render_template
+from flask import request
+from flask import session
+from flask import url_for
+from flask_sqlalchemy import SQLAlchemy
+
 from .. import FlUser
 from .. import FlGroup
 from .. import FlMembership
 from .. import FlSystemSettings
-from flask import request
-from flask import current_app
-from flask import render_template
-from flask import session
-from flask import redirect
-from flask import url_for
-from flask_sqlalchemy import SQLAlchemy
+from .. import FlEmailSettings
+from .. import bp
+from .. import sql_do
+from .. import struc
+from ....builtins.functions.auth import generate_private_key
+from ....builtins.functions.auth import generate_salt
+from ....builtins.functions.auth import safe_username
+from ....builtins.functions.auth import sha_password
+from ....builtins.functions.database import get_tables
+from ....builtins.functions.utilities import clear_error
+from ....builtins.functions.utilities import clear_message
+from ....builtins.functions.utilities import string_to_bool
+from ....builtins.functions.utilities import is_string_bool
+from ....builtins.functions.import_mgr import read_config_as_dict
+
+app_config = read_config_as_dict(app_config=True)
 
 
 @bp.route("/", methods=["GET", "POST"])
@@ -65,22 +71,68 @@ def setup():
             private_key=private_key,
             disabled=False
         )
-        add_group = FlGroup(
-            group_type="system",
-            group_name="system"
+        add_system_group = FlGroup(
+            group_name="system",
+            group_type="system"
         )
+        add_user_group = FlGroup(
+            group_name="user",
+            group_type="system"
+        )
+        add_administrator_group = FlGroup(
+            group_name="administrator",
+            group_type="system"
+        )
+        add_assets_group = FlGroup(
+            group_name="assets",
+            group_type="system"
+        )
+
         sql_do.add(add_user)
-        sql_do.add(add_group)
+        sql_do.add(add_system_group)
+        sql_do.add(add_user_group)
+        sql_do.add(add_administrator_group)
+        sql_do.add(add_assets_group)
+
         sql_do.flush()
-        add_membership = FlMembership(
+
+        add_system_group_membership = FlMembership(
             user_id=add_user.user_id,
-            group_id=add_group.group_id
+            group_id=add_system_group.group_id
         )
-        sql_do.add(add_membership)
+        add_user_group_membership = FlMembership(
+            user_id=add_user.user_id,
+            group_id=add_user_group.group_id
+        )
+        add_administrator_group_membership = FlMembership(
+            user_id=add_user.user_id,
+            group_id=add_administrator_group.group_id
+        )
+        add_assets_group_membership = FlMembership(
+            user_id=add_user.user_id,
+            group_id=add_assets_group.group_id
+        )
         system_setup = FlSystemSettings(
             setup=True
         )
+        email_setup = FlEmailSettings(
+            enabled=string_to_bool(app_config["smtp"]["enabled"]),
+            username=app_config["smtp"]["username"],
+            server=app_config["smtp"]["server"],
+            port=app_config["smtp"]["port"],
+            from_name=app_config["smtp"]["from_name"],
+            send_from=app_config["smtp"]["send_from"],
+            reply_to=app_config["smtp"]["reply_to"],
+            default_send_to=app_config["smtp"]["default_send_to"],
+        )
+
+        sql_do.add(add_system_group_membership)
+        sql_do.add(add_user_group_membership)
+        sql_do.add(add_administrator_group_membership)
+        sql_do.add(add_assets_group_membership)
         sql_do.add(system_setup)
+        sql_do.add(email_setup)
+
         sql_do.commit()
 
         return redirect(url_for("account.login"))

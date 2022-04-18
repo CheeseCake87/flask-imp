@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 @bp.route("/database/drop_all", methods=["GET"])
+@login_required("auth", "account.login")
 def database_drop_all():
     for module_name, module in current_app.config["SHARED_MODELS"].items():
         SQLAlchemy.drop_all(module)
@@ -14,6 +15,7 @@ def database_drop_all():
 
 
 @bp.route("/database/drop/<module>", methods=["GET"])
+@login_required("auth", "account.login")
 def database_drop(module):
     try:
         SQLAlchemy.drop_all(current_app.config["SHARED_MODELS"][module])

@@ -1,19 +1,16 @@
+from flask import render_template
+from flask import session
+
+from .. import bp
+from .. import struc
 from ....builtins.functions.security import login_required
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
-from .. import bp
-from .. import struc
-from flask import request
-from flask import current_app
-from flask import render_template
-from flask import session
-from flask import redirect
-from flask import url_for
-from flask_sqlalchemy import SQLAlchemy
 
 
 @bp.route("/", methods=["GET", "POST"])
-def uploads():
+@login_required("auth", "account.login")
+def setup():
     error = session["error"]
     message = session["message"]
     render = "renders/setup.html"

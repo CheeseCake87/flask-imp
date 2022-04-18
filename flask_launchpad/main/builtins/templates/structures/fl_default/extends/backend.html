@@ -12,14 +12,26 @@
 </head>
 
 <body>
-    {% if error %}
-        <div class="error" id="error">
-            {{ error }}
-            <a class="button button-small" href="#" id="close_error" onclick="parentNode.remove()">
-            Close
-            </a>
+{% if error %}
+    <div class="error" id="error">
+        <div>
+            {{ error|safe }}
         </div>
-    {% endif %}
+        <a class="button button-small" href="#" id="close_error" onclick="parentNode.remove()">
+            Close
+        </a>
+    </div>
+{% endif %}
+{% if message %}
+    <div class="message" id="message">
+    <div>
+        {{ message|safe }}
+    </div>
+        <a class="button button-small" href="#" id="close_error" onclick="parentNode.remove()">
+            Close
+        </a>
+    </div>
+{% endif %}
 {% block _global %}
     <div class="global-container">
 
@@ -35,16 +47,13 @@
         <div class="flex-container">
 
             <div class="flex-menu">
-                <span>Account</span>
-                <a href="{{ url_for("account.dashboard") }}">Dashboard</a>
-                <a href="{{ url_for("account.settings") }}">Settings</a>
-                <a href="{{ url_for("account.logout") }}">Logout</a>
-                <span>Administrator</span>
-                <a href="{{ url_for("administrator.users") }}">Users</a>
-                <a href="{{ url_for("administrator.groups") }}">Groups</a>
-                <span>System</span>
-                <a href="{{ url_for("system.endpoints") }}">Endpoints</a>
-                <a href="{{ url_for("system.database") }}">Database</a>
+                {% set nav_dict = {}|backend_nav %}
+                {% for key, value in nav_dict.items() %}
+                    <span>{{ value.section_title }}</span>
+                    {% for ikey, ivalue in value["items"].items() %}
+                        <a href="{{ url_for(ivalue["url_for"]) }}">{{ ikey }}</a>
+                    {% endfor %}
+                {% endfor %}
             </div>
 
             <div class="flex-content">

@@ -1,14 +1,11 @@
-from .utilities import find_illegal_dir_char
-from .utilities import show_stats
-from .utilities import get_app_root
-from .database import has_table
 from configparser import ConfigParser
-from flask import current_app
-from inspect import getmembers
-from inspect import isclass
-from os import path
 from os import listdir
-from sys import modules
+from os import path
+from json import load
+
+from .utilities import find_illegal_dir_char
+from .utilities import get_app_root
+from .utilities import show_stats
 
 app_root = get_app_root()
 
@@ -56,7 +53,7 @@ def load_modules(module_folder: str, builtin: bool = False) -> list:
     modules = []
     for module in find_modules(module_folder=module_folder):
         # passes config file find to load_import_config
-        module_config = read_config(module_folder=module_folder, module=module)
+        module_config = read_config_as_dict(module_folder=module_folder, module=module)
         if "error" in module_config:
             show_stats(f":| ERROR LOADING CONFIG FOR [{module}] |:")
             continue
@@ -113,8 +110,8 @@ def import_routes(module_folder: str = None, module: str = None) -> list:
     return routes_clean
 
 
-def read_config(module_folder: str = None, module: str = None, from_file_dir: str = None,
-                app_config: bool = False, api_config: bool = False) -> dict:
+def read_config_as_dict(module_folder: str = None, module: str = None, from_file_dir: str = None,
+                        app_config: bool = False, api_config: bool = False) -> dict:
     """
     Takes in the current working directory of the import, then returns
     the config file values in its directory as a dict
@@ -171,3 +168,17 @@ def read_config(module_folder: str = None, module: str = None, from_file_dir: st
         return config_to_dict
 
     return {"error": True}
+
+
+def read_app_config(section: str = None):
+    config = ConfigParser()
+    config.read(f"{app_root}/app_config.ini")
+    if section is not None:
+        return config[section]
+    return config
+
+
+def read_nav(nav_path: str) -> dict:
+    with open(nav_path, "r") as nav:
+        loaded_nav = load(nav)
+    return loaded_nav

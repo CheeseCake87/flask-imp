@@ -1,22 +1,17 @@
-from ....builtins.functions.security import login_required
-from ....builtins.functions.utilities import clear_error
-from ....builtins.functions.utilities import clear_message
-from .. import bp
-from .. import struc
-from .. import sql_do
-from .. import FlUser
-from .. import FlGroup
-from .. import FlMembership
-from sqlalchemy.orm.exc import NoResultFound
-from flask import render_template
-from sqlalchemy import desc
-from flask import request
-from flask import session
 from flask import redirect
+from flask import session
 from flask import url_for
+from sqlalchemy.orm.exc import NoResultFound
+
+from .. import FlMembership
+from .. import FlUser
+from .. import bp
+from .. import sql_do
+from ....builtins.functions.security import login_required
 
 
 @bp.route("/users/delete/<user_id>", methods=["GET"])
+@login_required("auth", "account.login")
 def delete_user(user_id):
     try:
         query_delete_user = sql_do.query(

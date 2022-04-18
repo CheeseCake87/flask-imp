@@ -13,10 +13,11 @@ from flask import session
 from flask import redirect
 from flask import request
 from flask import url_for
+from flask import current_app
 
 
 @bp.route("/login", methods=["GET", "POST"])
-@logged_in_check(session_bool_key="auth", on_true_endpoint="account.dashboard")
+@logged_in_check("auth", "account.dashboard")
 def login():
     error = session["error"]
     message = session["message"]
@@ -48,7 +49,7 @@ def login():
             session["auth"] = True
             session["user_id"] = query_user.user_id
             session["username"] = query_user.username
-            return redirect(url_for("account.dashboard"))
+            return redirect(url_for(current_app.config["LOGIN_DASHBOARD"]))
 
         return redirect(url_for("account.login"))
 

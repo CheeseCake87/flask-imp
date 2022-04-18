@@ -1,0 +1,16 @@
+{
+  "frontend": {},
+  "backend": {
+    "section_title": "Administrator",
+    "items": {
+      "Users": {
+        "url_for": "administrator.users",
+        "view_group": "administrators"
+      },
+      "Groups": {
+        "url_for": "administrator.groups",
+        "view_group": "administrators"
+      }
+    }
+  }
+}

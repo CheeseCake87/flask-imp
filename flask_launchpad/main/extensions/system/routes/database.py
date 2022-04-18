@@ -1,17 +1,13 @@
-from ....builtins.functions.security import login_required
-from ....builtins.functions.database import get_tables
-from ....builtins.functions.database import has_table
+from flask import render_template
+
 from .. import bp
 from .. import struc
-import sys
-import inspect
-from flask import request
-from flask import current_app
-from flask import render_template
-from flask_sqlalchemy import SQLAlchemy
+from ....builtins.functions.database import get_tables
+from ....builtins.functions.security import login_required
 
 
 @bp.route("/database", methods=["GET"])
+@login_required("auth", "account.login")
 def database():
     render = "renders/database.html"
     structure = struc.name()

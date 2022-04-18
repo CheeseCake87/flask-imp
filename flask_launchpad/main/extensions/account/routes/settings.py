@@ -1,25 +1,25 @@
-from flask_launchpad.main.builtins.functions.security import login_required
-from ....builtins.functions.utilities import clear_error
-from ....builtins.functions.utilities import clear_message
-from ....builtins.functions.auth import sha_password
-from ....builtins.functions.auth import generate_salt
-from ....builtins.functions.auth import generate_private_key
-from ....builtins.functions.auth import safe_username
-from .. import bp
-from .. import struc
-from .. import sql_do
-from .. import FlUser
-from .. import FlGroup
-from .. import FlMembership
+from flask import redirect
 from flask import render_template
-from sqlalchemy import desc
 from flask import request
 from flask import session
-from flask import redirect
 from flask import url_for
+
+from flask_launchpad.main.builtins.functions.security import login_required
+from .. import FlGroup
+from .. import FlMembership
+from .. import FlUser
+from .. import bp
+from .. import sql_do
+from .. import struc
+from ....builtins.functions.auth import generate_salt
+from ....builtins.functions.auth import safe_username
+from ....builtins.functions.auth import sha_password
+from ....builtins.functions.utilities import clear_error
+from ....builtins.functions.utilities import clear_message
 
 
 @bp.route("/settings", methods=["GET", "POST"])
+@login_required("auth", "account.login")
 def settings():
     error = session["error"]
     message = session["message"]
@@ -28,17 +28,21 @@ def settings():
     extend = struc.extend("backend.html")
     footer = struc.include("footer.html")
 
-    query_user = sql_do.query(
-        FlUser
-    ).filter(
-        FlUser.user_id == session["user_id"]
-    ).first()
+    try:
+        query_user = sql_do.query(
+            FlUser
+        ).filter(
+            FlUser.user_id == session["user_id"]
+        ).first()
+        _user_id = query_user.user_id
+    except AttributeError:
+        return redirect(url_for("account.login"))
 
     if request.method == "POST":
         if "update_user" in request.form:
             if not safe_username(request.form["username"].lower()):
                 session["error"] = "Username cannot contain any special characters"
-                return redirect(url_for("administrator.edit_user", user_id=user_id))
+                return redirect(url_for("administrator.edit_user", user_id=query_user.user_id))
 
             if request.form["username"] != query_user.username:
                 check_username = sql_do.query(
@@ -48,7 +52,7 @@ def settings():
                 ).first()
                 if check_username:
                     session["error"] = "Username already exists"
-                    return redirect(url_for("administrator.edit_user", user_id=user_id))
+                    return redirect(url_for("administrator.edit_user", user_id=query_user.user_id))
 
                 query_user.username = request.form["username"].lower()
 
@@ -59,7 +63,7 @@ def settings():
 
             sql_do.commit()
             session["message"] = "User has been updated"
-            return redirect(url_for("administrator.edit_user", user_id=user_id))
+            return redirect(url_for("administrator.edit_user", user_id=query_user.user_id))
 
         if "add_group" in request.form:
             add_membership = FlMembership(
@@ -68,8 +72,7 @@ def settings():
             )
             sql_do.add(add_membership)
             sql_do.commit()
-            return redirect(url_for("administrator.edit_user", user_id=user_id))
-
+            return redirect(url_for("administrator.edit_user", user_id=query_user.user_id))
 
     group_dict = {}
 

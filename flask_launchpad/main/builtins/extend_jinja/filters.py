@@ -16,3 +16,9 @@ def version(value: str) -> str:
 @current_app.template_filter('form_element')
 def form_import(value: str) -> str:
     return f"macros/forms/{value}.jinja"
+
+
+@current_app.template_filter('backend_nav')
+def backend_nav(blank_dict: dict) -> dict:
+    blank_dict = current_app.config["BACKEND_NAV"]
+    return blank_dict

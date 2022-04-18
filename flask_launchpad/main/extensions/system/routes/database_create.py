@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 @bp.route("/database/create_all/<forward>", methods=["GET"])
+@login_required("auth", "account.login")
 def database_create_all(forward):
     for module_name, module in current_app.config["SHARED_MODELS"].items():
         SQLAlchemy.create_all(module)
@@ -14,6 +15,7 @@ def database_create_all(forward):
 
 
 @bp.route("/database/create/<module>", methods=["GET"])
+@login_required("auth", "account.login")
 def database_create(module):
     try:
         SQLAlchemy.create_all(current_app.config["SHARED_MODELS"][module])

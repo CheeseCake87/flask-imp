@@ -1,13 +1,12 @@
-from ....builtins.functions.security import login_required
+from flask import render_template
+
 from .. import bp
 from .. import struc
-from flask import request
-from flask import current_app
-from flask import render_template
-from flask_sqlalchemy import SQLAlchemy
+from ....builtins.functions.security import login_required
 
 
 @bp.route("/elements", methods=["GET"])
+@login_required("auth", "account.login")
 def elements():
     render = "renders/elements.html"
     structure = struc.name()

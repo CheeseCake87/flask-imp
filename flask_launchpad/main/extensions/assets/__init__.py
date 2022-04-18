@@ -1,7 +1,6 @@
 from ...builtins.functions.import_mgr import read_config_as_dict
 from ...builtins.functions.import_mgr import import_routes
 from ...builtins.functions.structure import StructureBuilder
-from ...builtins.functions.database import find_model_location
 from importlib import import_module
 from flask import Blueprint
 from flask import current_app
@@ -24,11 +23,6 @@ bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file
 
 db = SQLAlchemy()
 sql_do = db.session
-
-account_model = import_module(find_model_location("account"))
-FlUser = getattr(account_model, "FlUser")
-FlGroup = getattr(account_model, "FlGroup")
-FlMembership = getattr(account_model, "FlMembership")
 
 struc = StructureBuilder(current_app.config["STRUCTURE"])
 

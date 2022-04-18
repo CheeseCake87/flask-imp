@@ -1,0 +1,16 @@
+{
+  "frontend": {},
+  "backend": {
+    "section_title": "Account",
+    "items": {
+      "Settings": {
+        "url_for": "account.settings",
+        "view_group": "users"
+      },
+      "Logout": {
+        "url_for": "account.logout",
+        "view_group": "users"
+      }
+    }
+  }
+}

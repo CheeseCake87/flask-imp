@@ -1,18 +1,46 @@
-from .utilities import is_file
-from .utilities import get_app_root
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.exc import OperationalError
-from flask import current_app
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
-from inspect import ismodule
-from sys import modules
 from os import path
+from sys import modules
+
+from flask import current_app
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import OperationalError
+
+from .utilities import get_app_root
 
 db = SQLAlchemy()
 sql_do = db.session
 app_root = get_app_root()
+
+
+def convert_sql_to_list_dict(query, return_only_these_fields: list = None) -> list:
+    return_list = []
+    for value in query:
+        temp_dict = {}
+        vars_dict = vars(value)
+        for inner_key, inner_value in vars_dict.items():
+            if isinstance(return_only_these_fields, list):
+                if inner_key in return_only_these_fields:
+                    temp_dict[inner_key] = inner_value
+            else:
+                temp_dict[inner_key] = inner_value
+        return_list.append(temp_dict)
+    return return_list
+
+
+def convert_sql_to_dict(query, return_only_these_fields: list = None) -> dict:
+    for value in query:
+        temp_dict = {}
+        vars_dict = vars(value)
+        for inner_key, inner_value in vars_dict.items():
+            if isinstance(return_only_these_fields, list):
+                if inner_key in return_only_these_fields:
+                    temp_dict[inner_key] = inner_value
+            else:
+                temp_dict[inner_key] = inner_value
+        return temp_dict
 
 
 def has_table(module, table_name: str) -> bool:

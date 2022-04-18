@@ -5,5 +5,6 @@ from flask import redirect
 
 
 @bp.route("/", methods=["GET"])
+@login_required("auth", "account.login")
 def account():
     return redirect(url_for("account.dashboard"))

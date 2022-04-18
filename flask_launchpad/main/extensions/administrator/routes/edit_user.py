@@ -1,25 +1,25 @@
-from flask_launchpad.main.builtins.functions.security import login_required
-from ....builtins.functions.utilities import clear_error
-from ....builtins.functions.utilities import clear_message
-from ....builtins.functions.auth import sha_password
-from ....builtins.functions.auth import generate_salt
-from ....builtins.functions.auth import generate_private_key
-from ....builtins.functions.auth import safe_username
-from .. import bp
-from .. import struc
-from .. import sql_do
-from .. import FlUser
-from .. import FlGroup
-from .. import FlMembership
+from flask import redirect
 from flask import render_template
-from sqlalchemy import desc
 from flask import request
 from flask import session
-from flask import redirect
 from flask import url_for
+
+from flask_launchpad.main.builtins.functions.security import login_required
+from .. import FlGroup
+from .. import FlMembership
+from .. import FlUser
+from .. import bp
+from .. import sql_do
+from .. import struc
+from ....builtins.functions.auth import generate_salt
+from ....builtins.functions.auth import safe_username
+from ....builtins.functions.auth import sha_password
+from ....builtins.functions.utilities import clear_error
+from ....builtins.functions.utilities import clear_message
 
 
 @bp.route("/users/edit/<user_id>", methods=["GET", "POST"])
+@login_required("auth", "account.login")
 def edit_user(user_id):
     error = session["error"]
     message = session["message"]
@@ -69,7 +69,6 @@ def edit_user(user_id):
             sql_do.add(add_membership)
             sql_do.commit()
             return redirect(url_for("administrator.edit_user", user_id=user_id))
-
 
     group_dict = {}
 

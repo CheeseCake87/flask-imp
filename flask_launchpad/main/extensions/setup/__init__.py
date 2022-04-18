@@ -1,13 +1,14 @@
-from ...builtins.functions.import_mgr import read_config
-from ...builtins.functions.import_mgr import import_routes
-from ...builtins.functions.structure import StructureBuilder
-from ...builtins.functions.database import find_model_location
 from importlib import import_module
+from os import path
+
 from flask import Blueprint
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import engine
-from os import path
+
+from ...builtins.functions.database import find_model_location
+from ...builtins.functions.import_mgr import import_routes
+from ...builtins.functions.import_mgr import read_config_as_dict
+from ...builtins.functions.structure import StructureBuilder
 
 """
 This is an example blueprint init file.
@@ -20,7 +21,7 @@ This is an example blueprint init file.
 . routes in the routes folder of the blueprint are imported
 """
 
-config = read_config(from_file_dir=path.dirname(path.realpath(__file__)))
+config = read_config_as_dict(from_file_dir=path.dirname(path.realpath(__file__)))
 bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file__)))
 
 db = SQLAlchemy()
@@ -33,6 +34,7 @@ FlMembership = getattr(account_model, "FlMembership")
 
 system_model = import_module(find_model_location("system"))
 FlSystemSettings = getattr(system_model, "FlSystemSettings")
+FlEmailSettings = getattr(system_model, "FlEmailSettings")
 
 struc = StructureBuilder(current_app.config["STRUCTURE"])
 

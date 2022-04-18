@@ -22,7 +22,7 @@ NONE = do not include the attribute in the call
 #}
 
 {% macro input(div=True, name="", label="", type="text", class="", placeholder="", required=False, value="",
-autocomplete=False, read_only=False, disabled=False) %}
+autocomplete=False, read_only=False, disabled=False, multiple=False) %}
     {% if div %}
         <div class="form-element">
     {% endif %}
@@ -60,6 +60,10 @@ autocomplete=False, read_only=False, disabled=False) %}
 
         {% if disabled %}
         disabled
+        {% endif %}
+
+        {% if multiple %}
+        multiple
         {% endif %}
 />
 {% if div %}
