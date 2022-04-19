@@ -1,26 +1,63 @@
 <!doctype html>
-
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %} {% endblock %}</title>
+    <title>{% block _title %} {% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='milligram.css') }}">
     <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='form_structure.css') }}">
 </head>
 
 <body>
 
+{% if error %}
+    <div class="error" id="error">
+        <div>
+            {{ error|safe }}
+        </div>
+        <a class="button button-small" href="#" id="close_error" onclick="parentNode.remove()">
+            Close
+        </a>
+    </div>
+{% endif %}
 
+{% if message %}
+    <div class="message" id="message">
+    <div>
+        {{ message|safe }}
+    </div>
+        <a class="button button-small" href="#" id="close_error" onclick="parentNode.remove()">
+            Close
+        </a>
+    </div>
+{% endif %}
 
+{% block _global %}
+    <div class="global-container">
 
-{#{% block global_body %}#}
-{#    <div class="container">#}
-{#    {% block body %}#}
-{##}
-{#    {% endblock %}#}
-{#    </div>#}
-{#{% endblock %}#}
+        <div class="top-bar">
+            <div>
+                <img src="{{ url_for('structure_img', structure=structure, filename='Flask-Launchpad.png') }}"
+                     height="80px"
+                     style="padding: 10px">
+            </div>
+            <div>{{ "Flask-Launchpad"|version }}</div>
+        </div>
+
+            <div class="flex-content">
+                <div class="container">
+                    {% block _container %}
+                    {% endblock %}
+                </div>
+            </div>
+
+        {% include "structures/fl_default/includes/footer.html" %}
+    </div>
+{% endblock %}
+
 <script src="{{ url_for('structure_js', structure=structure, filename='main.js') }}"></script>
 </body>
 </html>

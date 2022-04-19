@@ -1,5 +1,6 @@
 from ...builtins.functions.import_mgr import read_config_as_dict
 from ...builtins.functions.import_mgr import import_routes
+from ...builtins.functions.structure import StructureBuilder
 from importlib import import_module
 from flask import Blueprint
 from flask import current_app
@@ -23,11 +24,7 @@ bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file
 db = SQLAlchemy()
 sql_do = db.session
 
-extmod = {}
-
-for module_name, module in current_app.config["SHARED_MODELS"].items():
-    if module_name != config['settings']['import_name']:
-        extmod[module_name] = module
+struc = StructureBuilder()
 
 for route in import_routes(module_folder="blueprints", module=config["settings"]["name"]):
     import_module(f"{current_app.config['APP_NAME']}.blueprints.{config['settings']['name']}.routes.{route}")

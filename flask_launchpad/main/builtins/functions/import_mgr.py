@@ -6,6 +6,8 @@ from json import load
 from .utilities import find_illegal_dir_char
 from .utilities import get_app_root
 from .utilities import show_stats
+from .utilities import is_string_bool
+from .utilities import string_to_bool
 
 app_root = get_app_root()
 
@@ -131,11 +133,8 @@ def read_config_as_dict(module_folder: str = None, module: str = None, from_file
             for key, value in config_to_dict.items():
                 loop_dict = {}
                 for inner_key, inner_value in value.items():
-                    if inner_value == "True" or inner_value == "true" or inner_value == "yes":
-                        loop_dict[inner_key] = True
-                        continue
-                    if inner_value == "False" or inner_value == "false" or inner_value == "no":
-                        loop_dict[inner_key] = False
+                    if is_string_bool(inner_value):
+                        loop_dict[inner_key] = string_to_bool(inner_value)
                         continue
                     try:
                         loop_dict[inner_key] = int(inner_value)

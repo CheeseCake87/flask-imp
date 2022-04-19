@@ -11,15 +11,13 @@ struc = StructureBuilder(current_app.config["STRUCTURE"])
 
 @current_app.errorhandler(404)
 def request_404(error):
-    render = "system/error.html"
-    extend = struc.extend("error.html")
-
-    debug_args = {
-        "debug": session,
-        "error": error,
-        "this_path": request.path
-    }
-    return render_template(render, extend=extend, **debug_args), 404
+    render = struc.error("404.html")
+    structure = struc.name()
+    return render_template(
+        render,
+        structure=structure,
+        path=request.path
+    ), 404
 
 
 @current_app.errorhandler(401)
@@ -30,11 +28,14 @@ def custom_401(error):
 
 @current_app.route("/errors/redirect-catch-all", endpoint="errors.redirect_catch_all")
 def redirect_catch_all():
-    re_var = """
-    This is a redirect catch all.
-    """
+    render = struc.error("redirect_catch_all.html")
+    structure = struc.name()
     if "tried" in request.args:
-        re_var = f"""
-        The endpoint: {request.args['tried']} does not exist
-        """
-    return Markup(re_var)
+        endpoint_tried = f"The endpoint: {request.args['tried']} does not exist"
+    return render_template(
+        render,
+        structure=structure,
+        path=request.path,
+        endpoint=request.args['tried'],
+        endpoint_tried=endpoint_tried
+    ), 404
