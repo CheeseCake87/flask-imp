@@ -1,18 +1,21 @@
-from .builtins.functions.email_connector import test_email_server_connection
-from .builtins.functions.email_connector import send_email
-from .builtins.functions.import_mgr import show_stats
-from .builtins.functions.import_mgr import read_config
-from .builtins.functions.import_mgr import load_modules
-from .builtins.functions.import_mgr import import_routes
-from .builtins.functions.utilities import building_rocket
-from .builtins.functions.utilities import rocket_launched
-from .builtins.functions.utilities import email_server_status
 from importlib import import_module
 from datetime import timedelta
 from flask import Flask
 from os import path
 
-settings = read_config(app_config=True)
+from .builtins.functions.email_connector import test_email_server_connection
+from .builtins.functions.email_connector import send_email
+from .builtins.functions.import_mgr import show_stats
+from .builtins.functions.import_mgr import read_config_as_dict
+from .builtins.functions.import_mgr import read_nav
+from .builtins.functions.import_mgr import load_modules
+from .builtins.functions.import_mgr import import_routes
+from .builtins.functions.utilities import building_rocket
+from .builtins.functions.utilities import rocket_launched
+from .builtins.functions.utilities import email_server_status
+from .builtins.functions.utilities import create_folder_if_not_found
+
+settings = read_config_as_dict(app_config=True)
 app_name = settings["app"]["name"]
 app_root = settings["app"]["root"]
 
@@ -27,7 +30,11 @@ class Config(object):
     UPLOAD_FOLDER = f"{app_root}/uploads"
     ERROR_404_HELP = settings["app"]["error_404_help"]
     STRUCTURE = settings["app"]["structure"]
+    HOME_PAGE = settings["app"]["home_page"]
+    LOGIN_DASHBOARD = settings["app"]["login_dashboard"]
     SHARED_MODELS = {}
+    BACKEND_NAV = {}
+    FRONTEND_NAV = {}
     if settings["database"]["enabled"]:
         _db = settings["database"]["name"]
         _u = settings["database"]["username"]
@@ -44,6 +51,7 @@ def create_app(live: bool):
     main.config.from_object(Config)
     main.template_folder = settings["app"]["template_folder"]
     main.static_folder = settings["app"]["static_folder"]
+    create_folder_if_not_found(main.config["UPLOAD_FOLDER"])
 
     show_stats(building_rocket(), live)
     show_stats(f">> {settings['frameworks']['launchpad']}", live)
@@ -66,12 +74,22 @@ def create_app(live: bool):
                     show_stats(f":! ERROR REGISTERING BLUEPRINT [{bp_name}]: No import attribute found !:")
                     continue
 
-                if path.isfile(f"{app_root}/blueprints/{bp_name}/models.py"):
+                root_folder = f"{app_root}/blueprints/{bp_name}"
+
+                if path.isfile(f"{root_folder}/nav.json"):
+                    _nav = read_nav(f"{root_folder}/nav.json")
+                    if _nav["frontend"]:
+                        main.config["BACKEND_NAV"][bp_name] = _nav["frontend"]
+
+                    if _nav["backend"]:
+                        main.config["BACKEND_NAV"][bp_name] = _nav["backend"]
+
+                if path.isfile(f"{root_folder}/models.py"):
                     models_module = import_module(f"{app_name}.blueprints.{bp_name}.models")
                     try:
                         import_object = getattr(models_module, "db")
                         import_object.init_app(main)
-                        bp_config = read_config(module_folder="blueprints", module=bp_name)
+                        bp_config = read_config_as_dict(module_folder="blueprints", module=bp_name)
                         if bp_config["init"]["share_models"]:
                             main.config["SHARED_MODELS"][bp_name] = import_object
                         show_stats(f":+ BLUEPRINT MODEL REGISTERED [{bp_name}.models] +:", live)
@@ -91,7 +109,17 @@ def create_app(live: bool):
                     show_stats(f":! ERROR REGISTERING EXTENSION [{ex_name}]: No import attribute found !:")
                     continue
 
-                if path.isfile(f"{app_root}/extensions/{ex_name}/models.py"):
+                root_folder = f"{app_root}/extensions/{ex_name}"
+
+                if path.isfile(f"{root_folder}/nav.json"):
+                    _nav = read_nav(f"{root_folder}/nav.json")
+                    if _nav["frontend"]:
+                        main.config["BACKEND_NAV"][ex_name] = _nav["frontend"]
+
+                    if _nav["backend"]:
+                        main.config["BACKEND_NAV"][ex_name] = _nav["backend"]
+
+                if path.isfile(f"{root_folder}/models.py"):
                     models_module = import_module(f"{app_name}.extensions.{ex_name}.models")
                     try:
                         import_object = getattr(models_module, "db")

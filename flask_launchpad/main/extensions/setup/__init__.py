@@ -34,7 +34,6 @@ FlMembership = getattr(account_model, "FlMembership")
 
 system_model = import_module(find_model_location("system"))
 FlSystemSettings = getattr(system_model, "FlSystemSettings")
-FlEmailSettings = getattr(system_model, "FlEmailSettings")
 
 struc = StructureBuilder(current_app.config["STRUCTURE"])
 

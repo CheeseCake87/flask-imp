@@ -1,4 +1,4 @@
-from ...builtins.functions.import_mgr import read_config
+from ...builtins.functions.import_mgr import read_config_as_dict
 from ...builtins.functions.import_mgr import import_routes
 from importlib import import_module
 from flask import Blueprint
@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 
 # Load the config for this API
-config = read_config(from_file_dir=path.dirname(path.realpath(__file__)))
+config = read_config_as_dict(from_file_dir=path.dirname(path.realpath(__file__)))
 
 # Create a Flask blueprint for this api
 bp = Blueprint(

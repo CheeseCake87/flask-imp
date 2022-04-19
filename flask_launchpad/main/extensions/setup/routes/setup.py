@@ -10,7 +10,6 @@ from .. import FlUser
 from .. import FlGroup
 from .. import FlMembership
 from .. import FlSystemSettings
-from .. import FlEmailSettings
 from .. import bp
 from .. import sql_do
 from .. import struc
@@ -115,23 +114,12 @@ def setup():
         system_setup = FlSystemSettings(
             setup=True
         )
-        email_setup = FlEmailSettings(
-            enabled=string_to_bool(app_config["smtp"]["enabled"]),
-            username=app_config["smtp"]["username"],
-            server=app_config["smtp"]["server"],
-            port=app_config["smtp"]["port"],
-            from_name=app_config["smtp"]["from_name"],
-            send_from=app_config["smtp"]["send_from"],
-            reply_to=app_config["smtp"]["reply_to"],
-            default_send_to=app_config["smtp"]["default_send_to"],
-        )
 
         sql_do.add(add_system_group_membership)
         sql_do.add(add_user_group_membership)
         sql_do.add(add_administrator_group_membership)
         sql_do.add(add_assets_group_membership)
         sql_do.add(system_setup)
-        sql_do.add(email_setup)
 
         sql_do.commit()
 

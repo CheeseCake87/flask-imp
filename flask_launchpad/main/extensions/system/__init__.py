@@ -27,8 +27,8 @@ db = SQLAlchemy()
 sql_do = db.session
 sql_test = engine.Engine
 
-account_model = import_module(find_model_location("system"))
-FlEmailSettings = getattr(account_model, "FlEmailSettings")
+system_model = import_module(find_model_location("system"))
+FlSystemSettings = getattr(system_model, "FlSystemSettings")
 
 struc = StructureBuilder(current_app.config["STRUCTURE"])
 

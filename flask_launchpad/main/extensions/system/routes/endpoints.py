@@ -13,7 +13,9 @@ def endpoints():
     extend = struc.extend("backend.html")
     footer = struc.include("footer.html")
 
-
+    endpoints_dict = {}
+    for rule in current_app.url_map.iter_rules():
+        endpoints_dict[rule.endpoint] = rule.rule
 
     return render_template(
         render,
