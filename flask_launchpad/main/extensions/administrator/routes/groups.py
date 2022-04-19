@@ -4,13 +4,13 @@ from flask import request
 from flask import session
 from flask import url_for
 
-from flask_launchpad.main.builtins.functions.security import login_required
 from .. import FlGroup
 from .. import bp
 from .. import sql_do
 from .. import struc
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
+from ....builtins.functions.security import login_required
 
 
 @bp.route("/groups", methods=["GET", "POST"])

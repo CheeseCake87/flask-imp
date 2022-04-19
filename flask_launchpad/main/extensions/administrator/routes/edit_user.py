@@ -4,7 +4,6 @@ from flask import request
 from flask import session
 from flask import url_for
 
-from flask_launchpad.main.builtins.functions.security import login_required
 from .. import FlGroup
 from .. import FlMembership
 from .. import FlUser
@@ -16,6 +15,7 @@ from ....builtins.functions.auth import safe_username
 from ....builtins.functions.auth import sha_password
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
+from ....builtins.functions.security import login_required
 
 
 @bp.route("/users/edit/<user_id>", methods=["GET", "POST"])
