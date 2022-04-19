@@ -3,6 +3,7 @@ from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.utilities import clear_error
 from .. import bp
 from .. import struc
+from .. import config
 from flask import request
 from flask import session
 from flask import redirect
@@ -12,8 +13,14 @@ from flask import render_template
 
 @bp.route("/", methods=["GET"])
 def index():
+    """Example of route url redirect"""
+    return redirect(url_for(config["init"]["home_redirect"]))
+
+
+@bp.route("/structure", methods=["GET"])
+def structure():
     """
-    This is an example method of rendering a template
+    This is an example method of rendering a template using the StructureBuilder Class
     :return:
     """
     render = "renders/render.html"
@@ -28,6 +35,27 @@ def index():
         structure=structure,
         extend=extend,
         footer=footer,
+        error=error,
+        message=message,
+        clear_error=clear_error(),
+        clear_message=clear_message(),
+    )
+
+
+@bp.route("/local", methods=["GET"])
+def local():
+    """
+    This is an example method of rendering a template using the local structure
+    :return:
+    """
+    render = "renders/render.html"
+    extend = "structures/base.html"
+    error = session["error"]
+    message = session["message"]
+
+    return render_template(
+        render,
+        extend=extend,
         error=error,
         message=message,
         clear_error=clear_error(),
