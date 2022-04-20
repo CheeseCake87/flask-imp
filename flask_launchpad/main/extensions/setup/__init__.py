@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from ...builtins.functions.database import find_model_location
 from ...builtins.functions.import_mgr import import_routes
-from ...builtins.functions.import_mgr import read_config_as_dict
+from ...builtins.functions.import_mgr import read_config
 from ...builtins.functions.structure import StructureBuilder
 
 """
@@ -21,7 +21,7 @@ This is an example blueprint init file.
 . routes in the routes folder of the blueprint are imported
 """
 
-config = read_config_as_dict(from_file_dir=path.dirname(path.realpath(__file__)))
+config = read_config(filepath=path.dirname(path.realpath(__file__)))
 bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file__)))
 
 db = SQLAlchemy()

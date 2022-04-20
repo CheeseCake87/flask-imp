@@ -100,8 +100,11 @@ def find_model_location(module_name: str) -> str:
     :param module_name:
     :return:
     """
+    if path.isfile(f"{app_root}/api/{module_name}/models.py"):
+        return f"{current_app.config['APP_NAME']}.api.{module_name}.models"
     if path.isfile(f"{app_root}/blueprints/{module_name}/models.py"):
         return f"{current_app.config['APP_NAME']}.blueprints.{module_name}.models"
     if path.isfile(f"{app_root}/extensions/{module_name}/models.py"):
         return f"{current_app.config['APP_NAME']}.extensions.{module_name}.models"
-    return ""
+
+    raise ImportError

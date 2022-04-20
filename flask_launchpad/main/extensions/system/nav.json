@@ -15,6 +15,10 @@
       "Clear Session": {
         "url_for": "system.clear_session",
         "view_group": "system"
+      },
+      "Test Function": {
+        "url_for": "system.test_function",
+        "view_group": "system"
       }
     }
   }

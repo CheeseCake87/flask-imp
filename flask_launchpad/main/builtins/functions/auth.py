@@ -97,6 +97,50 @@ def auth_password(input_password: str, database_password: str, database_salt: st
     return False
 
 
+def wrong_http_auth(request_auth, http_auth) -> bool:
+    """
+    Checks if the username and password of the http request matches the args passed in.
+    :param request_auth:
+    :param http_auth:
+    :return:
+    """
+    if request_auth is None:
+        return True
+    if "username" not in request_auth:
+        return True
+    if "password" not in request_auth:
+        return True
+    if request_auth['username'] != http_auth["username"]:
+        return True
+    if request_auth['password'] != http_auth["username"]:
+        return True
+    return False
+
+
+def wrong_public_key(passed_pk: str, correct_pk: str) -> bool:
+    """
+    Used to check if the public key passed into the system matches the stored public key.
+    :param passed_pk:
+    :param correct_pk:
+    :return:
+    """
+    if passed_pk != correct_pk:
+        return True
+    return False
+
+
+def wrong_private_key(passed_prk: str, correct_prk: str) -> bool:
+    """
+    Used to check if the private key passed into the system matches the stored private key.
+    :param passed_prk:
+    :param correct_prk:
+    :return:
+    """
+    if passed_prk != correct_prk:
+        return True
+    return False
+
+
 def generate_password(style: str, length: int) -> str:
     """
     Will return a plain text password based on choice of style and length.

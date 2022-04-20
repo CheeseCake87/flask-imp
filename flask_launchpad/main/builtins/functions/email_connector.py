@@ -5,10 +5,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from os.path import basename
-from .import_mgr import read_config_as_dict
+from .import_mgr import read_app_config
 from .utilities import get_file_extension
 
-settings = read_config_as_dict(app_config=True)["smtp"]
+app_config = read_app_config(section="smtp")
 
 
 def send_email(subject: str, email_to: str, email_body: str, attached_files: list = None) -> list:
@@ -28,9 +28,9 @@ def send_email(subject: str, email_to: str, email_body: str, attached_files: lis
     msg.set_type('multipart/alternative')
     msg['Subject'] = subject
     msg['To'] = email_to
-    msg['From'] = f'"{settings["from_name"]}"' + f'<{settings["send_from"]}>'
-    msg['Reply-To'] = settings["reply_to"]
-    msg['Original-Sender'] = settings["username"]
+    msg['From'] = f'"{app_config["from_name"]}"' + f'<{app_config["send_from"]}>'
+    msg['Reply-To'] = app_config["reply_to"]
+    msg['Original-Sender'] = app_config["username"]
     msg.attach(html_msg)
 
     for attached_file in attached_files or []:
@@ -41,27 +41,27 @@ def send_email(subject: str, email_to: str, email_body: str, attached_files: lis
         msg.attach(contents)
 
     try:
-        with SMTP(settings["server"], settings["port"]) as connection:
+        with SMTP(app_config["server"], app_config["port"]) as connection:
             connection.starttls()
-            connection.login(settings["username"], settings["password"])
-            connection.sendmail(settings["send_from"], email_to, msg.as_string())
+            connection.login(app_config["username"], app_config["password"])
+            connection.sendmail(app_config["send_from"], email_to, msg.as_string())
     except SMTPException as error:
         return [False, "AUTHENTICATION OR CONNECTION ISSUE", error]
 
     return [True, "EMAIL SENT", None]
 
 
-def test_email_server_connection() -> list:
+def test_email_server_connection() -> bool:
     """
     Used to test the settings of the smtp settings.
     :return list[bool, status]:
     """
     try:
         ssl_context = create_default_context()
-        with SMTP(settings["server"], settings["port"]) as connection:
+        with SMTP(app_config["server"], app_config["port"]) as connection:
             connection.starttls(context=ssl_context)
-            connection.login(settings["username"], settings["password"])
-    except SMTPException as error:
-        return [False, "AUTHENTICATION OR CONNECTION ISSUE", error]
+            connection.login(app_config["username"], app_config["password"])
+    except SMTPException:
+        return False
 
-    return [True, "ENABLED AND READY", None]
+    return True

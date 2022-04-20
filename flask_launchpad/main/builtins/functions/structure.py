@@ -48,7 +48,7 @@ class StructureBuilder:
         """
         Looks for the error page to render in the specified structure. If the error page is not found, it will
         look for the error page to render in the default structure. If again not found, it will return an error page.
-        :param extending:
+        :param error_page:
         :return:
         """
         _structure = f"{self.app_root}/builtins/templates/structures/{self.structure_name}/error_pages"
@@ -61,6 +61,23 @@ class StructureBuilder:
                 return f"structures/fl_default/error_pages/{error_page}"
 
         return "structures/fl_default/error_pages/template_extend_error.html"
+
+    def render(self, render_page: str) -> str:
+        """
+        Looks for a full render page in each module folder, if not found it renders the error page.
+        :param render_page:
+        :return:
+        """
+        _structure = f"{self.app_root}/builtins/templates/structures/{self.structure_name}/renders"
+        _default_structure = f"{self.app_root}/builtins/templates/structures/fl_default/renders"
+        if is_dir(_structure):
+            if is_file(f"{_structure}/{render_page}"):
+                return f"structures/{self.structure_name}/renders/{render_page}"
+
+            if is_file(f"{_default_structure}/{render_page}"):
+                return f"structures/fl_default/renders/{render_page}"
+
+        return "structures/fl_default/error_pages/template_render_error.html"
 
     def name(self) -> str:
         """

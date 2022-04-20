@@ -177,6 +177,42 @@ def read_app_config(section: str = None):
     return config
 
 
+def read_config(module: str = None, filepath: str = None, section: str = None):
+    """
+    Finds the config file for the passed in module.
+    :param module:
+    :param filepath:
+    :param section:
+    :return dict:
+    """
+    config = ConfigParser()
+    if module is not None:
+        if path.isfile(f"{app_root}/api/{module}/config.ini"):
+            config.read(f"{app_root}/api/{module}/config.ini")
+            if section is not None:
+                return config[section]
+            return config
+        if path.isfile(f"{app_root}/blueprints/{module}/config.ini"):
+            config.read(f"{app_root}/blueprints/{module}/config.ini")
+            if section is not None:
+                return config[section]
+            return config
+        if path.isfile(f"{app_root}/extensions/{module}/config.ini"):
+            config.read(f"{app_root}/extensions/{module}/config.ini")
+            if section is not None:
+                return config[section]
+            return config
+
+    if filepath is not None:
+        if path.isfile(f"{filepath}/config.ini"):
+            config.read(f"{filepath}/config.ini")
+            if section is not None:
+                return config[section]
+            return config
+
+    raise FileNotFoundError
+
+
 def read_nav(nav_path: str) -> dict:
     with open(nav_path, "r") as nav:
         loaded_nav = load(nav)
