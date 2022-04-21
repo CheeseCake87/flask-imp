@@ -22,5 +22,5 @@ def endpoints():
         structure=structure,
         extend=extend,
         footer=footer,
-        endpoints=endpoints_dict
+        endpoints=sorted(endpoints_dict.items())
     )
