@@ -1,4 +1,5 @@
 from flask import render_template
+from flask import current_app
 
 from .. import bp
 from .. import struc
@@ -21,5 +22,6 @@ def database():
         structure=structure,
         extend=extend,
         footer=footer,
-        models=models
+        models=models,
+        shared_models=current_app.config["SHARED_MODELS"]
     )

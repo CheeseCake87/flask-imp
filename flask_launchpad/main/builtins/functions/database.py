@@ -7,6 +7,7 @@ from sys import modules
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import ArgumentError
 
 from .utilities import get_app_root
 
@@ -51,17 +52,29 @@ def has_table(module, table_name: str) -> bool:
     :param table_name:
     :return:
     """
+    if table_name == "ForeignKey":
+        return False
     try:
         _import = import_module(f"{current_app.config['APP_NAME']}.blueprints.{module}.models")
     except ModuleNotFoundError:
         _import = import_module(f"{current_app.config['APP_NAME']}.extensions.{module}.models")
 
     _attr = getattr(_import, table_name)
+    print(type(_attr))
     try:
-        sql_do.query(_attr).first()
+        sql_do.query(_attr).all()
         return True
-    except OperationalError:
+    except (OperationalError, ArgumentError):
         return False
+
+
+def class_name_ok(class_name: str) -> bool:
+    _banned_class_names = [
+        "ForeignKey",
+    ]
+    if class_name in _banned_class_names:
+        return False
+    return True
 
 
 def get_tables() -> dict:
@@ -82,14 +95,16 @@ def get_tables() -> dict:
             )
             for m in mod:
                 class_name = m[0]
-                models[key].append((class_name, has_table(module=key, table_name=class_name)))
+                if class_name_ok(class_name):
+                    models[key].append((class_name, has_table(module=key, table_name=class_name)))
         except KeyError:
             mod = getmembers(
                 modules[f"{current_app.config['APP_NAME']}.extensions.{key}.models"], isclass
             )
             for m in mod:
                 class_name = m[0]
-                models[key].append((class_name, has_table(module=key, table_name=class_name)))
+                if class_name_ok(class_name):
+                    models[key].append((class_name, has_table(module=key, table_name=class_name)))
 
     return models
 
@@ -106,5 +121,4 @@ def find_model_location(module_name: str) -> str:
         return f"{current_app.config['APP_NAME']}.blueprints.{module_name}.models"
     if path.isfile(f"{app_root}/extensions/{module_name}/models.py"):
         return f"{current_app.config['APP_NAME']}.extensions.{module_name}.models"
-
-    raise ImportError
+    return ""

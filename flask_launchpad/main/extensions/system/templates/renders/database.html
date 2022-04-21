@@ -44,6 +44,20 @@
         {% endfor %}
         </tbody>
     </table>
+    <table>
+        <thead>
+        <tr>
+            <th>App Config Shared Models</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for key, value in shared_models.items() %}
+            <tr>
+                <td>{{ key }} {{ value }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block _footer %}
