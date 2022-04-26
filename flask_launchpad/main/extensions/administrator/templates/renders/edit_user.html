@@ -98,7 +98,7 @@ onclick="" ) }}
                     {% set all_groups, add_group_disabled = {"no_groups": "No Groups Available"}, True %}
                 {% endif %}
 
-                {{ select.input_select_dumb(div=True, label="Available Groups", name="group_id", options=all_groups) }}
+                {{ select.input_select_dumb(div=True, label="Permissions", name="permission_id", options=all_groups) }}
 
                 {{ button.submit(name="add_group", value="Add User to Group", class="", disabled=add_group_disabled) }}
             </div>

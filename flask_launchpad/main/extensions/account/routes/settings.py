@@ -4,18 +4,17 @@ from flask import request
 from flask import session
 from flask import url_for
 
-from .. import FlGroup
-from .. import FlMembership
-from .. import FlUser
-from .. import bp
-from .. import sql_do
-from .. import struc
 from ....builtins.functions.auth import generate_salt
 from ....builtins.functions.auth import safe_username
 from ....builtins.functions.auth import sha_password
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.security import login_required
+
+from .. import FlUser
+from .. import bp
+from .. import sql_do
+from .. import struc
 
 
 @bp.route("/settings", methods=["GET", "POST"])
@@ -28,15 +27,7 @@ def settings():
     extend = struc.extend("backend.html")
     footer = struc.include("footer.html")
 
-    try:
-        query_user = sql_do.query(
-            FlUser
-        ).filter(
-            FlUser.user_id == session["user_id"]
-        ).first()
-        _user_id = query_user.user_id
-    except AttributeError:
-        return redirect(url_for("account.login"))
+    query_user = sql_do.query(FlUser).filter(FlUser.user_id == session["user_id"]).first()
 
     if request.method == "POST":
         if "update_user" in request.form:
@@ -45,9 +36,7 @@ def settings():
                 return redirect(url_for("administrator.edit_user", user_id=query_user.user_id))
 
             if request.form["username"] != query_user.username:
-                check_username = sql_do.query(
-                    FlUser
-                ).filter(
+                check_username = sql_do.query(FlUser).filter(
                     FlUser.username == request.form["username"].lower()
                 ).first()
                 if check_username:
@@ -65,47 +54,11 @@ def settings():
             session["message"] = "User has been updated"
             return redirect(url_for("administrator.edit_user", user_id=query_user.user_id))
 
-        if "add_group" in request.form:
-            add_membership = FlMembership(
-                user_id=query_user.user_id,
-                group_id=request.form["group_id"]
-            )
-            sql_do.add(add_membership)
-            sql_do.commit()
-            return redirect(url_for("administrator.edit_user", user_id=query_user.user_id))
-
-    group_dict = {}
-
-    membership = sql_do.query(
-        FlMembership
-    ).filter(
-        FlMembership.user_id == query_user.user_id
-    ).all()
-
     user_dict = {
         "user_id": query_user.user_id,
         "username": query_user.username,
-        "groups": [],
         "disabled": query_user.disabled
     }
-    group_list = []
-    for iv in membership:
-        groups = sql_do.query(
-            FlGroup
-        ).filter(
-            FlGroup.group_id == iv.group_id
-        ).all()
-        for iiv in groups:
-            group_list.append(iiv.group_name)
-            user_dict["groups"].append((iiv.group_id, iiv.group_name))
-
-    all_groups = sql_do.query(
-        FlGroup
-    ).all()
-
-    for value in all_groups:
-        if value.group_name not in group_list:
-            group_dict[value.group_id] = value.group_name
 
     return render_template(
         render,
@@ -116,6 +69,5 @@ def settings():
         clear_error=clear_error(),
         message=message,
         clear_message=clear_message(),
-        user=user_dict,
-        all_groups=group_dict,
+        user=user_dict
     )

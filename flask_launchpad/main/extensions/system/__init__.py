@@ -30,8 +30,8 @@ sql_test = engine.Engine
 system_model = import_module(find_model_location("system"))
 FlSystemSettings = getattr(system_model, "FlSystemSettings")
 
-account_model = import_module(find_model_location("account"))
-FlMembership = getattr(account_model, "FlMembership")
+administrator_model = import_module(find_model_location("administrator"))
+FlPermissionMembership = getattr(administrator_model, "FlPermissionMembership")
 
 struc = StructureBuilder(current_app.config["STRUCTURE"])
 

@@ -20,11 +20,11 @@ This is an example blueprint init file.
 
 config = read_config(filepath=path.dirname(path.realpath(__file__)))
 bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file__)))
+struc = StructureBuilder()
 
 db = SQLAlchemy()
 sql_do = db.session
 
-struc = StructureBuilder()
 
 for route in import_routes(module_folder="blueprints", module=config["settings"]["name"]):
     import_module(f"{current_app.config['APP_NAME']}.blueprints.{config['settings']['name']}.routes.{route}")

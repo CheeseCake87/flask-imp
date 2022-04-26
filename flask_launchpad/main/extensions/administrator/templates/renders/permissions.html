@@ -4,7 +4,7 @@
 {% import 'macros/forms/select.jinja' as select %}
 
 {% block _title %}
-    Administrator | Groups
+    Administrator | Permissions
 {% endblock %}
 
 {% block _container %}
@@ -15,7 +15,7 @@
 div=True,
 type="text",
 label="Name",
-name="group_name",
+name="name",
 class="input-small",
 placeholder="",
 required=True,
@@ -29,7 +29,7 @@ disabled=False
 div=True,
 type="text",
 label="Custom Type",
-name="group_type",
+name="type",
 class="input-small",
 placeholder="",
 required=True,
@@ -39,7 +39,7 @@ read_only=False,
 disabled=False
 )|deco }}
 
-                {{ button.submit(name="add_group", value="Add Group", class="button-100") }}
+                {{ button.submit(name="add_permission", value="Add Permission", class="button-100") }}
             </div>
         </div>
     </form>
@@ -47,52 +47,51 @@ disabled=False
     <table>
         <thead>
         <tr>
-            <th>Group ID</th>
+            <th>Permission ID</th>
             <th>Name</th>
             <th>Type</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
         <tbody>
-        {% for group, values in all_groups.items() %}
+        {% for permission, values in all_permissions.items() %}
             <tr>
-                <td>{{ group }}</td>
-                <td>{{ values.group_name }}</td>
-                <td>{{ values.group_type }}</td>
+                <td>{{ permission }}</td>
+                <td>{{ values.name }}</td>
+                <td>{{ values.type }}</td>
                 <td>
                     <div class="table-buttons">
 
-{% if values.group_type != "system" %}
-
-{% set group_delete_show = "javascript:showEle('group_delete_" + group|string + "','table-row');" %}
-{% set group_delete_hide = "javascript:hideEle('group_delete_" + group|string + "','table-row');" %}
+{% if values.type != "system" %}
+{% set permission_delete_show = "javascript:showEle('permission_delete_" + permission|string + "','table-row');" %}
+{% set permission_delete_hide = "javascript:hideEle('permission_delete_" + permission|string + "','table-row');" %}
 {{ button.submit_link(
 div=False,
-name="delete_user",
+name="delete_permission",
 label="Delete",
 button_type="button button-small button-danger",
 link="",
-onclick=group_delete_show ) }}
+onclick=permission_delete_show ) }}
 
 {% endif %}
                     </div>
                 </td>
             </tr>
 
-{% if values.group_type != "system" %}
+{% if values.type != "system" %}
 
-            <tr id="group_delete_{{ group|string }}" style="display: none">
+            <tr id="permission_delete_{{ permission|string }}" style="display: none">
                 <td colspan="100%">
                     <div class="table-row-action">
-                        <div>Are you sure you want to delete this group?</div> &nbsp;
+                        <div>Are you sure you want to delete this permission?</div> &nbsp;
                         <div>
 
 {{ button.submit_link(
 div=False,
-name="yes_delete_group",
+name="yes_delete_permission",
 label="Yes",
 button_type="button button-small button-danger",
-link=url_for("administrator.delete_group", group_id=group),
+link=url_for("administrator.delete_permission", permission_id=permission),
 onclick="" ) }}
 
                         </div>
@@ -100,11 +99,11 @@ onclick="" ) }}
 
 {{ button.submit_link(
 div=False,
-name="no_delete_group",
+name="no_delete_permission",
 label="No",
 button_type="button button-small",
 link="",
-onclick=group_delete_hide ) }}
+onclick=permission_delete_hide ) }}
 
                         </div>
                     </div>

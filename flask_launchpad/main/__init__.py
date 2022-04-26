@@ -100,14 +100,19 @@ def create_app(live: bool):
 
         def load_extensions() -> None:
             for ex_name in load_modules(module_folder="extensions"):
-                try:
-                    extension_module = import_module(f"{app_name}.extensions.{ex_name}")
-                    extension_object = getattr(extension_module, "bp")
-                    main.register_blueprint(extension_object, name=f"{ex_name}")
-                    show_stats(f":+ EXTENSION REGISTERED [{ex_name}] +:", live)
-                except AttributeError:
-                    show_stats(f":! ERROR REGISTERING EXTENSION [{ex_name}]: No import attribute found !:")
-                    continue
+                # try:
+                #     extension_module = import_module(f"{app_name}.extensions.{ex_name}")
+                #     extension_object = getattr(extension_module, "bp")
+                #     main.register_blueprint(extension_object, name=f"{ex_name}")
+                #     show_stats(f":+ EXTENSION REGISTERED [{ex_name}] +:", live)
+                # except AttributeError:
+                #     show_stats(f":! ERROR REGISTERING EXTENSION [{ex_name}]: No import attribute found !:")
+                #     continue
+
+                extension_module = import_module(f"{app_name}.extensions.{ex_name}")
+                extension_object = getattr(extension_module, "bp")
+                main.register_blueprint(extension_object, name=f"{ex_name}")
+                show_stats(f":+ EXTENSION REGISTERED [{ex_name}] +:", live)
 
                 root_folder = f"{app_root}/extensions/{ex_name}"
 

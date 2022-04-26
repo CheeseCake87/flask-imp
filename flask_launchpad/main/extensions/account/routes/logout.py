@@ -1,8 +1,9 @@
-from .. import bp
-from .. import config
 from flask import session
 from flask import redirect
 from flask import url_for
+
+from .. import bp
+from .. import config
 
 
 @bp.route("/logout", methods=["GET", "POST"])

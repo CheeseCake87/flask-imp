@@ -6,17 +6,6 @@ from flask import session
 from flask import url_for
 from flask_sqlalchemy import SQLAlchemy
 
-from .. import FlUser
-from .. import FlPermissions
-from .. import FlPermissionsMembership
-from .. import FlClan
-from .. import FlClanMembership
-from .. import FlTeam
-from .. import FlTeamMembership
-from .. import FlSystemSettings
-from .. import bp
-from .. import sql_do
-from .. import struc
 from ....builtins.functions.auth import generate_private_key
 from ....builtins.functions.auth import generate_salt
 from ....builtins.functions.auth import safe_username
@@ -24,9 +13,19 @@ from ....builtins.functions.auth import sha_password
 from ....builtins.functions.database import get_tables
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
-from ....builtins.functions.utilities import string_to_bool
-from ....builtins.functions.utilities import is_string_bool
 from ....builtins.functions.import_mgr import read_config_as_dict
+
+from .. import FlUser
+from .. import FlPermission
+from .. import FlPermissionMembership
+from .. import FlCompany
+from .. import FlCompanyMembership
+from .. import FlTeam
+from .. import FlTeamMembership
+from .. import FlSystemSettings
+from .. import bp
+from .. import sql_do
+from .. import struc
 
 app_config = read_config_as_dict(app_config=True)
 
@@ -63,6 +62,7 @@ def setup():
             session["error"] = "Username cannot have any special characters"
             return redirect(url_for("setup.setup"))
 
+        # Add user
         salt = generate_salt()
         private_key = generate_private_key(salt)
         add_user = FlUser(
@@ -72,57 +72,92 @@ def setup():
             private_key=private_key,
             disabled=False
         )
-        add_system_perm = FlPermissions(
+
+        # Add system company
+        add_system_company = FlCompany(
+            name="__system__",
+        )
+
+        # Add system team
+        add_system_team = FlTeam(
+            name="__system__",
+        )
+
+        # Add permission groups
+        add_system_perm = FlPermission(
             name="system",
             type="system"
         )
-        add_user_perm = FlPermissions(
+        add_user_perm = FlPermission(
             name="user",
             type="system"
         )
-        add_administrator_perm = FlPermissions(
+        add_administrator_perm = FlPermission(
             name="administrator",
             type="system"
         )
-        add_assets_perm = FlPermissions(
+        add_assets_perm = FlPermission(
             name="assets",
             type="system"
         )
 
+        # Insert into database session and flush to get IDs
+        sql_do.add(add_system_company)
+        sql_do.add(add_system_team)
         sql_do.add(add_user)
         sql_do.add(add_system_perm)
         sql_do.add(add_user_perm)
         sql_do.add(add_administrator_perm)
         sql_do.add(add_assets_perm)
-
         sql_do.flush()
 
-        add_system_perm_mem = FlPermissionsMembership(
+        # Add user to company
+        add_to_system_company = FlCompanyMembership(
             user_id=add_user.user_id,
-            permissions_id=add_system_perm.group_id
+            company_id=add_system_company.company_id
         )
-        add_user_perm_mem = FlPermissionsMembership(
+
+        # Add user to team
+        add_to_system_team = FlTeamMembership(
             user_id=add_user.user_id,
-            permissions_id=add_user_perm.group_id
+            team_id=add_system_team.team_id
         )
-        add_administrator_perm_mem = FlPermissionsMembership(
+
+        # Add user to permission groups
+        add_system_perm_mem = FlPermissionMembership(
             user_id=add_user.user_id,
-            permissions_id=add_administrator_perm.group_id
+            permission_id=add_system_perm.permission_id
         )
-        add_assets_perm_mem = FlPermissionsMembership(
+        add_user_perm_mem = FlPermissionMembership(
             user_id=add_user.user_id,
-            permissions_id=add_assets_perm.group_id
+            permission_id=add_user_perm.permission_id
         )
+        add_administrator_perm_mem = FlPermissionMembership(
+            user_id=add_user.user_id,
+            permission_id=add_administrator_perm.permission_id
+        )
+        add_assets_perm_mem = FlPermissionMembership(
+            user_id=add_user.user_id,
+            permission_id=add_assets_perm.permission_id
+        )
+
+        # Mark system as being setup
         system_setup = FlSystemSettings(
             setup=True
         )
+
+        # Insert into database session
+        sql_do.add(add_to_system_company)
+        sql_do.add(add_to_system_team)
 
         sql_do.add(add_system_perm_mem)
         sql_do.add(add_user_perm_mem)
         sql_do.add(add_administrator_perm_mem)
         sql_do.add(add_assets_perm_mem)
+
         sql_do.add(system_setup)
 
+        # Commit to database
         sql_do.commit()
 
         return redirect(url_for("account.login"))

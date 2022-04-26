@@ -4,44 +4,45 @@ from flask import request
 from flask import session
 from flask import url_for
 
-from .. import FlGroup
-from .. import bp
-from .. import sql_do
-from .. import struc
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.security import login_required
 
+from .. import FlPermission
+from .. import bp
+from .. import sql_do
+from .. import struc
 
-@bp.route("/groups", methods=["GET", "POST"])
+
+@bp.route("/permissions", methods=["GET", "POST"])
 @login_required("auth", "account.login")
-def groups():
+def permissions():
     error = session["error"]
     message = session["message"]
-    render = "renders/groups.html"
+    render = "renders/permissions.html"
     structure = struc.name()
     extend = struc.extend("backend.html")
     footer = struc.include("footer.html")
 
     if request.method == "POST":
-        add_group = FlGroup(
-            group_name=request.form["group_name"].lower(),
-            group_type=request.form["group_type"].lower()
+        add_permission = FlPermission(
+            name=request.form["name"].lower(),
+            type=request.form["type"].lower()
         )
-        sql_do.add(add_group)
+        sql_do.add(add_permission)
         sql_do.commit()
-        return redirect(url_for("administrator.groups"))
+        return redirect(url_for("administrator.permissions"))
 
-    all_groups = sql_do.query(
-        FlGroup
+    all_permissions = sql_do.query(
+        FlPermission
     ).all()
 
-    group_dict = {}
+    permission_dict = {}
 
-    for value in all_groups:
-        group_dict[value.group_id] = {
-            "group_name": value.group_name,
-            "group_type": value.group_type,
+    for value in all_permissions:
+        permission_dict[value.permission_id] = {
+            "name": value.name,
+            "type": value.type,
         }
 
     return render_template(
@@ -53,5 +54,5 @@ def groups():
         clear_error=clear_error(),
         message=message,
         clear_message=clear_message(),
-        all_groups=group_dict,
+        all_permissions=permission_dict,
     )

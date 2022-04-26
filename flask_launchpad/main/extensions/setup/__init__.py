@@ -21,8 +21,10 @@ This is an example blueprint init file.
 . routes in the routes folder of the blueprint are imported
 """
 
-config = read_config(filepath=path.dirname(path.realpath(__file__)))
-bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file__)))
+root = path.dirname(path.realpath(__file__))
+config = read_config(filepath=root)
+bp = Blueprint(**config["settings"], root_path=root)
+struc = StructureBuilder(current_app.config["STRUCTURE"])
 
 db = SQLAlchemy()
 sql_do = db.session
@@ -31,17 +33,15 @@ account_model = import_module(find_model_location("account"))
 FlUser = getattr(account_model, "FlUser")
 
 administrator_model = import_module(find_model_location("administrator"))
-FlPermissions = getattr(account_model, "FlPermissions")
-FlPermissionsMembership = getattr(account_model, "FlPermissionsMembership")
-FlClan = getattr(account_model, "FlClan")
-FlClanMembership = getattr(account_model, "FlClanMembership")
-FlTeam = getattr(account_model, "FlTeam")
-FlTeamMembership = getattr(account_model, "FlTeamMembership")
+FlPermission = getattr(administrator_model, "FlPermission")
+FlPermissionMembership = getattr(administrator_model, "FlPermissionMembership")
+FlCompany = getattr(administrator_model, "FlCompany")
+FlCompanyMembership = getattr(administrator_model, "FlCompanyMembership")
+FlTeam = getattr(administrator_model, "FlTeam")
+FlTeamMembership = getattr(administrator_model, "FlTeamMembership")
 
 system_model = import_module(find_model_location("system"))
 FlSystemSettings = getattr(system_model, "FlSystemSettings")
-
-struc = StructureBuilder(current_app.config["STRUCTURE"])
 
 for route in import_routes(module_folder="extensions", module=config["settings"]["name"]):
     import_module(f"{current_app.config['APP_NAME']}.extensions.{config['settings']['name']}.routes.{route}")

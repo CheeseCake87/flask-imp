@@ -1,19 +1,20 @@
-from ....builtins.functions.security import logged_in_check
-from ....builtins.functions.utilities import clear_error
-from ....builtins.functions.utilities import clear_message
-from ....builtins.functions.auth import safe_username
-from ....builtins.functions.auth import auth_password
-from .. import bp
-from .. import struc
-from .. import sql_do
-from .. import FlUser
-from sqlalchemy.orm.exc import NoResultFound
 from flask import render_template
 from flask import session
 from flask import redirect
 from flask import request
 from flask import url_for
 from flask import current_app
+
+from ....builtins.functions.security import logged_in_check
+from ....builtins.functions.utilities import clear_error
+from ....builtins.functions.utilities import clear_message
+from ....builtins.functions.auth import safe_username
+from ....builtins.functions.auth import auth_password
+
+from .. import bp
+from .. import struc
+from .. import sql_do
+from .. import FlUser
 
 
 @bp.route("/login", methods=["GET", "POST"])
@@ -30,15 +31,8 @@ def login():
         if not safe_username(request.form["username"]):
             session["error"] = "Username or password incorrect"
             return redirect(url_for("account.login"))
-        try:
-            query_user = sql_do.query(
-                FlUser
-            ).filter(
-                FlUser.username == request.form["username"]
-            ).first()
-        except NoResultFound:
-            session["error"] = "Username or password incorrect"
-            return redirect(url_for("account.login"))
+
+        query_user = sql_do.query(FlUser).filter(FlUser.username == request.form["username"]).first()
         if query_user is None:
             session["error"] = "Username or password incorrect"
             return redirect(url_for("account.login"))

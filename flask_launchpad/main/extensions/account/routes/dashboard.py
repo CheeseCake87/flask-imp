@@ -1,10 +1,12 @@
+from flask import render_template
+from flask import session
+
 from ....builtins.functions.security import login_required
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
+
 from .. import bp
 from .. import struc
-from flask import render_template
-from flask import session
 
 
 @bp.route("/dashboard", methods=["GET"])

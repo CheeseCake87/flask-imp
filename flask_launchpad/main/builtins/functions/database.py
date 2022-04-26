@@ -8,6 +8,7 @@ from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.exc import ArgumentError
+from sqlalchemy.exc import InvalidRequestError
 
 from .utilities import get_app_root
 
@@ -64,7 +65,7 @@ def has_table(module, table_name: str) -> bool:
     try:
         sql_do.query(_attr).all()
         return True
-    except (OperationalError, ArgumentError):
+    except (OperationalError, ArgumentError, InvalidRequestError):
         return False
 
 
@@ -85,6 +86,7 @@ def get_tables() -> dict:
     :return dict:
     """
     models = {}
+    print(current_app.config["SHARED_MODELS"])
     for key, value in current_app.config["SHARED_MODELS"].items():
         if key not in models:
             models[key] = []

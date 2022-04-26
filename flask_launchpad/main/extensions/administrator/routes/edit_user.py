@@ -4,18 +4,19 @@ from flask import request
 from flask import session
 from flask import url_for
 
-from .. import FlGroup
-from .. import FlMembership
-from .. import FlUser
-from .. import bp
-from .. import sql_do
-from .. import struc
 from ....builtins.functions.auth import generate_salt
 from ....builtins.functions.auth import safe_username
 from ....builtins.functions.auth import sha_password
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.security import login_required
+
+from .. import FlPermission
+from .. import FlPermissionMembership
+from .. import FlUser
+from .. import bp
+from .. import sql_do
+from .. import struc
 
 
 @bp.route("/users/edit/<user_id>", methods=["GET", "POST"])
@@ -28,9 +29,7 @@ def edit_user(user_id):
     extend = struc.extend("backend.html")
     footer = struc.include("footer.html")
 
-    query_user = sql_do.query(
-        FlUser
-    ).filter(
+    query_user = sql_do.query(FlUser).filter(
         FlUser.user_id == user_id
     ).first()
 
@@ -61,21 +60,21 @@ def edit_user(user_id):
             session["message"] = "User has been updated"
             return redirect(url_for("administrator.edit_user", user_id=user_id))
 
-        if "add_group" in request.form:
-            add_membership = FlMembership(
+        if "add_permission" in request.form:
+            add_permission = FlPermissionMembership(
                 user_id=query_user.user_id,
-                group_id=request.form["group_id"]
+                permission_id=request.form["permission_id"]
             )
-            sql_do.add(add_membership)
+            sql_do.add(add_permission)
             sql_do.commit()
             return redirect(url_for("administrator.edit_user", user_id=user_id))
 
-    group_dict = {}
+    permission_dict = {}
 
-    membership = sql_do.query(
-        FlMembership
+    permission_membership = sql_do.query(
+        FlPermissionMembership
     ).filter(
-        FlMembership.user_id == query_user.user_id
+        FlPermissionMembership.user_id == query_user.user_id
     ).all()
 
     user_dict = {
@@ -85,11 +84,11 @@ def edit_user(user_id):
         "disabled": query_user.disabled
     }
     group_list = []
-    for iv in membership:
+    for iv in permission_membership:
         groups = sql_do.query(
-            FlGroup
+            FlPermission
         ).filter(
-            FlGroup.group_id == iv.group_id
+            FlPermission.permission_id == iv.permission_id
         ).all()
         for iiv in groups:
             group_list.append(iiv.group_name)
