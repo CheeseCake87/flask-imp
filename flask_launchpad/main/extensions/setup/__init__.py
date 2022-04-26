@@ -29,8 +29,14 @@ sql_do = db.session
 
 account_model = import_module(find_model_location("account"))
 FlUser = getattr(account_model, "FlUser")
-FlGroup = getattr(account_model, "FlGroup")
-FlMembership = getattr(account_model, "FlMembership")
+
+administrator_model = import_module(find_model_location("administrator"))
+FlPermissions = getattr(account_model, "FlPermissions")
+FlPermissionsMembership = getattr(account_model, "FlPermissionsMembership")
+FlClan = getattr(account_model, "FlClan")
+FlClanMembership = getattr(account_model, "FlClanMembership")
+FlTeam = getattr(account_model, "FlTeam")
+FlTeamMembership = getattr(account_model, "FlTeamMembership")
 
 system_model = import_module(find_model_location("system"))
 FlSystemSettings = getattr(system_model, "FlSystemSettings")

@@ -7,8 +7,12 @@ from flask import url_for
 from flask_sqlalchemy import SQLAlchemy
 
 from .. import FlUser
-from .. import FlGroup
-from .. import FlMembership
+from .. import FlPermissions
+from .. import FlPermissionsMembership
+from .. import FlClan
+from .. import FlClanMembership
+from .. import FlTeam
+from .. import FlTeamMembership
 from .. import FlSystemSettings
 from .. import bp
 from .. import sql_do
@@ -37,11 +41,9 @@ def setup():
     footer = struc.include("footer.html")
 
     tables = get_tables()
-    system_modules = ["system", "administrator", "account", "uploads"]
 
     for key, value in tables.items():
-        if key in system_modules:
-            SQLAlchemy.create_all(current_app.config["SHARED_MODELS"][key])
+        SQLAlchemy.create_all(current_app.config["SHARED_MODELS"][key])
 
     system_setup = sql_do.query(
         FlSystemSettings
@@ -70,55 +72,55 @@ def setup():
             private_key=private_key,
             disabled=False
         )
-        add_system_group = FlGroup(
-            group_name="system",
-            group_type="system"
+        add_system_perm = FlPermissions(
+            name="system",
+            type="system"
         )
-        add_user_group = FlGroup(
-            group_name="user",
-            group_type="system"
+        add_user_perm = FlPermissions(
+            name="user",
+            type="system"
         )
-        add_administrator_group = FlGroup(
-            group_name="administrator",
-            group_type="system"
+        add_administrator_perm = FlPermissions(
+            name="administrator",
+            type="system"
         )
-        add_assets_group = FlGroup(
-            group_name="assets",
-            group_type="system"
+        add_assets_perm = FlPermissions(
+            name="assets",
+            type="system"
         )
 
         sql_do.add(add_user)
-        sql_do.add(add_system_group)
-        sql_do.add(add_user_group)
-        sql_do.add(add_administrator_group)
-        sql_do.add(add_assets_group)
+        sql_do.add(add_system_perm)
+        sql_do.add(add_user_perm)
+        sql_do.add(add_administrator_perm)
+        sql_do.add(add_assets_perm)
 
         sql_do.flush()
 
-        add_system_group_membership = FlMembership(
+        add_system_perm_mem = FlPermissionsMembership(
             user_id=add_user.user_id,
-            group_id=add_system_group.group_id
+            permissions_id=add_system_perm.group_id
         )
-        add_user_group_membership = FlMembership(
+        add_user_perm_mem = FlPermissionsMembership(
             user_id=add_user.user_id,
-            group_id=add_user_group.group_id
+            permissions_id=add_user_perm.group_id
         )
-        add_administrator_group_membership = FlMembership(
+        add_administrator_perm_mem = FlPermissionsMembership(
             user_id=add_user.user_id,
-            group_id=add_administrator_group.group_id
+            permissions_id=add_administrator_perm.group_id
         )
-        add_assets_group_membership = FlMembership(
+        add_assets_perm_mem = FlPermissionsMembership(
             user_id=add_user.user_id,
-            group_id=add_assets_group.group_id
+            permissions_id=add_assets_perm.group_id
         )
         system_setup = FlSystemSettings(
             setup=True
         )
 
-        sql_do.add(add_system_group_membership)
-        sql_do.add(add_user_group_membership)
-        sql_do.add(add_administrator_group_membership)
-        sql_do.add(add_assets_group_membership)
+        sql_do.add(add_system_perm_mem)
+        sql_do.add(add_user_perm_mem)
+        sql_do.add(add_administrator_perm_mem)
+        sql_do.add(add_assets_perm_mem)
         sql_do.add(system_setup)
 
         sql_do.commit()
