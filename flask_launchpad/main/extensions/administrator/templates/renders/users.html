@@ -26,6 +26,13 @@ read_only=False,
 disabled=False
 )|deco }}
 
+{#{% if company_names|length == 1 %}#}
+{#<div style="padding-bottom: 14px">&commat; {{ company_names[0] }}</div>#}
+{#{% else %}#}
+{#<div style="padding-bottom: 14px">&commat;</div>#}
+{{ select.input_select_list(div=True, label="Company", name="company_name", options=company_names) }}
+{#{% endif %}#}
+
 {{ input.input(
 div=True,
 type="password",
@@ -40,7 +47,6 @@ read_only=False,
 disabled=False
 )|deco }}
 
-{{ select.input_select_dumb(div=True, label="Group", name="group_id", options=all_groups) }}
 {{ button.submit(name="add_user", value="Add User", class="button-100") }}
 
             </div>
@@ -52,7 +58,7 @@ disabled=False
         <tr>
             <th>User ID</th>
             <th>Username</th>
-            <th>Group(s)</th>
+            <th>Permissions</th>
             <th>Status</th>
             <th style="text-align: right">&nbsp;</th>
         </tr>
@@ -63,7 +69,7 @@ disabled=False
                 <td>{{ user }}</td>
                 <td>{{ values.username }}</td>
                 <td>
-                    {% for v in values.groups %}{{ v[1] }};&nbsp;{% endfor %}
+                    {% for v in values.permissions %}{{ v[1] }};&nbsp;{% endfor %}
                 </td>
                 <td>
                     {% if values.disabled %}
