@@ -7,7 +7,7 @@ from flask import render_template
 from sqlalchemy.exc import MultipleResultsFound
 
 
-@bp.route("/endpoints", methods=["GET"])
+@bp.route("/test-function", methods=["GET"])
 @login_required("auth", "account.login")
 def test_function():
     render = "renders/test_function.html"

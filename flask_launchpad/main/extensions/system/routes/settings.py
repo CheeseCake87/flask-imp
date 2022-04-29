@@ -13,7 +13,7 @@ from ....builtins.functions.utilities import clear_message
 def settings():
     error = session["error"]
     message = session["message"]
-    render = "renders/settings.html"
+    render = "renders/system_settings.html"
     structure = struc.name()
     extend = struc.extend("backend.html")
     footer = struc.include("footer.html")

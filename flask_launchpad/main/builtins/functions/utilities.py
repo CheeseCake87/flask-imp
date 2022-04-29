@@ -275,4 +275,11 @@ def is_string_bool(bool_str: str) -> bool:
         if isinstance(v, int):
             return True
     except ValueError:
-        return False                                                                                               
+        return False
+
+
+def reverse_dict(input_dict: dict):
+    return_dict = {}
+    for key, value in input_dict.items():
+        return_dict[value] = key
+    return return_dict

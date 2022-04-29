@@ -9,10 +9,16 @@ from ....builtins.functions.auth import safe_username
 from ....builtins.functions.auth import sha_password
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
+from ....builtins.functions.utilities import reverse_dict
 from ....builtins.functions.security import login_required
+from ....builtins.functions.memberships import get_company_membership_from_user_id
+from ....builtins.functions.memberships import get_all_companies
+from ....builtins.functions.memberships import get_permission_membership_from_user_id
 
 from .. import FlPermission
 from .. import FlPermissionMembership
+from .. import FlCompany
+from .. import FlCompanyMembership
 from .. import FlUser
 from .. import bp
 from .. import sql_do
@@ -22,16 +28,63 @@ from .. import struc
 @bp.route("/users/edit/<user_id>", methods=["GET", "POST"])
 @login_required("auth", "account.login")
 def edit_user(user_id):
-    error = session["error"]
-    message = session["message"]
-    render = "renders/edit_user.html"
-    structure = struc.name()
-    extend = struc.extend("backend.html")
-    footer = struc.include("footer.html")
-
     query_user = sql_do.query(FlUser).filter(
         FlUser.user_id == user_id
     ).first()
+
+    if "system" in session["permissions"]:
+        logged_in_company_membership = get_all_companies()
+    else:
+        logged_in_company_membership = get_company_membership_from_user_id(session["user_id"])
+
+    query_user_company_membership = get_company_membership_from_user_id(query_user.user_id)
+    for company_name in query_user_company_membership:
+        if company_name not in logged_in_company_membership:
+            redirect("account.users")
+
+    if request.method == "GET":
+        error = session["error"]
+        message = session["message"]
+        render = "renders/edit_user.html"
+        structure = struc.name()
+        extend = struc.extend("backend.html")
+        footer = struc.include("footer.html")
+
+        query_user_permissions = get_permission_membership_from_user_id(query_user.user_id)
+
+        user_dict = {
+            "user_id": query_user.user_id,
+            "username": query_user.username,
+            "permissions": query_user_permissions,
+            "companies": query_user_company_membership,
+            "disabled": query_user.disabled
+        }
+
+        all_permissions = sql_do.query(FlPermission).all()
+        permission_dict = {}
+        for value in all_permissions:
+            if value.name not in query_user_permissions:
+                permission_dict[value.permission_id] = value.name
+
+        all_companies = sql_do.query(FlCompany).all()
+        company_dict = {}
+        for value in all_companies:
+            if value.name not in query_user_company_membership:
+                company_dict[value.company_id] = value.name
+
+        return render_template(
+            render,
+            structure=structure,
+            extend=extend,
+            footer=footer,
+            error=error,
+            clear_error=clear_error(),
+            message=message,
+            clear_message=clear_message(),
+            user=user_dict,
+            all_permissions=permission_dict,
+            available_companies=company_dict
+        )
 
     if request.method == "POST":
         if "update_user" in request.form:
@@ -69,48 +122,13 @@ def edit_user(user_id):
             sql_do.commit()
             return redirect(url_for("administrator.edit_user", user_id=user_id))
 
-    permission_dict = {}
+        if "add_company" in request.form:
+            add_company = FlCompanyMembership(
+                user_id=query_user.user_id,
+                company_id=request.form["company_id"]
+            )
+            sql_do.add(add_company)
+            sql_do.commit()
+            return redirect(url_for("administrator.edit_user", user_id=user_id))
 
-    permission_membership = sql_do.query(
-        FlPermissionMembership
-    ).filter(
-        FlPermissionMembership.user_id == query_user.user_id
-    ).all()
-
-    user_dict = {
-        "user_id": query_user.user_id,
-        "username": query_user.username,
-        "groups": [],
-        "disabled": query_user.disabled
-    }
-    group_list = []
-    for iv in permission_membership:
-        groups = sql_do.query(
-            FlPermission
-        ).filter(
-            FlPermission.permission_id == iv.permission_id
-        ).all()
-        for iiv in groups:
-            group_list.append(iiv.group_name)
-            user_dict["groups"].append((iiv.group_id, iiv.group_name))
-
-    all_groups = sql_do.query(
-        FlGroup
-    ).all()
-
-    for value in all_groups:
-        if value.group_name not in group_list:
-            group_dict[value.group_id] = value.group_name
-
-    return render_template(
-        render,
-        structure=structure,
-        extend=extend,
-        footer=footer,
-        error=error,
-        clear_error=clear_error(),
-        message=message,
-        clear_message=clear_message(),
-        user=user_dict,
-        all_groups=group_dict,
-    )
+        return redirect(url_for("administrator.edit_user", user_id=user_id))

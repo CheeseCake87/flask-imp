@@ -12,7 +12,7 @@
         <div class="action-box">
             <div class="form-container-inline">
 
-{{ input.input(
+                {{ input.input(
 div=True,
 type="text",
 label="Username",
@@ -26,14 +26,11 @@ read_only=False,
 disabled=False
 )|deco }}
 
-{#{% if company_names|length == 1 %}#}
-{#<div style="padding-bottom: 14px">&commat; {{ company_names[0] }}</div>#}
-{#{% else %}#}
-{#<div style="padding-bottom: 14px">&commat;</div>#}
-{{ select.input_select_list(div=True, label="Company", name="company_name", options=company_names) }}
-{#{% endif %}#}
+                {% if "system" in session["permissions"] %}
+                    {{ select.input_select_dict(label="Company", name="company", options=all_companies) }}
+                {% endif %}
 
-{{ input.input(
+                {{ input.input(
 div=True,
 type="password",
 label="Password",
@@ -47,7 +44,7 @@ read_only=False,
 disabled=False
 )|deco }}
 
-{{ button.submit(name="add_user", value="Add User", class="button-100") }}
+                {{ button.submit(name="add_user", value="Add User", class="button-100") }}
 
             </div>
         </div>
@@ -59,6 +56,7 @@ disabled=False
             <th>User ID</th>
             <th>Username</th>
             <th>Permissions</th>
+            <th>Company</th>
             <th>Status</th>
             <th style="text-align: right">&nbsp;</th>
         </tr>
@@ -69,7 +67,10 @@ disabled=False
                 <td>{{ user }}</td>
                 <td>{{ values.username }}</td>
                 <td>
-                    {% for v in values.permissions %}{{ v[1] }};&nbsp;{% endfor %}
+                    {% for perm_name in values.permissions %}{{ perm_name }}<br/>{% endfor %}
+                </td>
+                <td>
+                    {% for company_name in values.companies %}{{ company_name }}<br/>{% endfor %}
                 </td>
                 <td>
                     {% if values.disabled %}

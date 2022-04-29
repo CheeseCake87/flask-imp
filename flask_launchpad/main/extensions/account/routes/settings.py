@@ -22,7 +22,7 @@ from .. import struc
 def settings():
     error = session["error"]
     message = session["message"]
-    render = "renders/settings.html"
+    render = "renders/account_settings.html"
     structure = struc.name()
     extend = struc.extend("backend.html")
     footer = struc.include("footer.html")
@@ -69,5 +69,6 @@ def settings():
         clear_error=clear_error(),
         message=message,
         clear_message=clear_message(),
-        user=user_dict
+        user=user_dict,
+        endpoints={},
     )

@@ -89,32 +89,62 @@ onclick="" ) }}
 
 
     <div class="flex-container-inline">
-
-
         <form method="post" class="no-margin width-100p">
             <div class="form-container">
-                {% set add_group_disabled = False %}
-                {% if not all_groups %}
-                    {% set all_groups, add_group_disabled = {"no_groups": "No Groups Available"}, True %}
+                {% set add_permissions_disabled = False %}
+                {% if not all_permissions %}
+                    {% set all_permissions, add_permissions_disabled = {"no_permissions": "No More Permissions Available"}, True %}
                 {% endif %}
 
-                {{ select.input_select_dumb(div=True, label="Permissions", name="permission_id", options=all_groups) }}
+                {{ select.input_select_dict(div=True, label="Permissions", name="permission_id", options=all_permissions) }}
 
-                {{ button.submit(name="add_group", value="Add User to Group", class="", disabled=add_group_disabled) }}
+                {{ button.submit(name="add_permission", value="Add User to Permission", class="", disabled=add_permissions_disabled) }}
             </div>
         </form>
 
         <div class="form-element width-100p">
-            <label>In Group(s)</label>
-            {% for value in user.groups %}
+            <label>Has Permissions</label>
+            {% for perm_name, perm_id in user.permissions.items() %}
                 <div class="group-box">
-                    <span>{{ value[1] }}</span>
+                    <span>{{ perm_name }}</span>
                     {{ button.submit_link(
 div=False,
-name="delete_group_from_user",
+name="delete_permission_from_user",
 label="Delete",
 button_type="button button-danger button-small",
-link=url_for('administrator.delete_group_from_user', user_id=user.user_id, group_id=value[0]),
+link=url_for('administrator.delete_permission_from_user', user_id=user.user_id, permission_id=perm_id),
+onclick="" ) }}
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="flex-container-inline">
+        <form method="post" class="no-margin width-100p">
+            <div class="form-container">
+                {% set add_company_disabled = False %}
+                {% if not available_companies %}
+                    {% set available_companies, add_company_disabled = {"no_companies": "No More Companies Available"}, True %}
+                {% endif %}
+
+                {{ select.input_select_dict(div=True, label="Companies", name="company_id", options=available_companies) }}
+
+                {{ button.submit(name="add_company", value="Add User to Company", class="", disabled=add_company_disabled) }}
+            </div>
+        </form>
+
+        <div class="form-element width-100p">
+            <label>In Company</label>
+            {% for company_name, company_id in user.companies.items() %}
+                <div class="group-box">
+                    <span>{{ company_name }}</span>
+                    {{ button.submit_link(
+div=False,
+name="delete_company_from_user",
+label="Delete",
+button_type="button button-danger button-small",
+link=url_for('administrator.delete_company_from_user', user_id=user.user_id, company_id=company_id),
 onclick="" ) }}
                 </div>
             {% endfor %}

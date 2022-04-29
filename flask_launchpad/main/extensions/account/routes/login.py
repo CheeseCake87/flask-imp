@@ -10,6 +10,7 @@ from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.auth import safe_username
 from ....builtins.functions.auth import auth_password
+from ....builtins.functions.memberships import get_permission_membership_from_user_id
 
 from .. import bp
 from .. import struc
@@ -43,6 +44,7 @@ def login():
             session["auth"] = True
             session["user_id"] = query_user.user_id
             session["username"] = query_user.username
+            session["permissions"] = get_permission_membership_from_user_id(query_user.user_id)
             return redirect(url_for(current_app.config["LOGIN_DASHBOARD"]))
 
         return redirect(url_for("account.login"))

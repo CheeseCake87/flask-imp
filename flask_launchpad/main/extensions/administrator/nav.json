@@ -2,14 +2,19 @@
   "frontend": {},
   "backend": {
     "section_title": "Administrator",
+    "global_permission": "administrator",
     "items": {
       "Users": {
         "url_for": "administrator.users",
-        "view_group": "administrators"
+        "permission": "administrator"
       },
       "Permissions": {
         "url_for": "administrator.permissions",
-        "view_group": "administrators"
+        "permission": "administrator"
+      },
+      "Companies": {
+        "url_for": "administrator.companies",
+        "permission": "administrator"
       }
     }
   }

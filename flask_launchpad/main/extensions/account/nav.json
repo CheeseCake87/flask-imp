@@ -2,14 +2,15 @@
   "frontend": {},
   "backend": {
     "section_title": "Account",
+    "global_permission": "user",
     "items": {
       "Settings": {
         "url_for": "account.settings",
-        "view_group": "users"
+        "permission": "user"
       },
       "Logout": {
         "url_for": "account.logout",
-        "view_group": "users"
+        "permission": "user"
       }
     }
   }

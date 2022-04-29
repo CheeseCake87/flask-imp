@@ -1,6 +1,9 @@
-from ..functions.utilities import remove_escapes
 from flask import current_app
+from flask import session
 from markupsafe import Markup
+
+from ..functions.utilities import remove_escapes
+from ..functions.memberships import get_permission_membership_from_user_id
 
 
 @current_app.template_filter('deco')

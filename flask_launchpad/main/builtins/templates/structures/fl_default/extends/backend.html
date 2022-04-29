@@ -24,9 +24,9 @@
 {% endif %}
 {% if message %}
     <div class="message" id="message">
-    <div>
-        {{ message|safe }}
-    </div>
+        <div>
+            {{ message|safe }}
+        </div>
         <a class="button button-small" href="#" id="close_error" onclick="parentNode.remove()">
             Close
         </a>
@@ -44,18 +44,21 @@
             <div>{{ "Flask-Launchpad"|version }}</div>
         </div>
 
-        <div class="flex-container">
-
+        <div class="flex-backend">
             <div class="flex-menu">
                 {% set nav_dict = {}|backend_nav %}
+                {% set user_perms = session["permissions"] %}
                 {% for key, value in nav_dict.items() %}
-                    <span>{{ value.section_title }}</span>
-                    {% for ikey, ivalue in value["items"].items() %}
-                        <a href="{{ url_for(ivalue["url_for"]) }}">{{ ikey }}</a>
-                    {% endfor %}
+                    {% if value.global_permission in user_perms %}
+                        <span>{{ value.section_title }}</span>
+                        {% for ikey, ivalue in value["items"].items() %}
+                            {% if ivalue["permission"] in user_perms %}
+                                <a href="{{ url_for(ivalue["url_for"]) }}">{{ ikey }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 {% endfor %}
             </div>
-
             <div class="flex-content">
                 <div class="container">
                     {% block _container %}
