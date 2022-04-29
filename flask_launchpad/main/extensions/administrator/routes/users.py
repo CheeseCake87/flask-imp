@@ -42,10 +42,6 @@ def users():
         else:
             logged_in_company_membership = get_company_membership_from_user_id(session["user_id"])
 
-
-        print(logged_in_company_membership)
-        print(session)
-
         company_ids, company_names = [], []
 
         for company_name, company_id in logged_in_company_membership.items():
@@ -112,9 +108,9 @@ def users():
 
         if "company" not in request.form:
             company_membership = get_company_membership_from_user_id(session["user_id"])
-            for company in company_membership:
+            for company_name, company_id in company_membership.items():
                 add_company_membership = FlCompanyMembership(
-                    company_id=company[0],
+                    company_id=company_id,
                     user_id=add_user.user_id
                 )
                 sql_do.add(add_company_membership)
@@ -124,6 +120,7 @@ def users():
                 user_id=add_user.user_id
             )
             sql_do.add(add_company_membership)
+            print(request.form["company"])
 
         sql_do.commit()
         return redirect(url_for("administrator.users"))

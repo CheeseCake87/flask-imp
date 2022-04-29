@@ -4,6 +4,7 @@ from string import punctuation, digits, ascii_letters
 from random import choice
 from random import randrange
 from datetime import datetime
+from re import search
 
 
 def safe_username(username: str) -> bool:
@@ -12,6 +13,12 @@ def safe_username(username: str) -> bool:
     :param username:
     :return bool:
     """
+    vec = valid_email_chars()
+    if "@" in username:
+        for char in username:
+            if char not in vec:
+                return False
+        return bool(search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", username))
     if username.isalnum():
         return True
     return False
@@ -159,6 +166,17 @@ def generate_password(style: str, length: int) -> str:
             _random_index = randrange(0, len(WordGen.animals))
             _final.append(WordGen.animals[_random_index])
         return '-'.join(_final)
+
+
+def valid_email_chars() -> list:
+    special_chars = ["@", ".", "-", "_"]
+    alpha = []
+    numeric = []
+    for letter in ascii_letters:
+        alpha.append(letter)
+    for number in digits:
+        numeric.append(number)
+    return special_chars + alpha + numeric
 
 
 class WordGen:
