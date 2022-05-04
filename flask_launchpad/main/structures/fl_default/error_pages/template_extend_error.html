@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flask-Launchpad - Template Extend Error</title>
+    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='milligram.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='form_structure.css') }}">
+</head>
+
+<body>
+<div class="global-container">
+
+    <div class="top-bar" style="text-align: center">
+        <img src="{{ url_for('structure_img', structure=structure, filename='Flask-Launchpad.png') }}"
+             height="80px"
+             style="padding: 10px">
+
+    </div>
+
+    <div class="flex-content">
+        <div class="container">
+            <h1>Template Extend Error</h1>
+            <p>Unable to find the template to extend on the requesting URL.</p>
+            <p style="font-size: small">{{ "Flask-Launchpad"|version }}</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

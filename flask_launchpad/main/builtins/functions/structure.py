@@ -5,8 +5,11 @@ from .utilities import is_file
 
 class StructureBuilder:
     def __init__(self, structure_name: str = "fl_default"):
-        self.app_root = get_app_root()
-        self.structure_name = structure_name
+        self._app_root = get_app_root()
+        self._structure_name = structure_name
+        self._default_structure_name = "fl_default"
+        self._structure = f"{self._app_root}/structures/{self._structure_name}"
+        self._default_structure = f"{self._app_root}/structures/fl_default"
 
     def extend(self, extending: str) -> str:
         """
@@ -15,16 +18,14 @@ class StructureBuilder:
         :param extending:
         :return:
         """
-        _structure = f"{self.app_root}/builtins/templates/structures/{self.structure_name}/extends"
-        _default_structure = f"{self.app_root}/builtins/templates/structures/fl_default/extends"
-        if is_dir(_structure):
-            if is_file(f"{_structure}/{extending}"):
-                return f"structures/{self.structure_name}/extends/{extending}"
+        if is_dir(self._structure):
+            if is_file(f"{self._structure}/extends/{extending}"):
+                return f"{self._structure_name}/extends/{extending}"
 
-            if is_file(f"{_default_structure}/{extending}"):
-                return f"structures/fl_default/extends/{extending}"
+            if is_file(f"{self._default_structure}/extends/{extending}"):
+                return f"{self._default_structure_name}/extends/{extending}"
 
-        return "structures/fl_default/error_pages/template_extend_error.html"
+        return f"{self._default_structure}/error_pages/template_extend_error.html"
 
     def include(self, including: str) -> str:
         """
@@ -33,16 +34,14 @@ class StructureBuilder:
         :param including:
         :return:
         """
-        _structure = f"{self.app_root}/builtins/templates/structures/{self.structure_name}/includes"
-        _default_structure = f"{self.app_root}/builtins/templates/structures/fl_default/includes"
-        if is_dir(_structure):
-            if is_file(f"{_structure}/{including}"):
-                return f"structures/{self.structure_name}/includes/{including}"
+        if is_dir(self._structure):
+            if is_file(f"{self._structure}/includes/{including}"):
+                return f"{self._structure_name}/includes/{including}"
 
-            if is_file(f"{_default_structure}/{including}"):
-                return f"structures/fl_default/includes/{including}"
+            if is_file(f"{self._default_structure}/includes/{including}"):
+                return f"{self._default_structure_name}/includes/{including}"
 
-        return "structures/fl_default/error_pages/template_include_error.html"
+        return f"{self._default_structure}/error_pages/template_include_error.html"
 
     def error(self, error_page: str) -> str:
         """
@@ -51,16 +50,16 @@ class StructureBuilder:
         :param error_page:
         :return:
         """
-        _structure = f"{self.app_root}/builtins/templates/structures/{self.structure_name}/error_pages"
-        _default_structure = f"{self.app_root}/builtins/templates/structures/fl_default/error_pages"
-        if is_dir(_structure):
-            if is_file(f"{_structure}/{error_page}"):
-                return f"structures/{self.structure_name}/error_pages/{error_page}"
+        print(self._structure)
+        if is_dir(self._structure):
 
-            if is_file(f"{_default_structure}/{error_page}"):
-                return f"structures/fl_default/error_pages/{error_page}"
+            if is_file(f"{self._structure}/error_pages/{error_page}"):
+                return f"{self._structure_name}/error_pages/{error_page}"
 
-        return "structures/fl_default/error_pages/template_extend_error.html"
+            if is_file(f"{self._default_structure}/error_pages/{error_page}"):
+                return f"{self._default_structure_name}/error_pages/{error_page}"
+
+        return f"{self._default_structure_name}/error_pages/template_extend_error.html"
 
     def render(self, render_page: str) -> str:
         """
@@ -68,16 +67,14 @@ class StructureBuilder:
         :param render_page:
         :return:
         """
-        _structure = f"{self.app_root}/builtins/templates/structures/{self.structure_name}/renders"
-        _default_structure = f"{self.app_root}/builtins/templates/structures/fl_default/renders"
-        if is_dir(_structure):
-            if is_file(f"{_structure}/{render_page}"):
-                return f"structures/{self.structure_name}/renders/{render_page}"
+        if is_dir(self._structure):
+            if is_file(f"{self._structure}/renders/{render_page}"):
+                return f"{self._structure_name}/renders/{render_page}"
 
-            if is_file(f"{_default_structure}/{render_page}"):
-                return f"structures/fl_default/renders/{render_page}"
+            if is_file(f"{self._default_structure}/renders/{render_page}"):
+                return f"{self._default_structure_name}/renders/{render_page}"
 
-        return "structures/fl_default/error_pages/template_render_error.html"
+        return f"{self._default_structure}/error_pages/template_render_error.html"
 
     def name(self) -> str:
         """
@@ -85,7 +82,6 @@ class StructureBuilder:
         it will default to fl_default
         :return:
         """
-        _location = f"{self.app_root}/builtins/templates/structures/{self.structure_name}"
-        if is_dir(_location):
-            return self.structure_name
+        if is_dir(self._structure):
+            return self._structure_name
         return "fl_default"

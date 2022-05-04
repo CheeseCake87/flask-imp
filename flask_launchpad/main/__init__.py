@@ -2,6 +2,7 @@ from importlib import import_module
 from datetime import timedelta
 from flask import Flask
 from os import path
+from flask import Blueprint
 
 from .builtins.functions.email_connector import test_email_server_connection
 from .builtins.functions.email_connector import send_email
@@ -52,6 +53,8 @@ def create_app(live: bool):
     main.template_folder = settings["app"]["template_folder"]
     main.static_folder = settings["app"]["static_folder"]
     create_folder_if_not_found(main.config["UPLOAD_FOLDER"])
+    structures = Blueprint(name="structures", import_name="structures", template_folder=f"{app_root}/structures")
+    main.register_blueprint(structures)
 
     show_stats(building_rocket(), live)
     show_stats(f">> {settings['frameworks']['launchpad']}", live)
