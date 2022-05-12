@@ -3,38 +3,14 @@ from flask import url_for
 
 
 class BootstrapNavs:
-    _all: dict = {}
-    _endpoint: str = ""
+    nav_items: dict
 
-    def __init__(self, endpoint: str = "") -> None:
-        self._endpoint = endpoint
-        self.clear()
-
-    def all(self) -> dict:
-        if self._all == {}:
-            return {"": ""}
-        return self._all
-
-    def add(self, element: object) -> None:
-        tack = {
-            len(self._all): element
-        }
-        self._all.update(tack)
-
-    def remove(self, name) -> None:
-        self._all.pop(name)
-
-    def update(self, name, element) -> None:
-        self._all[name] = element
-
-    def clear(self) -> None:
-        self._all.clear()
-
-    def no_space(self, string: str) -> str:
-        return string.replace(" ", "").lower()
-
-    def title(self, string: str) -> str:
-        return string.title()
+    def __init__(self, nav_items: dict):
+        """
+        nav_items: dict { order(int): dict { label: str, url_for: str, permission: str }
+        """
+        _version = "0.1"
+        self.nav_items = nav_items
 
     def wrap_element(self, constructor: list, wrap_class: str = None) -> list:
         if wrap_class is not None:
@@ -42,54 +18,29 @@ class BootstrapNavs:
             constructor.append("</div>")
         return constructor
 
-    def tabs(self) -> dict:
-        tabs_dict = {}
-        tabs_dict.clear()
-        tabs_dict["start_of_tabs"] = Markup('<ul class="nav nav-tabs">')
-        tabs_dict.update(self.all())
-        tabs_dict["end_of_tabs"] = Markup('</ul>')
-        return tabs_dict
+    def tabs(self,
+             wrap_class: str = None,
+             endpoint: str = None,
+             ):
+        construction = []
 
-    def tab(self,
-            label: str,
-            tab_class: str = "",
-            endpoint: str = None,
-            match_endpoint: bool = True,
-            override_url: str = "",
-            active: bool = False,
-            disabled: bool = False,
-            wrap_class: str = None,
-            ):
+        if self.nav_items is None:
+            construction.append("<p>Not a valid button_action type</p>")
+            return Markup("".join(construction))
 
-        construction = ['<li class="nav-item">', '<a class="nav-link']
+        nav_items = self.nav_items
+        construction.append('<ul class="nav nav-tabs">')
 
-        if tab_class != "":
-            construction.append(f' {tab_class}')
-        if active:
-            construction.append(' active')
-        if disabled:
-            construction.append(' disabled')
-
-        else:
-            if match_endpoint:
-                if endpoint == self._endpoint:
+        for key in sorted(nav_items):
+            construction.append('<li class="nav-item">')
+            construction.append('<a class="nav-link')
+            if endpoint is not None:
+                if nav_items[key]["url_for"] == endpoint:
                     construction.append(' active')
+            construction.append(
+                f'" href="{url_for(nav_items[key]["url_for"])}">{nav_items[key]["label"]}</a>')
+            construction.append('<li class="nav-item">')
+        construction.append('</ul>')
 
-        construction.append('"')
-
-        if override_url != "":
-            construction.append(f' href="{override_url}">{label}</a>')
-            construction.append('</li>')
-            final = self.wrap_element(construction, wrap_class)
-            return Markup("".join(final))
-
-        if endpoint is not None:
-            construction.append(f' href="{url_for(endpoint)}">{label}</a>')
-            construction.append('</li>')
-            final = self.wrap_element(construction, wrap_class)
-            return Markup("".join(final))
-
-        construction.append(f' href="#">{label}</a>')
-        construction.append('</li>')
         final = self.wrap_element(construction, wrap_class)
         return Markup("".join(final))

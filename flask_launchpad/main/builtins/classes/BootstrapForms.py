@@ -2,45 +2,8 @@ from markupsafe import Markup
 
 
 class BootstrapForms:
-    _all = {}
-
     def __init__(self):
         _version = "0.1"
-        self.clear()
-
-    def all(self) -> dict:
-        if self._all == {}:
-            return {"": ""}
-        return self._all
-
-    def add(self, name: str, element: Markup = None, element_list: list = None) -> None:
-        null_marker = ":null:"
-        if element is not None:
-            if null_marker in element:
-                element = element.replace(null_marker, name)
-            tack = {name: element}
-            self._all.update(tack)
-            return
-
-        if element_list is not None:
-            unpack_list = []
-            for index, element in enumerate(element_list):
-                if null_marker in element:
-                    unpack_list.append(element.replace(null_marker, f"{name}_{index}"))
-                else:
-                    unpack_list.append(element)
-            tack = {name: unpack_list}
-            self._all.update(tack)
-            return
-
-    def remove(self, name) -> None:
-        self._all.pop(name)
-
-    def update(self, name, element) -> None:
-        self._all[name] = element
-
-    def clear(self) -> None:
-        self._all.clear()
 
     def no_space(self, string: str) -> str:
         return string.replace(" ", "").lower()
@@ -58,90 +21,63 @@ class BootstrapForms:
         return constructor
 
     def apply_input_group(self, constructor) -> list:
-        constructor.insert(0, '<div class="input-group">')
-        constructor.append('</div>')
-        return constructor
+        _constructor = constructor
+        _constructor.insert(0, '<div class="input-group">')
+        _constructor.append('</div>')
+        return _constructor
 
     def prepend_label_func(self, constructor: list, label: str) -> list:
-        if '<div class="input-group">' not in constructor:
-            constructor = self.apply_input_group(constructor)
-        constructor.insert(1, f'</div>')
-        constructor.insert(1,
-                           f'<span class="input-group-text" id="inputGroup-sizing-default">{label}</span>')
-        constructor.insert(1, f'<div class="input-group-prepend">')
-        return constructor
+        _constructor = constructor
+        if '<div class="input-group">' not in _constructor:
+            _constructor = self.apply_input_group(_constructor)
+        _constructor.insert(1, f'</div>')
+        _constructor.insert(1,
+                            f'<span class="input-group-text" id="inputGroup-sizing-default">{label}</span>')
+        _constructor.insert(1, f'<div class="input-group-prepend">')
+        print(_constructor)
+        return _constructor
 
     def append_label_func(self, constructor: list, label: str) -> list:
-        if '<div class="input-group">' not in constructor:
-            constructor = self.apply_input_group(constructor)
-        constructor.append(f'<div class="input-group-append">')
-        constructor.append(
+        _constructor = constructor
+        if '<div class="input-group">' not in _constructor:
+            _constructor = self.apply_input_group(_constructor)
+        _constructor.append(f'<div class="input-group-append">')
+        _constructor.append(
             f'<span class="input-group-text" id="inputGroup-sizing-default">{label}</span>')
-        constructor.append(f'</div>')
-        return constructor
+        _constructor.append(f'</div>')
+        return _constructor
 
     def prepend_button_func(self, constructor: list, button_object: str) -> list:
-        if '<div class="input-group">' not in constructor:
-            constructor = self.apply_input_group(constructor)
-        constructor.insert(1, f'</div>')
-        constructor.insert(1, button_object)
-        constructor.insert(1, f'<div class="input-group-prepend">')
-        constructor.insert(1, f'<div class="input-group">')
-        constructor.append('</div>')
-        return constructor
+        _constructor = constructor
+        if '<div class="input-group">' not in _constructor:
+            _constructor = self.apply_input_group(_constructor)
+        _constructor.insert(1, f'</div>')
+        _constructor.insert(1, button_object)
+        _constructor.insert(1, f'<div class="input-group-prepend">')
+        _constructor.insert(1, f'<div class="input-group">')
+        _constructor.append('</div>')
+        return _constructor
 
     def append_button_func(self, constructor: list, button_object: str) -> list:
-        if '<div class="input-group">' not in constructor:
-            constructor.append(f'<div class="input-group-append">')
-            constructor.append(button_object)
-            constructor.append(f'</div>')
-            constructor = self.apply_input_group(constructor)
-            return constructor
+        _constructor = constructor
+        if '<div class="input-group">' not in _constructor:
+            _constructor.append(f'<div class="input-group-append">')
+            _constructor.append(button_object)
+            _constructor.append(f'</div>')
+            _constructor = self.apply_input_group(_constructor)
+            return _constructor
 
-        constructor.insert(constructor.__len__() - 2, f'<div class="input-group-append">')
-        constructor.insert(constructor.__len__() - 2, button_object)
-        constructor.append(f'</div>')
-        return constructor
+        _constructor.insert(_constructor.__len__() - 1, f'<div class="input-group-append">')
+        _constructor.insert(_constructor.__len__() - 1, button_object)
+        _constructor.append(f'</div>')
+        return _constructor
 
     def hidden(self,
-               name: str = ":null:",
-               value: str = "submit"
+               name: str,
+               value: str
                ):
         return Markup(
             f'<input type="hidden" name="{self.no_space(name)}" id="{self.no_space(name)}" value="{value}" />')
-
-    def switch(self,
-               name: str = ":null:",
-               label: str = "",
-               input_class: str = "",
-               onclick: str = "",
-               wrap_class: str = None,
-               wrap_inner_class: str = None,
-               checked: bool = False,
-               disabled: bool = False,
-               required: bool = False,
-               ) -> Markup:
-
-        construction = ['<div class="form-check form-switch">', '<input class="form-check-input']
-        if input_class != "":
-            construction.append(f'{input_class}')
-        construction.append(f'" type="checkbox" name="{name}" id="{name}"')
-        if onclick != "":
-            construction.append(f' onclick="{onclick}"')
-        if checked:
-            construction.append(' checked')
-        if disabled:
-            construction.append(' disabled')
-        if required:
-            construction.append(' required')
-        construction.append('>')
-        if label != "":
-            construction.append(
-                f'<label class="form-check-label" for="{name}">{label}</label>'
-            )
-        construction.append('</div>')
-        final = self.wrap_element(construction, wrap_class, wrap_inner_class)
-        return Markup("".join(final))
 
     def button(self,
                label: str,
@@ -149,11 +85,10 @@ class BootstrapForms:
                button_action: str = "button",
                button_class: str = None,
                href: str = "#",
-               target: str = "",
                wrap_class: str = None,
                wrap_inner_class: str = None,
                disabled: bool = False,
-               ) -> Markup:
+               ) -> str:
         """
         Generates a Bootstrap button.
         element_type: button , a
@@ -171,11 +106,9 @@ class BootstrapForms:
 
         if element_type == "a":
             construction.append(f'<a href="{href}" ')
-            construction.append(f'class="{button_class}')
-            if target != "":
-                construction.append(f'target="{target}')
+            construction.append(f'class="{button_class} ')
             if disabled:
-                construction.append(' disabled')
+                construction.append('disabled')
             construction.append(f'" role="button">{label}</a>')
             final = self.wrap_element(construction, wrap_class)
             return Markup("".join(final))
@@ -187,7 +120,7 @@ class BootstrapForms:
             construction.append(f'<button type="{button_action}" ')
             construction.append(f'class="{button_class}" ')
             if disabled:
-                construction.append('disabled')
+                construction.append('disabled"')
             construction.append(f'>{label}</button>')
             final = self.wrap_element(construction, wrap_class, wrap_inner_class)
             return Markup("".join(final))
@@ -196,7 +129,7 @@ class BootstrapForms:
         return Markup("".join(construction))
 
     def input(self,
-              name: str = ":null:",
+              name: str,
               label: str = "",
               prepend_label: str = "",
               append_label: str = "",
@@ -205,16 +138,14 @@ class BootstrapForms:
               placeholder: str = "",
               input_type: str = "text",
               input_class: str = "",
-              input_id: str = "",
               wrap_class: str = None,
               wrap_inner_class: str = None,
               required: bool = False,
               readonly: bool = False,
               disabled: bool = False,
               multiple: bool = False,
-              autofocus: bool = False,
               value: str = None,
-              ) -> Markup:
+              ) -> str:
 
         _name = self.no_space(name)
         _label = self.title(label)
@@ -223,16 +154,9 @@ class BootstrapForms:
             f'<input ',
             f'type="{input_type}" ',
             f'name="{_name}" ',
-            'class="form-control',
+            f'id="{_name}" ',
+            f'class="form-control {input_class}" ',
         ]
-
-        if input_class != "":
-            construction.append(f' {input_class}')
-
-        construction.append(f'" id="{_name}', )
-        if input_id != "":
-            construction.append(f' {input_id}')
-        construction.append(f'"')
 
         if value:
             construction.append(f'value="{value}" ')
@@ -251,9 +175,6 @@ class BootstrapForms:
 
         if multiple:
             construction.append('multiple ')
-
-        if autofocus:
-            construction.append('autofocus ')
 
         construction.append("/>")
 
@@ -282,12 +203,10 @@ class BootstrapForms:
         return Markup("".join(final))
 
     def select(self,
-               name: str = ":null:",
+               name: str,
                label: str = "",
                prepend_label: str = "",
                append_label: str = "",
-               prepend_button: str = "",
-               append_button: str = "",
                input_class: str = "",
                wrap_class: str = None,
                wrap_inner_class: str = None,
@@ -308,8 +227,7 @@ class BootstrapForms:
             '<select ',
             f'name="{_name}" ',
             f'id="{_name}" ',
-            'style="-webkit-appearance: menulist;" ',
-            f'class="form-control form-override {input_class}" ',
+            f'class="form-control {input_class}" ',
         ]
 
         if required:
@@ -351,14 +269,8 @@ class BootstrapForms:
         if append_label != "":
             construction = self.append_label_func(construction, prepend_label)
 
-        if prepend_button != "":
-            construction = self.prepend_button_func(construction, prepend_button)
-
-        if append_button != "":
-            construction = self.append_button_func(construction, append_button)
-
         if label != "":
-            construction.insert(0, f'<label for="{_name}" class="mb-2">{_label}</label>')
+            construction.insert(0, f'<label for="{_name}">{_label}</label>')
 
         final = self.wrap_element(construction, wrap_class, wrap_inner_class)
         return Markup("".join(final))
