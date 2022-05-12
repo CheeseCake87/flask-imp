@@ -11,10 +11,6 @@
       "Permissions": {
         "url_for": "administrator.permissions",
         "permission": "administrator"
-      },
-      "Companies": {
-        "url_for": "administrator.companies",
-        "permission": "administrator"
       }
     }
   }

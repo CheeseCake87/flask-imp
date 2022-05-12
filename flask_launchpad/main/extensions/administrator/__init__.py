@@ -23,10 +23,6 @@ FlUser = getattr(account_model, "FlUser")
 administrator_model = import_module(find_model_location("administrator"))
 FlPermission = getattr(administrator_model, "FlPermission")
 FlPermissionMembership = getattr(administrator_model, "FlPermissionMembership")
-FlCompany = getattr(administrator_model, "FlCompany")
-FlCompanyMembership = getattr(administrator_model, "FlCompanyMembership")
-FlTeam = getattr(administrator_model, "FlTeam")
-FlTeamMembership = getattr(administrator_model, "FlTeamMembership")
 
 for route in import_routes(module_folder="extensions", module=config["settings"]["name"]):
     import_module(f"{current_app.config['APP_NAME']}.extensions.{config['settings']['name']}.routes.{route}")

@@ -1,8 +1,8 @@
 from importlib import import_module
 from datetime import timedelta
 from flask import Flask
-from os import path
 from flask import Blueprint
+from os import path
 
 from .builtins.functions.email_connector import test_email_server_connection
 from .builtins.functions.email_connector import send_email
@@ -53,17 +53,11 @@ def create_app(live: bool):
     main.template_folder = settings["app"]["template_folder"]
     main.static_folder = settings["app"]["static_folder"]
     create_folder_if_not_found(main.config["UPLOAD_FOLDER"])
+
     structures = Blueprint(name="structures", import_name="structures", template_folder=f"{app_root}/structures")
     main.register_blueprint(structures)
 
     show_stats(building_rocket(), live)
-    show_stats(f">> {settings['frameworks']['launchpad']}", live)
-    show_stats(email_server_status(settings["smtp"]["enabled"]), live)
-    show_stats(f">> {settings['smtp']['server']}, {settings['smtp']['port']}, {settings['smtp']['username']}", live)
-    show_stats("!! Got to: http://127.0.0.1:5000/system/test-email to test. !!", live)
-    show_stats(" ", live)
-    show_stats(f":: GLOBAL JS : {settings['frameworks']['global_js']} ::", live)
-    show_stats(f":: GLOBAL CSS : {settings['frameworks']['global_css']} ::", live)
 
     with main.app_context():
         def load_blueprints() -> None:

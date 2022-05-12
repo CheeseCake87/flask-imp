@@ -6,7 +6,7 @@ from flask import current_app
 
 @current_app.route("/structures/<structure>/css/<filename>", methods=["GET"])
 def structure_css(structure, filename):
-    file_location = f"{get_app_root()}/builtins/templates/structures/{structure}/css"
+    file_location = f"{get_app_root()}/structures/{structure}/css"
     if is_file(f"{file_location}/{filename}"):
         return send_from_directory(
             directory=file_location,
@@ -16,7 +16,7 @@ def structure_css(structure, filename):
 
 @current_app.route("/structures/<structure>/js/<filename>", methods=["GET"])
 def structure_js(structure, filename):
-    file_location = f"{get_app_root()}/builtins/templates/structures/{structure}/js"
+    file_location = f"{get_app_root()}/structures/{structure}/js"
     if is_file(f"{file_location}/{filename}"):
         return send_from_directory(
             directory=file_location,
@@ -26,7 +26,7 @@ def structure_js(structure, filename):
 
 @current_app.route("/structures/<structure>/img/<filename>", methods=["GET"])
 def structure_img(structure, filename):
-    file_location = f"{get_app_root()}/builtins/templates/structures/{structure}/img"
+    file_location = f"{get_app_root()}/structures/{structure}/img"
     if is_file(f"{file_location}/{filename}"):
         return send_from_directory(
             directory=file_location,
