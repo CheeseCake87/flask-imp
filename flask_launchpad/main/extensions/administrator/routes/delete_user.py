@@ -5,7 +5,6 @@ from flask import session
 from ....builtins.functions.security import login_required
 
 from .. import FlPermissionMembership
-from .. import FlCompanyMembership
 from .. import FlUser
 from .. import bp
 from .. import sql_do
@@ -23,9 +22,6 @@ def delete_user(user_id):
     ).delete()
     sql_do.query(FlPermissionMembership).filter(
         FlPermissionMembership.user_id == user_id
-    ).delete()
-    sql_do.query(FlCompanyMembership).filter(
-        FlCompanyMembership.user_id == user_id
     ).delete()
     sql_do.commit()
     return redirect(url_for("administrator.users"))

@@ -12,18 +12,14 @@ from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.utilities import reverse_dict
 from ....builtins.functions.security import login_required
-from ....builtins.functions.memberships import get_company_membership_from_user_id
-from ....builtins.functions.memberships import get_user_ids_from_company_id_list
 from ....builtins.functions.memberships import get_permission_membership_from_user_id
 from ....builtins.functions.memberships import get_permission_id_from_permission_name
-from ....builtins.functions.memberships import get_all_companies
 
 from .. import bp
 from .. import sql_do
 from .. import struc
 from .. import FlUser
 from .. import FlPermissionMembership
-from .. import FlCompanyMembership
 
 
 @bp.route("/users", methods=["GET", "POST"])

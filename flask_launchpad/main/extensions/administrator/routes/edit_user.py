@@ -11,14 +11,10 @@ from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.utilities import reverse_dict
 from ....builtins.functions.security import login_required
-from ....builtins.functions.memberships import get_company_membership_from_user_id
-from ....builtins.functions.memberships import get_all_companies
 from ....builtins.functions.memberships import get_permission_membership_from_user_id
 
 from .. import FlPermission
 from .. import FlPermissionMembership
-from .. import FlCompany
-from .. import FlCompanyMembership
 from .. import FlUser
 from .. import bp
 from .. import sql_do
