@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name='Flask-Launchpad',
-    version='1.0',
+    version='0.2',
     url='https://uilix.com/flask-launchpad',
     license='MIT',
     author='David Carmichael | UiliX Ltd (UK, Scotland)',

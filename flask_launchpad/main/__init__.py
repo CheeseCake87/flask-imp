@@ -50,7 +50,7 @@ class Config(object):
         SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
-def create_app(live: bool):
+def create_app():
     main = Flask(__name__)
     main.config.from_object(Config)
     main.template_folder = settings["app"]["template_folder"]
