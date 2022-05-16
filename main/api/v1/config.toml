@@ -1,0 +1,16 @@
+[init]
+enabled = true
+version = 1.0
+type = "api"
+
+[settings]
+url_prefix = "/v1"
+
+[http_auth]
+enabled = false
+http_user = "httpuser"
+http_pass = "httppass"
+
+[public_key]
+enabled = false
+public_key = "a3oe3qhY8knm"

@@ -1,30 +1,25 @@
-"""
-Flask-Launchpad v1(alt)
--------------
-
-Enabling auto importing of blueprints and apis to allow you to use swarm of routes!
-"""
 from setuptools import setup
+from setuptools import find_packages
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
 setup(
     name='Flask-Launchpad',
-    version='0.2',
-    url='https://uilix.com/flask-launchpad',
+    version='0.4',
+    url='https://github.com/CheeseCake87/Flask-Launchpad',
     license='MIT',
-    author='David Carmichael | UiliX Ltd (UK, Scotland)',
-    author_email='hello@uilix.com',
+    author='David Carmichael and UiliX Ltd',
+    author_email='carmichaelits@gmail.com',
     description='A small auto importer for blueprints and apis',
-    long_description=__doc__,
-    py_modules=['flask_sqlite3'],
-    # if you would be using a package instead use packages instead
-    # of py_modules:
-    # packages=['flask_sqlite3'],
-    zip_safe=False,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    py_modules=['flask_launchpad'],
+    zip_safe=True,
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'Flask'
+        'Flask', 'toml'
     ],
     classifiers=[
         'Environment :: Web Environment',
@@ -34,5 +29,8 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
-    ]
+    ],
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
+    python_requires=">=3.6",
 )

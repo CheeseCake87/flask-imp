@@ -1,11 +1,6 @@
-from ...builtins.functions.import_mgr import read_config
-from ...builtins.functions.import_mgr import import_routes
 from ...builtins.functions.structure import StructureBuilder
-from importlib import import_module
-from flask import Blueprint
-from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
-from os import path
+from ..._flask_launchpad.src.flask_launchpad import FLBlueprint
 
 """
 This is an example blueprint init file.
@@ -18,10 +13,10 @@ This is an example blueprint init file.
 . routes in the routes folder of the blueprint are imported
 """
 
-config = read_config(filepath=path.dirname(path.realpath(__file__)))
-bp = Blueprint(**config["settings"], root_path=path.dirname(path.realpath(__file__)))
-struc = StructureBuilder()
+fl_bp = FLBlueprint()
+bp = fl_bp.register()
+fl_bp.import_routes("routes")
 
+struc = StructureBuilder()
 db = SQLAlchemy()
 sql_do = db.session
-

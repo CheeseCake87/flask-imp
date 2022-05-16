@@ -1,0 +1,10 @@
+[init]
+enabled = true
+version = 0.1
+type = "blueprint"
+
+[settings]
+url_prefix = "/example"
+template_folder = "templates"
+static_folder = "static"
+static_url_path = "/static"

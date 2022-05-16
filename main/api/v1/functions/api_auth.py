@@ -1,7 +1,7 @@
-from functools import wraps
 from flask_restx import abort
-from .. import config
 
+from .. import fl_bl
+config = fl_bl.config()
 
 def check_http_auth(request_authorization) -> bool:
     if request_authorization is None:
