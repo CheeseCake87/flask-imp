@@ -19,7 +19,8 @@ Don't get lazy and ensure you know what code you are potentially going to run.
 Here's an example of how your project should look
 ```
 Example folder structure :
-
+```
+```
 project/
     - main/
         - blueprints/
