@@ -5,6 +5,8 @@ To install Flask-Launchpad do:
 pip install Flask-Launchpad
 ```
 
+This project imports Flask-Launchpad from a local directory, for testing, obviously.
+
 Flask-Launchpad is a small auto importer to import multiple blueprints and their routes. Can also handle multiple 
 imports of flask_restx apis.
 
