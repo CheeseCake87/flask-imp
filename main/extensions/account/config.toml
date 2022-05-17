@@ -1,0 +1,17 @@
+[init]
+enabled = true
+version = 0.1
+
+[settings]
+type = "extension"
+structure = "fl_default"
+
+[blueprint]
+url_prefix = "/account"
+template_folder = "templates"
+
+[session]
+auth = false
+user_id = 0
+username = "None"
+permissions = "None"

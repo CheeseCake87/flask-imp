@@ -30,6 +30,7 @@ def custom_401(error):
 def redirect_catch_all():
     render = struc.error("redirect_catch_all.html")
     structure = struc.name()
+    endpoint_tried = ""
     if "tried" in request.args:
         endpoint_tried = f"The endpoint: {request.args['tried']} does not exist"
     return render_template(

@@ -18,10 +18,6 @@ from ....builtins.functions.import_mgr import read_config_as_dict
 from .. import FlUser
 from .. import FlPermission
 from .. import FlPermissionMembership
-from .. import FlCompany
-from .. import FlCompanyMembership
-from .. import FlTeam
-from .. import FlTeamMembership
 from .. import FlSystemSettings
 from .. import bp
 from .. import sql_do
@@ -73,16 +69,6 @@ def setup():
             disabled=False
         )
 
-        # Add system company
-        add_system_company = FlCompany(
-            name="__system__",
-        )
-
-        # Add system team
-        add_system_team = FlTeam(
-            name="__system__",
-        )
-
         # Add permission groups
         add_system_perm = FlPermission(
             name="system",
@@ -102,26 +88,12 @@ def setup():
         )
 
         # Insert into database session and flush to get IDs
-        sql_do.add(add_system_company)
-        sql_do.add(add_system_team)
         sql_do.add(add_user)
         sql_do.add(add_system_perm)
         sql_do.add(add_user_perm)
         sql_do.add(add_administrator_perm)
         sql_do.add(add_assets_perm)
         sql_do.flush()
-
-        # Add user to company
-        add_to_system_company = FlCompanyMembership(
-            user_id=add_user.user_id,
-            company_id=add_system_company.company_id
-        )
-
-        # Add user to team
-        add_to_system_team = FlTeamMembership(
-            user_id=add_user.user_id,
-            team_id=add_system_team.team_id
-        )
 
         # Add user to permission groups
         add_system_perm_mem = FlPermissionMembership(
@@ -147,9 +119,6 @@ def setup():
         )
 
         # Insert into database session
-        sql_do.add(add_to_system_company)
-        sql_do.add(add_to_system_team)
-
         sql_do.add(add_system_perm_mem)
         sql_do.add(add_user_perm_mem)
         sql_do.add(add_administrator_perm_mem)

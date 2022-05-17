@@ -4,7 +4,6 @@ from flask import session
 from ....builtins.functions.security import login_required
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
-from ....builtins.functions.memberships import get_permission_membership_from_user_id
 
 from .. import bp
 from .. import struc
@@ -13,6 +12,8 @@ from .. import struc
 @bp.route("/dashboard", methods=["GET"])
 @login_required("auth", "account.login")
 def dashboard():
+    from ....builtins.functions.memberships import get_permission_membership_from_user_id
+
     error = session["error"]
     message = session["message"]
     render = "renders/dashboard.html"

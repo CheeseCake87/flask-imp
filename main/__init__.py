@@ -9,9 +9,11 @@ def create_app():
     fl.init_app(main)
 
     fl.app_config("app_config.toml")
+    fl.register_structure_folder("structures")
     fl.import_builtins("builtins/routes")
     fl.import_builtins("builtins/template_filters")
     fl.import_blueprints("blueprints")
+    fl.import_blueprints("extensions")
     fl.import_apis("api")
 
     # fl.import_blueprints("extensions")
@@ -21,5 +23,7 @@ def create_app():
     #
     # for key, value in main.config.items():
     #     print(key, value)
+
+    print(main.config)
 
     return main

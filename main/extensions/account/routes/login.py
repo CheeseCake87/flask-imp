@@ -10,7 +10,6 @@ from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.auth import safe_username
 from ....builtins.functions.auth import auth_password
-from ....builtins.functions.memberships import get_permission_membership_from_user_id
 
 from .. import bp
 from .. import struc
@@ -21,6 +20,8 @@ from .. import FlUser
 @bp.route("/login", methods=["GET", "POST"])
 @logged_in_check("auth", "account.dashboard")
 def login():
+    from ....builtins.functions.memberships import get_permission_membership_from_user_id
+
     error = session["error"]
     message = session["message"]
     render = "renders/login.html"

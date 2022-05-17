@@ -62,7 +62,16 @@ class FlaskLaunchpad(object):
             config.update(toml_load(f"{current_app.root_path}/{_file}"))
 
             if "flask" in config:
-                for key, value in config["flask"].items():
+                c_flask = config["flask"]
+                if "static_folder" in c_flask:
+                    current_app.static_folder = f"{current_app.root_path}/{c_flask['static_folder']}"
+                    del config["flask"]["static_folder"]
+                if "template_folder" in c_flask:
+                    current_app.template_folder = f"{current_app.root_path}/{c_flask['template_folder']}"
+                    del config["flask"]["template_folder"]
+
+                print(config["flask"])
+                for key, value in c_flask.items():
                     current_app.config[key.upper()] = value
                 del config["flask"]
 
@@ -107,8 +116,9 @@ class FlaskLaunchpad(object):
 
             for route in routes_clean:
                 try:
-                    import_module(f"{folder.replace('/','.')}.{route}")
-                except ImportError:
+                    import_module(f"{current_app.name}.{folder.replace('/', '.')}.{route}")
+                except ImportError as e:
+                    print(e)
                     continue
 
     def import_blueprints(self, folder: str) -> None:
@@ -179,45 +189,69 @@ class FlaskLaunchpad(object):
 
 
 class FLBlueprint:
-    module_folder = None
-    blueprint_name = None
-    module_name = None
-    config_file = "config.toml"
-    this_config = None
+    module = None
+    import_from = None
+    root_path = None
+    config_file = None
+    config = None
+    session = {}
 
     def __init__(self):
         caller = stack()[1]
         split_module_folder = caller.filename.split("/")[:-1]
-        self.module_folder = "/".join(split_module_folder)
-        self.blueprint_name = caller.filename.split("/")[-3:-2][0]
-        self.module_name = caller.filename.split("/")[-2:-1][0]
+        self.root_path = "/".join(split_module_folder)
+        self.import_from = caller.filename.split("/")[-3:-2][0]
+        self.name = caller.filename.split("/")[-2:-1][0]
 
-    def config(self) -> dict:
+    def load_config(self, config_file: str) -> dict:
         config = {}
-        if not path.isfile(f"{self.module_folder}/{self.config_file}") or ".toml" not in self.config_file:
+        if not path.isfile(f"{self.root_path}/{config_file}") or ".toml" not in config_file:
             raise ImportError("""
     Blueprint or API has no valid config file, must be like config.toml and be found in the root of the module.
                 """)
-        config.update(toml_load(f"{self.module_folder}/{self.config_file}"))
+
+        config.update(toml_load(f"{self.root_path}/{config_file}"))
+        self.config_file = config_file
+        self.config = config
+
         return config
 
-    def register(self, config_file: str = None):
-        if config_file is not None:
-            self.config_file = config_file
-        self.this_config = self.config()
-        settings = self.this_config["settings"]
-        if "init" in self.this_config:
-            if "enabled" in self.this_config["init"]:
-                if not self.this_config["init"]["enabled"]:
-                    return
-            if "type" in self.this_config["init"]:
-                if self.this_config["init"]["type"] == "api":
-                    new_url = f"/{self.blueprint_name}{settings['url_prefix']}"
-                    settings['url_prefix'] = new_url
-        return Blueprint(self.module_name, self.module_name, **settings)
+    def register(self, config_file: str = "config.toml"):
+        config = self.load_config(config_file)
+
+        try:
+            c_init = config["init"]
+            c_settings = config["settings"]
+            c_blueprint = config["blueprint"]
+        except KeyError:
+            raise ImportError("INIT and SETTINGS sections missing from config file.")
+
+        if c_init["enabled"]:
+            if c_settings["type"] == "api":
+                new_url = f"/{self.import_from}{c_blueprint['url_prefix']}"
+                c_settings['url_prefix'] = new_url
+
+        if "session" in config:
+            s = config["session"]
+            for key, value in s.items():
+                self.session[key] = value
+
+        bp_name, bp_import_name = self.name, self.name
+
+        if "name" in c_blueprint:
+            bp_name = c_blueprint["name"]
+
+        if "import_name" in c_blueprint:
+            bp_import_name = c_blueprint["import_name"]
+
+        if "template_folder" in c_blueprint:
+            c_blueprint["template_folder"] = f"{self.root_path}/{c_blueprint['template_folder']}"
+
+        print(c_blueprint)
+        return Blueprint(bp_name, bp_import_name, **c_blueprint)
 
     def import_routes(self, folder: str = "routes"):
-        routes_raw, routes_clean = listdir(f"{self.module_folder}/{folder}"), []
+        routes_raw, routes_clean = listdir(f"{self.root_path}/{folder}"), []
         for route in routes_raw:
             if has_illegal_chars(route, exception=[".py"]):
                 continue
@@ -225,6 +259,10 @@ class FLBlueprint:
 
         for route in routes_clean:
             try:
-                import_module(f"{current_app.name}.{self.blueprint_name}.{self.module_name}.{folder}.{route}")
-            except ImportError:
+                import_module(f"{current_app.name}.{self.import_from}.{self.name}.{folder}.{route}")
+            except ImportError as e:
+                print(f"""
+Error when importing {self.import_from} - {self.name} - {route}: 
+{e}
+                """)
                 continue

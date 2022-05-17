@@ -25,6 +25,8 @@ project/
     - main/
         - blueprints/
             - example/
+                - templates/
+                - static/
                 - routes/
                     - route1.py
                     - route2.py
@@ -44,6 +46,8 @@ project/
                 
         - __init__.py
         - app_config.toml
+        - templates/
+        - static/
     - venv/
     - run.py
 ```
@@ -158,10 +162,26 @@ main/blueprints/example/__init__.py :
 ```
 ```python
 from flask_launchpad import FLBlueprint
+from flask import session
 
 fl_bp = FLBlueprint()
 bp = fl_bp.register()
 fl_bp.import_routes("routes")
+
+@bp.before_app_first_request
+def before_app_first_request():
+    session.update(fl_bp.session)
+
+
+@bp.before_app_request
+def before_app_request():
+    pass
+
+
+@bp.after_app_request
+def after_app_request(response):
+    return response
+
 ```
 ```
 main/blueprints/example/config.toml :
@@ -170,13 +190,18 @@ main/blueprints/example/config.toml :
 [init]
 enabled = true
 version = 0.1
-type = "blueprint"
 
 [settings]
+type = "blueprint"
+
+[blueprint]
 url_prefix = "/example"
 template_folder = "templates"
 static_folder = "static"
 static_url_path = "/static"
+
+[session]
+var_in_session = "this can be loaded using fl_bp.session"
 
 ```
 ```
@@ -218,9 +243,11 @@ main/api/v1/config.toml :
 [init]
 enabled = true
 version = 1.0
-type = "api"
 
 [settings]
+type = "api"
+
+[blueprint]
 url_prefix = "/v1"
 
 [http_auth]

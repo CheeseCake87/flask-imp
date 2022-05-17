@@ -1,0 +1,11 @@
+[init]
+enabled = true
+version = 0.1
+
+[settings]
+type = "extension"
+structure = "fl_default"
+
+[blueprint]
+url_prefix = "/assets"
+template_folder = "templates"

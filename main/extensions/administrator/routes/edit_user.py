@@ -11,7 +11,6 @@ from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.utilities import reverse_dict
 from ....builtins.functions.security import login_required
-from ....builtins.functions.memberships import get_permission_membership_from_user_id
 
 from .. import FlPermission
 from .. import FlPermissionMembership
@@ -24,19 +23,11 @@ from .. import struc
 @bp.route("/users/edit/<user_id>", methods=["GET", "POST"])
 @login_required("auth", "account.login")
 def edit_user(user_id):
+    from ....builtins.functions.memberships import get_permission_membership_from_user_id
+
     query_user = sql_do.query(FlUser).filter(
         FlUser.user_id == user_id
     ).first()
-
-    if "system" in session["permissions"]:
-        logged_in_company_membership = get_all_companies()
-    else:
-        logged_in_company_membership = get_company_membership_from_user_id(session["user_id"])
-
-    query_user_company_membership = get_company_membership_from_user_id(query_user.user_id)
-    for company_name in query_user_company_membership:
-        if company_name not in logged_in_company_membership:
-            redirect("account.users")
 
     if request.method == "GET":
         error = session["error"]
@@ -52,7 +43,6 @@ def edit_user(user_id):
             "user_id": query_user.user_id,
             "username": query_user.username,
             "permissions": query_user_permissions,
-            "companies": query_user_company_membership,
             "disabled": query_user.disabled
         }
 
@@ -61,12 +51,6 @@ def edit_user(user_id):
         for value in all_permissions:
             if value.name not in query_user_permissions:
                 permission_dict[value.permission_id] = value.name
-
-        all_companies = sql_do.query(FlCompany).all()
-        company_dict = {}
-        for value in all_companies:
-            if value.name not in query_user_company_membership:
-                company_dict[value.company_id] = value.name
 
         return render_template(
             render,
@@ -79,7 +63,6 @@ def edit_user(user_id):
             clear_message=clear_message(),
             user=user_dict,
             all_permissions=permission_dict,
-            available_companies=company_dict
         )
 
     if request.method == "POST":
@@ -115,15 +98,6 @@ def edit_user(user_id):
                 permission_id=request.form["permission_id"]
             )
             sql_do.add(add_permission)
-            sql_do.commit()
-            return redirect(url_for("administrator.edit_user", user_id=user_id))
-
-        if "add_company" in request.form:
-            add_company = FlCompanyMembership(
-                user_id=query_user.user_id,
-                company_id=request.form["company_id"]
-            )
-            sql_do.add(add_company)
             sql_do.commit()
             return redirect(url_for("administrator.edit_user", user_id=user_id))
 

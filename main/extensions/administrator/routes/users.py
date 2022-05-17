@@ -12,8 +12,7 @@ from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.utilities import reverse_dict
 from ....builtins.functions.security import login_required
-from ....builtins.functions.memberships import get_permission_membership_from_user_id
-from ....builtins.functions.memberships import get_permission_id_from_permission_name
+from ....builtins.functions.database import convert_sql_to_list_dict
 
 from .. import bp
 from .. import sql_do
@@ -25,6 +24,8 @@ from .. import FlPermissionMembership
 @bp.route("/users", methods=["GET", "POST"])
 @login_required("auth", "account.login")
 def users():
+    from ....builtins.functions.memberships import get_permission_id_from_permission_name
+
     if request.method == "GET":
         error = session["error"]
         message = session["message"]
@@ -33,30 +34,7 @@ def users():
         extend = struc.extend("backend.html")
         footer = struc.include("footer.html")
 
-        if "system" in session["permissions"]:
-            logged_in_company_membership = get_all_companies()
-        else:
-            logged_in_company_membership = get_company_membership_from_user_id(session["user_id"])
-
-        company_ids, company_names = [], []
-
-        for company_name, company_id in logged_in_company_membership.items():
-            company_names.append(company_name)
-            company_ids.append(company_id)
-
-        company_users = get_user_ids_from_company_id_list(company_ids)
-
-        users_in_company = sql_do.query(FlUser).filter(
-            FlUser.user_id.in_(company_users)
-        )
-
-        user_dict = {}
-        for user in users_in_company:
-            user_dict[user.user_id] = {}
-            user_dict[user.user_id]["username"] = user.username
-            user_dict[user.user_id]["disabled"] = user.disabled
-            user_dict[user.user_id]["permissions"] = get_permission_membership_from_user_id(user.user_id)
-            user_dict[user.user_id]["companies"] = get_company_membership_from_user_id(user.user_id)
+        user_dict = convert_sql_to_list_dict(sql_do.query(FlUser).all())
 
         return render_template(
             render,
@@ -68,7 +46,6 @@ def users():
             message=message,
             clear_message=clear_message(),
             all_users=user_dict,
-            all_companies=reverse_dict(logged_in_company_membership)
         )
 
     if request.method == "POST":
@@ -101,22 +78,6 @@ def users():
             permission_id=default_permission_id
         )
         sql_do.add(add_permission_membership)
-
-        if "company" not in request.form:
-            company_membership = get_company_membership_from_user_id(session["user_id"])
-            for company_name, company_id in company_membership.items():
-                add_company_membership = FlCompanyMembership(
-                    company_id=company_id,
-                    user_id=add_user.user_id
-                )
-                sql_do.add(add_company_membership)
-        else:
-            add_company_membership = FlCompanyMembership(
-                company_id=request.form["company"],
-                user_id=add_user.user_id
-            )
-            sql_do.add(add_company_membership)
-            print(request.form["company"])
 
         sql_do.commit()
         return redirect(url_for("administrator.users"))

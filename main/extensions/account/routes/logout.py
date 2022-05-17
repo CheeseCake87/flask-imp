@@ -3,12 +3,12 @@ from flask import redirect
 from flask import url_for
 
 from .. import bp
-from .. import config
+from .. import fl_bp
 
 
 @bp.route("/logout", methods=["GET", "POST"])
 def logout():
-    for key, value in config["init_session"].items():
+    for key, value in fl_bp.config["session"].items():
         if value == "False":
             value = False
         if value == "True":

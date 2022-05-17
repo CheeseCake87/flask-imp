@@ -3,15 +3,18 @@
 # current_app.config["YOUR_VAR_NAME"] or of course, app.config["YOUR_VAR_NAME"] if you are not using app factory.
 
 [flask]
-name = "main"
+app_name = "main"
+version = "0.4.1"
 secret_key = "sdflskjdflksjdflksjdflkjsdf"
 debug = true
 testing = true
 session_time = 480
-static_folder = "static"
-template_folder = "templates"
+static_folder = "builtins/static"
+template_folder = "builtins/templates"
 error_404_help = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false
+structure = "fl_default"
+EXPLAIN_TEMPLATE_LOADING = true
 
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
 # type = mysql / postgresql / sqlite
