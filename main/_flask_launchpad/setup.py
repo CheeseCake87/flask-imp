@@ -9,7 +9,7 @@ setup(
     version='0.5',
     url='https://github.com/CheeseCake87/Flask-Launchpad',
     license='MIT',
-    author='David Carmichael and UiliX Ltd',
+    author='David Carmichael',
     author_email='carmichaelits@gmail.com',
     description='A small auto importer for blueprints and apis',
     long_description=long_description,
