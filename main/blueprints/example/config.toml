@@ -5,9 +5,10 @@ version = 0.1
 [settings]
 type = "blueprint"
 structure = "fl_default"
-models_folder = "models"
+models_folder = ""
 
 [blueprint]
+name = "my_cool_blueprint"
 url_prefix = "/"
 template_folder = "templates"
 static_folder = "static"

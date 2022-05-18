@@ -26,32 +26,32 @@ def contains_illegal_chars(name: str, exception: list = None) -> bool:
     return False
 
 
-# this function may not live long
-def class_name_ok(class_name: str) -> bool:
-    _banned_class_names = [
-        "ForeignKey",
-    ]
-    if class_name in _banned_class_names:
-        return False
-    return True
-
-
 class FlaskLaunchpad(object):
+    """
+    Main Flask-Launchpad Class
+    """
+    _app = None
+
     def __init__(self, app=None):
-        self._app = app
+        """
+        init method, fires init_app if app name is passed in. This is usually used when NOT using create_app()
+        """
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app=None):
+        """
+        init method used when working with create_app()
+        """
         if app is None:
-            raise ImportError
+            raise ImportError("No app passed into the FlaskLaunchpad app")
         self._app = app
 
     def register_structure_folder(self, folder: str) -> None:
         """
         Registers a folder in the root path as a Flask template folder.
-        :param folder: str
-        :return: None
+        The use of this is to allow for themes. I've called this structures and not themes as a template folder can
+        import template files, macros, etc.
         """
         with self._app.app_context():
             structures = Blueprint(folder, folder, template_folder=f"{current_app.root_path}/{folder}")
@@ -127,7 +127,13 @@ class FlaskLaunchpad(object):
             for key, value in config.items():
                 current_app.config[key.upper()] = value
 
-    def import_builtins(self, folder: str = "routes"):
+    def import_builtins(self, folder: str = "routes") -> None:
+        """
+        This allows you to import app level routes and template_filters.
+        It does the same as:
+        from .routes import my_route
+        But loops the import over all valid files found
+        """
         with self._app.app_context():
             routes_raw, routes_clean = listdir(f"{current_app.root_path}/{folder}"), []
             for route in routes_raw:
@@ -143,10 +149,22 @@ class FlaskLaunchpad(object):
                     continue
 
     def models_folder(self, folder: str, module: str = None) -> None:
-        if not path.isdir(folder):
-            return
-
+        """
+        This method is used to load valid model.py files into current_app.config["models"]
+        The shape of this data looks like this:
+        { module (blueprint name / app name):
+            { model (name of model file):
+                "import": <the import of the file>,
+                "classes": { class_name (name of the class in the model file): class_object (the class itself)
+            }
+        }
+        """
         with self._app.app_context():
+            if not path.isdir(folder):
+                folder = f"{current_app.root_path}/{folder}"
+                if not path.isdir(folder):
+                    print("Folder not found: ", folder)
+
             if module is None:
                 module = current_app.name
 
@@ -167,10 +185,10 @@ class FlaskLaunchpad(object):
                     model_module = import_module(import_path)
                     model_object = getattr(model_module, "db")
                 except ImportError as e:
-                    print(e)
+                    print("Error importing model: ", e)
                     continue
                 except AttributeError as e:
-                    print(e)
+                    print("Error importing model: ", e)
                     continue
 
                 models_dict[module].update({model: {"import": model_module, "db": model_object, "classes": {}}})
@@ -186,6 +204,18 @@ class FlaskLaunchpad(object):
             current_app.config["models"] = models_dict
 
     def create_all_models(self):
+        """
+        This creates the database, tables and fields from the models found in current_app.config["models"]
+        Can be used like:
+
+        FlaskLaunchpad(current_app).create_all_models()
+
+        ~or~
+
+        create_app():
+            ~~~~
+            fl.create_all_models()
+        """
         with self._app.app_context():
             for key, value in current_app.config["models"].items():
                 for ik, iv in value.items():
@@ -193,10 +223,8 @@ class FlaskLaunchpad(object):
 
     def import_blueprints(self, folder: str) -> None:
         """
-        Looks through the passed in folder for Blueprint modules, imports them then registers them with Flask.
+        Looks through the passed in folder for Blueprint modules; Imports them then registers them with Flask.
         The Blueprint object must be stored in a variable called bp in the __init__.py file in the Blueprint folder.
-        :param folder: str
-        :return: None
         """
 
         with self._app.app_context():
@@ -219,18 +247,14 @@ class FlaskLaunchpad(object):
                     print("Error importing blueprint: ", e)
                     continue
 
-                try:
+                if "models_folder" in bp_settings and bp_settings['models_folder'] != "":
                     self.models_folder(f"{_bp_root_folder}/{bp_settings['models_folder']}", blueprint)
-                except KeyError as e:
-                    print(e)
 
     def import_apis(self, folder: str) -> None:
         """
         Looks through the passed in folder for Blueprint modules, imports them then registers them with Flask.
         This does the same as import_blueprints, but decorates the name with an api marker
-        The Blueprint object must be stored in a variable called api_bp in the __init__.py file in the Blueprint folder.
-        :param folder: str
-        :return: None
+        The Blueprint object must be stored in a variable called api_bp in the __init__.py file in the Api Blueprint folder.
         """
 
         with self._app.app_context():
@@ -262,6 +286,9 @@ class FlaskLaunchpad(object):
 
 
 class FLBlueprint:
+    """
+    Class that handles Blueprints from within the Blueprint __init__ file
+    """
     module = None
     import_from = None
     root_path = None
@@ -270,6 +297,9 @@ class FLBlueprint:
     session = {}
 
     def __init__(self):
+        """
+        ini method sets defaults based on what file called the FLBlueprint Class.
+        """
         caller = stack()[1]
         split_module_folder = caller.filename.split("/")[:-1]
         self.root_path = "/".join(split_module_folder)
@@ -277,6 +307,10 @@ class FLBlueprint:
         self.name = caller.filename.split("/")[-2:-1][0]
 
     def load_config(self, config_file: str) -> dict:
+        """
+        This loads the config file of the Blueprint and saves it to the config var
+        so it can be accessed using fl_bp.config
+        """
         config = {}
         if not path.isfile(f"{self.root_path}/{config_file}") or ".toml" not in config_file:
             raise ImportError("""
@@ -290,6 +324,9 @@ class FLBlueprint:
         return config
 
     def register(self, config_file: str = "config.toml"):
+        """
+        Pulls the settings from the Blueprints config file and uses them to register a Flask Blueprint.
+        """
         config = self.load_config(config_file)
 
         try:
@@ -313,13 +350,11 @@ class FLBlueprint:
 
         if "name" in c_blueprint:
             bp_name = c_blueprint["name"]
-        else:
-            self.config["name"] = self.name
+            del c_blueprint["name"]
 
         if "import_name" in c_blueprint:
             bp_import_name = c_blueprint["import_name"]
-        else:
-            self.config["import_name"] = self.name
+            del c_blueprint["import_name"]
 
         if "template_folder" in c_blueprint:
             c_blueprint["template_folder"] = f"{self.root_path}/{c_blueprint['template_folder']}"
@@ -327,6 +362,9 @@ class FLBlueprint:
         return Blueprint(bp_name, bp_import_name, **c_blueprint)
 
     def import_routes(self, folder: str = "routes"):
+        """
+        Imports the routes from within the Blueprint folder.
+        """
         routes_raw, routes_clean = listdir(f"{self.root_path}/{folder}"), []
         for route in routes_raw:
             if contains_illegal_chars(route, exception=[".py"]):

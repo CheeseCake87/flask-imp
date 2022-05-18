@@ -1,7 +1,9 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from ._flask_launchpad.src.flask_launchpad import FlaskLaunchpad
 
 fl = FlaskLaunchpad()
+db = SQLAlchemy()
 
 
 def create_app():
@@ -18,5 +20,7 @@ def create_app():
     fl.import_blueprints("blueprints")
 
     fl.models_folder("models")
+
+    print(main.config["models"])
 
     return main
