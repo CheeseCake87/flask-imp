@@ -4,6 +4,7 @@ version = 1.0
 
 [settings]
 type = "api"
+models_folder = "models"
 
 [blueprint]
 url_prefix = "/v1"

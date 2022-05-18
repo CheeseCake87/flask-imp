@@ -69,13 +69,7 @@ def has_table(module, table_name: str) -> bool:
         return False
 
 
-def class_name_ok(class_name: str) -> bool:
-    _banned_class_names = [
-        "ForeignKey",
-    ]
-    if class_name in _banned_class_names:
-        return False
-    return True
+
 
 
 def get_tables() -> dict:

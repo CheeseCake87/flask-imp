@@ -27,12 +27,14 @@ project/
             - example/
                 - templates/
                 - static/
+                - models/
+                    - models.py
+                    - models2.py
                 - routes/
                     - route1.py
                     - route2.py
                 - __init__.py
                 - config.toml
-                - models.py
             - example2/
             - example3/
         - api/
@@ -65,21 +67,38 @@ fl = FlaskLaunchpad()
 def create_app():
     main = Flask(__name__)
     fl.init_app(main)
+    
     fl.app_config("app_config.toml")
+    fl.register_structure_folder("structures")
+    
     fl.import_builtins("routes")
     fl.import_builtins("another/folder/template_filters")
+    
     fl.import_blueprints("blueprints")
     fl.import_apis("api")
+    
+    # optional: you can specify a global model folder below, or add a model folder to each Blueprint or Api...
+    # ...or both, I suppose.
+    fl.models_folder("models")
 
 # ~~~ other create app things
 
 ```
 
-.app_config() loads Flask env vars, database settings and email
-settings from a specified toml file that sits in the app root folder
+.models_folder() loads model files and classes into the apps config under current_app.config["models"] setting this
+in the app __init__.py is optional, and can be set in Blueprint config files if you would rather keep your models
+attached to your Blueprints.
+
+.app_config() loads Flask env vars, database settings and email settings from a 
+specified toml file that sits in the app root folder.
+
+.register_structure_folder() registers a cut down Blueprint that will be added to the template folder lookups.
 
 .import_builtins() imports basically app level routes that use @current_app.whatever, this
 can be used to import routes and template_filters for jinja as shown.
+
+.import_blueprints() and .import_apis() look in the folder passed in for Blueprint modules and registers them in
+Flask. This also includes model files by adding models_folder to the Blueprint config.
 ```
 main/blueprints/example/app_config.toml :
 ```
@@ -193,6 +212,8 @@ version = 0.1
 
 [settings]
 type = "blueprint"
+models_folder = "models"
+# models_folder is optional, see app __init__.py above for more info
 
 [blueprint]
 url_prefix = "/example"
@@ -215,6 +236,21 @@ from .. import bp
 def index():
     """Example of route url redirect"""
     return """Working..."""
+```
+```
+main/blueprints/example/models/models.py :
+```
+```python
+from sqlalchemy.orm import relationship
+from .. import db
+
+
+class Example1(db.Model):
+    __tablename__ = "example1"
+    example1_id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(256), nullable=False)
+    password = db.Column(db.String(512), nullable=False)
+    fk_details = relationship("Example2")
 ```
 
 import_apis() from the main / init file, works much the same as the blueprint imports, although it prepends the blueprint holding folder into the URL registration.
@@ -246,6 +282,7 @@ version = 1.0
 
 [settings]
 type = "api"
+models_folder = "folder"
 
 [blueprint]
 url_prefix = "/v1"

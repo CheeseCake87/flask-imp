@@ -4,7 +4,7 @@
 
 [flask]
 app_name = "main"
-version = "0.4.1"
+version = "0.4.2"
 secret_key = "sdflskjdflksjdflksjdflkjsdf"
 debug = true
 testing = true
@@ -31,7 +31,7 @@ EXPLAIN_TEMPLATE_LOADING = true
 
     # Anything below will be imported using SQLALCHEMY_BINDS, with the [SECTION] name being the __bind_key__
 
-    [database.example1]
+    [database.sqldatabase]
     enabled = false
     type = "mysql"
     server = "0.0.0.0"
@@ -39,9 +39,9 @@ EXPLAIN_TEMPLATE_LOADING = true
     username = "user"
     password = "password"
 
-    [database.example2]
+    [database.postgresqldatabase]
     enabled = false
-    type = "mysql"
+    type = "postgresql"
     server = "localhost"
     database_name = "example2"
     username = "user"

@@ -5,6 +5,7 @@ version = 0.1
 [settings]
 type = "blueprint"
 structure = "fl_default"
+models_folder = "models"
 
 [blueprint]
 url_prefix = "/"
@@ -14,4 +15,3 @@ static_url_path = "/static"
 
 [session]
 var_in_session = "this can be loaded using fl_bp.session"
-

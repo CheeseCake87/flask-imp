@@ -10,20 +10,13 @@ def create_app():
 
     fl.app_config("app_config.toml")
     fl.register_structure_folder("structures")
+
     fl.import_builtins("builtins/routes")
     fl.import_builtins("builtins/template_filters")
-    fl.import_blueprints("blueprints")
-    fl.import_blueprints("extensions")
+
     fl.import_apis("api")
+    fl.import_blueprints("blueprints")
 
-    # fl.import_blueprints("extensions")
-
-    # for rule in main.url_map.iter_rules():
-    #     print(rule)
-    #
-    # for key, value in main.config.items():
-    #     print(key, value)
-
-    print(main.config)
+    fl.models_folder("models")
 
     return main

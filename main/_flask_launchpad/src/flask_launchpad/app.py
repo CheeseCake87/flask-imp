@@ -1,13 +1,17 @@
 from toml import load as toml_load
 from flask import current_app
 from flask import Blueprint
+from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
+from inspect import getmembers
+from inspect import isclass
+from sys import modules
 from os import path
 from os import listdir
 from inspect import stack
 
 
-def has_illegal_chars(name: str, exception: list = None) -> bool:
+def contains_illegal_chars(name: str, exception: list = None) -> bool:
     """
     Removes illegal chars from dir, there are:
     ['%', '$', '£', ' ', '#', 'readme', '__', '.py']
@@ -20,6 +24,16 @@ def has_illegal_chars(name: str, exception: list = None) -> bool:
         if char in name:
             return True
     return False
+
+
+# this function may not live long
+def class_name_ok(class_name: str) -> bool:
+    _banned_class_names = [
+        "ForeignKey",
+    ]
+    if class_name in _banned_class_names:
+        return False
+    return True
 
 
 class FlaskLaunchpad(object):
@@ -70,17 +84,20 @@ class FlaskLaunchpad(object):
                     current_app.template_folder = f"{current_app.root_path}/{c_flask['template_folder']}"
                     del config["flask"]["template_folder"]
 
-                print(config["flask"])
                 for key, value in c_flask.items():
                     current_app.config[key.upper()] = value
                 del config["flask"]
+
+            current_app.config["models"] = {}
 
             if "database" in config:
                 database = config["database"]
                 if "main" in database:
                     main_uri = database["main"]
                     if main_uri["type"] == "sqlite":
-                        current_app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:////{main_uri['database_name']}"
+                        current_app.config[
+                            "SQLALCHEMY_DATABASE_URI"
+                        ] = f"sqlite:////{current_app.root_path}/{main_uri['database_name']}.sqlite"
                     else:
                         type_user_pass = f"{main_uri['type']}://{main_uri['username']}:{main_uri['password']}"
                         server_database = f"@{main_uri['server']}/{main_uri['database_name']}"
@@ -90,9 +107,13 @@ class FlaskLaunchpad(object):
                 current_app.config["SQLALCHEMY_BINDS"] = {}
                 for key, value in config["database"].items():
                     if value["enabled"]:
-                        type_user_pass = f"{value['type']}://{value['username']}:{value['password']}"
-                        server_database = f"@{value['server']}/{value['database_name']}"
-                        current_app.config["SQLALCHEMY_BINDS"].update({key: type_user_pass + server_database})
+                        if value["type"] == "sqlite":
+                            database = f"sqlite:////{current_app.root_path}/{value['database_name']}.sqlite"
+                            current_app.config["SQLALCHEMY_BINDS"].update({key: database})
+                        else:
+                            type_user_pass = f"{value['type']}://{value['username']}:{value['password']}"
+                            server_database = f"@{value['server']}/{value['database_name']}"
+                            current_app.config["SQLALCHEMY_BINDS"].update({key: type_user_pass + server_database})
                 del config["database"]
 
             if "smtp" in config:
@@ -110,7 +131,7 @@ class FlaskLaunchpad(object):
         with self._app.app_context():
             routes_raw, routes_clean = listdir(f"{current_app.root_path}/{folder}"), []
             for route in routes_raw:
-                if has_illegal_chars(route, exception=[".py"]):
+                if contains_illegal_chars(route, exception=[".py"]):
                     continue
                 routes_clean.append(route.replace(".py", ""))
 
@@ -121,10 +142,59 @@ class FlaskLaunchpad(object):
                     print(e)
                     continue
 
+    def models_folder(self, folder: str, module: str = None) -> None:
+        if not path.isdir(folder):
+            return
+
+        with self._app.app_context():
+            if module is None:
+                module = current_app.name
+
+            models_raw, modules_clean = listdir(folder), []
+
+            for model in models_raw:
+                if contains_illegal_chars(model, exception=[".py"]):
+                    continue
+                modules_clean.append(model.replace(".py", ""))
+
+            models_dict = {module: {}}
+
+            for model in modules_clean:
+                split_folder = folder.split("/")
+                strip_folder = split_folder[split_folder.index(current_app.name):]
+                import_path = f"{'.'.join(strip_folder)}.{model}"
+                try:
+                    model_module = import_module(import_path)
+                    model_object = getattr(model_module, "db")
+                except ImportError as e:
+                    print(e)
+                    continue
+                except AttributeError as e:
+                    print(e)
+                    continue
+
+                models_dict[module].update({model: {"import": model_module, "db": model_object, "classes": {}}})
+
+                model_object.init_app(current_app)
+                model_members = getmembers(modules[import_path], isclass)
+                for member in model_members:
+                    class_name = member[0]
+                    class_object = member[1]
+                    if current_app.name in str(class_object):
+                        models_dict[module][model]["classes"].update({class_name: class_object})
+
+            current_app.config["models"] = models_dict
+
+    def create_all_models(self):
+        with self._app.app_context():
+            for key, value in current_app.config["models"].items():
+                for ik, iv in value.items():
+                    SQLAlchemy.create_all(iv["db"])
+
     def import_blueprints(self, folder: str) -> None:
         """
         Looks through the passed in folder for Blueprint modules, imports them then registers them with Flask.
-        The Blueprint object must be stored in a variable called bp in the __init__.py file on the Blueprint folder.
+        The Blueprint object must be stored in a variable called bp in the __init__.py file in the Blueprint folder.
         :param folder: str
         :return: None
         """
@@ -133,7 +203,8 @@ class FlaskLaunchpad(object):
             blueprints_raw, blueprints_clean = listdir(f"{current_app.root_path}/{folder}/"), []
             for blueprint in blueprints_raw:
                 if path.isdir(f"{current_app.root_path}/{folder}/{blueprint}"):
-                    blueprints_clean.append(blueprint)
+                    if not contains_illegal_chars(blueprint):
+                        blueprints_clean.append(blueprint)
 
             for blueprint in blueprints_clean:
                 _bp_root_folder = f"{current_app.root_path}/{folder}/{blueprint}"
@@ -142,23 +213,22 @@ class FlaskLaunchpad(object):
                     blueprint_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}")
                     blueprint_object = getattr(blueprint_module, "bp")
                     current_app.register_blueprint(blueprint_object)
+                    fl_bp_object = getattr(blueprint_module, "fl_bp")
+                    bp_settings = fl_bp_object.config["settings"]
                 except AttributeError as e:
-                    print(e)
+                    print("Error importing blueprint: ", e)
                     continue
 
-                if path.isfile(f"{_bp_root_folder}/models.py"):
-                    models_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}.models")
-                    try:
-                        import_object = getattr(models_module, "db")
-                        import_object.init_app(current_app)
-                    except AttributeError:
-                        continue
+                try:
+                    self.models_folder(f"{_bp_root_folder}/{bp_settings['models_folder']}", blueprint)
+                except KeyError as e:
+                    print(e)
 
     def import_apis(self, folder: str) -> None:
         """
         Looks through the passed in folder for Blueprint modules, imports them then registers them with Flask.
         This does the same as import_blueprints, but decorates the name with an api marker
-        The Blueprint object must be stored in a variable called bp in the __init__.py file on the Blueprint folder.
+        The Blueprint object must be stored in a variable called api_bp in the __init__.py file in the Blueprint folder.
         :param folder: str
         :return: None
         """
@@ -167,7 +237,8 @@ class FlaskLaunchpad(object):
             blueprints_raw, blueprints_clean = listdir(f"{current_app.root_path}/{folder}/"), []
             for blueprint in blueprints_raw:
                 if path.isdir(f"{current_app.root_path}/{folder}/{blueprint}"):
-                    blueprints_clean.append(blueprint)
+                    if not contains_illegal_chars(blueprint):
+                        blueprints_clean.append(blueprint)
 
             for blueprint in blueprints_clean:
                 _bp_root_folder = f"{current_app.root_path}/{folder}/{blueprint}"
@@ -176,16 +247,18 @@ class FlaskLaunchpad(object):
                     blueprint_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}")
                     blueprint_object = getattr(blueprint_module, "api_bp")
                     current_app.register_blueprint(blueprint_object)
+                    fl_bp_object = getattr(blueprint_module, "fl_bp")
+                    bp_settings = fl_bp_object.config["settings"]
                 except AttributeError as e:
                     continue
 
-                if path.isfile(f"{_bp_root_folder}/models.py"):
-                    models_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}.models")
-                    try:
-                        import_object = getattr(models_module, "db")
-                        import_object.init_app(current_app)
-                    except AttributeError:
-                        continue
+                if "models_folder" in bp_settings:
+                    if path.isdir(f"{_bp_root_folder}/{bp_settings['models_folder']}"):
+                        self.models_folder(f"{_bp_root_folder}/{bp_settings['models_folder']}", blueprint)
+
+                if "model_folder" in bp_settings:
+                    if path.isdir(f"{_bp_root_folder}/{bp_settings['model_folder']}"):
+                        self.models_folder(f"{_bp_root_folder}/{bp_settings['model_folder']}", blueprint)
 
 
 class FLBlueprint:
@@ -240,20 +313,23 @@ class FLBlueprint:
 
         if "name" in c_blueprint:
             bp_name = c_blueprint["name"]
+        else:
+            self.config["name"] = self.name
 
         if "import_name" in c_blueprint:
             bp_import_name = c_blueprint["import_name"]
+        else:
+            self.config["import_name"] = self.name
 
         if "template_folder" in c_blueprint:
             c_blueprint["template_folder"] = f"{self.root_path}/{c_blueprint['template_folder']}"
 
-        print(c_blueprint)
         return Blueprint(bp_name, bp_import_name, **c_blueprint)
 
     def import_routes(self, folder: str = "routes"):
         routes_raw, routes_clean = listdir(f"{self.root_path}/{folder}"), []
         for route in routes_raw:
-            if has_illegal_chars(route, exception=[".py"]):
+            if contains_illegal_chars(route, exception=[".py"]):
                 continue
             routes_clean.append(route.replace(".py", ""))
 
