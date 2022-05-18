@@ -312,5 +312,3 @@ class Test(Resource):
 ```
 
 Sticking to this method of blueprints and APIs will allow you to mass import route files.
-
-It also auto imports models.py files, this does need a little more dev though.
