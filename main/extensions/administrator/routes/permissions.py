@@ -4,14 +4,17 @@ from flask import request
 from flask import session
 from flask import url_for
 
+from ...._flask_launchpad.src.flask_launchpad import model_class
+from ...._flask_launchpad.src.flask_launchpad import sql_do
+
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 from ....builtins.functions.security import login_required
 
-from .. import FlPermission
 from .. import bp
-from .. import sql_do
 from .. import struc
+
+FlPermission = model_class("FlPermission")
 
 
 @bp.route("/permissions", methods=["GET", "POST"])

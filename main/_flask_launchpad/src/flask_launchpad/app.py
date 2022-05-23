@@ -10,6 +10,8 @@ from os import path
 from os import listdir
 from inspect import stack
 
+sql_do = SQLAlchemy().session
+
 
 def contains_illegal_chars(name: str, exception: list = None) -> bool:
     """
@@ -42,6 +44,30 @@ Config file is invalid, must be config.toml and be found in the root of the modu
     return config
 
 
+def model_class(class_name: str, app=None):
+    if app is None:
+        app = current_app
+
+    current_classes = app.config["models"]["classes"]
+
+    if class_name not in current_classes:
+        return print(f"Model class {class_name} has not been found.")
+
+    return current_classes[class_name]
+
+
+def model_module(module_name: str, app=None) -> dict:
+    if app is None:
+        app = current_app
+
+    current_models = app.config["models"]
+
+    if module_name not in current_models["modules"]:
+        raise KeyError(f"Model module {module_name} has not been found.")
+
+    return current_models["modules"][module_name]
+
+
 class FlaskLaunchpad(object):
     """
     Main Flask-Launchpad Class
@@ -63,16 +89,6 @@ class FlaskLaunchpad(object):
             raise ImportError("No app passed into the FlaskLaunchpad app")
         self._app = app
 
-    def register_structure_folder(self, folder: str) -> None:
-        """
-        Registers a folder in the root path as a Flask template folder.
-        The use of this is to allow for themes. I've called this structures and not themes as a template folder can
-        import template files, macros, etc.
-        """
-        with self._app.app_context():
-            structures = Blueprint(folder, folder, template_folder=f"{current_app.root_path}/{folder}")
-            current_app.register_blueprint(structures)
-
     def app_config(self, file: str = None) -> None:
         """
         Enables the config.toml method to set Flask env vars, deal with custom Flask env vars,
@@ -89,6 +105,10 @@ class FlaskLaunchpad(object):
     Flask app has no valid config file, must be like app_config.toml and be in the root of the app.
                 """)
 
+            current_app.config["structure_folders"] = {}
+            current_app.config["models"] = {"modules": {}, "classes": {}}
+            current_app.config["SQLALCHEMY_BINDS"] = {}
+
             config.update(toml_load(f"{current_app.root_path}/{_file}"))
 
             if "flask" in config:
@@ -104,8 +124,6 @@ class FlaskLaunchpad(object):
                     current_app.config[key.upper()] = value
                 del config["flask"]
 
-            current_app.config["models"] = {}
-
             if "database" in config:
                 database = config["database"]
                 if "main" in database:
@@ -120,7 +138,6 @@ class FlaskLaunchpad(object):
                         current_app.config["SQLALCHEMY_DATABASE_URI"] = type_user_pass + server_database
                     del config["database"]["main"]
 
-                current_app.config["SQLALCHEMY_BINDS"] = {}
                 for key, value in config["database"].items():
                     if value["enabled"]:
                         if value["type"] == "sqlite":
@@ -143,6 +160,17 @@ class FlaskLaunchpad(object):
             for key, value in config.items():
                 current_app.config[key.upper()] = value
 
+    def register_structure_folder(self, folder: str) -> None:
+        """
+        Registers a folder in the root path as a Flask template folder.
+        The use of this is to allow for themes. I've called this structures and not themes as a template folder can
+        import template files, macros, etc.
+        """
+        with self._app.app_context():
+            structures = Blueprint(folder, folder, template_folder=f"{current_app.root_path}/{folder}")
+            current_app.register_blueprint(structures)
+            current_app.config["structure_folders"].update({folder: f"{current_app.root_path}/{folder}"})
+
     def import_builtins(self, folder: str = "routes") -> None:
         """
         This allows you to import app level routes and template_filters.
@@ -164,7 +192,7 @@ class FlaskLaunchpad(object):
                     print(e)
                     continue
 
-    def models_folder(self, folder: str, module: str = None) -> None:
+    def models_folder(self, folder: str) -> None:
         """
         This method is used to load valid model.py files into current_app.config["models"]
         The shape of this data looks like this:
@@ -181,9 +209,6 @@ class FlaskLaunchpad(object):
                 if not path.isdir(folder):
                     print("Folder not found: ", folder)
 
-            if module is None:
-                module = current_app.name
-
             models_raw, modules_clean = listdir(folder), []
 
             for model in models_raw:
@@ -191,15 +216,17 @@ class FlaskLaunchpad(object):
                     continue
                 modules_clean.append(model.replace(".py", ""))
 
-            models_dict = {module: {}}
+            models_files_dict = {}
+            models_classes_dict = {}
 
             for model in modules_clean:
                 split_folder = folder.split("/")
                 strip_folder = split_folder[split_folder.index(current_app.name):]
                 import_path = f"{'.'.join(strip_folder)}.{model}"
                 try:
-                    model_module = import_module(import_path)
-                    model_object = getattr(model_module, "db")
+                    _model_module = import_module(import_path)
+                    _model_object = getattr(_model_module, "db")
+
                 except ImportError as e:
                     print("Error importing model: ", e)
                     continue
@@ -207,17 +234,20 @@ class FlaskLaunchpad(object):
                     print("Error importing model: ", e)
                     continue
 
-                models_dict[module].update({model: {"import": model_module, "db": model_object, "classes": {}}})
+                models_files_dict.update(
+                    {model: {"import": import_path, "io": _model_module, "db": _model_object}})
 
-                model_object.init_app(current_app)
+                _model_object.init_app(current_app)
+
                 model_members = getmembers(modules[import_path], isclass)
                 for member in model_members:
                     class_name = member[0]
                     class_object = member[1]
                     if current_app.name in str(class_object):
-                        models_dict[module][model]["classes"].update({class_name: class_object})
+                        models_classes_dict.update({class_name: class_object})
 
-            current_app.config["models"] = models_dict
+            current_app.config["models"]["modules"].update(models_files_dict)
+            current_app.config["models"]["classes"].update(models_classes_dict)
 
     def create_all_models(self):
         """
@@ -233,9 +263,8 @@ class FlaskLaunchpad(object):
             fl.create_all_models()
         """
         with self._app.app_context():
-            for key, value in current_app.config["models"].items():
-                for ik, iv in value.items():
-                    SQLAlchemy.create_all(iv["db"])
+            for key, value in current_app.config["models"]["modules"].items():
+                SQLAlchemy.create_all(value["db"])
 
     def import_blueprints(self, folder: str) -> None:
         """
@@ -259,14 +288,9 @@ class FlaskLaunchpad(object):
                     blueprint_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}")
                     blueprint_object = getattr(blueprint_module, "bp")
                     current_app.register_blueprint(blueprint_object)
-                    fl_bp_object = getattr(blueprint_module, "fl_bp")
-                    bp_settings = fl_bp_object.config["settings"]
                 except AttributeError as e:
                     print("Error importing blueprint: ", e)
                     continue
-
-                if "models_folder" in bp_settings and bp_settings['models_folder'] != "":
-                    self.models_folder(f"{_bp_root_folder}/{bp_settings['models_folder']}", blueprint)
 
     def import_apis(self, folder: str) -> None:
         """
@@ -291,18 +315,8 @@ class FlaskLaunchpad(object):
                     blueprint_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}")
                     blueprint_object = getattr(blueprint_module, "api_bp")
                     current_app.register_blueprint(blueprint_object)
-                    fl_bp_object = getattr(blueprint_module, "fl_bp")
-                    bp_settings = fl_bp_object.config["settings"]
                 except AttributeError as e:
                     continue
-
-                if "models_folder" in bp_settings:
-                    if path.isdir(f"{_bp_root_folder}/{bp_settings['models_folder']}"):
-                        self.models_folder(f"{_bp_root_folder}/{bp_settings['models_folder']}", blueprint)
-
-                if "model_folder" in bp_settings:
-                    if path.isdir(f"{_bp_root_folder}/{bp_settings['model_folder']}"):
-                        self.models_folder(f"{_bp_root_folder}/{bp_settings['model_folder']}", blueprint)
 
 
 class FLBlueprint:

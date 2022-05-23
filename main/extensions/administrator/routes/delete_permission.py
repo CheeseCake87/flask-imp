@@ -2,12 +2,15 @@ from flask import redirect
 from flask import session
 from flask import url_for
 
+from ...._flask_launchpad.src.flask_launchpad import model_class
+from ...._flask_launchpad.src.flask_launchpad import sql_do
+
 from ....builtins.functions.security import login_required
 
-from .. import FlPermission
-from .. import FlPermissionMembership
 from .. import bp
-from .. import sql_do
+
+FlPermission = model_class("FlPermission")
+FlPermissionMembership = model_class("FlPermissionMembership")
 
 
 @bp.route("/permissions/delete/<permission_id>", methods=["GET"])

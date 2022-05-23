@@ -1,10 +1,11 @@
 from flask import render_template
 from flask import current_app
 
-from .. import bp
-from .. import struc
 from ....builtins.functions.database import get_tables
 from ....builtins.functions.security import login_required
+
+from .. import bp
+from .. import struc
 
 
 @bp.route("/database", methods=["GET"])

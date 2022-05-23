@@ -2,11 +2,14 @@ from flask import redirect
 from flask import session
 from flask import url_for
 
+from ...._flask_launchpad.src.flask_launchpad import model_class
+from ...._flask_launchpad.src.flask_launchpad import sql_do
+
 from ....builtins.functions.security import login_required
 
-from .. import FlUser
 from .. import bp
-from .. import sql_do
+
+FlUser = model_class("FlUser")
 
 
 @bp.route("/users/disable/<user_id>", methods=["GET"])

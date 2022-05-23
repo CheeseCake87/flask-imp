@@ -1,8 +1,10 @@
-from ....builtins.functions.security import login_required
-from .. import bp
-from .. import struc
 from flask import current_app
 from flask import render_template
+
+from ....builtins.functions.security import login_required
+
+from .. import bp
+from .. import struc
 
 
 @bp.route("/endpoints", methods=["GET"])

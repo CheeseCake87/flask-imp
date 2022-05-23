@@ -5,6 +5,9 @@ from flask import request
 from flask import url_for
 from flask import current_app
 
+from ...._flask_launchpad.src.flask_launchpad import model_class
+from ...._flask_launchpad.src.flask_launchpad import sql_do
+
 from ....builtins.functions.security import logged_in_check
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
@@ -13,8 +16,8 @@ from ....builtins.functions.auth import auth_password
 
 from .. import bp
 from .. import struc
-from .. import sql_do
-from .. import FlUser
+
+FlUser = model_class("FlUser")
 
 
 @bp.route("/login", methods=["GET", "POST"])

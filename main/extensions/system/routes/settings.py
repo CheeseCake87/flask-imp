@@ -1,11 +1,12 @@
 from flask import render_template
 from flask import session
 
-from .. import bp
-from .. import struc
 from ....builtins.functions.security import login_required
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
+
+from .. import bp
+from .. import struc
 
 
 @bp.route("/settings", methods=["GET", "POST"])
@@ -17,8 +18,6 @@ def settings():
     structure = struc.name()
     extend = struc.extend("backend.html")
     footer = struc.include("footer.html")
-
-
 
     return render_template(
         render,

@@ -1,19 +1,8 @@
-from importlib import import_module
-from flask_sqlalchemy import SQLAlchemy
 from flask import session
 
-from ...builtins.functions.database import find_model_location
-from ...builtins.functions.structure import StructureBuilder
 from ..._flask_launchpad.src.flask_launchpad import FLBlueprint
 
-db = SQLAlchemy()
-sql_do = db.session
-
-system_model = import_module(find_model_location("system"))
-FlSystemSettings = getattr(system_model, "FlSystemSettings")
-
-administrator_model = import_module(find_model_location("administrator"))
-FlPermissionMembership = getattr(administrator_model, "FlPermissionMembership")
+from ...builtins.functions.structure import StructureBuilder
 
 fl_bp = FLBlueprint()
 bp = fl_bp.register()

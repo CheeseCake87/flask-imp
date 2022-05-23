@@ -9,8 +9,13 @@ db = SQLAlchemy()
 def create_app():
     main = Flask(__name__)
     fl.init_app(main)
-
     fl.app_config("app_config.toml")
+    fl.models_folder("models")
+
+    # for key, value in main.config["models"].items():
+    #     print(key)
+    #     print(value)
+
     fl.register_structure_folder("structures")
 
     fl.import_builtins("builtins/routes")
@@ -19,9 +24,5 @@ def create_app():
     fl.import_apis("api")
     fl.import_blueprints("blueprints")
     fl.import_blueprints("extensions")
-
-    fl.models_folder("models")
-
-    print(main.config["models"])
 
     return main

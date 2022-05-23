@@ -1,10 +1,11 @@
-from ....builtins.functions.security import login_required
-from .. import bp
-from .. import struc
-from .. import sql_do
 from flask import current_app
 from flask import render_template
 from sqlalchemy.exc import MultipleResultsFound
+
+from ....builtins.functions.security import login_required
+
+from .. import bp
+from .. import struc
 
 
 @bp.route("/test-function", methods=["GET"])

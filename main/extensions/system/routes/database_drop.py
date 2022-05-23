@@ -1,9 +1,11 @@
-from ....builtins.functions.security import login_required
-from .. import bp
 from flask import redirect
 from flask import url_for
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
+
+from ....builtins.functions.security import login_required
+
+from .. import bp
 
 
 @bp.route("/database/drop_all", methods=["GET"])

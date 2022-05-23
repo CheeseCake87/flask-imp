@@ -1,6 +1,5 @@
-from . import db
+from .. import db
 
-sql_do = db.session
 
 
 class FlUpload(db.Model):

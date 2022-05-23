@@ -1,11 +1,8 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
-from . import db
-
-sql_do = db.session
+from .. import db
 
 
-# Permissions are used to disable certain features
 class FlPermission(db.Model):
     __tablename__ = "fl_permission"
     permission_id = db.Column(db.Integer, primary_key=True)

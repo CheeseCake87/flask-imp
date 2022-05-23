@@ -3,10 +3,14 @@ from flask import session
 from flask import url_for
 from sqlalchemy.orm.exc import NoResultFound
 
-from .. import FlUser
-from .. import bp
-from .. import sql_do
+from ...._flask_launchpad.src.flask_launchpad import model_class
+from ...._flask_launchpad.src.flask_launchpad import sql_do
+
 from ....builtins.functions.security import login_required
+
+from .. import bp
+
+FlUser = model_class("FlUser")
 
 
 @bp.route("/users/enable/<user_id>", methods=["GET"])

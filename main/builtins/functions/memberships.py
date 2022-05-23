@@ -1,14 +1,10 @@
-from importlib import import_module
-from flask_sqlalchemy import SQLAlchemy
+from flask import current_app
 
-from ...builtins.functions.database import find_model_location
+from ..._flask_launchpad.src.flask_launchpad import model_class
+from ..._flask_launchpad.src.flask_launchpad import sql_do
 
-administrator_model = import_module(find_model_location("administrator"))
-FlPermission = getattr(administrator_model, "FlPermission")
-FlPermissionMembership = getattr(administrator_model, "FlPermissionMembership")
-
-db = SQLAlchemy()
-sql_do = db.session
+FlPermission = model_class("FlPermission", app=current_app)
+FlPermissionMembership = model_class("FlPermissionMembership", app=current_app)
 
 
 def get_permission_membership_from_user_id(user_id: int) -> dict:
@@ -17,7 +13,9 @@ def get_permission_membership_from_user_id(user_id: int) -> dict:
     :param user_id: int
     :return: dict {permission name = permission id}, {permission name = permission id},
     """
-    users_permissions = sql_do.query(FlPermissionMembership).filter(
+    users_permissions = sql_do.query(
+        FlPermissionMembership
+    ).filter(
         FlPermissionMembership.user_id == user_id
     ).all()
     permissions = {}
@@ -36,6 +34,3 @@ def get_permission_id_from_permission_name(permission_name: str) -> str:
         FlPermission.name == permission_name
     ).first()
     return query_object.permission_id
-
-
-

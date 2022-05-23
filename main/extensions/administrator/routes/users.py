@@ -4,21 +4,23 @@ from flask import request
 from flask import session
 from flask import url_for
 
+from ...._flask_launchpad.src.flask_launchpad import model_class
+from ...._flask_launchpad.src.flask_launchpad import sql_do
+
 from ....builtins.functions.auth import generate_private_key
 from ....builtins.functions.auth import generate_salt
 from ....builtins.functions.auth import safe_username
 from ....builtins.functions.auth import sha_password
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
-from ....builtins.functions.utilities import reverse_dict
 from ....builtins.functions.security import login_required
 from ....builtins.functions.database import convert_sql_to_list_dict
 
 from .. import bp
-from .. import sql_do
 from .. import struc
-from .. import FlUser
-from .. import FlPermissionMembership
+
+FlUser = model_class("FlUser")
+FlPermissionMembership = model_class("FlPermissionMembership")
 
 
 @bp.route("/users", methods=["GET", "POST"])

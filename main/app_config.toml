@@ -15,6 +15,7 @@ error_404_help = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false
 structure = "fl_default"
 EXPLAIN_TEMPLATE_LOADING = true
+login_dashboard = "administrator.users"
 
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
 # type = mysql / postgresql / sqlite

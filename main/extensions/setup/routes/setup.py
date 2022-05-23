@@ -4,23 +4,25 @@ from flask import render_template
 from flask import request
 from flask import session
 from flask import url_for
-from flask_sqlalchemy import SQLAlchemy
+
+from ...._flask_launchpad.src.flask_launchpad import FlaskLaunchpad
+from ...._flask_launchpad.src.flask_launchpad import model_class
+from ...._flask_launchpad.src.flask_launchpad import sql_do
 
 from ....builtins.functions.auth import generate_private_key
 from ....builtins.functions.auth import generate_salt
 from ....builtins.functions.auth import safe_username
 from ....builtins.functions.auth import sha_password
-from ....builtins.functions.database import get_tables
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
 
-from .. import FlUser
-from .. import FlPermission
-from .. import FlPermissionMembership
-from .. import FlSystemSettings
 from .. import bp
-from .. import sql_do
 from .. import struc
+
+FlUser = model_class("FlUser")
+FlPermission = model_class("FlPermission")
+FlPermissionMembership = model_class("FlPermissionMembership")
+FlSystemSettings = model_class("FlSystemSettings")
 
 app_config = current_app.config
 
@@ -34,10 +36,7 @@ def setup():
     extend = struc.extend("backend.html")
     footer = struc.include("footer.html")
 
-    tables = get_tables()
-
-    for key, value in tables.items():
-        SQLAlchemy.create_all(current_app.config["SHARED_MODELS"][key])
+    FlaskLaunchpad(current_app).create_all_models()
 
     system_setup = sql_do.query(
         FlSystemSettings

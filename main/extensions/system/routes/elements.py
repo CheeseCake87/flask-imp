@@ -1,8 +1,9 @@
 from flask import render_template
 
+from ....builtins.functions.security import login_required
+
 from .. import bp
 from .. import struc
-from ....builtins.functions.security import login_required
 
 
 @bp.route("/elements", methods=["GET"])

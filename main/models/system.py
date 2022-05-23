@@ -1,6 +1,4 @@
-from . import db
-
-sql_do = db.session
+from .. import db
 
 
 class FlSystem(db.Model):

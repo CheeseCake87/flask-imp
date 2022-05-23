@@ -1,9 +1,10 @@
 from flask import render_template
 from flask import session
 
+from ....builtins.functions.security import login_required
+
 from .. import bp
 from .. import struc
-from ....builtins.functions.security import login_required
 
 
 @bp.route("/session", methods=["GET"])
