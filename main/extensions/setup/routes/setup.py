@@ -13,7 +13,6 @@ from ....builtins.functions.auth import sha_password
 from ....builtins.functions.database import get_tables
 from ....builtins.functions.utilities import clear_error
 from ....builtins.functions.utilities import clear_message
-from ....builtins.functions.import_mgr import read_config_as_dict
 
 from .. import FlUser
 from .. import FlPermission
@@ -23,7 +22,7 @@ from .. import bp
 from .. import sql_do
 from .. import struc
 
-app_config = read_config_as_dict(app_config=True)
+app_config = current_app.config
 
 
 @bp.route("/", methods=["GET", "POST"])

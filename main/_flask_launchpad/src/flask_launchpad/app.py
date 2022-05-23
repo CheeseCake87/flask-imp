@@ -26,6 +26,22 @@ def contains_illegal_chars(name: str, exception: list = None) -> bool:
     return False
 
 
+def load_config(root_path: str) -> dict:
+    """
+    This loads the config file of the Blueprint and saves it to the config var
+    so it can be accessed using fl_bp.config
+    """
+    config = {}
+    if not path.isfile(f"{root_path}/config.toml"):
+        raise ImportError(f"""
+Config file is invalid, must be config.toml and be found in the root of the module. Importing from {root_path}
+            """)
+
+    config.update(toml_load(f"{root_path}/config.toml"))
+
+    return config
+
+
 class FlaskLaunchpad(object):
     """
     Main Flask-Launchpad Class
@@ -230,9 +246,11 @@ class FlaskLaunchpad(object):
         with self._app.app_context():
             blueprints_raw, blueprints_clean = listdir(f"{current_app.root_path}/{folder}/"), []
             for blueprint in blueprints_raw:
-                if path.isdir(f"{current_app.root_path}/{folder}/{blueprint}"):
+                _path = f"{current_app.root_path}/{folder}/{blueprint}"
+                if path.isdir(_path):
                     if not contains_illegal_chars(blueprint):
-                        blueprints_clean.append(blueprint)
+                        if load_config(_path)["init"]["enabled"]:
+                            blueprints_clean.append(blueprint)
 
             for blueprint in blueprints_clean:
                 _bp_root_folder = f"{current_app.root_path}/{folder}/{blueprint}"
@@ -260,9 +278,11 @@ class FlaskLaunchpad(object):
         with self._app.app_context():
             blueprints_raw, blueprints_clean = listdir(f"{current_app.root_path}/{folder}/"), []
             for blueprint in blueprints_raw:
-                if path.isdir(f"{current_app.root_path}/{folder}/{blueprint}"):
+                _path = f"{current_app.root_path}/{folder}/{blueprint}"
+                if path.isdir(_path):
                     if not contains_illegal_chars(blueprint):
-                        blueprints_clean.append(blueprint)
+                        if load_config(_path)["init"]["enabled"]:
+                            blueprints_clean.append(blueprint)
 
             for blueprint in blueprints_clean:
                 _bp_root_folder = f"{current_app.root_path}/{folder}/{blueprint}"
@@ -306,33 +326,16 @@ class FLBlueprint:
         self.import_from = caller.filename.split("/")[-3:-2][0]
         self.name = caller.filename.split("/")[-2:-1][0]
 
-    def load_config(self, config_file: str) -> dict:
-        """
-        This loads the config file of the Blueprint and saves it to the config var
-        so it can be accessed using fl_bp.config
-        """
-        config = {}
-        if not path.isfile(f"{self.root_path}/{config_file}") or ".toml" not in config_file:
-            raise ImportError("""
-    Blueprint or API has no valid config file, must be like config.toml and be found in the root of the module.
-                """)
-
-        config.update(toml_load(f"{self.root_path}/{config_file}"))
-        self.config_file = config_file
-        self.config = config
-
-        return config
-
-    def register(self, config_file: str = "config.toml"):
+    def register(self):
         """
         Pulls the settings from the Blueprints config file and uses them to register a Flask Blueprint.
         """
-        config = self.load_config(config_file)
+        self.config = load_config(self.root_path)
 
         try:
-            c_init = config["init"]
-            c_settings = config["settings"]
-            c_blueprint = config["blueprint"]
+            c_init = self.config["init"]
+            c_settings = self.config["settings"]
+            c_blueprint = self.config["blueprint"]
         except KeyError:
             raise ImportError("INIT and SETTINGS sections missing from config file.")
 
@@ -341,8 +344,8 @@ class FLBlueprint:
                 new_url = f"/{self.import_from}{c_blueprint['url_prefix']}"
                 c_settings['url_prefix'] = new_url
 
-        if "session" in config:
-            s = config["session"]
+        if "session" in self.config:
+            s = self.config["session"]
             for key, value in s.items():
                 self.session[key] = value
 
