@@ -8,4 +8,4 @@ from .auth import auth as auth
 from .bootstrap import BootstrapNavs as BootstrapNavs
 from .bootstrap import BootstrapForms as BootstrapForms
 
-version = "0.5.4"
+version = "0.5.5"
