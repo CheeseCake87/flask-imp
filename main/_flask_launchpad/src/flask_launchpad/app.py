@@ -415,36 +415,55 @@ class FLStructure:
             raise ImportError(
                 "Structure name has not been passed in. Do FLStructure(current_app, 'structure_being_used')")
 
-        self._app = app
-        self._sn = structure_name
-
         with self._app.app_context():
             if "structure_folder" not in current_app.config:
                 raise ImportError(
-                    "Structure folder has not been registered. Do fl.register_structure_folder('folder_that_contains_structures')")
+                    """
+Structure folder has not been registered. Do fl.register_structure_folder('folder_that_contains_structures')
+                    """)
 
-            self._sf = current_app.config["structure_folder"]
-            self._sp = f"{self._sf}/{self._sn}"
+        self._app = app
+        self._sn = structure_name
+        self._sf = current_app.config["structure_folder"]
+        self._sp = f"{self._sf}/{self._sn}"
 
     def extend(self, extending: str) -> str:
         """
-        Looks for the template to extend in the specified structure.
+        Checks if an extend page location exists and if so returns its location valid with Flask template folder lookup.
+        To use do.
+
+        in Blueprint init:
+        fls = FLStructure(current_app, "structure_name")
+        / structure_name is the folder name of a structure /
+
+        in Blueprint route:
+        render_template(fls.render("page.html), extends=fls.extend("backend.html"))
+        / checks for file in folder structure_name/extends/include.html /
         """
         if path.isfile(f"{self._sp}/extends/{extending}"):
             return f"{self._sn}/extends/{extending}"
-        return Markup(f"Extend template error, unable to find: {extending}")
+        return Markup(f"Extend template error, unable to find: {self._sn} - extend > {extending}")
 
     def include(self, including: str) -> str:
         """
-        Looks for the file to be included in the page.
+        Checks if an include location exists and if so returns its location valid with Flask template folder lookup.
+        To use do.
+
+        in Blueprint init:
+        fls = FLStructure(current_app, "structure_name")
+        / structure_name is the folder name of a structure /
+
+        in Blueprint route:
+        render_template(fls.render("page.html), inlcude=fls.include("include.html"))
+        / checks for file in folder structure_name/includes/include.html /
         """
         if path.isfile(f"{self._sp}/includes/{including}"):
             return f"{self._sn}/includes/{including}"
-        return Markup(f"Include template error, unable to find: {including}")
+        return Markup(f"Include template error, unable to find: {self._sn} - include > {including}")
 
     def error(self, error_page: str) -> str:
         """
-        Checks if an error page location exists and if so returns its location valid with Flask template folders.
+        Checks if an error page location exists and if so returns its location valid with Flask template folder lookup.
         To use do.
 
         in Builtin error routes:
@@ -457,11 +476,11 @@ class FLStructure:
         """
         if path.isfile(f"{self._sp}/error_pages/{error_page}"):
             return f"{self._sn}/error_pages/{error_page}"
-        return Markup(f"Error page render error, unable to find: {error_page}")
+        return Markup(f"Error page render error, unable to find: {self._sn} - error_page > {error_page}")
 
     def render(self, render_page: str) -> str:
         """
-        Checks if a render page location exists and if so returns its location valid with Flask template folders.
+        Checks if a render page location exists and if so returns its location valid with Flask template folder lookup.
         To use do.
 
         in Blueprint init:
@@ -474,7 +493,7 @@ class FLStructure:
         """
         if path.isfile(f"{self._sp}/renders/{render_page}"):
             return f"{self._sn}/renders/{render_page}"
-        return Markup(f"Page render error, unable to find: {render_page}")
+        return Markup(f"Page render error, unable to find: {self._sn} - render > {render_page}")
 
     def name(self) -> str:
         """
