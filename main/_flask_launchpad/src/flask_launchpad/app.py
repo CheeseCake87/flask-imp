@@ -106,7 +106,6 @@ class FlaskLaunchpad(object):
     Flask app has no valid config file, must be like app_config.toml and be in the root of the app.
                 """)
 
-            current_app.config["structure_folders"] = {}
             current_app.config["models"] = {"modules": {}, "classes": {}}
             current_app.config["SQLALCHEMY_BINDS"] = {}
 
@@ -405,6 +404,7 @@ class FLStructure:
     _sf = None
     _sp = None
     _app = None
+    name = None
 
     def __init__(self, app=None, structure_name: str = None):
         if app is None:
@@ -424,6 +424,7 @@ Structure folder has not been registered. Do fl.register_structure_folder('folde
 
         self._app = app
         self._sn = structure_name
+        self.name = structure_name
         self._sf = current_app.config["structure_folder"]
         self._sp = f"{self._sf}/{self._sn}"
 
