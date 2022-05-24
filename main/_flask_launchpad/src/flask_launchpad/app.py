@@ -9,6 +9,7 @@ from sys import modules
 from os import path
 from os import listdir
 from inspect import stack
+from markupsafe import Markup
 
 sql_do = SQLAlchemy().session
 
@@ -169,7 +170,7 @@ class FlaskLaunchpad(object):
         with self._app.app_context():
             structures = Blueprint(folder, folder, template_folder=f"{current_app.root_path}/{folder}")
             current_app.register_blueprint(structures)
-            current_app.config["structure_folders"].update({folder: f"{current_app.root_path}/{folder}"})
+            current_app.config["structure_folder"] = f"{current_app.root_path}/{folder}"
 
     def import_builtins(self, folder: str = "routes") -> None:
         """
@@ -397,3 +398,86 @@ Error when importing {self.import_from} - {self.name} - {route}:
 {e}
                 """)
                 continue
+
+
+class FLStructure:
+    _sn = None
+    _sf = None
+    _sp = None
+    _app = None
+
+    def __init__(self, app=None, structure_name: str = None):
+        if app is None:
+            raise ImportError(
+                "App has not been passed in. Do FLStructure(current_app, 'structure_being_used')")
+
+        if structure_name is None:
+            raise ImportError(
+                "Structure name has not been passed in. Do FLStructure(current_app, 'structure_being_used')")
+
+        self._app = app
+        self._sn = structure_name
+
+        with self._app.app_context():
+            if "structure_folder" not in current_app.config:
+                raise ImportError(
+                    "Structure folder has not been registered. Do fl.register_structure_folder('folder_that_contains_structures')")
+
+            self._sf = current_app.config["structure_folder"]
+            self._sp = f"{self._sf}/{self._sn}"
+
+    def extend(self, extending: str) -> str:
+        """
+        Looks for the template to extend in the specified structure.
+        """
+        if path.isfile(f"{self._sp}/extends/{extending}"):
+            return f"{self._sn}/extends/{extending}"
+        return Markup(f"Extend template error, unable to find: {extending}")
+
+    def include(self, including: str) -> str:
+        """
+        Looks for the file to be included in the page.
+        """
+        if path.isfile(f"{self._sp}/includes/{including}"):
+            return f"{self._sn}/includes/{including}"
+        return Markup(f"Include template error, unable to find: {including}")
+
+    def error(self, error_page: str) -> str:
+        """
+        Checks if an error page location exists and if so returns its location valid with Flask template folders.
+        To use do.
+
+        in Builtin error routes:
+        fls = FLStructure(current_app, "structure_name")
+        / structure_name is the folder name of a structure /
+
+        in Blueprint route:
+        render_template(fls.error("error_page.html))
+        / checks for file in folder structure_name/error_pages/error_page.html /
+        """
+        if path.isfile(f"{self._sp}/error_pages/{error_page}"):
+            return f"{self._sn}/error_pages/{error_page}"
+        return Markup(f"Error page render error, unable to find: {error_page}")
+
+    def render(self, render_page: str) -> str:
+        """
+        Checks if a render page location exists and if so returns its location valid with Flask template folders.
+        To use do.
+
+        in Blueprint init:
+        fls = FLStructure(current_app, "structure_name")
+        / structure_name is the folder name of a structure /
+
+        in Blueprint route:
+        render_template(fls.render("page.html))
+        / checks for file in folder structure_name/renders/page.html /
+        """
+        if path.isfile(f"{self._sp}/renders/{render_page}"):
+            return f"{self._sn}/renders/{render_page}"
+        return Markup(f"Page render error, unable to find: {render_page}")
+
+    def name(self) -> str:
+        """
+        Simply returns the name of the structure
+        """
+        return self._sn
