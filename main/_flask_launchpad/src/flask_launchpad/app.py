@@ -1,6 +1,7 @@
 from toml import load as toml_load
 from flask import current_app
 from flask import Blueprint
+from flask import send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
 from inspect import getmembers
@@ -170,6 +171,13 @@ class FlaskLaunchpad(object):
             structures = Blueprint(folder, folder, template_folder=f"{current_app.root_path}/{folder}")
             current_app.register_blueprint(structures)
             current_app.config["structure_folder"] = f"{current_app.root_path}/{folder}"
+
+            @current_app.route("/<structure>/<filepath>", methods=["GET"])
+            def structure_static(structure, filepath):
+                structure_location = f"{current_app.root_path}/{current_app.config['structure_folder']}/{structure}/"
+                if path.isfile(f"{structure_location}/{filepath}"):
+                    return send_from_directory(directory=structure_location, path=filepath)
+                return 404
 
     def import_builtins(self, folder: str = "routes") -> None:
         """

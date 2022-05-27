@@ -23,6 +23,5 @@ def create_app():
 
     fl.import_apis("api")
     fl.import_blueprints("blueprints")
-    fl.import_blueprints("extensions")
 
     return main

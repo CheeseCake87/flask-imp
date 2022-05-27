@@ -6,15 +6,21 @@ from .. import bp
 
 @bp.route("/", methods=["GET"])
 def index():
+    return """Working..."""
+
+
+@bp.route("/create-all-models", methods=["GET"])
+def create_all_models():
+    """
+    Example of flask_launchpads ability to create all models
+    """
     FlaskLaunchpad(current_app).create_all_models()
-
-    print(session)
-
-    """Example of route url"""
     return """Working..."""
 
 
 @bp.route("/test", methods=["GET"])
-def test():
-    """Example of route url"""
+def flask_config_output():
+    """
+    Example of route url
+    """
     return """Working..."""
