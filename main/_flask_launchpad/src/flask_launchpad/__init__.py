@@ -9,4 +9,4 @@ from .auth import WordGen as WordGen
 from .BootstrapNavs import BootstrapNavs as BootstrapNavs
 from .BootstrapForms import BootstrapForms as BootstrapForms
 
-version = "0.5.6"
+version = "0.5.8"

@@ -64,7 +64,7 @@ def model_module(module_name: str, app=None) -> dict:
     current_models = app.config["models"]
 
     if module_name not in current_models["modules"]:
-        raise KeyError(f"Model module {module_name} has not been found.")
+        raise KeyError(f"Model module {module_name} has not been found. Calling from {stack()[1]}")
 
     return current_models["modules"][module_name]
 
@@ -228,10 +228,10 @@ class FlaskLaunchpad(object):
                     _model_object = getattr(_model_module, "db")
 
                 except ImportError as e:
-                    print("Error importing model: ", e)
+                    print("Error importing model: ", e, f" from {import_path}")
                     continue
                 except AttributeError as e:
-                    print("Error importing model: ", e)
+                    print("Error importing model: ", e, f" from {import_path}")
                     continue
 
                 models_files_dict.update(
@@ -289,7 +289,7 @@ class FlaskLaunchpad(object):
                     blueprint_object = getattr(blueprint_module, "bp")
                     current_app.register_blueprint(blueprint_object)
                 except AttributeError as e:
-                    print("Error importing blueprint: ", e)
+                    print("Error importing blueprint: ", e, f" from {_bp_root_folder}")
                     continue
 
     def import_apis(self, folder: str) -> None:
@@ -316,6 +316,7 @@ class FlaskLaunchpad(object):
                     blueprint_object = getattr(blueprint_module, "api_bp")
                     current_app.register_blueprint(blueprint_object)
                 except AttributeError as e:
+                    print("Error importing api: ", e, f" from {_bp_root_folder}")
                     continue
 
 
@@ -351,7 +352,7 @@ class FLBlueprint:
             c_settings = self.config["settings"]
             c_blueprint = self.config["blueprint"]
         except KeyError:
-            raise ImportError("INIT and SETTINGS sections missing from config file.")
+            raise ImportError(f"{self.import_from} INIT and SETTINGS sections missing from config file.")
 
         if c_init["enabled"]:
             if c_settings["type"] == "api":
@@ -415,6 +416,8 @@ class FLStructure:
             raise ImportError(
                 "Structure name has not been passed in. Do FLStructure(current_app, 'structure_being_used')")
 
+        self._app = app
+
         with self._app.app_context():
             if "structure_folder" not in current_app.config:
                 raise ImportError(
@@ -422,7 +425,6 @@ class FLStructure:
 Structure folder has not been registered. Do fl.register_structure_folder('folder_that_contains_structures')
                     """)
 
-        self._app = app
         self._sn = structure_name
         self.name = structure_name
         self._sf = current_app.config["structure_folder"]
@@ -495,9 +497,3 @@ Structure folder has not been registered. Do fl.register_structure_folder('folde
         if path.isfile(f"{self._sp}/renders/{render_page}"):
             return f"{self._sn}/renders/{render_page}"
         return Markup(f"Page render error, unable to find: {self._sn} - render > {render_page}")
-
-    def name(self) -> str:
-        """
-        Simply returns the name of the structure
-        """
-        return self._sn
