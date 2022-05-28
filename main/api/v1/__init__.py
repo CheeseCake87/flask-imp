@@ -4,12 +4,12 @@ from flask import session
 
 from ..._flask_launchpad.src.flask_launchpad import FLBlueprint
 
-fl_bl = FLBlueprint()
+fl_bp = FLBlueprint()
 
-api_bp = fl_bl.register()
+api_bp = fl_bp.register()
 api = Api(api_bp, doc=f"/docs")
 
-fl_bl.import_routes()
+fl_bp.import_routes()
 
 db = SQLAlchemy()
 sql_do = db.session
@@ -17,12 +17,15 @@ sql_do = db.session
 
 @api_bp.before_app_first_request
 def before_app_first_request():
-    session.update(fl_bl.session)
+    pass
 
 
 @api_bp.before_app_request
 def before_app_request():
-    pass
+    for key in fl_bp.session:
+        if key not in session:
+            session.update(fl_bp.session)
+            break
 
 
 @api_bp.after_app_request

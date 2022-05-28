@@ -8,7 +8,7 @@ structure = "fl_default"
 models_folder = ""
 
 [blueprint]
-name = "my_cool_blueprint"
+name = "exmaple_blueprint"
 url_prefix = "/"
 template_folder = "templates"
 static_folder = "static"

@@ -1,4 +1,5 @@
+/* Main app css found in app_config static folder */
+
 body {
-    background-color: lightgrey;
-    color: #111111;
+    display: block;
 }

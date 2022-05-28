@@ -1,1 +1,0 @@
-Build in here all default options, this will include full general designed pages.

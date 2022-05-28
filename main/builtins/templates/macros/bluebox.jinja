@@ -1,0 +1,8 @@
+{# This is an example macro, can be imported using {% import 'bluebox.jinja' as bluebox %}  #}
+{# and can be used like: bluebox(inside_p="what ever you want inside the p tag") #}
+
+{% macro bluebox(inside_p="") %}
+    <div style="width: 100%; height: 40px; background-color: #889be7">
+        <p>{{ inside_p }}</p>
+    </div>
+{% endmacro %}

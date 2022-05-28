@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import session
 from flask_sqlalchemy import SQLAlchemy
 from ._flask_launchpad.src.flask_launchpad import FlaskLaunchpad
 
@@ -11,10 +12,6 @@ def create_app():
     fl.init_app(main)
     fl.app_config("app_config.toml")
     fl.models_folder("models")
-
-    # for key, value in main.config["models"].items():
-    #     print(key)
-    #     print(value)
 
     fl.register_structure_folder("structures")
 

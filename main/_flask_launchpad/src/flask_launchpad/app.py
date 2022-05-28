@@ -197,7 +197,7 @@ class FlaskLaunchpad(object):
                 try:
                     import_module(f"{current_app.name}.{folder.replace('/', '.')}.{route}")
                 except ImportError as e:
-                    print(e)
+                    print("Error importing builtin: ", e, f"in {folder}/{route}")
                     continue
 
     def models_folder(self, folder: str) -> None:
