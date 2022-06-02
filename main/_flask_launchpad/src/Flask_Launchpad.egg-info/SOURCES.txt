@@ -8,8 +8,7 @@ src/Flask_Launchpad.egg-info/dependency_links.txt
 src/Flask_Launchpad.egg-info/requires.txt
 src/Flask_Launchpad.egg-info/top_level.txt
 src/Flask_Launchpad.egg-info/zip-safe
-src/flask_launchpad/BootstrapForms.py
-src/flask_launchpad/BootstrapNavs.py
 src/flask_launchpad/__init__.py
 src/flask_launchpad/app.py
 src/flask_launchpad/auth.py
+src/flask_launchpad/security.py
