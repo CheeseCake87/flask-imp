@@ -1,5 +1,4 @@
 from flask import Flask
-from flask import session
 from flask_sqlalchemy import SQLAlchemy
 from ._flask_launchpad.src.flask_launchpad import FlaskLaunchpad
 

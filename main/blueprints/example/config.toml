@@ -16,3 +16,6 @@ static_url_path = "/static"
 
 [session]
 var_in_session = "this can be loaded using fl_bp.session"
+permissions = ["this", "that"]
+logged_in = true
+not_logged_in = false

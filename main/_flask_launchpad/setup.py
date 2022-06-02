@@ -6,12 +6,12 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='Flask-Launchpad',
-    version='0.5.9',
+    version='0.6.0',
     url='https://github.com/CheeseCake87/Flask-Launchpad',
     license='MIT',
     author='David Carmichael',
     author_email='carmichaelits@gmail.com',
-    description='A small auto importer for blueprints and apis',
+    description='A small auto importer for blueprints and apis + some extras',
     long_description=long_description,
     long_description_content_type="text/markdown",
     py_modules=['flask_launchpad'],

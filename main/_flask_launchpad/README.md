@@ -1,7 +1,8 @@
 # Flask-Launchpad
 
-Flask-Launchpad is a small auto importer to import multiple blueprints and their routes. Can also handle multiple 
-imports of flask_restx apis.
+Flask-Launchpad is a small auto importer to import multiple blueprints and their routes + some extras. 
+
+Can also handle multiple imports of flask_restx apis.
 
 This extension allows you to make multiple route files and not have to worry about manually importing each of them.
 

@@ -6,7 +6,6 @@ from .app import model_class as model_class
 from .app import sql_do as sql_do
 from .auth import Auth as Auth
 from .auth import WordGen as WordGen
-from .BootstrapNavs import BootstrapNavs as BootstrapNavs
-from .BootstrapForms import BootstrapForms as BootstrapForms
+from .security import Security as Security
 
-version = "0.5.9"
+version = "0.6.0"
