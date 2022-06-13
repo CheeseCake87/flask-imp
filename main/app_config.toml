@@ -30,25 +30,6 @@ login_dashboard = "administrator.users"
     username = "user"
     password = "password"
 
-# - below is archive code:::
-#    # Anything below will be imported using SQLALCHEMY_BINDS, with the [SECTION] name being the __bind_key__
-#
-#    [database.sqldatabase]
-#    enabled = false
-#    type = "mysql"
-#    server = "0.0.0.0"
-#    database_name = "example1"
-#    username = "user"
-#    password = "password"
-#
-#    [database.postgresqldatabase]
-#    enabled = false
-#    type = "postgresql"
-#    server = "localhost"
-#    database_name = "example2"
-#    username = "user"
-#    password = "password"
-
 # works well with Microsoft Exchange Kiosk License
 # for Exchange Kiosk to work you must enable Authenticated-SMTP in the accounts features
 # this feature takes a while to activate, so don't expect instant results

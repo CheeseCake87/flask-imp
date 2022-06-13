@@ -27,25 +27,41 @@ project/
             - example/
                 - templates/
                 - static/
-                - models/
-                    - models.py
-                    - models2.py
                 - routes/
-                    - route1.py
-                    - route2.py
+                    - app_info.py
+                    - main.py
                 - __init__.py
                 - config.toml
-            - example2/
-            - example3/
         - api/
             - v1/
+                - functions/
+                    api_auth.py
                 - routes/
-                    api_route1.py
-                    api_route2.py
+                    test.py
+                    test2.py
                 - __init__.py
                 - config.toml
-                - models.py
-                
+        - builtins/
+            - routes/
+                - system.py
+            - template_filters/
+                - filters.py
+        - models/
+            - example.py
+        - structures/
+            - fl_default/
+                - css/
+                    - main.css
+                - error_pages/
+                    - 404.html
+                - extends/
+                    - main.html
+                - img/
+                    - Flask-Launchpad.png
+                - includes/
+                    - footer.html
+                - js/
+                    - main.js
         - __init__.py
         - app_config.toml
         - templates/
@@ -60,37 +76,33 @@ main/__init__.py :
 from flask import Flask
 from flask_launchpad import FlaskLaunchpad
 
-# ~~ other imports
-
 fl = FlaskLaunchpad()
+
 
 def create_app():
     main = Flask(__name__)
     fl.init_app(main)
-    
     fl.app_config("app_config.toml")
-    fl.register_structure_folder("structures")
-    
-    fl.import_builtins("routes")
-    fl.import_builtins("another/folder/template_filters")
-    
-    fl.import_blueprints("blueprints")
-    fl.import_apis("api")
-    
-    # optional: you can specify a global model folder below, or add a model folder to each Blueprint or Api...
-    # ...or both, I suppose.
     fl.models_folder("models")
 
-# ~~~ other create app things
+    fl.register_structure_folder("structures")
+
+    fl.import_builtins("builtins/routes")
+    fl.import_builtins("builtins/template_filters")
+
+    fl.import_apis("api")
+    fl.import_blueprints("blueprints")
+
+    return main
 
 ```
-
-.models_folder() loads model files and classes into the apps config under current_app.config["models"] setting this
-in the app __init__.py is optional, and can be set in Blueprint config files if you would rather keep your models
-attached to your Blueprints.
-
+```text
 .app_config() loads Flask env vars, database settings and email settings from a 
 specified toml file that sits in the app root folder.
+
+.models_folder() loads model files and classes into the apps config under current_app.config["MODELS"] setting this
+in the app __init__.py is optional, and can be set in Blueprint config files if you would rather keep your models
+attached to your Blueprints.
 
 .register_structure_folder() registers a cut down Blueprint that will be added to the template folder lookups.
 
@@ -99,6 +111,7 @@ can be used to import routes and template_filters for jinja as shown.
 
 .import_blueprints() and .import_apis() look in the folder passed in for Blueprint modules and registers them in
 Flask. This also includes model files by adding models_folder to the Blueprint config.
+```
 ```
 main/blueprints/example/app_config.toml :
 ```
@@ -128,24 +141,6 @@ SQLALCHEMY_TRACK_MODIFICATIONS = false
     type = "sqlite"
     server = "local"
     database_name = "database"
-    username = "user"
-    password = "password"
-
-    # Anything below will be imported using SQLALCHEMY_BINDS, with the [SECTION] name being the __bind_key__
-
-    [database.example1]
-    enabled = false
-    type = "mysql"
-    server = "0.0.0.0"
-    database_name = "example1"
-    username = "user"
-    password = "password"
-
-    [database.example2]
-    enabled = false
-    type = "mysql"
-    server = "localhost"
-    database_name = "example2"
     username = "user"
     password = "password"
 
@@ -180,26 +175,37 @@ SQLALCHEMY_TRACK_MODIFICATIONS = false
 main/blueprints/example/__init__.py :
 ```
 ```python
-from flask_launchpad import FLBlueprint
 from flask import session
+from flask import current_app
+
+from flask_launchpad import FLStructure
+from flask_launchpad import FLBlueprint
 
 fl_bp = FLBlueprint()
 bp = fl_bp.register()
+
+fls = FLStructure(current_app, current_app.config["STRUCTURE"])
+
 fl_bp.import_routes("routes")
+
 
 @bp.before_app_first_request
 def before_app_first_request():
-    session.update(fl_bp.session)
+    pass
 
 
 @bp.before_app_request
 def before_app_request():
-    pass
+    for key in fl_bp.session:
+        if key not in session:
+            session.update(fl_bp.session)
+            break
 
 
 @bp.after_app_request
 def after_app_request(response):
     return response
+
 
 ```
 ```
@@ -226,31 +232,29 @@ var_in_session = "this can be loaded using fl_bp.session"
 
 ```
 ```
-main/blueprints/example/routes/route1.py :
+main/blueprints/example/routes/app_info.py :
 ```
 ```python
+from flask import current_app
+
+from .. import fls
 from .. import bp
 
 
-@bp.route("/", methods=["GET"])
-def index():
-    """Example of route url redirect"""
-    return """Working..."""
-```
-```
-main/blueprints/example/models/models.py :
-```
-```python
-from sqlalchemy.orm import relationship
-from .. import db
+@bp.route("/app-models", methods=["GET"])
+def app_models():
+    output = ""
+    for key, value in current_app.config["models"].items():
+        output += f"{key} : {value} <br/>"
+    return output
 
 
-class Example1(db.Model):
-    __tablename__ = "example1"
-    example1_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(256), nullable=False)
-    password = db.Column(db.String(512), nullable=False)
-    fk_details = relationship("Example2")
+@bp.route("/app-url-map", methods=["GET"])
+def app_url_map():
+    output = ""
+    for rule in current_app.url_map.iter_rules():
+        output += f"{rule.endpoint} : {rule.rule} <br/>"
+    return output
 ```
 
 import_apis() from the main / init file, works much the same as the blueprint imports, although it prepends the blueprint holding folder into the URL registration.
@@ -264,13 +268,39 @@ main/api/v1/__init__.py :
 ```
 ```python
 from flask_restx import Api
+from flask_sqlalchemy import SQLAlchemy
+from flask import session
+
 from flask_launchpad import FLBlueprint
 
-fl_bl = FLBlueprint()
-api_bp = fl_bl.register()
+fl_bp = FLBlueprint()
+
+api_bp = fl_bp.register()
 api = Api(api_bp, doc=f"/docs")
-fl_bl.import_routes()
+
+fl_bp.import_routes()
 # import_routes() defaults to a folder called routes
+
+db = SQLAlchemy()
+sql_do = db.session
+
+
+@api_bp.before_app_first_request
+def before_app_first_request():
+    pass
+
+
+@api_bp.before_app_request
+def before_app_request():
+    for key in fl_bp.session:
+        if key not in session:
+            session.update(fl_bp.session)
+            break
+
+
+@api_bp.after_app_request
+def after_app_request(response):
+    return response
 ```
 ```
 main/api/v1/config.toml :
@@ -297,9 +327,10 @@ enabled = false
 public_key = "a3oe3qhY8knm"
 ```
 ```
-main/api/v1/routes/api_route1.py :
+main/api/v1/routes/test.py :
 ```
 ```python
+from ..functions.api_auth import public_key_required
 from flask_restx import Resource
 
 from .. import api
@@ -308,7 +339,11 @@ from .. import api
 @api.route('/test')
 class Test(Resource):
     def get(self):
-        return "waiting"
+        return "GET Method"
+
+    def post(self, public_key):
+        public_key_required(public_key)
+        return """POST Method"""
 ```
 
 Sticking to this method of blueprints and APIs will allow you to mass import route files.

@@ -46,19 +46,37 @@ Config file is invalid, must be config.toml and be found in the root of the modu
     return config
 
 
-def model_class(class_name: str, app=None):
+def model_class(class_name: str, app=None) -> object:
+    """
+    Returns a class object that is stored in app.config, returns error if not found.
+
+    The shape of app.config["MODELS"] looks like this
+    {
+    "modules": { "module_name": {"import": "main.module.location", "io": import_object, "db": getattr("db") }, },
+    "classes": { "class_name": class_object, }
+    }
+    """
     if app is None:
         app = current_app
 
     current_classes = app.config["models"]["classes"]
 
     if class_name not in current_classes:
-        return print(f"Model class {class_name} has not been found.")
+        raise KeyError(f"Model class {class_name} has not been found. Calling from {stack()[1]}")
 
     return current_classes[class_name]
 
 
 def model_module(module_name: str, app=None) -> dict:
+    """
+    Returns
+
+    The shape of app.config["MODELS"] looks like this
+    {
+    "modules": { "module_name": {"import": "main.module.location", "io": import_object, "db": getattr("db") }, },
+    "classes": { "class_name": class_object, }
+    }
+    """
     if app is None:
         app = current_app
 
@@ -170,11 +188,11 @@ class FlaskLaunchpad(object):
         with self._app.app_context():
             structures = Blueprint(folder, folder, template_folder=f"{current_app.root_path}/{folder}")
             current_app.register_blueprint(structures)
-            current_app.config["structure_folder"] = f"{current_app.root_path}/{folder}"
+            current_app.config["STRUCTURE_FOLDER"] = f"{current_app.root_path}/{folder}"
 
             @current_app.route("/<structure>/<filepath>", methods=["GET"])
             def structure_static(structure, filepath):
-                structure_location = f"{current_app.root_path}/{current_app.config['structure_folder']}/{structure}/"
+                structure_location = f"{current_app.root_path}/{current_app.config['STRUCTURE_FOLDER']}/{structure}/"
                 if path.isfile(f"{structure_location}/{filepath}"):
                     return send_from_directory(directory=structure_location, path=filepath)
                 return 404
@@ -204,11 +222,9 @@ class FlaskLaunchpad(object):
         """
         This method is used to load valid model.py files into current_app.config["models"]
         The shape of this data looks like this:
-        { module (blueprint name / app name):
-            { model (name of model file):
-                "import": <the import of the file>,
-                "classes": { class_name (name of the class in the model file): class_object (the class itself)
-            }
+        app.config["MODELS"] {
+        "modules": { "module_name": {"import": "main.module.location", "io": import_object, "db": getattr("db") }, },
+        "classes": { "class_name": class_object, }
         }
         """
         with self._app.app_context():
@@ -254,8 +270,8 @@ class FlaskLaunchpad(object):
                     if current_app.name in str(class_object):
                         models_classes_dict.update({class_name: class_object})
 
-            current_app.config["models"]["modules"].update(models_files_dict)
-            current_app.config["models"]["classes"].update(models_classes_dict)
+            current_app.config["MODELS"]["modules"].update(models_files_dict)
+            current_app.config["MODELS"]["classes"].update(models_classes_dict)
 
     def create_all_models(self):
         """
