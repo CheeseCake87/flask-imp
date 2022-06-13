@@ -121,15 +121,19 @@ main/blueprints/example/app_config.toml :
 # current_app.config["YOUR_VAR_NAME"] or of course, app.config["YOUR_VAR_NAME"] if you are not using app factory.
 
 [flask]
-name = "main"
+app_name = "main"
+version = "0.6.0"
 secret_key = "sdflskjdflksjdflksjdflkjsdf"
 debug = true
 testing = true
 session_time = 480
-static_folder = "static"
-template_folder = "templates"
+static_folder = "builtins/static"
+template_folder = "builtins/templates"
 error_404_help = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false
+structure = "fl_default"
+EXPLAIN_TEMPLATE_LOADING = true
+login_dashboard = "administrator.users"
 
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
 # type = mysql / postgresql / sqlite
@@ -147,7 +151,6 @@ SQLALCHEMY_TRACK_MODIFICATIONS = false
 # works well with Microsoft Exchange Kiosk License
 # for Exchange Kiosk to work you must enable Authenticated-SMTP in the accounts features
 # this feature takes a while to activate, so don't expect instant results
-
 # The name of the key is used as the username to login to the server defined below.
 # If your username is different uncomment alt_username and set it there
 [smtp]
