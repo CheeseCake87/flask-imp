@@ -59,7 +59,7 @@ def model_class(class_name: str, app=None) -> object:
     if app is None:
         app = current_app
 
-    current_classes = app.config["models"]["classes"]
+    current_classes = app.config["MODELS"]["classes"]
 
     if class_name not in current_classes:
         raise KeyError(f"Model class {class_name} has not been found. Calling from {stack()[1]}")
@@ -80,7 +80,7 @@ def model_module(module_name: str, app=None) -> dict:
     if app is None:
         app = current_app
 
-    current_models = app.config["models"]
+    current_models = app.config["MODELS"]
 
     if module_name not in current_models["modules"]:
         raise KeyError(f"Model module {module_name} has not been found. Calling from {stack()[1]}")
@@ -125,7 +125,7 @@ class FlaskLaunchpad(object):
     Flask app has no valid config file, must be like app_config.toml and be in the root of the app.
                 """)
 
-            current_app.config["models"] = {"modules": {}, "classes": {}}
+            current_app.config["MODELS"] = {"modules": {}, "classes": {}}
             current_app.config["SQLALCHEMY_BINDS"] = {}
 
             config.update(toml_load(f"{current_app.root_path}/{_file}"))
@@ -220,7 +220,7 @@ class FlaskLaunchpad(object):
 
     def models_folder(self, folder: str) -> None:
         """
-        This method is used to load valid model.py files into current_app.config["models"]
+        This method is used to load valid model.py files into current_app.config["MODELS"]
         The shape of this data looks like this:
         app.config["MODELS"] {
         "modules": { "module_name": {"import": "main.module.location", "io": import_object, "db": getattr("db") }, },
@@ -275,7 +275,7 @@ class FlaskLaunchpad(object):
 
     def create_all_models(self):
         """
-        This creates the database, tables and fields from the models found in current_app.config["models"]
+        This creates the database, tables and fields from the models found in current_app.config["MODELS"]
         Can be used like:
 
         FlaskLaunchpad(current_app).create_all_models()
@@ -287,7 +287,7 @@ class FlaskLaunchpad(object):
             fl.create_all_models()
         """
         with self._app.app_context():
-            for key, value in current_app.config["models"]["modules"].items():
+            for key, value in current_app.config["MODELS"]["modules"].items():
                 SQLAlchemy.create_all(value["db"])
 
     def import_blueprints(self, folder: str) -> None:
@@ -443,7 +443,7 @@ class FLStructure:
         self._app = app
 
         with self._app.app_context():
-            if "structure_folder" not in current_app.config:
+            if "STRUCTURE_FOLDER" not in current_app.config:
                 raise ImportError(
                     """
 Structure folder has not been registered. Do fl.register_structure_folder('folder_that_contains_structures')
@@ -451,7 +451,7 @@ Structure folder has not been registered. Do fl.register_structure_folder('folde
 
         self._sn = structure_name
         self.name = structure_name
-        self._sf = current_app.config["structure_folder"]
+        self._sf = current_app.config["STRUCTURE_FOLDER"]
         self._sp = f"{self._sf}/{self._sn}"
 
     def extend(self, extending: str) -> str:
