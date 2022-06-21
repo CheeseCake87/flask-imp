@@ -8,4 +8,4 @@ from .auth import Auth as Auth
 from .auth import WordGen as WordGen
 from .security import Security as Security
 
-version = "0.6.5"
+version = "0.6.6"

@@ -46,7 +46,7 @@ Config file is invalid, must be config.toml and be found in the root of the modu
     return config
 
 
-def model_class(class_name: str, app=None) -> object:
+def model_class(class_name: str, app=None):
     """
     Returns a class object that is stored in app.config, returns error if not found.
 
