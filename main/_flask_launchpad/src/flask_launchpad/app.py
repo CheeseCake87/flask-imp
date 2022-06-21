@@ -186,16 +186,11 @@ class FlaskLaunchpad(object):
         import template files, macros, etc.
         """
         with self._app.app_context():
-            structures = Blueprint(folder, folder, template_folder=f"{current_app.root_path}/{folder}")
+            structures = Blueprint(folder, folder,
+                                   template_folder=f"{current_app.root_path}/{folder}/templates",
+                                   static_folder=f"{current_app.root_path}/{folder}/static")
             current_app.register_blueprint(structures)
             current_app.config["STRUCTURE_FOLDER"] = f"{current_app.root_path}/{folder}"
-
-            @current_app.route("/<structure>/<filepath>", methods=["GET"])
-            def structure_static(structure, filepath):
-                structure_location = f"{current_app.root_path}/{current_app.config['STRUCTURE_FOLDER']}/{structure}/"
-                if path.isfile(f"{structure_location}/{filepath}"):
-                    return send_from_directory(directory=structure_location, path=filepath)
-                return 404
 
     def import_builtins(self, folder: str = "routes") -> None:
         """
@@ -431,14 +426,41 @@ class FLStructure:
     _app = None
     name = None
 
+    """
+    in app init:
+    fls = FLStructure()
+    
+    create_app:
+    fls.init_app(main)
+    
+    in Blueprint init:
+    fls = FLStructure(current_app, "structure_name")
+    / structure_name is the folder name of a structure /
+
+    in Blueprint route:
+    render_template(fls.render("page.html), extends=fls.extend("backend.html"))
+    """
+
     def __init__(self, app=None, structure_name: str = None):
+        if app is not None:
+            self.init_app(app, structure_name)
+
+    def init_app(self, app=None, structure_name: str = None):
         if app is None:
             raise ImportError(
-                "App has not been passed in. Do FLStructure(current_app, 'structure_being_used')")
+                """
+App has not been passed in. 
+Do FLStructure(current_app, 'structure_being_used') 
+or fls.init_app(app, 'structure_being_used')
+""")
 
         if structure_name is None:
             raise ImportError(
-                "Structure name has not been passed in. Do FLStructure(current_app, 'structure_being_used')")
+                """
+Structure name has not been passed in. 
+Do FLStructure(current_app, 'structure_being_used') 
+or fls.init_app(app, 'structure_being_used')
+                """)
 
         self._app = app
 
@@ -449,22 +471,16 @@ class FLStructure:
 Structure folder has not been registered. Do fl.register_structure_folder('folder_that_contains_structures')
                     """)
 
-        self._sn = structure_name
+        self._sn = structure_name + "/templates"
         self.name = structure_name
         self._sf = current_app.config["STRUCTURE_FOLDER"]
-        self._sp = f"{self._sf}/{self._sn}"
+        self._sp = f"{self._sf}/{self._sn}/templates"
 
     def extend(self, extending: str) -> str:
         """
         Checks if an extend page location exists and if so returns its location valid with Flask template folder lookup.
         To use do.
 
-        in Blueprint init:
-        fls = FLStructure(current_app, "structure_name")
-        / structure_name is the folder name of a structure /
-
-        in Blueprint route:
-        render_template(fls.render("page.html), extends=fls.extend("backend.html"))
         / checks for file in folder structure_name/extends/include.html /
         """
         if path.isfile(f"{self._sp}/extends/{extending}"):
