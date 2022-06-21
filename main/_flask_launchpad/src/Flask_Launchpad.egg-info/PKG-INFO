@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Flask-Launchpad
-Version: 0.6.4
+Version: 0.6.5
 Summary: A small auto importer for blueprints and apis + some extras
 Home-page: https://github.com/CheeseCake87/Flask-Launchpad
 Author: David Carmichael
