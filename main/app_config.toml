@@ -9,11 +9,10 @@ secret_key = "sdflskjdflksjdflksjdflkjsdf"
 debug = true
 testing = true
 session_time = 480
-static_folder = "builtins/static"
-template_folder = "builtins/templates"
+static_folder = "flask/static"
+template_folder = "flask/templates"
 error_404_help = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false
-structure = "fl_default"
 EXPLAIN_TEMPLATE_LOADING = true
 login_dashboard = "administrator.users"
 

@@ -1,6 +1,5 @@
 from flask import current_app
 
-from .. import fls
 from .. import bp
 
 

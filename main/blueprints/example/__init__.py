@@ -1,13 +1,9 @@
 from flask import session
-from flask import current_app
 
-from ..._flask_launchpad.src.flask_launchpad import FLStructure
 from ..._flask_launchpad.src.flask_launchpad import FLBlueprint
 
 fl_bp = FLBlueprint()
 bp = fl_bp.register()
-
-fls = FLStructure(current_app, current_app.config["STRUCTURE"])
 
 fl_bp.import_routes("routes")
 
