@@ -383,6 +383,9 @@ class FLBlueprint:
         if "template_folder" in c_blueprint:
             c_blueprint["template_folder"] = f"{self.root_path}/{c_blueprint['template_folder']}"
 
+        if "static_folder" in c_blueprint:
+            c_blueprint["static_folder"] = f"{self.root_path}/{c_blueprint['static_folder']}"
+
         return Blueprint(bp_name, bp_import_name, **c_blueprint)
 
     def import_routes(self, folder: str = "routes"):
