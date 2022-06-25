@@ -1,0 +1,13 @@
+body, html {
+    background-color: #4f5050;
+    height: 100%;
+    width: 100%;
+}
+
+.window {
+    background-color: whitesmoke;
+    border: 1px solid;
+    padding: 20px;
+    border-radius: 25px;
+    width: 400px;
+}
