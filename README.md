@@ -59,7 +59,7 @@ pip install -r requirements.txt
 
 Flask-Launchpad's main purpose is to help simplify the importing of blueprints, templates and models.
 
-It has a few extra features builtin to help with theming, securing pages and password authentication.
+It has a few extra features built in to help with theming, securing pages and password authentication.
 
 ## Minimal Flask-Launchpad app
 
@@ -79,8 +79,8 @@ secret_key = "sdflskjdflksjdflksjdflkjsdf"
 debug = true
 testing = true
 session_time = 480
-static_folder = "flask/static"
-template_folder = "flask/templates"
+static_folder = "static"
+template_folder = "templates"
 error_404_help = true
 ```
 
@@ -109,6 +109,8 @@ Let's say we have this folder structure:
 ```
 Flask-Launchpad
     main
+        static
+        templates
         routes
             index.py
         __init__.py
@@ -153,6 +155,8 @@ So now our folder structure looks like this:
 ```
 Flask-Launchpad
     main
+        static
+        templates
         routes
             index.py
             my_page.py
