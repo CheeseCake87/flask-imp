@@ -7,4 +7,4 @@ from .app import sql_do as sql_do
 from .auth import WordGen as WordGen
 from .security import Security as Security
 
-version = "0.6.9"
+version = "0.7.0"
