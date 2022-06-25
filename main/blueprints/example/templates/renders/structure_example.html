@@ -1,0 +1,11 @@
+{% extends extend %}
+
+{% block _title %}
+Flask-Launchpad - Example Blueprint
+{% endblock %}
+
+{% block _container %}
+    <img width="50" src="{{ url_for('fl_default.static', filename='img/Flask-Launchpad.png') }}" alt="Flask-Launchpad Logo">
+    <h1>Flask-Launchpad Structure Example</h1>
+    {% include footer %}
+{% endblock %}

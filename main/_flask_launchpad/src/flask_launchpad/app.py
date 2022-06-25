@@ -12,13 +12,19 @@ from os import listdir
 from inspect import stack
 from markupsafe import Markup
 
+"""
+sql_do is used to simplify db.session actions, this works in page routes
+from flask_launchpad import sql_do
+route:
+    sql_do.query...
+    sql_do.commit()
+"""
 sql_do = SQLAlchemy().session
 
 
 def contains_illegal_chars(name: str, exception: list = None) -> bool:
     """
-    Removes illegal chars from dir, there are:
-    ['%', '$', '£', ' ', '#', 'readme', '__', '.py']
+    Finds illegal chars in <name>, is able to accept exceptions in list form.
     """
     _illegal_characters = ['%', '$', '£', ' ', '#', 'readme', '__', '.py']
     if exception is not None:
@@ -32,8 +38,7 @@ def contains_illegal_chars(name: str, exception: list = None) -> bool:
 
 def load_config(root_path: str) -> dict:
     """
-    This loads the config file of the Blueprint and saves it to the config var
-    so it can be accessed using fl_bp.config
+    This loads a config.toml file from passed in path. Main usage is for blueprint imports.
     """
     config = {}
     if not path.isfile(f"{root_path}/config.toml"):
@@ -50,11 +55,7 @@ def model_class(class_name: str, app=None):
     """
     Returns a class object that is stored in app.config, returns error if not found.
 
-    The shape of app.config["MODELS"] looks like this
-    {
-    "modules": { "module_name": {"import": "main.module.location", "io": import_object, "db": getattr("db") }, },
-    "classes": { "class_name": class_object, }
-    }
+    See FlaskLaunchpad.models_folder()
     """
     if app is None:
         app = current_app
@@ -202,8 +203,18 @@ class FlaskLaunchpad(object):
 
     def models_folder(self, folder: str) -> None:
         """
-        This method is used to load valid model.py files into current_app.config["MODELS"]
-        The shape of this data looks like this:
+        This method is used to load valid model files, it looks for the attribute "db" in the file then init_apps them
+        to the main app.
+
+        It also puts the import path, import object(io) and the db attribute into:
+        app.config['MODELS']['modules']['module_nam ']
+
+        It also loads the class names found in the file into app.config['MODELS']['classes']['class_name']
+
+        See functions model_class() and model_module()
+
+        The shape of the config data looks like this:
+
         app.config["MODELS"] {
         "modules": { "module_name": {"import": "main.module.location", "io": import_object, "db": getattr("db") }, },
         "classes": { "class_name": class_object, }
@@ -301,7 +312,7 @@ class FlaskLaunchpad(object):
     def import_apis(self, folder: str) -> None:
         """
         Looks through the passed in folder for Blueprint modules, imports them then registers them with Flask.
-        This does the same as import_blueprints, but decorates the name with an api marker
+        This does the same as import_blueprints, but decorates the blueprint name with an api marker
         The Blueprint object must be stored in a variable called api_bp in the __init__.py file in the Api Blueprint folder.
         """
 
@@ -410,6 +421,21 @@ Error when importing {self.import_from} - {self.name} - {route}:
 
 
 class FLStructure:
+    """
+    This is used for more flexible theming and templating.
+    I've called this structures and not themes as a template folder can
+    import template files, macros, etc.
+
+    In the main apps __init__ file you can do:
+
+    sts = FLStructure(current_app, "folder_where_structures_are_stored")
+
+    ~or~
+
+    create_app():
+        ~~~~
+        sts.init_app(app, "folder_where_structures_are_stored")
+    """
     _app = None
     _structures_folder = None
     _structures_absolute_folder = None
@@ -443,9 +469,9 @@ or fls.init_app(app, 'structure_being_used')
     def register_structure(self, structure: str, template_folder: str = "templates",
                            static_folder: str = "static") -> None:
         """
-        Registers a folder in the root path as a Flask template folder.
-        The use of this is to allow for themes. I've called this structures and not themes as a template folder can
-        import template files, macros, etc.
+        Registers a folder in the specified structures folder as a Flask blueprint.
+        This makes it available to the render_template lookthrough for templates and
+        url_for("folder.static") for static files
         """
         with self._app.app_context():
             t_folder = f"{current_app.root_path}/{self._structures_folder}/{structure}/{template_folder}"
@@ -456,11 +482,45 @@ or fls.init_app(app, 'structure_being_used')
                 return
             structures = Blueprint(
                 structure, structure,
-                template_folder=t_folder, static_folder=s_folder, static_url_path=f"/{structure}/static/")
+                template_folder=t_folder, static_folder=s_folder, static_url_path=f"/structure/{structure}")
             current_app.register_blueprint(structures)
             self._reg_structures.update({
                 structure: {"template_folder": t_folder, "static_folder": s_folder}
             })
+
+    """
+    To use the methods below you will need to structure your structure in a specific way
+    app_root 
+        structures
+            structure_name
+                static
+                templates
+                    structure_name
+                        extends
+                        includes
+                        error_pages
+                        renders
+    
+    We need to specify the structure name again under the templates directory, as all template folders
+    registered by blueprints are all added to the same lookup table, if a template file shares the same name with
+    another structure or blueprint they would clash.
+    
+    The methods below make it easy to pull from the template folder of the structure
+    
+    in a route page:
+    
+    from main import sts
+    
+    structure = "name_of_structure_folder"  # this can be stored in a session var to allow theme picking
+    
+    @bp.route
+    render_template(<local_bp_template>, extend=sts.extend("template.html", structure)
+    
+    jinja of local_bp_template:
+    
+    {% extends extend %}
+    ... rest or page ...
+    """
 
     def extend(self, file: str, structure: str) -> str:
         p = f"{structure}/extends/{file}"

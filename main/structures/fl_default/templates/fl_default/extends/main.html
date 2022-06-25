@@ -5,22 +5,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block _title %} {% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('structure_static', structure=structure, filename='milligram.css') }}">
-    <link rel="stylesheet" href="{{ url_for('structure_static', structure=structure, filename='normalize.css') }}">
-    <link rel="stylesheet" href="{{ url_for('structure_static', structure=structure, filename='main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('structure_static', structure=structure, filename='form_structure.css') }}">
+    <link rel="stylesheet" href="{{ url_for('fl_default.static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('fl_default.static', filename='css/bootstrap-utilities.css') }}">
+    <link rel="stylesheet" href="{{ url_for('fl_default.static', filename='css/custom.css') }}">
 </head>
 
 <body>
 
 {% block _global %}
-    <div class="flex-content">
-        <div class="container">
+    <div class="d-flex align-items-center justify-content-center w-100 h-100">
+        <div class="window">
             {% block _container %}
             {% endblock %}
         </div>
     </div>
 {% endblock %}
-<script src="{{ url_for('structure_static', structure=structure, filename='main.js') }}"></script>
+<script src="{{ url_for('fl_default.static', filename='js/main.js') }}"></script>
 </body>
 </html>

@@ -1,5 +1,4 @@
 from flask_restx import Api
-from flask_sqlalchemy import SQLAlchemy
 from flask import session
 
 from ..._flask_launchpad.src.flask_launchpad import FLBlueprint
@@ -10,9 +9,6 @@ api_bp = fl_bp.register()
 api = Api(api_bp, doc=f"/docs")
 
 fl_bp.import_routes()
-
-db = SQLAlchemy()
-sql_do = db.session
 
 
 @api_bp.before_app_first_request

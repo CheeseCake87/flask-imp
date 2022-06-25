@@ -5,6 +5,9 @@ from ..._flask_launchpad.src.flask_launchpad import FLBlueprint
 fl_bp = FLBlueprint()
 bp = fl_bp.register()
 
+# Set the default structure theme for this blueprint ( this can be done route by route also )
+stru = "fl_default"
+
 fl_bp.import_routes("routes")
 
 
