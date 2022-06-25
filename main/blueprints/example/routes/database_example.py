@@ -5,7 +5,7 @@ from .. import bp
 
 
 @bp.route("/database-example", methods=["GET"])
-def index():
+def database_example():
     # Load the ExampleUser class found in the models folder, this way saves having to import files
     example_user = model_class("ExampleUser")
 

@@ -12,7 +12,7 @@ def home_page():
     Shows an example of the structure working
     """
 
-    render = "renders/structure_example.html"
+    render = "renders/structure-example.html"
     extend = structures.extend("main.html", stru)
     footer = structures.include("footer.html", stru)
 

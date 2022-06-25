@@ -18,115 +18,122 @@ def valid_email_chars() -> list:
     return special_chars + alpha + numeric
 
 
-class Auth:
-    def safe_username(self, username: str) -> bool:
-        """
-        Checks username for any special characters.
-        :param username:
-        :return bool:
-        """
-        vec = valid_email_chars()
-        if "@" in username:
-            for char in username:
-                if char not in vec:
-                    return False
-            return bool(search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", username))
-        if username.isalnum():
-            return True
-        return False
+def safe_username(username: str) -> bool:
+    """
+    Checks username for any special characters.
+    :param username:
+    :return bool:
+    """
+    vec = valid_email_chars()
+    if "@" in username:
+        for char in username:
+            if char not in vec:
+                return False
+        return bool(search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", username))
+    if username.isalnum():
+        return True
+    return False
 
-    def generate_form_token(self) -> str:
-        """
-        Generates a SHA1 using todays date and time.
-        :return str: hash:
-        """
-        sha = sha1()
-        sha.update(str(datetime.now()).encode("utf-8"))
-        return sha.hexdigest()
 
-    def generate_salt(self) -> str:
-        """
-        Generates a string of 4 special characters, for use in password salting
-        :return str:
-        """
-        return "".join(choice(punctuation) for _ in range(4))
+def generate_form_token() -> str:
+    """
+    Generates a SHA1 using todays date and time.
+    :return str: hash:
+    """
+    sha = sha1()
+    sha.update(str(datetime.now()).encode("utf-8"))
+    return sha.hexdigest()
 
-    def generate_private_key(self, hook: str) -> str:
-        """
-        Generates a private key for api access from a passed in hook value.
-        :return str: hash:
-        """
-        sha = sha256()
-        sha.update(hook.encode("utf-8"))
-        return sha.hexdigest()
 
-    def generate_email_validator(self) -> str:
-        """
-        Generates a string of 8 random numbers, for use in MFA email
-        :return str:
-        """
-        return "".join(choice(digits) for i in range(8))
+def generate_salt() -> str:
+    """
+    Generates a string of 4 special characters, for use in password salting
+    :return str:
+    """
+    return "".join(choice(punctuation) for _ in range(4))
 
-    def generate_pepper(self, password: str):
-        """
-        Chooses a random letter from ascii_letters and joins it onto the user's password,
-        this is used to pepper the password
-        :param password:
-        :return str:
-        """
-        return "".join(choice(ascii_letters) for i in range(1)) + password
 
-    def sha_password(self, password: str, salt: str, encrypt: int = 512) -> str:
-        """
-        Takes user's password, peppers in, salts it, then converts it to sha
-        Can set encryption to 256/512 - 256 is system
-        :param password:
-        :param salt:
-        :param encrypt:
-        :return str: hash:
-        """
+def generate_private_key(hook: str) -> str:
+    """
+    Generates a private key for api access from a passed in hook value.
+    :return str: hash:
+    """
+    sha = sha256()
+    sha.update(hook.encode("utf-8"))
+    return sha.hexdigest()
+
+
+def generate_email_validator() -> str:
+    """
+    Generates a string of 8 random numbers, for use in MFA email
+    :return str:
+    """
+    return "".join(choice(digits) for _ in range(8))
+
+
+def generate_pepper(password: str):
+    """
+    Chooses a random letter from ascii_letters and joins it onto the user's password,
+    this is used to pepper the password
+    :param password:
+    :return str:
+    """
+    return "".join(choice(ascii_letters) for _ in range(1)) + password
+
+
+def sha_password(password: str, salt: str, encrypt: int = 512) -> str:
+    """
+    Takes user's password, peppers in, salts it, then converts it to sha
+    Can set encryption to 256/512 - 256 is system
+    :param password:
+    :param salt:
+    :param encrypt:
+    :return str: hash:
+    """
+    sha = sha512() if encrypt == 512 else sha256()
+    sha.update((generate_pepper(password) + salt).encode("utf-8"))
+    return sha.hexdigest()
+
+
+def auth_password(input_password: str, database_password: str, database_salt: str,
+                  encrypt: int = 512) -> bool:
+    """
+    Takes user's password (input_password), loops over all possible ascii_letters joining
+    to the password as a pepper, then salts using salt value in the database, then converts it
+    to sha, then compares that loop result to the database password to find a match
+    Can set encryption to 256/512 - 256 is system
+    :param input_password: str
+    :param database_password: str
+    :param database_salt: str
+    :param encrypt: int
+    :return bool:
+    """
+    for letter in list(ascii_letters):
         sha = sha512() if encrypt == 512 else sha256()
-        sha.update((self.generate_pepper(password) + salt).encode("utf-8"))
-        return sha.hexdigest()
+        sha.update((letter + input_password + database_salt).encode("utf-8"))
+        if sha.hexdigest() == database_password:
+            return True
+    return False
 
-    def auth_password(self, input_password: str, database_password: str, database_salt: str,
-                      encrypt: int = 512) -> bool:
-        """
-        Takes user's password (input_password), loops over all possible ascii_letters joining
-        to the password as a pepper, then salts using salt value in the database, then converts it
-        to sha, then compares that loop result to the database password to find a match
-        Can set encryption to 256/512 - 256 is system
-        :param input_password: str
-        :param database_password: str
-        :param database_salt: str
-        :param encrypt: int
-        :return bool:
-        """
-        for letter in list(ascii_letters):
-            sha = sha512() if encrypt == 512 else sha256()
-            sha.update((letter + input_password + database_salt).encode("utf-8"))
-            if sha.hexdigest() == database_password:
-                return True
-        return False
 
-    def generate_password(self, style: str, length: int) -> str:
-        """
-        Will return a plain text password based on choice of style and length.
+def generate_password(style: str, length: int) -> str:
+    """
+    Will return a plain text password based on choice of style and length.
 
-        Combinations available:
+    Combinations available:
 
-        style: str "animals", length: int <number of animals returned>
+    style: str "animals", length: int <number of animals returned>
 
-        :param style: str
-        :param length: int
-        :return: str:
-        """
-        if style == "animals":
-            _final = []
-            for i in range(length):
-                _random_index = randrange(0, len(WordGen.animals))
-                _final.append(WordGen.animals[_random_index])
-            return '-'.join(_final)
+    :param style: str
+    :param length: int
+    :return: str:
+    """
+    if style == "animals":
+        _final = []
+        for i in range(length):
+            _random_index = randrange(0, len(WordGen.animals))
+            _final.append(WordGen.animals[_random_index])
+        return '-'.join(_final)
 
 
 class WordGen:
