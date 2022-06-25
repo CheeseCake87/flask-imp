@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from ._flask_launchpad.src.flask_launchpad import FlaskLaunchpad
 from ._flask_launchpad.src.flask_launchpad import FLStructure
 from ._flask_launchpad.src.flask_launchpad import Security
+from ._flask_launchpad.src.flask_launchpad import WordGen
+
 
 fl = FlaskLaunchpad()
 db = SQLAlchemy()

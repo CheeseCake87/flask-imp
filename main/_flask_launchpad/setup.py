@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='Flask-Launchpad',
-    version='0.6.8',
+    version='0.6.9',
     url='https://github.com/CheeseCake87/Flask-Launchpad',
     license='MIT',
     author='David Carmichael',
@@ -19,7 +19,7 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'Flask', 'toml'
+        'Flask', 'toml', 'Flask-SQLAlchemy'
     ],
     classifiers=[
         'Environment :: Web Environment',
