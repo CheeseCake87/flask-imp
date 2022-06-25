@@ -6,6 +6,10 @@ from flask import url_for
 
 
 class Security:
+    """
+    A class that provides route function decorators to check for session variables and their values.
+    """
+
     _app = None
 
     def __init__(self, app=None):
