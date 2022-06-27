@@ -74,7 +74,7 @@ def model_module(module_name: str, app=None) -> dict:
 
     The shape of app.config["MODELS"] looks like this
     {
-    "modules": { "module_name": {"import": "main.module.location", "io": import_object, "db": getattr("db") }, },
+    "modules": { "module_name": {"import": "app.module.location", "io": import_object, "db": getattr("db") }, },
     "classes": { "class_name": class_object, }
     }
     """
@@ -216,7 +216,7 @@ class FlaskLaunchpad(object):
         The shape of the config data looks like this:
 
         app.config["MODELS"] {
-        "modules": { "module_name": {"import": "main.module.location", "io": import_object, "db": getattr("db") }, },
+        "modules": { "module_name": {"import": "app.module.location", "io": import_object, "db": getattr("db") }, },
         "classes": { "class_name": class_object, }
         }
         """
@@ -426,7 +426,7 @@ class FLStructure:
     I've called this structures and not themes as a template folder can
     import template files, macros, etc.
 
-    In the main apps __init__ file you can do:
+    In the app app __init__ file you can do:
 
     sts = FLStructure(current_app, "folder_where_structures_are_stored")
 
@@ -509,7 +509,7 @@ or fls.init_app(app, 'structure_being_used')
     
     in a route page:
     
-    from main import sts
+    from app import structures
     
     structure = "name_of_structure_folder"  # this can be stored in a session var to allow theme picking
     

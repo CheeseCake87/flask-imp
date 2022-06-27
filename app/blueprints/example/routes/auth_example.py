@@ -1,7 +1,7 @@
 from flask import render_template
 
 from ...._flask_launchpad.src.flask_launchpad import auth
-from main import structures
+from app import structures
 
 from .. import bp
 from .. import stru

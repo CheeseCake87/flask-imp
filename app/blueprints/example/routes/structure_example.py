@@ -1,6 +1,6 @@
 from flask import current_app
 from flask import render_template
-from main import structures
+from app import structures
 
 from .. import bp
 from .. import stru

@@ -1,6 +1,6 @@
 import flask
 from flask import current_app
-from main import security
+from app import security
 
 from ...._flask_launchpad.src.flask_launchpad import FlaskLaunchpad
 from .. import bp
