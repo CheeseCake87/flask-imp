@@ -1,8 +1,6 @@
 import flask
-from flask import current_app
 from app import security
 
-from ...._flask_launchpad.src.flask_launchpad import FlaskLaunchpad
 from .. import bp
 
 
@@ -34,15 +32,6 @@ def permission_redirect():
     session['permissions] = ['this', 'that', 'here', 'there']
     """
     return "You have the required permission to view this page."
-
-
-@bp.route("/create-all-models", methods=["GET"])
-def create_all_models():
-    """
-    Example of flask_launchpads ability to create all models
-    """
-    FlaskLaunchpad(current_app).create_all_models()
-    return """If you didn't see an error, this probably worked..."""
 
 
 @bp.route("/not-logged-in", methods=["GET"])

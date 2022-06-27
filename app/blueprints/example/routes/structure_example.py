@@ -1,4 +1,3 @@
-from flask import current_app
 from flask import render_template
 from app import structures
 

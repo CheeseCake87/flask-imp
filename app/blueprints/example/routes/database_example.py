@@ -1,7 +1,18 @@
 from ...._flask_launchpad.src.flask_launchpad import model_class
 from ...._flask_launchpad.src.flask_launchpad import sql_do
 
+from app import fl
+
 from .. import bp
+
+
+@bp.route("/create-all-models", methods=["GET"])
+def create_all_models():
+    """
+    Example of flask_launchpads ability to create all models
+    """
+    fl.create_all_models()
+    return """If you didn't see an error, this probably worked..."""
 
 
 @bp.route("/database-example", methods=["GET"])
