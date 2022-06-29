@@ -18,7 +18,7 @@ def valid_email_chars() -> list:
     return special_chars + alpha + numeric
 
 
-def safe_username(username: str) -> bool:
+def is_username_safe(username: str) -> bool:
     """
     Checks username for any special characters.
     :param username:
