@@ -523,29 +523,17 @@ or fls.init_app(app, 'structure_being_used')
     """
 
     @classmethod
-    def extend(cls, file: str, structure: str, structures_folder: str = "structures") -> str:
-        p = f"{structure}/extends/{file}"
-        if path.isfile(f"{structures_folder}/{p}"):
-            return p
-        return Markup(f"Extend template error, unable to find: {file} - extend > {p}")
+    def extend(cls, file: str, structure: str) -> str:
+        return f"{structure}/extends/{file}"
 
     @classmethod
-    def include(cls, file: str, structure: str, structures_folder: str = "structures") -> str:
-        p = f"{structure}/includes/{file}"
-        if path.isfile(f"{structures_folder}/{p}"):
-            return p
-        return Markup(f"Include template error, unable to find: {file} - include > {p}")
+    def include(cls, file: str, structure: str) -> str:
+        return f"{structure}/includes/{file}"
 
     @classmethod
-    def error_page(cls, file: str, structure: str, structures_folder: str = "structures") -> str:
-        p = f"{structure}/errors/{file}"
-        if path.isfile(f"{structures_folder}/{p}"):
-            return p
-        return Markup(f"Error page render error, unable to find: {file} - error_page > {p}")
+    def error_page(cls, file: str, structure: str) -> str:
+        return f"{structure}/errors/{file}"
 
     @classmethod
-    def render(cls, file: str, structure: str, structures_folder: str = "structures") -> str:
-        p = f"{structure}/renders/{file}"
-        if path.isfile(f"{structures_folder}/{p}"):
-            return p
-        return Markup(f"Page render error, unable to find: {file} - render > {p}")
+    def render(cls, file: str, structure: str) -> str:
+        return f"{structure}/renders/{file}"
