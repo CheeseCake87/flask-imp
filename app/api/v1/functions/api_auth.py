@@ -1,5 +1,3 @@
-from flask_restx import abort
-
 from .. import fl_bp
 
 

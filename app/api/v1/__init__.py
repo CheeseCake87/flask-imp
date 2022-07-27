@@ -1,12 +1,9 @@
-from flask_restx import Api
 from flask import session
 
 from ..._flask_launchpad.src.flask_launchpad import FLBlueprint
 
 fl_bp = FLBlueprint()
-
 api_bp = fl_bp.register()
-api = Api(api_bp, doc=f"/docs")
 
 fl_bp.import_routes()
 

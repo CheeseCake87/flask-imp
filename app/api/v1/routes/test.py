@@ -1,14 +1,14 @@
-from flask_restx import Resource
+from flask import jsonify
 from ..functions.api_auth import public_key_required
 
-from .. import api
+from .. import api_bp
 
 
-@api.route('/test')
-class Test(Resource):
+@api_bp.route('/test')
+class Test():
     def get(self):
-        return "GET Method"
+        return jsonify(Response="GET Method")
 
     def post(self, public_key):
         public_key_required(public_key)
-        return """POST Method"""
+        return jsonify(Response="POST Method")

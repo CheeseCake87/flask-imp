@@ -498,7 +498,7 @@ or fls.init_app(app, 'structure_being_used')
                     structure_name
                         extends
                         includes
-                        error_pages
+                        errors
                         renders
     
     We need to specify the structure name again under the templates directory, as all template folders
@@ -522,26 +522,30 @@ or fls.init_app(app, 'structure_being_used')
     ... rest or page ...
     """
 
-    def extend(self, file: str, structure: str) -> str:
+    @classmethod
+    def extend(cls, file: str, structure: str, structures_folder: str = "structures") -> str:
         p = f"{structure}/extends/{file}"
-        if path.isfile(f"{self._reg_structures[structure]['template_folder']}/{p}"):
+        if path.isfile(f"{structures_folder}/{p}"):
             return p
         return Markup(f"Extend template error, unable to find: {file} - extend > {p}")
 
-    def include(self, file: str, structure: str) -> str:
+    @classmethod
+    def include(cls, file: str, structure: str, structures_folder: str = "structures") -> str:
         p = f"{structure}/includes/{file}"
-        if path.isfile(f"{self._reg_structures[structure]['template_folder']}/{p}"):
+        if path.isfile(f"{structures_folder}/{p}"):
             return p
         return Markup(f"Include template error, unable to find: {file} - include > {p}")
 
-    def error_page(self, file: str, structure: str) -> str:
-        p = f"{structure}/error_pages/{file}"
-        if path.isfile(f"{self._reg_structures[structure]['template_folder']}/{p}"):
+    @classmethod
+    def error_page(cls, file: str, structure: str, structures_folder: str = "structures") -> str:
+        p = f"{structure}/errors/{file}"
+        if path.isfile(f"{structures_folder}/{p}"):
             return p
         return Markup(f"Error page render error, unable to find: {file} - error_page > {p}")
 
-    def render(self, file: str, structure: str) -> str:
+    @classmethod
+    def render(cls, file: str, structure: str, structures_folder: str = "structures") -> str:
         p = f"{structure}/renders/{file}"
-        if path.isfile(f"{self._reg_structures[structure]['template_folder']}/{p}"):
+        if path.isfile(f"{structures_folder}/{p}"):
             return p
         return Markup(f"Page render error, unable to find: {file} - render > {p}")
