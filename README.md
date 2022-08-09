@@ -88,20 +88,20 @@ Your app's ```__init__.py``` file should look like this:
 
 ```python
 from flask import Flask
-from flask_bigapp import BigApp
+from flask_bigapp import BApp
 
-ba = BigApp()
+bapp = BApp()
 
 
 def create_app():
     main = Flask(__name__)
-    ba.init_app(main)
-    ba.app_config("app_config.toml")
-    ba.import_builtins("routes")
+    bapp.init_app(main)
+    bapp.app_config("app_config.toml")
+    bapp.import_builtins("routes")
     return main
 ```
 
-The ```ba.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
+The ```bapp.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
 from.
 
 Let's say we have this folder structure:
