@@ -5,16 +5,16 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name='Flask-Launchpad',
-    version='0.8.1',
-    url='https://github.com/CheeseCake87/Flask-Launchpad',
+    name='Flask-BigApp',
+    version='0.8.3',
+    url='https://github.com/CheeseCake87/Flask-BigApp',
     license='MIT',
     author='David Carmichael',
     author_email='carmichaelits@gmail.com',
-    description='A small auto importer for blueprints and apis + some extras',
+    description='A Flask auto importer to allows your Flask apps to grow big.',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    py_modules=['flask_launchpad'],
+    py_modules=['flask_bigapp'],
     zip_safe=True,
     include_package_data=True,
     platforms='any',
@@ -32,5 +32,5 @@ setup(
     ],
     package_dir={"": "src"},
     packages=find_packages(where="src"),
-    python_requires=">=3.6",
+    python_requires=">=3.8",
 )

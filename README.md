@@ -1,14 +1,14 @@
-# Flask-Launchpad
+# Flask-BigApp
 
 ```bash
-pip install flask-launchpad
+pip install flask-bigapp
 ```
 
 ---
 
 ## Setup GitHub version
 
-! This project imports Flask-Launchpad from a local directory (_flask_launchpad) !
+! This project imports Flask-BigApp from a local directory (_flask_bigapp) !
 
 ### Linux setup
 
@@ -17,11 +17,11 @@ pip install flask-launchpad
 #### Git clone:
 
 ```bash
-git clone https://github.com/CheeseCake87/Flask-Launchpad.git
+git clone https://github.com/CheeseCake87/Flask-BigApp.git
 ```
 
 ```bash
-cd Flask-Launchpad
+cd Flask-BigApp
 ```
 
 ```bash
@@ -55,13 +55,13 @@ pip install -r requirements.txt
 
 ---
 
-# What is Flask-Launchpad?
+# What is Flask-BigApp?
 
 Flask-Launchpad's main purpose is to help simplify the importing of blueprints, templates and models.
 
 It has a few extra features built in to help with theming, securing pages and password authentication.
 
-## Minimal Flask-Launchpad app
+## Minimal Flask-BigApp app
 
 ```app_config.toml``` file is required to sit next to your app's ```__init__.py``` file.
 
@@ -88,26 +88,26 @@ Your app's ```__init__.py``` file should look like this:
 
 ```python
 from flask import Flask
-from flask_launchpad import FlaskLaunchpad
+from flask_bigapp import BigApp
 
-fl = FlaskLaunchpad()
+ba = BigApp()
 
 
 def create_app():
     main = Flask(__name__)
-    fl.init_app(main)
-    fl.app_config("app_config.toml")
-    fl.import_builtins("routes")
+    ba.init_app(main)
+    ba.app_config("app_config.toml")
+    ba.import_builtins("routes")
     return main
 ```
 
-The ```fl.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
+The ```ba.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
 from.
 
 Let's say we have this folder structure:
 
 ```
-Flask-Launchpad
+Flask-BigApp
     main
         static
         templates
@@ -153,7 +153,7 @@ def my_page():
 So now our folder structure looks like this:
 
 ```
-Flask-Launchpad
+Flask-BigApp
     main
         static
         templates
@@ -171,9 +171,9 @@ The ```my_page.py``` routes will also be imported into the main app.
 Using this method you can keep your routes in different files, and not have to worry about adding the import into
 your ```__init__.py``` file.
 
-This is an example of a very basic app in Flask-Launchpad.
+This is an example of a very basic app in Flask-BigApp.
 
-Please check out the Flask-Launchpad GitHub project. It contains working examples of what Flask-Launchpad can do, and
+Please check out the Flask-BigApp GitHub project. It contains working examples of what Flask-BigApp can do, and
 how it can be used to save some time with projects that require a lot of importing.
 
 More documentation coming soon!

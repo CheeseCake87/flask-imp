@@ -1,8 +1,8 @@
 from flask import session
 
-from ..._flask_launchpad.src.flask_launchpad import FLBlueprint
+from ..._flask_bigapp.src.flask_bigapp import BABlueprint
 
-fl_bp = FLBlueprint()
+fl_bp = BABlueprint()
 api_bp = fl_bp.register()
 
 fl_bp.import_routes()

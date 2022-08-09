@@ -1,32 +1,29 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from ._flask_launchpad.src.flask_launchpad import FlaskLaunchpad
-from ._flask_launchpad.src.flask_launchpad import FLStructure
-from ._flask_launchpad.src.flask_launchpad import Security
+from ._flask_bigapp.src.flask_bigapp import BApp
+from ._flask_bigapp.src.flask_bigapp import BAStructure
+from ._flask_bigapp.src.flask_bigapp import Security
 
-fl = FlaskLaunchpad()
-db = SQLAlchemy()
-structures = FLStructure()
+bapp = BApp()
+structures = BAStructure()
 security = Security()
 
 
 def create_app():
     main = Flask(__name__)
-    fl.init_app(main)
-    fl.app_config("app_config.toml")
+    bapp.init_app(main)
+    bapp.app_config("app_config.toml")
 
     security.init_app(main)
 
-    fl.models_folder("models")
-    db.init_app(main)
+    bapp.models(folder="models")
 
     structures.init_app(main, "structures")
     structures.register_structure("fl_default")
 
-    fl.import_builtins("flask/routes")
-    fl.import_builtins("flask/template_filters")
+    bapp.import_builtins("flask/routes")
+    bapp.import_builtins("flask/template_filters")
 
-    fl.import_apis("api")
-    fl.import_blueprints("blueprints")
+    bapp.import_apis("api")
+    bapp.import_blueprints("blueprints")
 
     return main

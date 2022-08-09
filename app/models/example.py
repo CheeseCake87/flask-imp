@@ -1,7 +1,7 @@
+from app import bapp
 from sqlalchemy import ForeignKey
 
-# Import db object from apps __init__.py
-from .. import db
+db = bapp.db
 
 
 class ExampleUser(db.Model):
