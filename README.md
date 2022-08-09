@@ -173,6 +173,89 @@ your ```__init__.py``` file.
 
 This is an example of a very basic app in Flask-BigApp.
 
+## Working with Models
+
+In your apps `__init__.py` file we will include the `bapp.models` method
+
+```python
+from flask import Flask
+from flask_bigapp import BApp
+
+bapp = BApp()
+
+
+def create_app():
+    main = Flask(__name__)
+    bapp.init_app(main)
+    bapp.app_config("app_config.toml")
+
+    # File or Folder can be set
+    bapp.models(file="models.py", folder="models_folder")
+
+    bapp.import_builtins("routes")
+    return main
+```
+
+The `bapp.models` method initializes flask_sqlalchemy into `BApp.db`.
+
+It also loads the classes along with their attributes into `BApp` and can be retrieved
+using the `bapp.model_class` method.
+
+Here is what our model file looks like:
+
+```python
+from app import bapp
+
+db = bapp.db
+
+
+class ExampleUser(db.Model):
+    __tablename__ = "fl_example_user"
+    user_id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(256), nullable=False)
+    password = db.Column(db.String(512), nullable=False)
+    salt = db.Column(db.String(4), nullable=False)
+    private_key = db.Column(db.String(256), nullable=False)
+    disabled = db.Column(db.Boolean)
+```
+
+Below is an example route using the `bapp.model_class` method:
+
+```python
+@bp.route("/database-example", methods=["GET"])
+def database_example():
+    # Load the ExampleUser class found in the models folder, this way saves having to import files
+    example_user = bapp.model_class("ExampleUser")
+
+    user_id = 1
+    result = "NULL"
+    find_username = True
+
+    # Normal query
+    nq_example_user = example_user.query
+
+    # Query class using sql_do session
+    sq_example_user = bapp.sql_do.query(example_user)
+
+    if find_username:
+        sq_example_user = sq_example_user.filter(example_user.user_id == user_id).first()
+        if sq_example_user is not None:
+            username = sq_example_user.username
+            result = f"Session Query: Username is {username}"
+
+        nq_example_user = nq_example_user.filter(example_user.user_id == user_id).first()
+        if nq_example_user is not None:
+            username = nq_example_user.username
+            result = f"{result}, Normal Query: Username is {username}"
+
+    return f"{result}"
+```
+`bapp.model_class("ExampleUser")` load the `ExampleUser` class into the variable `example_user` that can then be used to query.
+
+You may have also noticed `bapp.sql_do` this is just a proxy for `db.session`
+
+### Etc...
+
 Please check out the Flask-BigApp GitHub project. It contains working examples of what Flask-BigApp can do, and
 how it can be used to save some time with projects that require a lot of importing.
 

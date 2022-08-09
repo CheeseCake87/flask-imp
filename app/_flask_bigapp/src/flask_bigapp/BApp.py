@@ -14,7 +14,7 @@ class BApp(object):
     _smtp = dict()
     _model_classes = dict()
 
-    sql_do = None
+    sql_do = SQLAlchemy().session
     db = SQLAlchemy()
 
     def __init__(self, app=None):
@@ -208,7 +208,6 @@ class BApp(object):
                     print("File not found: ", f"{current_app.root_path}/{file}")
 
             self.db.init_app(current_app)
-            self.sql_do = self.db.session
 
     def model_class(self, class_name: str):
         return self._model_classes[class_name]

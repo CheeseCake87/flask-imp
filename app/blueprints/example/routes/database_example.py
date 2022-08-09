@@ -18,16 +18,23 @@ def database_example():
 
     user_id = 1
     result = "NULL"
-
     find_username = True
 
+    # Normal query
+    nq_example_user = example_user.query
+
     # Query class using sql_do session
-    q_example_user = bapp.sql_do.query(example_user)
+    sq_example_user = bapp.sql_do.query(example_user)
 
     if find_username:
-        q_example_user = q_example_user.filter(example_user.user_id == user_id)
-        if q_example_user.first() is not None:
-            username = q_example_user.username
-            result = result + f"Username is {username}"
+        sq_example_user = sq_example_user.filter(example_user.user_id == user_id).first()
+        if sq_example_user is not None:
+            username = sq_example_user.username
+            result = f"Session Query: Username is {username}"
+
+        nq_example_user = nq_example_user.filter(example_user.user_id == user_id).first()
+        if nq_example_user is not None:
+            username = nq_example_user.username
+            result = f"{result}, Normal Query: Username is {username}"
 
     return f"{result}"
