@@ -1,14 +1,6 @@
-[init]
-enabled = true
-version = 0.1
+enabled = "yes"
 
 [settings]
-type = "blueprint"
-structure = "fl_default"
-models_folder = ""
-
-[blueprint]
-name = "exmaple_blueprint"
 url_prefix = "/"
 template_folder = "templates"
 static_folder = "static"

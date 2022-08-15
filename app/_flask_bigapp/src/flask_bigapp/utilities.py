@@ -9,16 +9,31 @@ def contains_illegal_chars(name: str, exception: list = None) -> bool:
     return False
 
 
-def load_config(root_path: str) -> dict:
+def load_config(config_path: str) -> dict:
     from os import path
     from toml import load as toml_load
 
-    config = {}
-    if not path.isfile(f"{root_path}/config.toml"):
+    _config = {}
+    _path = config_path
+
+    if path.isfile(_path) and _path.endswith(".toml"):
+        _config.update(toml_load(_path))
+        return _config
+
+    if not path.isfile(f"{_path}/config.toml"):
         raise ImportError(f"""
-Config file is invalid, must be config.toml and be found in the root of the module. Importing from {root_path}
+Config file is invalid, must be config.toml and be found in the root of the module. Importing from {_path}
             """)
 
-    config.update(toml_load(f"{root_path}/config.toml"))
+    _config.update(toml_load(f"{_path}/config.toml"))
 
-    return config
+    return _config
+
+
+def str_bool(bool_as_string: str) -> bool:
+    true = ["yes", "true", "1"]
+    false = ["no", "false", "0"]
+    if bool_as_string.lower() in true:
+        return True
+    if bool_as_string.lower() in false:
+        return False

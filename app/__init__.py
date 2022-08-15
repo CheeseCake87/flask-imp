@@ -23,7 +23,6 @@ def create_app():
     bapp.import_builtins("flask/routes")
     bapp.import_builtins("flask/template_filters")
 
-    bapp.import_apis("api")
     bapp.import_blueprints("blueprints")
 
     return main

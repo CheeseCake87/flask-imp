@@ -6,60 +6,29 @@ pip install flask-bigapp
 
 ---
 
-## Setup GitHub version
+## Contents
 
-! This project imports Flask-BigApp from a local directory (_flask_bigapp) !
+[What is Flask-BigApp?](#What is Flask-BigApp?)
 
-### Linux setup
+[Minimal Flask-BigApp app](#Minimal Flask-BigApp app)
 
-(Assuming location is home directory)
+[Working with Models](#Working with Models)
 
-#### Git clone:
+[Setup GitHub version](#Setup GitHub version)
 
-```bash
-git clone https://github.com/CheeseCake87/Flask-BigApp.git
-```
+[Setup GitHub version](#Setup GitHub version)
 
-```bash
-cd Flask-BigApp
-```
-
-```bash
-python3 -m venv venv
-```
-
-```bash
-source venv/bin/activate
-```
-
-```bash
-pip install -r requirements.txt
-```
-
-#### Manual:
-
-1. Download zip and unpack
-2. cd into unpacked folder
-
-```bash
-python3 -m venv venv
-```
-
-```bash
-source venv/bin/activate
-```
-
-```bash
-pip install -r requirements.txt
-```
+[Setup GitHub version](#Setup GitHub version)
 
 ---
-
-# What is Flask-BigApp?
+## What is Flask-BigApp?
 
 Flask-BigApp's main purpose is to help simplify the importing of blueprints, templates and models.
 
 It has a few extra features built in to help with theming, securing pages and password authentication.
+
+---
+
 
 ## Minimal Flask-BigApp app
 
@@ -173,6 +142,8 @@ your ```__init__.py``` file.
 
 This is an example of a very basic app in Flask-BigApp.
 
+---
+
 ## Working with Models
 
 In your apps `__init__.py` file we will include the `bapp.models` method
@@ -253,6 +224,63 @@ def database_example():
 `bapp.model_class("ExampleUser")` load the `ExampleUser` class into the variable `example_user` that can then be used to query.
 
 You may have also noticed `bapp.sql_do` this is just a proxy for `db.session`
+
+---
+
+## Working with Blueprints
+
+---
+
+
+## Setup GitHub version
+
+! This project imports Flask-BigApp from a local directory (_flask_bigapp) !
+
+### Linux setup
+
+(Assuming location is home directory)
+
+#### Git clone:
+
+```bash
+git clone https://github.com/CheeseCake87/Flask-BigApp.git
+```
+
+```bash
+cd Flask-BigApp
+```
+
+```bash
+python3 -m venv venv
+```
+
+```bash
+source venv/bin/activate
+```
+
+```bash
+pip install -r requirements.txt
+```
+
+#### Manual:
+
+1. Download zip and unpack
+2. cd into unpacked folder
+
+```bash
+python3 -m venv venv
+```
+
+```bash
+source venv/bin/activate
+```
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
 
 ### Etc...
 

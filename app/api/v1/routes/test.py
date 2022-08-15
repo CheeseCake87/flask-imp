@@ -1,10 +1,10 @@
 from flask import jsonify
 from ..functions.api_auth import public_key_required
 
-from .. import api_bp
+from .. import bp
 
 
-@api_bp.route('/test')
+@bp.route('/test')
 class Test():
     def get(self):
         return jsonify(Response="GET Method")

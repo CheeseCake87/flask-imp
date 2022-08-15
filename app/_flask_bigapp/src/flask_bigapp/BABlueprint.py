@@ -1,63 +1,52 @@
-class BABlueprint:
+from flask import Blueprint
+
+
+class BABlueprint(Blueprint):
     """
     Class that handles Blueprints from within the Blueprint __init__ file
     """
-    module = None
-    import_from = None
-    root_path = None
-    config_file = None
-    config = None
-    session = {}
+    enabled = True
+    settings = dict()
+    session = dict()
+    location = str()
 
-    def __init__(self):
+    def __init__(self, config_file: str = "config.toml"):
         from inspect import stack
+        _caller = stack()[1]
+        _split_module_folder = _caller.filename.split("/")[:-1]
+        self.name = _caller.filename.split("/")[-2:-1][0]
+        self.import_from = _caller.filename.split("/")[-3:-2][0]
+        self.location = "/".join(_split_module_folder)
+        bpn, bpi, bpa = self._process_config(config_file)
+        super().__init__(bpn, bpi, **bpa)
 
-        caller = stack()[1]
-        split_module_folder = caller.filename.split("/")[:-1]
-        self.root_path = "/".join(split_module_folder)
-        self.import_from = caller.filename.split("/")[-3:-2][0]
-        self.name = caller.filename.split("/")[-2:-1][0]
+    def _process_config(self, config_file):
+        from .utilities import load_config, str_bool
 
-    def register(self):
-        from flask import Blueprint
-        from .utilities import load_config
+        _config = load_config(f"{self.location}/{config_file}")
+        _name = self.name
 
-        self.config = load_config(self.root_path)
+        if "settings" not in _config:
+            raise ImportError(f"{self.import_from} => SETTINGS section is missing from config file.")
 
-        try:
-            c_init = self.config["init"]
-            c_settings = self.config["settings"]
-            c_blueprint = self.config["blueprint"]
-        except KeyError:
-            raise ImportError(f"{self.import_from} INIT and SETTINGS sections missing from config file.")
+        self.settings.update(_config["settings"])
 
-        if c_init["enabled"]:
-            if c_settings["type"] == "api":
-                new_url = f"/{self.import_from}{c_blueprint['url_prefix']}"
-                c_settings['url_prefix'] = new_url
+        if "session" in _config:
+            self.session.update(_config["session"])
 
-        if "session" in self.config:
-            s = self.config["session"]
-            for key, value in s.items():
-                self.session[key] = value
+        if "enabled" in _config:
+            if not str_bool(_config["enabled"]):
+                self.enabled = False
 
-        bp_name, bp_import_name = self.name, self.name
+        _strip_settings = self.settings.copy()
 
-        if "name" in c_blueprint:
-            bp_name = c_blueprint["name"]
-            del c_blueprint["name"]
+        if "name" in self.settings:
+            del _strip_settings["name"]
 
-        if "import_name" in c_blueprint:
-            bp_import_name = c_blueprint["import_name"]
-            del c_blueprint["import_name"]
+        if "import_name" in self.settings:
+            del _strip_settings["import_name"]
 
-        if "template_folder" in c_blueprint:
-            c_blueprint["template_folder"] = f"{self.root_path}/{c_blueprint['template_folder']}"
-
-        if "static_folder" in c_blueprint:
-            c_blueprint["static_folder"] = f"{self.root_path}/{c_blueprint['static_folder']}"
-
-        return Blueprint(bp_name, bp_import_name, **c_blueprint)
+        return self.name, __name__, _strip_settings
 
     def import_routes(self, folder: str = "routes"):
         from os import listdir
@@ -65,7 +54,7 @@ class BABlueprint:
         from flask import current_app
         from .utilities import contains_illegal_chars
 
-        routes_raw, routes_clean = listdir(f"{self.root_path}/{folder}"), []
+        routes_raw, routes_clean = listdir(f"{self.location}/{folder}"), []
         for route in routes_raw:
             if contains_illegal_chars(route, exception=[".py"]):
                 continue
@@ -81,3 +70,9 @@ Error when importing {self.import_from} - {self.name} - {route}:
                 """)
                 continue
 
+    def init_session(self):
+        from flask import session
+        for key in self.session:
+            if key not in session:
+                session.update(self.session)
+                break

@@ -1,12 +1,13 @@
-from toml import load as toml_load
-from flask import current_app
-from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
-from sys import modules
-from os import path
 from os import listdir
+from os import path
+from sys import modules
+
+from flask import current_app
+from flask_sqlalchemy import SQLAlchemy
+from toml import load as toml_load
 
 
 class BApp(object):
@@ -97,7 +98,7 @@ class BApp(object):
                     continue
 
     def import_blueprints(self, folder: str) -> None:
-        from .utilities import contains_illegal_chars, load_config
+        from .utilities import contains_illegal_chars
 
         with self._app.app_context():
             blueprints_raw, blueprints_clean = listdir(f"{current_app.root_path}/{folder}/"), []
@@ -105,8 +106,7 @@ class BApp(object):
                 _path = f"{current_app.root_path}/{folder}/{blueprint}"
                 if path.isdir(_path):
                     if not contains_illegal_chars(blueprint):
-                        if load_config(_path)["init"]["enabled"]:
-                            blueprints_clean.append(blueprint)
+                        blueprints_clean.append(blueprint)
 
             for blueprint in blueprints_clean:
                 _bp_root_folder = f"{current_app.root_path}/{folder}/{blueprint}"
@@ -114,32 +114,10 @@ class BApp(object):
                 try:
                     blueprint_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}")
                     blueprint_object = getattr(blueprint_module, "bp")
-                    current_app.register_blueprint(blueprint_object)
+                    if blueprint_object.enabled:
+                        current_app.register_blueprint(blueprint_object)
                 except AttributeError as e:
                     print("Error importing blueprint: ", e, f" from {_bp_root_folder}")
-                    continue
-
-    def import_apis(self, folder: str) -> None:
-        from .utilities import contains_illegal_chars, load_config
-
-        with self._app.app_context():
-            blueprints_raw, blueprints_clean = listdir(f"{current_app.root_path}/{folder}/"), []
-            for blueprint in blueprints_raw:
-                _path = f"{current_app.root_path}/{folder}/{blueprint}"
-                if path.isdir(_path):
-                    if not contains_illegal_chars(blueprint):
-                        if load_config(_path)["init"]["enabled"]:
-                            blueprints_clean.append(blueprint)
-
-            for blueprint in blueprints_clean:
-                _bp_root_folder = f"{current_app.root_path}/{folder}/{blueprint}"
-
-                try:
-                    blueprint_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}")
-                    blueprint_object = getattr(blueprint_module, "api_bp")
-                    current_app.register_blueprint(blueprint_object)
-                except AttributeError as e:
-                    print("Error importing api: ", e, f" from {_bp_root_folder}")
                     continue
 
     def models(self, file: str = None, folder: str = None) -> None:

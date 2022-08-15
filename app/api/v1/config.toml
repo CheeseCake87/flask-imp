@@ -1,11 +1,7 @@
 [init]
-enabled = true
-version = 1.0
+enabled = "yes"
 
 [settings]
-type = "api"
-
-[blueprint]
 url_prefix = "/v1"
 
 [http_auth]
