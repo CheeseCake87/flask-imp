@@ -1,4 +1,4 @@
-from .. import bp
+from app.blueprints.example import bp
 
 
 @bp.route("/", methods=["GET"])

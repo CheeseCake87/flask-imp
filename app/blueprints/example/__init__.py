@@ -1,8 +1,9 @@
 from flask import session
+from flask import url_for
 
-from ..._flask_bigapp.src.flask_bigapp import BABlueprint
+from ..._flask_bigapp.src.flask_bigapp import Blueprint
 
-bp = BABlueprint()
+bp = Blueprint(__name__)
 
 # Set the default structure theme for this blueprint ( this can be done route by route also )
 stru = "fl_default"

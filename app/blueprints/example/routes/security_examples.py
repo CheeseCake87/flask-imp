@@ -1,11 +1,11 @@
 import flask
-from app import security
+from app._flask_bigapp.src.flask_bigapp import Security
 
-from .. import bp
+from app.blueprints.example import bp
 
 
 @bp.route("/account-fail", methods=["GET"])
-@security.login_required("exmaple_blueprint.not_logged_in", "not_logged_in")
+@Security.login_required("example.not_logged_in", "not_logged_in")
 def account_dashboard_fail():
     """
     Login required route, sends user to url_for example.not_logged_in if session var not_logged_in is false
@@ -13,9 +13,8 @@ def account_dashboard_fail():
     return "This should redirect to not_logged_in if you are not logged in."
 
 
-#
 @bp.route("/login-redirect", methods=["GET"])
-@security.no_login_required("exmaple_blueprint.already_logged_in", "logged_in")
+@Security.no_login_required("example.already_logged_in", "logged_in")
 def login_redirect():
     """
     No login required, this redirects the user to example_blueprint.already_logged_in if the session var logged_in is true
@@ -24,7 +23,7 @@ def login_redirect():
 
 
 @bp.route("/permission-redirect", methods=["GET"])
-@security.permission_required("exmaple_blueprint.permission_needed", "permissions", "that")
+@Security.permission_required("example.permission_needed", "permissions", "that")
 def permission_redirect():
     """
     This redirects the user to example_blueprint.permission_needed if the required permission is not found

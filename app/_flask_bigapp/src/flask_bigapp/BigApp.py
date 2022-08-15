@@ -10,27 +10,27 @@ from flask_sqlalchemy import SQLAlchemy
 from toml import load as toml_load
 
 
-class BApp(object):
+class BigApp(object):
     _app = None
     _smtp = dict()
     _model_classes = dict()
+    _structures = dict()
 
     sql_do = SQLAlchemy().session
     db = SQLAlchemy()
 
-    def __init__(self, app=None):
-        if app is not None:
-            self.init_app(app)
+    def __init__(self, flask_app=None, app_config_file: str = None):
+        if flask_app is not None:
+            self.init_app(flask_app, app_config_file)
 
-    def init_app(self, app=None):
-        if app is None:
+    def init_app(self, flask_app, app_config_file: str):
+        if flask_app is None:
             raise ImportError("No app passed into the FlaskLaunchpad app")
-        self._app = app
+        self._app = flask_app
 
-    def app_config(self, file: str = None) -> None:
-        _file = file
+        _file = app_config_file
 
-        if file is None:
+        if app_config_file is None:
             _file = "app_config.toml"
 
         with self._app.app_context():
@@ -186,6 +186,68 @@ class BApp(object):
                     print("File not found: ", f"{current_app.root_path}/{file}")
 
             self.db.init_app(current_app)
+
+    def import_structures(self, folder: str) -> None:
+        from .utilities import contains_illegal_chars, load_config
+        from jinja2 import FileSystemLoader
+        from flask import Blueprint
+        from flask import current_app
+
+        with self._app.app_context():
+            structures_raw, structures_clean = listdir(f"{current_app.root_path}/{folder}/"), []
+            for structure in structures_raw:
+                _path = f"{current_app.root_path}/{folder}/{structure}"
+                if path.isdir(_path):
+                    if not contains_illegal_chars(structure):
+                        structures_clean.append(structure)
+
+            for structure in structures_clean:
+                try:
+                    _str_root_folder = f"{current_app.root_path}/{folder}/{structure}"
+                    _str_config = load_config(_str_root_folder)["settings"]
+                    if "template_folder" in _str_config:
+                        _str_config["template_folder"] = f"{_str_root_folder}/{_str_config['template_folder']}"
+                    if "static_folder" in _str_config:
+                        _str_config["static_folder"] = f"{_str_root_folder}/{_str_config['static_folder']}"
+
+                    current_app.add_url_rule()
+                except ImportError as e:
+                    print(f"Error importing structure: {_str_root_folder} {e}")
+                    continue
+
+                self._structures.update({
+                    structure: {
+                        "template_folder": f"{_str_root_folder}/{_str_config['template_folder']}",
+                        "static_folder": f"{_str_root_folder}/{_str_config['template_folder']}"
+                    }
+                })
+
+    def _find_file(self, structure, folder, file):
+        from jinja2 import FileSystemLoader
+        if structure in self._structures:
+            _nested = f"{self._structures[structure]['template_folder']}/{structure}/{folder}"
+            _rooted = f"{self._structures[structure]['template_folder']}/{folder}"
+            print(_nested, _rooted)
+            if path.isdir(_nested):
+                loader = FileSystemLoader(_nested)
+                return loader.load(self._app, f"{file}")
+            if path.isdir(_rooted):
+                loader = FileSystemLoader(_rooted)
+                return loader.load(self._app, f"{file}")
+            raise FileNotFoundError(f"{folder}/{file} cannot be found")
+        raise KeyError(f"Structure has not been found in list of registered structures: {structure} ")
+
+    def extend(self, file: str, structure: str):
+        return self._find_file(structure, "extends", file)
+
+    def include(self, file: str, structure: str):
+        return self._find_file(structure, "includes", file)
+
+    def errors(self, file: str, structure: str):
+        return self._find_file(structure, "errors", file)
+
+    def render(self, file: str, structure: str):
+        return self._find_file(structure, "renders", file)
 
     def model_class(self, class_name: str):
         return self._model_classes[class_name]

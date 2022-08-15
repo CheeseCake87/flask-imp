@@ -175,9 +175,9 @@ using the `bapp.model_class` method.
 Here is what our model file looks like:
 
 ```python
-from app import bapp
+from app import bigapp
 
-db = bapp.db
+db = bigapp.db
 
 
 class ExampleUser(db.Model):

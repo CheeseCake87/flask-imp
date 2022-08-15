@@ -1,28 +1,20 @@
 from flask import Flask
-from ._flask_bigapp.src.flask_bigapp import BApp
-from ._flask_bigapp.src.flask_bigapp import BAStructure
-from ._flask_bigapp.src.flask_bigapp import Security
+from ._flask_bigapp.src.flask_bigapp import BigApp
 
-bapp = BApp()
-structures = BAStructure()
-security = Security()
+bigapp = BigApp()
 
 
 def create_app():
     main = Flask(__name__)
-    bapp.init_app(main)
-    bapp.app_config("app_config.toml")
+    bigapp.init_app(main, "app_config.toml")
 
-    security.init_app(main)
+    bigapp.models(folder="models")
 
-    bapp.models(folder="models")
+    bigapp.import_structures("structures")
 
-    structures.init_app(main, "structures")
-    structures.register_structure("fl_default")
+    bigapp.import_builtins("flask/routes")
+    bigapp.import_builtins("flask/template_filters")
 
-    bapp.import_builtins("flask/routes")
-    bapp.import_builtins("flask/template_filters")
-
-    bapp.import_blueprints("blueprints")
+    bigapp.import_blueprints("blueprints")
 
     return main

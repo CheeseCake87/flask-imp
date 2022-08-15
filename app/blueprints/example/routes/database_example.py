@@ -1,5 +1,5 @@
-from app import bapp
-from .. import bp
+from app import bigapp
+from app.blueprints.example import bp
 
 
 @bp.route("/create-all-models", methods=["GET"])
@@ -7,14 +7,14 @@ def create_all_models():
     """
     Example of flask_launchpads ability to create all models
     """
-    bapp.create_all_models()
+    bigapp.create_all_models()
     return """If you didn't see an error, this probably worked..."""
 
 
 @bp.route("/database-example", methods=["GET"])
 def database_example():
     # Load the ExampleUser class found in the models folder, this way saves having to import files
-    example_user = bapp.model_class("ExampleUser")
+    example_user = bigapp.model_class("ExampleUser")
 
     user_id = 1
     result = "NULL"
@@ -24,7 +24,7 @@ def database_example():
     nq_example_user = example_user.query
 
     # Query class using sql_do session
-    sq_example_user = bapp.sql_do.query(example_user)
+    sq_example_user = bigapp.sql_do.query(example_user)
 
     if find_username:
         sq_example_user = sq_example_user.filter(example_user.user_id == user_id).first()
