@@ -4,120 +4,21 @@
 ```bash
 pip install flask-bigapp
 ```
+## What is Flask-BigApp?
 
-## Minimal Flask-BigApp app
+Flask-BigApp's main purpose is to help simplify the importing of blueprints, routes and models.
 
-```app_config.toml``` file is required to sit next to your app's ```__init__.py``` file.
+It has a few extra features built in to help with theming, securing pages and password authentication.
 
-The ```app_config.toml``` file contains Flask config settings, a minimal version of this file looks like this:
+You can import model classes using `bigapp.import_models(file="models.py")`
 
-```toml
-# Updates the Flask app config with the variables below.
-# If any variable below does not exist in the standard Flask env vars it is created and will be accessible using
-# current_app.config["YOUR_VAR_NAME"] or of course, app.config["YOUR_VAR_NAME"] if you are not using app factory.
+You can auto import routes from a folder using `bigapp.import_builtins("folder that contains routes")`
 
-[flask]
-app_name = "app"
-version = "0.0.0"
-secret_key = "sdflskjdflksjdflksjdflkjsdf"
-debug = true
-testing = true
-session_time = 480
-static_folder = "static"
-template_folder = "templates"
-error_404_help = true
-```
+You can auto import blueprints using `bigapp.import_blueprints("folder that contains blueprint modules")`
 
-Your app's ```__init__.py``` file should look like this:
-
-```python
-from flask import Flask
-from flask_bigapp import BigApp
-
-bigapp = BigApp()
+You can register a theme (structure) folder using `bigapp.import_structures("folder that containes themes(structures)")`
 
 
-def create_app():
-    main = Flask(__name__)
-    bigapp.init_app(main)
-    bigapp.app_config("app_config.toml")
-    bigapp.import_builtins("routes")
-    return main
-```
-
-The ```bigapp.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
-from.
-
-Let's say we have this folder structure:
-
-```
-Flask-BigApp
-    app
-        static
-        templates
-        routes
-            index.py
-        __init__.py
-        app_config.toml
-    venv
-    run.py
-```
-
-The ```index.py``` file should look like this:
-
-```python
-from flask import current_app
-
-
-@current_app.route("/", methods=['GET'])
-def index_page():
-    """
-    Example index route
-    """
-    return "You will see this text in the browser"
-```
-
-This file will get imported into the main app using the ```import_builtins()```method.
-
-This is also the case if we add another file into the ```routes``` folder. Let's say we add ```my_page.py``` into the
-routes folder, and it looks like this:
-
-```python
-from flask import current_app
-
-
-@current_app.route("/my-page", methods=['GET'])
-def my_page():
-    """
-    My Page Route
-    """
-    return "This is my page route"
-```
-
-So now our folder structure looks like this:
-
-```
-Flask-BigApp
-    main
-        static
-        templates
-        routes
-            index.py
-            my_page.py
-        __init__.py
-        app_config.toml
-    venv
-    run.py
-```
-
-The ```my_page.py``` routes will also be imported into the main app.
-
-Using this method you can keep your routes in different files, and not have to worry about adding the import into
-your ```__init__.py``` file.
-
-This is an example of a very basic app in Flask-BigApp.
-
-
-## Example Project
+## GitHub
 
 A full example project can be found on [github](https://github.com/CheeseCake87/Flask-BigApp)

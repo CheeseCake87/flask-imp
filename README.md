@@ -7,9 +7,21 @@ pip install flask-bigapp
 
 ## What is Flask-BigApp?
 
-Flask-BigApp's main purpose is to help simplify the importing of blueprints, templates and import_models.
+Flask-BigApp's main purpose is to help simplify the importing of blueprints, routes and models.
 
 It has a few extra features built in to help with theming, securing pages and password authentication.
+
+You can import model classes using `bigapp.import_models(file="models.py")`
+
+You can auto import routes from a folder using `bigapp.import_builtins("folder that contains routes")`
+
+You can auto import blueprints using `bigapp.import_blueprints("folder that contains blueprint modules")`
+
+You can register a theme (structure) folder using `bigapp.import_structures("folder that containes themes(structures)")`
+
+I have yet to write a guide on how to use Flask-BigApp, but if you click around this project you will see how it's working. 
+
+Below is an example of a minimal app that allows you to auto import app routes.
 
 ## Minimal Flask-BigApp app
 
