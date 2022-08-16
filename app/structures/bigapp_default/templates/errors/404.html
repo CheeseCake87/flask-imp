@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flask-Launchpad - 404 Page Not Found</title>
+    <link rel="stylesheet" href="{{ url_for('__static', structure='bigapp_default', folder='css', filename='milligram.css') }}">
+    <link rel="stylesheet" href="{{ url_for('__static', structure='bigapp_default', folder='css', filename='normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('__static', structure='bigapp_default', folder='css', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('__static', structure='bigapp_default', folder='css', filename='form_structure.css') }}">
+</head>
+
+<body>
+<div class="global-container">
+
+    <div class="top-bar" style="text-align: center">
+        <img src="{{ url_for('__static', structure='bigapp_default', folder='img', filename='Flask-BigApp-Logo.png') }}"
+             height="80px"
+             style="padding: 10px">
+
+    </div>
+
+    <div class="flex-content">
+        <div class="container">
+            <h1>404</h1>
+            <p>Page not found</p>
+            <p>Requesting: {{ path }}</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends extend %}
+
+{% block _title %}
+Flask-BigApp - Index
+{% endblock %}
+
+{% block _container %}
+    <img width="50" src="{{ url_for('__static', structure='bigapp_default', folder='img', file='Flask-BigApp-Logo.png') }}" alt="Flask-BigApp Logo">
+    <h1>Flask-BigApp</h1>
+    {% include footer %}
+{% endblock %}

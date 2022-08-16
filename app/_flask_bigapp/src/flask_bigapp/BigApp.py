@@ -8,6 +8,9 @@ from sys import modules
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from toml import load as toml_load
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+from jinja2.exceptions import TemplateNotFound
 
 
 class BigApp(object):
@@ -16,8 +19,9 @@ class BigApp(object):
     _model_classes = dict()
     _structures = dict()
 
-    sql_do = SQLAlchemy().session
+    _jinja_env = Environment()
     db = SQLAlchemy()
+    sql_do = db.session
 
     def __init__(self, flask_app=None, app_config_file: str = None):
         if flask_app is not None:
@@ -120,6 +124,10 @@ class BigApp(object):
                     print("Error importing blueprint: ", e, f" from {_bp_root_folder}")
                     continue
 
+    def smtp(self, email_address: str):
+        if email_address in self._smtp:
+            return self._smtp[email_address]
+
     def models(self, file: str = None, folder: str = None) -> None:
         from .utilities import contains_illegal_chars
 
@@ -187,6 +195,12 @@ class BigApp(object):
 
             self.db.init_app(current_app)
 
+    def model_class(self, class_name: str):
+        return self._model_classes[class_name]
+
+    def create_all_models(self):
+        SQLAlchemy.create_all(self.db)
+
     def import_structures(self, structures_folder: str) -> None:
         from .utilities import contains_illegal_chars, load_config
         from flask import send_from_directory
@@ -195,7 +209,7 @@ class BigApp(object):
             if not path.isdir(f"{current_app.root_path}/{structures_folder}"):
                 raise NotADirectoryError(f"{current_app.root_path}/{structures_folder} was not found")
 
-            @current_app.route("/<structure>/static/<folder>/<file>", methods=["GET"])
+            @current_app.route("/<structure>/static/<folder>/<file>", endpoint="__static", methods=["GET"])
             def structure_static(structure, folder, file):
                 if path.isdir(f"{current_app.root_path}/{structures_folder}/{structure}/static/"):
                     if folder == "root":
@@ -231,46 +245,28 @@ class BigApp(object):
                 })
 
     def _find_file(self, structure, folder, file):
-        from jinja2 import Environment
-        from jinja2 import FileSystemLoader
-        jinja_env = Environment()
+        from flask import abort
         if structure in self._structures:
-            if folder is None:
-                _nested = f"{self._structures[structure]['template_folder']}/{structure}/"
-                _rooted = f"{self._structures[structure]['template_folder']}/"
-            else:
-                _nested = f"{self._structures[structure]['template_folder']}/{structure}/"
-                _rooted = f"{self._structures[structure]['template_folder']}/"
-            if path.isdir(_nested):
-                loader = FileSystemLoader(_nested)
-                return loader.load(jinja_env, f"{file}")
-            if path.isdir(_rooted):
-                loader = FileSystemLoader(_rooted)
-                return loader.load(jinja_env, f"{file}")
-            raise FileNotFoundError(f"{folder}/{file} cannot be found")
+            _root = f"{self._structures[structure]['template_folder']}/"
+            if path.isdir(_root):
+                try:
+                    loader = FileSystemLoader(_root)
+                    return loader.load(self._jinja_env, f"{folder}/{file}")
+                except TemplateNotFound:
+                    return abort(404, f"{folder}/{file} template file not found")
         raise KeyError(f"Structure has not been found in list of registered structures: {structure} ")
 
     def template(self, file: str, structure: str, folder: str = None):
         return self._find_file(structure, folder, file)
 
-    def extend(self, file: str, structure: str):
+    def extend(self, structure: str, file: str):
         return self._find_file(structure, "extends", file)
 
-    def include(self, file: str, structure: str):
+    def include(self, structure: str, file: str):
         return self._find_file(structure, "includes", file)
 
-    def errors(self, file: str, structure: str):
+    def errors(self, structure: str, file: str):
         return self._find_file(structure, "errors", file)
 
-    def render(self, file: str, structure: str):
+    def render(self, structure: str, file: str):
         return self._find_file(structure, "renders", file)
-
-    def model_class(self, class_name: str):
-        return self._model_classes[class_name]
-
-    def create_all_models(self):
-        SQLAlchemy.create_all(self.db)
-
-    def smtp(self, email_address: str):
-        if email_address in self._smtp:
-            return self._smtp[email_address]

@@ -6,7 +6,7 @@ from ..._flask_bigapp.src.flask_bigapp import Blueprint
 bp = Blueprint(__name__)
 
 # Set the default structure theme for this blueprint ( this can be done route by route also )
-stru = "fl_default"
+stru = "bigapp_default"
 
 bp.import_routes("routes")
 

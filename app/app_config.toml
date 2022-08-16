@@ -3,8 +3,8 @@
 # current_app.config["YOUR_VAR_NAME"] or of course, app.config["YOUR_VAR_NAME"] if you are not using app factory.
 
 [flask]
-app_name = "main"
-version = "0.6.0"
+app_name = "app"
+version = "1.0.0"
 secret_key = "sdflskjdflksjdflksjdflkjsdf"
 debug = true
 testing = true
@@ -14,7 +14,7 @@ template_folder = "flask/templates"
 error_404_help = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false
 EXPLAIN_TEMPLATE_LOADING = true
-login_dashboard = "administrator.users"
+custom_flask_setting = "Cheesecake is tasty"
 
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
 # type = mysql / postgresql / sqlite

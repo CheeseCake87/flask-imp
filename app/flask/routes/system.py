@@ -20,9 +20,9 @@ def after_request(response):
     return response
 
 
-@current_app.errorhandler(404)
-def request_404(error):
-    return Response("Page Not Found.", 404)
+# @current_app.errorhandler(404)
+# def request_404(error):
+#     return Response("Page Not Found.", 404)
 
 
 @current_app.errorhandler(401)
