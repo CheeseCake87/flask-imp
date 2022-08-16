@@ -1,24 +1,9 @@
+![](https://raw.githubusercontent.com/CheeseCake87/Flask-BigApp/master/app/structures/bigapp_default/static/img/Flask-BigApp-Logo-wbg.png)
 # Flask-BigApp
 
 ```bash
 pip install flask-bigapp
 ```
-
----
-
-## Contents
-
-[What is Flask-BigApp?](#What is Flask-BigApp?)
-
-[Minimal Flask-BigApp app](#Minimal Flask-BigApp app)
-
-[Working with Models](#Working with Models)
-
-[Setup GitHub version](#Setup GitHub version)
-
-[Setup GitHub version](#Setup GitHub version)
-
-[Setup GitHub version](#Setup GitHub version)
 
 ---
 ## What is Flask-BigApp?
