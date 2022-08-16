@@ -37,7 +37,8 @@ def database_example():
         nq_example_user = nq_example_user.filter(example_user.user_id == user_id).first()
         if nq_example_user is not None:
             username = nq_example_user.username
-            result = f"{result}, Normal Query: Username is {username}"
+            example_table_join = nq_example_user.rel_example_table[0].thing
+            result = f"{result}, Normal Query: Username is {username} -> ExampleTable Join: {example_table_join}"
 
     render = bp.render("database-example.html")
     extend = bigapp.extend("bigapp_default", "main.html")

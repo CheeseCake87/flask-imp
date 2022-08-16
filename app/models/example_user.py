@@ -13,5 +13,4 @@ class ExampleUser(db.Model):
     private_key = db.Column(db.String(256), nullable=False)
     disabled = db.Column(db.Boolean)
 
-
     rel_example_table = relationship("ExampleTable", lazy='joined', order_by="ExampleTable.thing")
