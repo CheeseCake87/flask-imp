@@ -7,7 +7,7 @@ from app.blueprints.example import bp
 @bp.route("/create-all-models", methods=["GET"])
 def create_all_models():
     """
-    Example of flask_launchpads ability to create all import_models
+    Creates database based on the models file
     """
     bigapp.create_all_models()
     return """If you didn't see an error, this probably worked..."""

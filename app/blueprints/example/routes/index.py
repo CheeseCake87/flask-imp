@@ -10,7 +10,7 @@ from app.blueprints.example import stru
 @bp.route("/", methods=["GET"])
 def index():
     """
-    Shows an example of the structure working
+    Shows an example of the structure (theme) working
     """
 
     render = bp.render("index.html")

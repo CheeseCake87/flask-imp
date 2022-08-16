@@ -219,19 +219,24 @@ class BigApp(object):
                     return send_from_directory(f"{current_app.root_path}/{structures_folder}/{structure}/static/{folder}/", f"{file}")
                 return abort(404)
 
-    def from_folder(self, file: str, structure: str, folder: str = None):
+    @staticmethod
+    def from_folder(file: str, structure: str, folder: str = None):
         if folder is None:
             return f"{structure}/templates/{file}"
         return f"{structure}/templates/{folder}/{file}"
 
-    def extend(self, structure: str, file: str):
+    @staticmethod
+    def extend(structure: str, file: str):
         return f"{structure}/templates/extends/{file}"
 
-    def include(self, structure: str, file: str):
+    @staticmethod
+    def include(structure: str, file: str):
         return f"{structure}/templates/includes/{file}"
 
-    def errors(self, structure: str, file: str):
+    @staticmethod
+    def errors(structure: str, file: str):
         return f"{structure}/templates/errors/{file}"
 
-    def render(self, structure: str, file: str):
+    @staticmethod
+    def render(structure: str, file: str):
         return f"{structure}/templates/renders/{file}"

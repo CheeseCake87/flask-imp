@@ -8,7 +8,7 @@ from .. import bp
 @bp.route("/app-models", methods=["GET"])
 def app_models():
     """
-    Lists the model information loaded into app.config['import_models'] by FlaskLaunchpad
+    Lists the model information loaded into bigapp.model_classes
     """
     models = bigapp.model_classes
 
