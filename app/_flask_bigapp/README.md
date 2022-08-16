@@ -1,65 +1,9 @@
+![](https://raw.githubusercontent.com/CheeseCake87/Flask-BigApp/master/app/structures/bigapp_default/static/img/Flask-BigApp-Logo-wbg.png)
 # Flask-BigApp
 
 ```bash
 pip install flask-bigapp
 ```
-
----
-
-## Setup GitHub version
-
-! This project imports Flask-BigApp from a local directory (_flask_bigapp) !
-
-### Linux setup
-
-(Assuming location is home directory)
-
-#### Git clone:
-
-```bash
-git clone https://github.com/CheeseCake87/Flask-BigApp.git
-```
-
-```bash
-cd Flask-BigApp
-```
-
-```bash
-python3 -m venv venv
-```
-
-```bash
-source venv/bin/activate
-```
-
-```bash
-pip install -r requirements.txt
-```
-
-#### Manual:
-
-1. Download zip and unpack
-2. cd into unpacked folder
-
-```bash
-python3 -m venv venv
-```
-
-```bash
-source venv/bin/activate
-```
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# What is Flask-BigApp?
-
-Flask-BigApp's main purpose is to help simplify the importing of blueprints, templates and import_models.
-
-It has a few extra features built in to help with theming, securing pages and password authentication.
 
 ## Minimal Flask-BigApp app
 
@@ -73,7 +17,7 @@ The ```app_config.toml``` file contains Flask config settings, a minimal version
 # current_app.config["YOUR_VAR_NAME"] or of course, app.config["YOUR_VAR_NAME"] if you are not using app factory.
 
 [flask]
-app_name = "main"
+app_name = "app"
 version = "0.0.0"
 secret_key = "sdflskjdflksjdflksjdflkjsdf"
 debug = true
@@ -88,27 +32,27 @@ Your app's ```__init__.py``` file should look like this:
 
 ```python
 from flask import Flask
-from flask_bigapp import BApp
+from flask_bigapp import BigApp
 
-bapp = BApp()
+bigapp = BigApp()
 
 
 def create_app():
     main = Flask(__name__)
-    bapp.init_app(main)
-    bapp.app_config("app_config.toml")
-    bapp.import_builtins("routes")
+    bigapp.init_app(main)
+    bigapp.app_config("app_config.toml")
+    bigapp.import_builtins("routes")
     return main
 ```
 
-The ```bapp.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
+The ```bigapp.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
 from.
 
 Let's say we have this folder structure:
 
 ```
 Flask-BigApp
-    main
+    app
         static
         templates
         routes
@@ -173,7 +117,7 @@ your ```__init__.py``` file.
 
 This is an example of a very basic app in Flask-BigApp.
 
-Please check out the Flask-BigApp GitHub project. It contains working examples of what Flask-BigApp can do, and
-how it can be used to save some time with projects that require a lot of importing.
 
-More documentation coming soon!
+## Example Project
+
+A full example project can be found on [github](https://github.com/CheeseCake87/Flask-BigApp)

@@ -5,15 +5,11 @@
 pip install flask-bigapp
 ```
 
----
 ## What is Flask-BigApp?
 
 Flask-BigApp's main purpose is to help simplify the importing of blueprints, templates and import_models.
 
 It has a few extra features built in to help with theming, securing pages and password authentication.
-
----
-
 
 ## Minimal Flask-BigApp app
 
@@ -27,7 +23,7 @@ The ```app_config.toml``` file contains Flask config settings, a minimal version
 # current_app.config["YOUR_VAR_NAME"] or of course, app.config["YOUR_VAR_NAME"] if you are not using app factory.
 
 [flask]
-app_name = "main"
+app_name = "app"
 version = "0.0.0"
 secret_key = "sdflskjdflksjdflksjdflkjsdf"
 debug = true
@@ -42,27 +38,27 @@ Your app's ```__init__.py``` file should look like this:
 
 ```python
 from flask import Flask
-from flask_bigapp import BApp
+from flask_bigapp import BigApp
 
-bapp = BApp()
+bigapp = BigApp()
 
 
 def create_app():
     main = Flask(__name__)
-    bapp.init_app(main)
-    bapp.app_config("app_config.toml")
-    bapp.import_builtins("routes")
+    bigapp.init_app(main)
+    bigapp.app_config("app_config.toml")
+    bigapp.import_builtins("routes")
     return main
 ```
 
-The ```bapp.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
+The ```bigapp.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
 from.
 
 Let's say we have this folder structure:
 
 ```
 Flask-BigApp
-    main
+    app
         static
         templates
         routes
@@ -127,97 +123,12 @@ your ```__init__.py``` file.
 
 This is an example of a very basic app in Flask-BigApp.
 
----
 
-## Working with Models
+## More Examples
 
-In your apps `__init__.py` file we will include the `bapp.import_models` method
+This github project is a working example, and can do much more that the minimal app above.
 
-```python
-from flask import Flask
-from flask_bigapp import BApp
-
-bapp = BApp()
-
-
-def create_app():
-    main = Flask(__name__)
-    bapp.init_app(main)
-    bapp.app_config("app_config.toml")
-
-    # File or Folder can be set
-    bapp.import_models(file="import_models.py", folder="models_folder")
-
-    bapp.import_builtins("routes")
-    return main
-```
-
-The `bapp.import_models` method initializes flask_sqlalchemy into `BApp.db`.
-
-It also loads the classes along with their attributes into `BApp` and can be retrieved
-using the `bapp.model_class` method.
-
-Here is what our model file looks like:
-
-```python
-from app import bigapp
-
-db = bigapp.db
-
-
-class ExampleUser(db.Model):
-    __tablename__ = "fl_example_user"
-    user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(256), nullable=False)
-    password = db.Column(db.String(512), nullable=False)
-    salt = db.Column(db.String(4), nullable=False)
-    private_key = db.Column(db.String(256), nullable=False)
-    disabled = db.Column(db.Boolean)
-```
-
-Below is an example route using the `bapp.model_class` method:
-
-```python
-@bp.route("/database-example", methods=["GET"])
-def database_example():
-    # Load the ExampleUser class found in the import_models folder, this way saves having to import files
-    example_user = bapp.model_class("ExampleUser")
-
-    user_id = 1
-    result = "NULL"
-    find_username = True
-
-    # Normal query
-    nq_example_user = example_user.query
-
-    # Query class using sql_do session
-    sq_example_user = bapp.sql_do.query(example_user)
-
-    if find_username:
-        sq_example_user = sq_example_user.filter(example_user.user_id == user_id).first()
-        if sq_example_user is not None:
-            username = sq_example_user.username
-            result = f"Session Query: Username is {username}"
-
-        nq_example_user = nq_example_user.filter(example_user.user_id == user_id).first()
-        if nq_example_user is not None:
-            username = nq_example_user.username
-            result = f"{result}, Normal Query: Username is {username}"
-
-    return f"{result}"
-```
-`bapp.model_class("ExampleUser")` load the `ExampleUser` class into the variable `example_user` that can then be used to query.
-
-You may have also noticed `bapp.sql_do` this is just a proxy for `db.session`
-
----
-
-## Working with Blueprints
-
----
-
-
-## Setup GitHub version
+This project covers how to work with models, blueprints and themes (structures)
 
 ! This project imports Flask-BigApp from a local directory (_flask_bigapp) !
 
@@ -263,13 +174,3 @@ source venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
-
----
-
-
-### Etc...
-
-Please check out the Flask-BigApp GitHub project. It contains working examples of what Flask-BigApp can do, and
-how it can be used to save some time with projects that require a lot of importing.
-
-More documentation coming soon!
