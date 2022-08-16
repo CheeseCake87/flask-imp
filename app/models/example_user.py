@@ -1,5 +1,5 @@
 from app import bigapp
-from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 db = bigapp.db
 
@@ -14,8 +14,4 @@ class ExampleUser(db.Model):
     disabled = db.Column(db.Boolean)
 
 
-class ExampleTable(db.Model):
-    __tablename__ = "fl_example_table"
-    example_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, ForeignKey('fl_example_user.user_id'))
-    thing = db.Column(db.String(256), nullable=False)
+    rel_example_table = relationship("ExampleTable", lazy='joined', order_by="ExampleTable.thing")
