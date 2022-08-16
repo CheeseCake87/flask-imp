@@ -8,10 +8,9 @@ src/Flask_BigApp.egg-info/dependency_links.txt
 src/Flask_BigApp.egg-info/requires.txt
 src/Flask_BigApp.egg-info/top_level.txt
 src/Flask_BigApp.egg-info/zip-safe
-src/flask_bigapp/BABlueprint.py
-src/flask_bigapp/BAStructure.py
-src/flask_bigapp/BApp.py
+src/flask_bigapp/Auth.py
+src/flask_bigapp/BigApp.py
+src/flask_bigapp/Blueprint.py
+src/flask_bigapp/Security.py
 src/flask_bigapp/__init__.py
-src/flask_bigapp/security.py
 src/flask_bigapp/utilities.py
-src/flask_bigapp/auth/__init__.py

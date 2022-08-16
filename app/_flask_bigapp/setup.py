@@ -6,12 +6,12 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='Flask-BigApp',
-    version='0.8.3',
+    version='1.0.0',
     url='https://github.com/CheeseCake87/Flask-BigApp',
     license='MIT',
     author='David Carmichael',
     author_email='carmichaelits@gmail.com',
-    description='A Flask auto importer to allows your Flask apps to grow big.',
+    description='A Flask auto importer that allows your Flask apps to grow big.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     py_modules=['flask_bigapp'],
