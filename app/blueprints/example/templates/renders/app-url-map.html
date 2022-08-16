@@ -1,16 +1,10 @@
 {% extends extend %}
 
 {% block _title %}
-    Flask-BigApp - Index
+    Flask-BigApp - App URL Map
 {% endblock %}
 
 {% block _container %}
-    <div class="text-center">
-        <img src="{{ url_for('__static', structure='bigapp_default', folder='img', file='Flask-BigApp-Logo.png') }}" alt="Flask-BigApp Logo">
-        <h1>Flask-BigApp</h1>
-        {% include "includes/menu.jinja" %}
-    </div>
-
     <h2>App URL Map</h2>
 
     <p>{{ output|safe }}</p>

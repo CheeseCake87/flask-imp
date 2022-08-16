@@ -203,12 +203,13 @@ class BigApp(object):
         SQLAlchemy.create_all(self.db)
 
     def import_structures(self, structures_folder: str) -> None:
-        from .utilities import contains_illegal_chars, load_config
-        from flask import send_from_directory
+        from flask import send_from_directory, abort
 
         with self._app.app_context():
             if not path.isdir(f"{current_app.root_path}/{structures_folder}"):
                 raise NotADirectoryError(f"{current_app.root_path}/{structures_folder} was not found")
+
+            current_app.jinja_loader.searchpath.append(f"{current_app.root_path}/{structures_folder}")
 
             @current_app.route("/<structure>/static/<folder>/<file>", endpoint="__static", methods=["GET"])
             def structure_static(structure, folder, file):
@@ -216,58 +217,21 @@ class BigApp(object):
                     if folder == "root":
                         return send_from_directory(f"{current_app.root_path}/{structures_folder}/{structure}/static/", f"{file}")
                     return send_from_directory(f"{current_app.root_path}/{structures_folder}/{structure}/static/{folder}/", f"{file}")
-                raise NotADirectoryError(f"{current_app.root_path}/{structures_folder}/{structure}/static was not found")
+                return abort(404)
 
-            structures_raw, structures_clean = listdir(f"{current_app.root_path}/{structures_folder}/"), []
-            for this_structure in structures_raw:
-                _path = f"{current_app.root_path}/{structures_folder}/{this_structure}"
-                if path.isdir(_path):
-                    if not contains_illegal_chars(this_structure):
-                        structures_clean.append(this_structure)
-
-            for this_structure in structures_clean:
-                try:
-                    _str_root_folder = f"{current_app.root_path}/{structures_folder}/{this_structure}"
-                    _str_config = load_config(_str_root_folder)["settings"]
-                    if "template_folder" in _str_config:
-                        _str_config["template_folder"] = f"{_str_config['template_folder']}"
-                    if "static_folder" in _str_config:
-                        _str_config["static_folder"] = f"{_str_config['static_folder']}"
-
-                except ImportError as e:
-                    print(f"Error importing structure: {_str_root_folder} {e}")
-                    continue
-
-                self.structures.update({
-                    this_structure: {
-                        "template_folder": f"{_str_root_folder}/{_str_config['template_folder']}",
-                        "static_folder": f"{_str_root_folder}/{_str_config['template_folder']}"
-                    }
-                })
-
-    def _find_file(self, structure, folder, file):
-        from flask import abort
-        if structure in self.structures:
-            _root = f"{self.structures[structure]['template_folder']}/"
-            if path.isdir(_root):
-                try:
-                    loader = FileSystemLoader(_root)
-                    return loader.load(self._jinja_env, f"{folder}/{file}")
-                except TemplateNotFound:
-                    return abort(404, f"{structure}/{folder}/{file} template file not found")
-        return abort(404, f"Structure has not been found in list of registered structures: {structure} ")
-
-    def template(self, file: str, structure: str, folder: str = None):
-        return self._find_file(structure, folder, file)
+    def from_folder(self, file: str, structure: str, folder: str = None):
+        if folder is None:
+            return f"{structure}/templates/{file}"
+        return f"{structure}/templates/{folder}/{file}"
 
     def extend(self, structure: str, file: str):
-        return self._find_file(structure, "extends", file)
+        return f"{structure}/templates/extends/{file}"
 
     def include(self, structure: str, file: str):
-        return self._find_file(structure, "includes", file)
+        return f"{structure}/templates/includes/{file}"
 
     def errors(self, structure: str, file: str):
-        return self._find_file(structure, "errors", file)
+        return f"{structure}/templates/errors/{file}"
 
     def render(self, structure: str, file: str):
-        return self._find_file(structure, "renders", file)
+        return f"{structure}/templates/renders/{file}"

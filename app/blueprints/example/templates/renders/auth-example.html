@@ -1,20 +1,19 @@
 {% extends extend %}
 
 {% block _title %}
-Flask-BigApp - Example Blueprint
+    Flask-BigApp - Auth Example
 {% endblock %}
 
 {% block _container %}
-    <table class="table">
-    <tr>
-        <th>Function</th>
-        <th>Result</th>
-        </tr>
-    {% for key, value in display_dict.items() %}
-        <tr>
-        <td>{{ key }}</td>
-        <td>{{ value }}</td>
-        </tr>
+    <h2>Auth Example</h2>
+    <p>The Auth class contains some userful methods for dealing with username or email address validation and password generation</p>
+    <p><strong>Examples</strong></p>
+    {% for key, value in examples.items() %}
+        {% if key == "Info" %}
+            <p> > {{ value }}</p>
+        {% else %}
+            <p>{{ key }} = {{ value }}</p>
+        {% endif %}
+
     {% endfor %}
-    </table>
 {% endblock %}

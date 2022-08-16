@@ -1,42 +1,41 @@
 {% extends extend %}
 
 {% block _title %}
-    Flask-BigApp - Index
+    Flask-BigApp - Database Example
 {% endblock %}
 
 {% block _container %}
-    <div class="text-center">
-        <img src="{{ url_for('__static', structure='bigapp_default', folder='img', file='Flask-BigApp-Logo.png') }}" alt="Flask-BigApp Logo">
-        <h1>Flask-BigApp</h1>
-        {% include "includes/menu.jinja" %}
-    </div>
-
     <h2>Database Example</h2>
 
     <p>the BigApp class comes with a model_class method that can be used to save the import of a model file.</p>
 
     <strong>Example</strong>
     <pre>
-        <code># Normal query</code>
-    <code>nq_example_user = example_user.query</code>
-
-    <code># Query class using sql_do session</code>
-    <code>sq_example_user = bigapp.sql_do.query(example_user)</code>
-
-    <code>
-        if find_username:
-        sq_example_user = sq_example_user.filter(example_user.user_id == user_id).first()
-        if sq_example_user is not None:
-            username = sq_example_user.username
-            result = f"Session Query: Username is {username}"
-    </code>
         <code>
-        nq_example_user = nq_example_user.filter(example_user.user_id == user_id).first()
-        if nq_example_user is not None:
-            username = nq_example_user.username
-            result = f"{result}, Normal Query: Username is {username}"
+# Load the ExampleUser class found in the import_models folder, this way saves having to import files
+example_user = bigapp.model_class("ExampleUser")
+
+# Normal query
+nq_example_user = example_user.query
+
+# Query class using sql_do session
+sq_example_user = bigapp.sql_do.query(example_user)
+
+
+if find_username:
+sq_example_user = sq_example_user.filter(example_user.user_id == user_id).first()
+if sq_example_user is not None:
+    username = sq_example_user.username
+    result = f"Session Query: Username is {username}"
+
+
+nq_example_user = nq_example_user.filter(example_user.user_id == user_id).first()
+if nq_example_user is not None:
+    username = nq_example_user.username
+    result = f"{result}, Normal Query: Username is {username}"
         </code>
     </pre>
 
-    {% include footer %}
+    <strong>Result</strong>
+    <p>{{ result }}</p>
 {% endblock %}
