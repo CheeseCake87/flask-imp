@@ -23,7 +23,7 @@ pip install flask-bigapp
 ---
 ## What is Flask-BigApp?
 
-Flask-BigApp's main purpose is to help simplify the importing of blueprints, templates and models.
+Flask-BigApp's main purpose is to help simplify the importing of blueprints, templates and import_models.
 
 It has a few extra features built in to help with theming, securing pages and password authentication.
 
@@ -146,7 +146,7 @@ This is an example of a very basic app in Flask-BigApp.
 
 ## Working with Models
 
-In your apps `__init__.py` file we will include the `bapp.models` method
+In your apps `__init__.py` file we will include the `bapp.import_models` method
 
 ```python
 from flask import Flask
@@ -161,13 +161,13 @@ def create_app():
     bapp.app_config("app_config.toml")
 
     # File or Folder can be set
-    bapp.models(file="models.py", folder="models_folder")
+    bapp.import_models(file="import_models.py", folder="models_folder")
 
     bapp.import_builtins("routes")
     return main
 ```
 
-The `bapp.models` method initializes flask_sqlalchemy into `BApp.db`.
+The `bapp.import_models` method initializes flask_sqlalchemy into `BApp.db`.
 
 It also loads the classes along with their attributes into `BApp` and can be retrieved
 using the `bapp.model_class` method.
@@ -195,7 +195,7 @@ Below is an example route using the `bapp.model_class` method:
 ```python
 @bp.route("/database-example", methods=["GET"])
 def database_example():
-    # Load the ExampleUser class found in the models folder, this way saves having to import files
+    # Load the ExampleUser class found in the import_models folder, this way saves having to import files
     example_user = bapp.model_class("ExampleUser")
 
     user_id = 1

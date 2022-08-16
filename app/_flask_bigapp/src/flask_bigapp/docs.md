@@ -56,7 +56,7 @@ app.config["MODELS"] {
 #### BApp.create_all_models
 
 ```text
-This creates the database, tables and fields from the models found in current_app.config["MODELS"]
+This creates the database, tables and fields from the import_models found in current_app.config["MODELS"]
 Can be used like:
 
 BigApp(current_app).create_all_models()

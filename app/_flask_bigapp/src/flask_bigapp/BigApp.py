@@ -7,19 +7,20 @@ from sys import modules
 
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
-from toml import load as toml_load
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2.exceptions import TemplateNotFound
+from toml import load as toml_load
 
 
 class BigApp(object):
-    _app = None
-    _smtp = dict()
-    _model_classes = dict()
-    _structures = dict()
+    smtp = dict()
+    structures = dict()
+    model_classes = dict()
 
+    _app = None
     _jinja_env = Environment()
+
     db = SQLAlchemy()
     sql_do = db.session
 
@@ -124,11 +125,7 @@ class BigApp(object):
                     print("Error importing blueprint: ", e, f" from {_bp_root_folder}")
                     continue
 
-    def smtp(self, email_address: str):
-        if email_address in self._smtp:
-            return self._smtp[email_address]
-
-    def models(self, file: str = None, folder: str = None) -> None:
+    def import_models(self, file: str = None, folder: str = None) -> None:
         from .utilities import contains_illegal_chars
 
         if file is None and folder is None:
@@ -164,7 +161,7 @@ class BigApp(object):
                             class_name = folder_member[0]
                             class_object = folder_member[1]
                             if current_app.name in str(class_object):
-                                self._model_classes.update({class_name: class_object})
+                                self.model_classes.update({class_name: class_object})
                 else:
                     print("Folder not found: ", f"{current_app.root_path}/{folder}")
 
@@ -188,15 +185,19 @@ class BigApp(object):
                         class_name = file_member[0]
                         class_object = file_member[1]
                         if current_app.name in str(class_object):
-                            self._model_classes.update({class_name: class_object})
+                            self.model_classes.update({class_name: class_object})
 
                 else:
                     print("File not found: ", f"{current_app.root_path}/{file}")
 
             self.db.init_app(current_app)
 
+    def smtp_settings(self, email_address: str):
+        if email_address in self.smtp:
+            return self.smtp[email_address]
+
     def model_class(self, class_name: str):
-        return self._model_classes[class_name]
+        return self.model_classes[class_name]
 
     def create_all_models(self):
         SQLAlchemy.create_all(self.db)
@@ -237,7 +238,7 @@ class BigApp(object):
                     print(f"Error importing structure: {_str_root_folder} {e}")
                     continue
 
-                self._structures.update({
+                self.structures.update({
                     this_structure: {
                         "template_folder": f"{_str_root_folder}/{_str_config['template_folder']}",
                         "static_folder": f"{_str_root_folder}/{_str_config['template_folder']}"
@@ -246,15 +247,15 @@ class BigApp(object):
 
     def _find_file(self, structure, folder, file):
         from flask import abort
-        if structure in self._structures:
-            _root = f"{self._structures[structure]['template_folder']}/"
+        if structure in self.structures:
+            _root = f"{self.structures[structure]['template_folder']}/"
             if path.isdir(_root):
                 try:
                     loader = FileSystemLoader(_root)
                     return loader.load(self._jinja_env, f"{folder}/{file}")
                 except TemplateNotFound:
-                    return abort(404, f"{folder}/{file} template file not found")
-        raise KeyError(f"Structure has not been found in list of registered structures: {structure} ")
+                    return abort(404, f"{structure}/{folder}/{file} template file not found")
+        return abort(404, f"Structure has not been found in list of registered structures: {structure} ")
 
     def template(self, file: str, structure: str, folder: str = None):
         return self._find_file(structure, folder, file)

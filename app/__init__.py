@@ -8,7 +8,7 @@ def create_app():
     main = Flask(__name__)
     bigapp.init_app(main, "app_config.toml")
 
-    bigapp.models(folder="models")
+    bigapp.import_models(folder="models")
 
     bigapp.import_structures("structures")
 

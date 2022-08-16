@@ -1,3 +1,5 @@
+from flask import render_template
+
 from app import bigapp
 from app.blueprints.example import bp
 
@@ -5,7 +7,7 @@ from app.blueprints.example import bp
 @bp.route("/create-all-models", methods=["GET"])
 def create_all_models():
     """
-    Example of flask_launchpads ability to create all models
+    Example of flask_launchpads ability to create all import_models
     """
     bigapp.create_all_models()
     return """If you didn't see an error, this probably worked..."""
@@ -13,7 +15,7 @@ def create_all_models():
 
 @bp.route("/database-example", methods=["GET"])
 def database_example():
-    # Load the ExampleUser class found in the models folder, this way saves having to import files
+    # Load the ExampleUser class found in the import_models folder, this way saves having to import files
     example_user = bigapp.model_class("ExampleUser")
 
     user_id = 1
@@ -37,4 +39,8 @@ def database_example():
             username = nq_example_user.username
             result = f"{result}, Normal Query: Username is {username}"
 
-    return f"{result}"
+    render = bp.render("database-example.html")
+    extend = bigapp.extend("bigapp_default", "main.html")
+    footer = bigapp.include("bigapp_default", "footer.html")
+
+    return render_template(render, extend=extend, footer=footer, result=result)

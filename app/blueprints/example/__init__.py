@@ -1,6 +1,3 @@
-from flask import session
-from flask import url_for
-
 from ..._flask_bigapp.src.flask_bigapp import Blueprint
 
 bp = Blueprint(__name__)
@@ -9,11 +6,6 @@ bp = Blueprint(__name__)
 stru = "bigapp_default"
 
 bp.import_routes("routes")
-
-
-@bp.before_app_first_request
-def before_app_first_request():
-    pass
 
 
 @bp.before_app_request

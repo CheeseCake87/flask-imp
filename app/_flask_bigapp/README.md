@@ -57,7 +57,7 @@ pip install -r requirements.txt
 
 # What is Flask-BigApp?
 
-Flask-BigApp's main purpose is to help simplify the importing of blueprints, templates and models.
+Flask-BigApp's main purpose is to help simplify the importing of blueprints, templates and import_models.
 
 It has a few extra features built in to help with theming, securing pages and password authentication.
 

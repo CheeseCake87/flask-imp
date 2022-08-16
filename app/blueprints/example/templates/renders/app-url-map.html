@@ -1,0 +1,34 @@
+{% extends extend %}
+
+{% block _title %}
+    Flask-BigApp - Index
+{% endblock %}
+
+{% block _container %}
+    <div class="text-center">
+        <img src="{{ url_for('__static', structure='bigapp_default', folder='img', file='Flask-BigApp-Logo.png') }}" alt="Flask-BigApp Logo">
+        <h1>Flask-BigApp</h1>
+        {% include "includes/menu.jinja" %}
+    </div>
+
+    <h2>App URL Map</h2>
+
+    <p>{{ output|safe }}</p>
+
+    <strong>Blueprint importing</strong>
+    <p>In the URL map below, you can see that we have example_blueprint.* but the folder that this blueprint is being imported from is just called example.</p>
+    <p>If you don't have name defined in the Blueprint config file, it will set the endpoint to the name of the folder the Blueprint is in.</p>
+    <p>Being able to set this name can avoid any endpoint duplicates if you have are importing blueprints from different folders.</p>
+
+    <strong>__static</strong>
+    <p>Dunder static is generated when you define a structure folder, and is used to serve static files like images, css etc.</p>
+    <p>Here's a small example</p>
+    {% raw %}
+
+    <pre>
+    <code>{{ url_for("__static", structure="bigapp_default", folder="img", file='Flask-BigApp-Logo.png') }}</code>
+    </pre>
+    {% endraw %}
+
+    {% include footer %}
+{% endblock %}
