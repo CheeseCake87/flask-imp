@@ -8,7 +8,7 @@
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('fl_default.static', filename='css/custom.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_static', structure='fl_default', folder='css', file='custom.css') }}">
 </head>
 
 <body>
@@ -21,6 +21,6 @@
         </div>
     </div>
 {% endblock %}
-<script src="{{ url_for('fl_default.static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('structure_static', structure='fl_default', folder='js', file='main.js') }}"></script>
 </body>
 </html>

@@ -91,7 +91,6 @@ Error when importing {self._import_name} - {self.name} - {route}:
         if "template_folder" in self.settings:
             _nested = f"{self.location}/{self.settings['template_folder']}/{__name__}/{folder}/{file}"
             _rooted = f"{self.location}/{self.settings['template_folder']}/{folder}/{file}"
-            print(self.settings['template_folder'])
             if path.isfile(_nested):
                 return f"{__name__}/{folder}/{file}"
             if path.isfile(_rooted):

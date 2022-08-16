@@ -187,55 +187,71 @@ class BigApp(object):
 
             self.db.init_app(current_app)
 
-    def import_structures(self, folder: str) -> None:
+    def import_structures(self, structures_folder: str) -> None:
         from .utilities import contains_illegal_chars, load_config
-        from jinja2 import FileSystemLoader
-        from flask import Blueprint
-        from flask import current_app
+        from flask import send_from_directory
 
         with self._app.app_context():
-            structures_raw, structures_clean = listdir(f"{current_app.root_path}/{folder}/"), []
-            for structure in structures_raw:
-                _path = f"{current_app.root_path}/{folder}/{structure}"
-                if path.isdir(_path):
-                    if not contains_illegal_chars(structure):
-                        structures_clean.append(structure)
+            if not path.isdir(f"{current_app.root_path}/{structures_folder}"):
+                raise NotADirectoryError(f"{current_app.root_path}/{structures_folder} was not found")
 
-            for structure in structures_clean:
+            @current_app.route("/<structure>/static/<folder>/<file>", methods=["GET"])
+            def structure_static(structure, folder, file):
+                if path.isdir(f"{current_app.root_path}/{structures_folder}/{structure}/static/"):
+                    if folder == "root":
+                        return send_from_directory(f"{current_app.root_path}/{structures_folder}/{structure}/static/", f"{file}")
+                    return send_from_directory(f"{current_app.root_path}/{structures_folder}/{structure}/static/{folder}/", f"{file}")
+                raise NotADirectoryError(f"{current_app.root_path}/{structures_folder}/{structure}/static was not found")
+
+            structures_raw, structures_clean = listdir(f"{current_app.root_path}/{structures_folder}/"), []
+            for this_structure in structures_raw:
+                _path = f"{current_app.root_path}/{structures_folder}/{this_structure}"
+                if path.isdir(_path):
+                    if not contains_illegal_chars(this_structure):
+                        structures_clean.append(this_structure)
+
+            for this_structure in structures_clean:
                 try:
-                    _str_root_folder = f"{current_app.root_path}/{folder}/{structure}"
+                    _str_root_folder = f"{current_app.root_path}/{structures_folder}/{this_structure}"
                     _str_config = load_config(_str_root_folder)["settings"]
                     if "template_folder" in _str_config:
-                        _str_config["template_folder"] = f"{_str_root_folder}/{_str_config['template_folder']}"
+                        _str_config["template_folder"] = f"{_str_config['template_folder']}"
                     if "static_folder" in _str_config:
-                        _str_config["static_folder"] = f"{_str_root_folder}/{_str_config['static_folder']}"
+                        _str_config["static_folder"] = f"{_str_config['static_folder']}"
 
-                    current_app.add_url_rule()
                 except ImportError as e:
                     print(f"Error importing structure: {_str_root_folder} {e}")
                     continue
 
                 self._structures.update({
-                    structure: {
+                    this_structure: {
                         "template_folder": f"{_str_root_folder}/{_str_config['template_folder']}",
                         "static_folder": f"{_str_root_folder}/{_str_config['template_folder']}"
                     }
                 })
 
     def _find_file(self, structure, folder, file):
+        from jinja2 import Environment
         from jinja2 import FileSystemLoader
+        jinja_env = Environment()
         if structure in self._structures:
-            _nested = f"{self._structures[structure]['template_folder']}/{structure}/{folder}"
-            _rooted = f"{self._structures[structure]['template_folder']}/{folder}"
-            print(_nested, _rooted)
+            if folder is None:
+                _nested = f"{self._structures[structure]['template_folder']}/{structure}/"
+                _rooted = f"{self._structures[structure]['template_folder']}/"
+            else:
+                _nested = f"{self._structures[structure]['template_folder']}/{structure}/"
+                _rooted = f"{self._structures[structure]['template_folder']}/"
             if path.isdir(_nested):
                 loader = FileSystemLoader(_nested)
-                return loader.load(self._app, f"{file}")
+                return loader.load(jinja_env, f"{file}")
             if path.isdir(_rooted):
                 loader = FileSystemLoader(_rooted)
-                return loader.load(self._app, f"{file}")
+                return loader.load(jinja_env, f"{file}")
             raise FileNotFoundError(f"{folder}/{file} cannot be found")
         raise KeyError(f"Structure has not been found in list of registered structures: {structure} ")
+
+    def template(self, file: str, structure: str, folder: str = None):
+        return self._find_file(structure, folder, file)
 
     def extend(self, file: str, structure: str):
         return self._find_file(structure, "extends", file)

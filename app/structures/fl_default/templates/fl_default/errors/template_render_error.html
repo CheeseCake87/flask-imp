@@ -5,17 +5,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flask-Launchpad - Template Render Error</title>
-    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='milligram.css') }}">
-    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='normalize.css') }}">
-    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('structure_css', structure=structure, filename='form_structure.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_static', structure=structure, filename='css/milligram.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_static', structure=structure, filename='css/normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_static', structure=structure, filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('structure_static', structure=structure, filename='css/form_structure.css') }}">
 </head>
 
 <body>
 <div class="global-container">
 
     <div class="top-bar" style="text-align: center">
-        <img src="{{ url_for('structure_img', structure=structure, filename='Flask-Launchpad.png') }}"
+        <img src="{{ url_for('structure_static', structure=structure, filename='img/Flask-Launchpad.png') }}"
              height="80px"
              style="padding: 10px">
 
