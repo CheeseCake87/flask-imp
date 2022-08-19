@@ -1,4 +1,5 @@
 from flask import Blueprint
+from flask import abort
 from os import path
 from inspect import stack
 
@@ -87,25 +88,16 @@ Error when importing {self._import_name} - {self.name} - {route}:
                 session.update(self.session)
                 break
 
-    def _find_file(self, folder, file):
+    def _find_file(self, file):
         if "template_folder" in self.settings:
-            _nested = f"{self.location}/{self.settings['template_folder']}/{__name__}/{folder}/{file}"
-            _rooted = f"{self.location}/{self.settings['template_folder']}/{folder}/{file}"
+            _nested = f"{self.location}/{self.settings['template_folder']}/{__name__}/{file}"
+            _rooted = f"{self.location}/{self.settings['template_folder']}/{file}"
             if path.isfile(_nested):
-                return f"{__name__}/{folder}/{file}"
+                return f"{__name__}/{file}"
             if path.isfile(_rooted):
-                return f"{folder}/{file}"
-            raise FileNotFoundError(f"{folder}/{file} cannot be found")
+                return f"{file}"
+            return abort(404, f"{file} cannot be found")
         raise KeyError(f"template_folder is not defined in the config of Blueprint: {__name__} ")
 
-    def extend(self, file: str) -> str:
-        return self._find_file("extends", file)
-
-    def include(self, file: str) -> str:
-        return self._find_file("includes", file)
-
-    def errors(self, file: str) -> str:
-        return self._find_file("errors", file)
-
-    def render(self, file: str) -> str:
-        return self._find_file("renders", file)
+    def tmpl(self, file: str) -> str:
+        return self._find_file(file)

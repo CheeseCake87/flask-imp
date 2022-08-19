@@ -8,8 +8,6 @@ from sys import modules
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from jinja2 import Environment
-from jinja2 import FileSystemLoader
-from jinja2.exceptions import TemplateNotFound
 from toml import load as toml_load
 
 
@@ -40,7 +38,8 @@ class BigApp(object):
 
         with self._app.app_context():
             if not path.isfile(f"{current_app.root_path}/{_file}"):
-                raise ImportError("""Flask app has no valid config file, must be like app_config.toml and be in the root of the app.""")
+                raise ImportError(
+                    """Flask app has no valid config file, must be like app_config.toml and be in the root of the app.""")
 
             _config = toml_load(f"{current_app.root_path}/{_file}")
 
@@ -215,28 +214,12 @@ class BigApp(object):
             def structure_static(structure, folder, file):
                 if path.isdir(f"{current_app.root_path}/{structures_folder}/{structure}/static/"):
                     if folder == "root":
-                        return send_from_directory(f"{current_app.root_path}/{structures_folder}/{structure}/static/", f"{file}")
-                    return send_from_directory(f"{current_app.root_path}/{structures_folder}/{structure}/static/{folder}/", f"{file}")
+                        return send_from_directory(f"{current_app.root_path}/{structures_folder}/{structure}/static/",
+                                                   f"{file}")
+                    return send_from_directory(
+                        f"{current_app.root_path}/{structures_folder}/{structure}/static/{folder}/", f"{file}")
                 return abort(404)
 
     @staticmethod
-    def from_folder(file: str, structure: str, folder: str = None):
-        if folder is None:
-            return f"{structure}/templates/{file}"
-        return f"{structure}/templates/{folder}/{file}"
-
-    @staticmethod
-    def extend(structure: str, file: str):
-        return f"{structure}/templates/extends/{file}"
-
-    @staticmethod
-    def include(structure: str, file: str):
-        return f"{structure}/templates/includes/{file}"
-
-    @staticmethod
-    def errors(structure: str, file: str):
-        return f"{structure}/templates/errors/{file}"
-
-    @staticmethod
-    def render(structure: str, file: str):
-        return f"{structure}/templates/renders/{file}"
+    def tmpl(structure: str, file: str):
+        return f"{structure}/templates/{file}"
