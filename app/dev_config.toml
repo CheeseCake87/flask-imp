@@ -5,7 +5,7 @@
 
 app_name = "app"
 version = "myapp_v1"
-secret_key = ""
+secret_key = "development-secret-key"
 debug = true
 testing = true
 session_time = 480
