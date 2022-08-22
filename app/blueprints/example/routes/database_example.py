@@ -1,7 +1,7 @@
 from flask import render_template
 
 from app import bigapp
-from app.blueprints.example import bp
+from .. import bp, page_needs
 
 
 @bp.route("/create-all-models", methods=["GET"])
@@ -40,8 +40,5 @@ def database_example():
             example_table_join = nq_example_user.rel_example_table[0].thing
             result = f"{result}, Normal Query: Username is {username} -> ExampleTable Join: {example_table_join}"
 
-    render = bp.render("database-example.html")
-    extend = bigapp.extend("bigapp_default", "main.html")
-    footer = bigapp.include("bigapp_default", "footer.html")
-
-    return render_template(render, extend=extend, footer=footer, result=result)
+    render = bp.tmpl("database-example.html")
+    return render_template(render, result=result, **page_needs)

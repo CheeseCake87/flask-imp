@@ -7,8 +7,6 @@ page_needs = {
 }
 bp = Blueprint(__name__)
 
-
-
 bp.import_routes("routes")
 
 

@@ -14,7 +14,7 @@ template_folder = "flask/templates"
 error_404_help = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false
 EXPLAIN_TEMPLATE_LOADING = true
-custom_flask_setting = "Cheesecake is tasty"
+TEMPLATES_AUTO_RELOAD = true
 
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
 # type = mysql / postgresql / sqlite

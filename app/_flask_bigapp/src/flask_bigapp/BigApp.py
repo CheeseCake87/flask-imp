@@ -1,3 +1,4 @@
+import logging
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
@@ -7,7 +8,6 @@ from sys import modules
 
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
-from jinja2 import Environment
 from toml import load as toml_load
 
 
@@ -17,7 +17,6 @@ class BigApp(object):
     model_classes = dict()
 
     _app = None
-    _jinja_env = Environment()
 
     db = SQLAlchemy()
     sql_do = db.session
@@ -28,7 +27,7 @@ class BigApp(object):
 
     def init_app(self, flask_app, app_config_file: str):
         if flask_app is None:
-            raise ImportError("No app passed into the FlaskLaunchpad app")
+            raise ImportError("No app passed into BigApp")
         self._app = flask_app
 
         _file = app_config_file
@@ -98,11 +97,13 @@ class BigApp(object):
                 try:
                     import_module(f"{current_app.name}.{folder.replace('/', '.')}.{route}")
                 except ImportError as e:
-                    print("Error importing builtin: ", e, f"in {folder}/{route}")
+                    logging.critical("Error importing builtin: ", e, f"in {folder}/{route}")
                     continue
 
     def import_blueprints(self, folder: str) -> None:
         from .utilities import contains_illegal_chars
+
+        _imported_blueprints = set()
 
         with self._app.app_context():
             blueprints_raw, blueprints_clean = listdir(f"{current_app.root_path}/{folder}/"), []
@@ -114,14 +115,20 @@ class BigApp(object):
 
             for blueprint in blueprints_clean:
                 _bp_root_folder = f"{current_app.root_path}/{folder}/{blueprint}"
-
                 try:
                     blueprint_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}")
-                    blueprint_object = getattr(blueprint_module, "bp")
+                    _imported_blueprints.add(blueprint_module)
+                except AttributeError as e:
+                    logging.critical("Error importing blueprint: ", e, f" from {_bp_root_folder}")
+                    continue
+
+            for blueprint in _imported_blueprints:
+                try:
+                    blueprint_object = getattr(blueprint, "bp")
                     if blueprint_object.enabled:
                         current_app.register_blueprint(blueprint_object)
                 except AttributeError as e:
-                    print("Error importing blueprint: ", e, f" from {_bp_root_folder}")
+                    logging.critical("Error importing blueprint: ", e, f" from {_bp_root_folder}")
                     continue
 
     def import_models(self, file: str = None, folder: str = None) -> None:
@@ -200,26 +207,3 @@ class BigApp(object):
 
     def create_all_models(self):
         SQLAlchemy.create_all(self.db)
-
-    def import_structures(self, structures_folder: str) -> None:
-        from flask import send_from_directory, abort
-
-        with self._app.app_context():
-            if not path.isdir(f"{current_app.root_path}/{structures_folder}"):
-                raise NotADirectoryError(f"{current_app.root_path}/{structures_folder} was not found")
-
-            current_app.jinja_loader.searchpath.append(f"{current_app.root_path}/{structures_folder}")
-
-            @current_app.route("/<structure>/static/<folder>/<file>", endpoint="__static", methods=["GET"])
-            def structure_static(structure, folder, file):
-                if path.isdir(f"{current_app.root_path}/{structures_folder}/{structure}/static/"):
-                    if folder == "root":
-                        return send_from_directory(f"{current_app.root_path}/{structures_folder}/{structure}/static/",
-                                                   f"{file}")
-                    return send_from_directory(
-                        f"{current_app.root_path}/{structures_folder}/{structure}/static/{folder}/", f"{file}")
-                return abort(404)
-
-    @staticmethod
-    def tmpl(structure: str, file: str):
-        return f"{structure}/templates/{file}"

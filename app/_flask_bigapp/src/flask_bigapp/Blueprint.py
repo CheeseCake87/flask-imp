@@ -1,7 +1,7 @@
+import logging
 from flask import Blueprint
-from flask import abort
-from os import path
 from inspect import stack
+from jinja2 import Environment, FileSystemLoader
 
 
 class BigAppBlueprint(Blueprint):
@@ -9,56 +9,75 @@ class BigAppBlueprint(Blueprint):
     Class that handles Blueprints from within the Blueprint __init__ file
     """
     enabled = True
-    settings = dict()
+    name = None
+    config = dict()
     session = dict()
     location = str()
 
-    _app_name = None
-    _nested_folder = None
-    _blueprint_name = None
-    _import_name = None
+    import_location = None
+    app_name_from_import = None
+    nested_folder_from_import = None
+    blueprint_name_from_import = None
 
-    def __init__(self, import_name, config_file: str = "config.toml"):
-        _caller = stack()[1]
-        _split_module_folder = _caller.filename.split("/")[:-1]
-        _split_import_name = import_name.split(".")
-        self.location = "/".join(_split_module_folder)
-        self._import_name = import_name
-        self._app_name = _split_import_name[0]
-        self._nested_folder = _split_import_name[1]
-        self._blueprint_name = _split_import_name[2]
+    _loader = None
+    _env = None
 
-        bpn, bps = self._process_config(config_file)
-        super().__init__(bpn, self._import_name, **bps)
+    def __init__(self, dunder_name, config_file: str = "config.toml"):
+        """
+        dunder_name must be __name__
+        """
+        caller_stack = stack()[1]
+        split_module_folder = caller_stack.filename.split("/")[:-1]
+        self.location = "/".join(split_module_folder)
 
-    def _process_config(self, config_file):
+        self.import_location = dunder_name
+        split_dunder_name = dunder_name.split(".")
+        self.app_name_from_import = split_dunder_name[0]
+        self.nested_folder_from_import = split_dunder_name[1]
+        self.blueprint_name_from_import = split_dunder_name[2]
+
+        self.name = self.blueprint_name_from_import
+
+        self._process_config(config_file)
+
+        self._loader = FileSystemLoader(f"{self.location}/{self.config['template_folder']}")
+        self._env = Environment(loader=self._loader)
+
+        super().__init__(self.name, self.import_location, **self.config)
+
+    def _process_config(self, config_file) -> None:
         from .utilities import load_config, str_bool
 
-        _config = load_config(f"{self.location}/{config_file}")
-        _name = self._blueprint_name
+        try:
+            config_from_file = load_config(f"{self.location}/{config_file}")
+        except FileNotFoundError:
+            self.enabled = False
+            logging.critical(f"{self.import_location} => Config file not found, skipping import.")
+            return
 
-        if "settings" not in _config:
-            raise ImportError(f"{self._import_name} => SETTINGS section is missing from config file.")
-
-        self.settings.update(_config["settings"])
-
-        if "session" in _config:
-            self.session.update(_config["session"])
-
-        if "enabled" in _config:
-            if not str_bool(_config["enabled"]):
+        if "enabled" in config_from_file:
+            if not str_bool(config_from_file["enabled"]):
                 self.enabled = False
+                return
 
-        _strip_settings = self.settings.copy()
+        if "settings" not in config_from_file:
+            self.enabled = False
+            logging.critical(f"{self.import_location} => SETTINGS section is missing from config file.")
+            return
 
-        if "name" in self.settings:
-            _name = self.settings["name"]
-            del _strip_settings["name"]
+        self.config.update(config_from_file["settings"])
 
-        if "import_name" in self.settings:
-            del _strip_settings["import_name"]
+        if "session" in config_from_file:
+            self.session.update(config_from_file["session"])
 
-        return _name, _strip_settings
+        if "name" in config_from_file:
+            self.name = config_from_file["name"]
+            del config_from_file["name"]
+
+        if "import_name" in config_from_file:
+            logging.warning(
+                f"{self.import_location} => import_name should not be define in config, this has been ignored.")
+            del config_from_file["import_name"]
 
     def import_routes(self, folder: str = "routes"):
         from os import listdir
@@ -73,10 +92,10 @@ class BigAppBlueprint(Blueprint):
 
         for route in routes_clean:
             try:
-                import_module(f"{self._import_name}.{folder}.{route}")
+                import_module(f"{self.import_name}.{folder}.{route}")
             except ImportError as e:
-                print(f"""
-Error when importing {self._import_name} - {self.name} - {route}: 
+                logging.warning(f"""
+Error when importing {self.import_name} - {self.name} - {route}: 
 {e}
                 """)
                 continue
@@ -88,16 +107,34 @@ Error when importing {self._import_name} - {self.name} - {route}:
                 session.update(self.session)
                 break
 
-    def _find_file(self, file):
-        if "template_folder" in self.settings:
-            _nested = f"{self.location}/{self.settings['template_folder']}/{__name__}/{file}"
-            _rooted = f"{self.location}/{self.settings['template_folder']}/{file}"
-            if path.isfile(_nested):
-                return f"{__name__}/{file}"
-            if path.isfile(_rooted):
-                return f"{file}"
-            return abort(404, f"{file} cannot be found")
-        raise KeyError(f"template_folder is not defined in the config of Blueprint: {__name__} ")
+    def tmpl(self, template):
+        return f"{self.name}/{template}"
 
-    def tmpl(self, file: str) -> str:
-        return self._find_file(file)
+    """
+    Here lays old code that was an attempt at loading a template from a scoped folder.
+    
+    This attempt was successful by making a new jinja environment. Although, by doing so
+    the methods url_for were not usable
+    """
+
+    # def _sort_blueprint(name):
+    #     _copy = OrderedDict(current_app.blueprints)
+    #     _copy.move_to_end(name, last=False)
+    #     current_app.blueprints = dict(_copy)
+    #     return
+    #
+    # def scoped_render(self, file: str) -> str:
+    #     """
+    #     This is an attempt to reorder the lookup dict
+    #     """
+    #     current_app.jinja_options.clear()
+    #     self._sort_blueprint(self.name)
+    #     return file
+    #
+    # def scoped_render_template(self, template, **context) -> str:
+    #     """
+    #     This is an attempt to create a custom loader
+    #     """
+    #     from flask.templating import _render
+    #     template = self._env.get_template(template)
+    #     return _render(current_app, template, context)
