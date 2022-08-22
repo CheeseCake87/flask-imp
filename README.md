@@ -138,7 +138,7 @@ This is an example of a very basic app in Flask-BigApp.
 
 ## More Examples
 
-This github project is a working example, and can do much more that the minimal app above.
+This github project is a working example, and can do much more than the minimal app above.
 
 This project covers how to work with models, blueprints and themes (structures)
 
