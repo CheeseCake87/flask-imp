@@ -1,13 +1,13 @@
 from flask import Flask
 
-from ._flask_bigapp.src.flask_bigapp import BigApp
+from _flask_bigapp.src.flask_bigapp import BigApp
 
 bigapp = BigApp()
 
 
-def create_app():
+def create_app(config: str):
     main = Flask(__name__)
-    bigapp.init_app(main, "app_config.toml")
+    bigapp.init_app(main, config)
 
     bigapp.import_structures("structures")
 

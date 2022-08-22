@@ -1,3 +1,5 @@
+# These are out of date currently, soz
+
 #### contains_illegal_chars
 
 ```text

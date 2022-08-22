@@ -8,15 +8,6 @@ from re import sub
 from distutils import util
 
 
-def get_app_root() -> str:
-    """
-    Finds the root folder of the app.
-    :return str: /app/folder/extend
-    """
-    strip = path.dirname(path.realpath(__file__)).split("/")[1:-2]
-    return "/" + "/".join(strip)
-
-
 def remove_escapes(string: str, remove_these: list = None) -> str:
     """
     Used to remove escapes like \n and \t in a string value.

@@ -1,6 +1,7 @@
 from app import create_app
 
 if __name__ == '__main__':
-    create_app().run()
+    app = create_app("dev_config.toml")
+    app.run()
 else:
-    flask_bigapp = create_app()
+    wsgi = create_app("pro_config.toml")

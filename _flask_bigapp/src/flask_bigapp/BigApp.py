@@ -16,11 +16,12 @@ class BigApp(object):
     smtp = dict()
     structures = dict()
     model_classes = dict()
+    config = dict()
 
     _app = None
 
-    db = SQLAlchemy()
-    sql_do = db.session
+    db = None
+    sql_do = None
 
     def __init__(self, flask_app=None, app_config_file: str = None):
         if flask_app is not None:
@@ -34,21 +35,19 @@ class BigApp(object):
         _file = app_config_file
 
         if app_config_file is None:
-            _file = "app_config.toml"
+            _file = "config.toml"
 
         with self._app.app_context():
             if not path.isfile(f"{current_app.root_path}/{_file}"):
                 raise ImportError(
-                    """Flask app has no valid config file, must be like app_config.toml and be in the root of the app.""")
+                    """Flask app has no valid config file, must be like config.toml and be in the root of the app.""")
 
             _config = toml_load(f"{current_app.root_path}/{_file}")
+            current_app.config["SQLALCHEMY_BINDS"] = dict()
 
-            if "smtp" in _config:
-                _smtp = _config["smtp"]
-                del _config["smtp"]
-
-            current_app.config["SQLALCHEMY_BINDS"] = {}
             if "flask" in _config:
+                self.config.update({"flask": _config['flask']})
+
                 if "static_folder" in _config['flask']:
                     current_app.static_folder = f"{current_app.root_path}/{_config['flask']['static_folder']}"
                     del _config["flask"]["static_folder"]
@@ -62,6 +61,8 @@ class BigApp(object):
                 del _config["flask"]
 
             if "database" in _config:
+                self.config.update({"database": _config['database']})
+
                 if "main" in _config["database"]:
                     if _config['database']['main']['type'] == "sqlite":
                         current_app.config[
@@ -83,6 +84,12 @@ class BigApp(object):
                             server_database = f"@{value['server']}/{value['database_name']}"
                             current_app.config["SQLALCHEMY_BINDS"].update({key: type_user_pass + server_database})
                 del _config["database"]
+
+            if "smtp" in _config:
+                self.config.update({"smtp": _config['smtp']})
+
+                _smtp = _config["smtp"]
+                del _config["smtp"]
 
     def import_builtins(self, folder: str = "routes") -> None:
         from .utilities import contains_illegal_chars
@@ -162,11 +169,15 @@ class BigApp(object):
     def structure_tmpl(structure, template):
         return f"{structure}/{template}"
 
-    def import_models(self, file: str = None, folder: str = None) -> None:
+    def import_models(self, file: str = None, folder: str = None, import_attribute: str = "db", auto_init: bool = True) -> None:
         from .utilities import contains_illegal_chars
 
         if file is None and folder is None:
             raise ImportError("You must pass in a file or folder located at the root of the app.")
+
+        if auto_init:
+            self.db = SQLAlchemy()
+            self.sql_do = self.db.session
 
         with self._app.app_context():
             if folder is not None:
@@ -184,7 +195,7 @@ class BigApp(object):
                         folder_import_path = f"{'.'.join(strip_folder)}.{folder_model}"
                         try:
                             _folder_model_module = import_module(folder_import_path)
-                            _folder_model_object = getattr(_folder_model_module, "db")
+                            _folder_model_object = getattr(_folder_model_module, import_attribute)
 
                         except ImportError as e:
                             print("Error importing model: ", e, f" from {folder_import_path}")
@@ -200,7 +211,7 @@ class BigApp(object):
                             if current_app.name in str(class_object):
                                 self.model_classes.update({class_name: class_object})
                 else:
-                    print("Folder not found: ", f"{current_app.root_path}/{folder}")
+                    logging.info("Model folder not found: ", f"{current_app.root_path}/{folder}")
 
             if file is not None:
                 _file = f"{current_app.root_path}/{file}"
@@ -210,7 +221,7 @@ class BigApp(object):
                     file_import_path = f"{'.'.join(strip_file)}.{file}"
                     try:
                         _file_model_module = import_module(file_import_path)
-                        _file_model_object = getattr(_file_model_module, "db")
+                        _file_model_object = getattr(_file_model_module, import_attribute)
 
                     except ImportError as e:
                         print("Error importing model: ", e, f" from {file_import_path}")
@@ -225,11 +236,12 @@ class BigApp(object):
                             self.model_classes.update({class_name: class_object})
 
                 else:
-                    print("File not found: ", f"{current_app.root_path}/{file}")
+                    logging.info("Model file not found: ", f"{current_app.root_path}/{file}")
 
-            self.db.init_app(current_app)
+            if auto_init:
+                self.db.init_app(current_app)
 
-    def smtp_settings(self, email_address: str):
+    def smtp_settings(self, email_address: str) -> dict:
         if email_address in self.smtp:
             return self.smtp[email_address]
 
@@ -237,4 +249,8 @@ class BigApp(object):
         return self.model_classes[class_name]
 
     def create_all_models(self):
-        SQLAlchemy.create_all(self.db)
+        if self.db is not None:
+            SQLAlchemy.create_all(self.db)
+            logging.info("All database models built.")
+            return
+        logging.warning("No database has been defined, you have likely chosen not to auto_init the database")

@@ -1,24 +1,25 @@
 # Updates the Flask app config with the variables below.
-# If any variable below does not exist in the standard Flask env vars it is created and will be accessible using
-# current_app.config["YOUR_VAR_NAME"] or of course, app.config["YOUR_VAR_NAME"] if you are not using app factory.
-
+# If any variable below does not exist in the standard Flask env vars
+# it is created and will be accessible using app.config["YOUR_VAR_NAME"]
 [flask]
+
 app_name = "app"
-version = "1.0.0"
-secret_key = "sdflskjdflksjdflksjdflkjsdf"
-debug = true
-testing = true
+version = "myapp_v1"
+secret_key = ""
+debug = false
+testing = false
 session_time = 480
 static_folder = "flask/static"
 template_folder = "flask/templates"
-error_404_help = true
+error_404_help = false
 SQLALCHEMY_TRACK_MODIFICATIONS = false
-EXPLAIN_TEMPLATE_LOADING = true
+EXPLAIN_TEMPLATE_LOADING = false
 TEMPLATES_AUTO_RELOAD = true
 
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
 # type = mysql / postgresql / sqlite
 # if type = sqlite, config parser will ignore username and password
+# Anything after [database.main] is added as SQLALCHEMY_BINDS
 [database]
 
     [database.main]
@@ -28,6 +29,14 @@ TEMPLATES_AUTO_RELOAD = true
     database_name = "database"
     username = "user"
     password = "password"
+
+#    [database."name_of_bind"]
+#    enabled = true
+#    type = "sqlite"
+#    server = "local"
+#    database_name = "database"
+#    username = "user"
+#    password = "password"
 
 # works well with Microsoft Exchange Kiosk License
 # for Exchange Kiosk to work you must enable Authenticated-SMTP in the accounts features

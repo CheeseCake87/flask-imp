@@ -1,9 +1,8 @@
-from ..._flask_bigapp.src.flask_bigapp import Blueprint
-from app import bigapp
+from _flask_bigapp.src.flask_bigapp import Blueprint
 
 page_needs = {
-    "extend": bigapp.structure_tmpl("bigapp_default", "extends/main.html"),
-    "footer": bigapp.structure_tmpl("bigapp_default", "includes/footer.html"),
+    "extend": "bigapp_default/extends/main.html",
+    "footer": "bigapp_default/includes/footer.html",
 }
 bp = Blueprint(__name__)
 
