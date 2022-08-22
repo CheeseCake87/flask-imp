@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='Flask-BigApp',
-    version='1.0.1',
+    version='1.0.2',
     url='https://github.com/CheeseCake87/Flask-BigApp',
     license='MIT',
     author='David Carmichael',

@@ -1,11 +1,11 @@
 from ..._flask_bigapp.src.flask_bigapp import Blueprint
-from app import structures
+from app import bigapp
 
 bp = Blueprint(__name__)
 
 page_needs = {
-    "extend": structures.tmpl("bigapp_default", "extends/main.html"),
-    "footer": structures.tmpl("bigapp_default", "includes/footer.html"),
+    "extend": bigapp.structure_tmpl("bigapp_default", "extends/main.html"),
+    "footer": bigapp.structure_tmpl("bigapp_default", "includes/footer.html"),
 }
 
 bp.import_routes("routes")

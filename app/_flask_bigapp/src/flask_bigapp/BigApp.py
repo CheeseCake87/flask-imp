@@ -7,6 +7,7 @@ from os import path
 from sys import modules
 
 from flask import current_app
+from flask import Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from toml import load as toml_load
 
@@ -130,6 +131,36 @@ class BigApp(object):
                 except AttributeError as e:
                     logging.critical("Error importing blueprint: ", e, f" from {_bp_root_folder}")
                     continue
+
+    def import_structures(self, structures_folder: str) -> None:
+        from .utilities import contains_illegal_chars
+
+        with self._app.app_context():
+            structures_raw, structures_clean = listdir(f"{current_app.root_path}/{structures_folder}/"), []
+            dunder_name = __name__
+            split_dunder_name = dunder_name.split(".")
+
+            for structure in structures_raw:
+                _path = f"{current_app.root_path}/{structures_folder}/{structure}"
+                if path.isdir(_path):
+                    if not contains_illegal_chars(structure):
+                        structures_clean.append(structure)
+
+            for structure in structures_clean:
+                _structure_root_folder = f"{current_app.root_path}/{structures_folder}/{structure}"
+                self.structures.update({structure: _structure_root_folder})
+                bp = Blueprint(
+                    name=structure,
+                    import_name=f"{split_dunder_name[0]}/{structures_folder}/{structure}",
+                    static_folder=f"{current_app.root_path}/{structures_folder}/{structure}/static",
+                    template_folder=f"{current_app.root_path}/{structures_folder}/{structure}/templates",
+                    static_url_path=f"/{structure}/static"
+                )
+                current_app.register_blueprint(bp)
+
+    @staticmethod
+    def structure_tmpl(structure, template):
+        return f"{structure}/{template}"
 
     def import_models(self, file: str = None, folder: str = None) -> None:
         from .utilities import contains_illegal_chars
