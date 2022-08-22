@@ -104,6 +104,8 @@ class BigApp(object):
     def import_blueprints(self, folder: str) -> None:
         from .utilities import contains_illegal_chars
 
+        _imported_blueprints = set()
+
         with self._app.app_context():
             blueprints_raw, blueprints_clean = listdir(f"{current_app.root_path}/{folder}/"), []
             for blueprint in blueprints_raw:
@@ -114,10 +116,16 @@ class BigApp(object):
 
             for blueprint in blueprints_clean:
                 _bp_root_folder = f"{current_app.root_path}/{folder}/{blueprint}"
-
                 try:
                     blueprint_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}")
-                    blueprint_object = getattr(blueprint_module, "bp")
+                    _imported_blueprints.add(blueprint_module)
+                except AttributeError as e:
+                    print("Error importing blueprint: ", e, f" from {_bp_root_folder}")
+                    continue
+
+            for blueprint in _imported_blueprints:
+                try:
+                    blueprint_object = getattr(blueprint, "bp")
                     if blueprint_object.enabled:
                         current_app.register_blueprint(blueprint_object)
                 except AttributeError as e:

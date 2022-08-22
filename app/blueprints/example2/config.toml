@@ -1,8 +1,8 @@
 enabled = "yes"
 
 [settings]
-name="example_blueprint"
-url_prefix = "/example_blueprint"
+name="example2"
+url_prefix = "/example2"
 template_folder = "templates"
 static_folder = "static"
 static_url_path = "/exmaple_blueprint/static"

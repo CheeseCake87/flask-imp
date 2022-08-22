@@ -1,5 +1,7 @@
 from flask import render_template
+from flask import url_for
 from app import bigapp
+import requests
 
 from app.blueprints.example import bp
 
@@ -9,12 +11,11 @@ from app.blueprints.example import stru
 
 @bp.route("/", methods=["GET"])
 def index():
-    """
-    Shows an example of the structure (theme) working
-    """
+    resp = requests.get(f"http://127.0.0.1:5000{url_for('example2.index')}")
 
-    render = bp.render("index.html")
-    extend = bigapp.extend(stru, "main.html")
-    footer = bigapp.include("bigapp_default", "footer.html")
+    print(resp)
 
-    return render_template(render, extend=extend, footer=footer)
+    extend = bigapp.tmpl(stru, "extends/main.html")
+    footer = bigapp.tmpl("bigapp_default", "includes/footer.html")
+
+    return bp.scoped_render_template("renders/index.html", extend=extend, footer=footer)

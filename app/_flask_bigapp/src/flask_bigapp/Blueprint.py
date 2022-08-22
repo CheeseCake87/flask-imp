@@ -1,6 +1,6 @@
 from flask import Blueprint
-from flask import abort
-from os import path
+from flask import current_app
+from collections import OrderedDict
 from inspect import stack
 
 
@@ -14,6 +14,7 @@ class BigAppBlueprint(Blueprint):
     location = str()
 
     _app_name = None
+    _name = None
     _nested_folder = None
     _blueprint_name = None
     _import_name = None
@@ -52,13 +53,13 @@ class BigAppBlueprint(Blueprint):
         _strip_settings = self.settings.copy()
 
         if "name" in self.settings:
-            _name = self.settings["name"]
+            self._name = self.settings["name"]
             del _strip_settings["name"]
 
         if "import_name" in self.settings:
             del _strip_settings["import_name"]
 
-        return _name, _strip_settings
+        return self._name, _strip_settings
 
     def import_routes(self, folder: str = "routes"):
         from os import listdir
@@ -88,16 +89,19 @@ Error when importing {self._import_name} - {self.name} - {route}:
                 session.update(self.session)
                 break
 
-    def _find_file(self, file):
-        if "template_folder" in self.settings:
-            _nested = f"{self.location}/{self.settings['template_folder']}/{__name__}/{file}"
-            _rooted = f"{self.location}/{self.settings['template_folder']}/{file}"
-            if path.isfile(_nested):
-                return f"{__name__}/{file}"
-            if path.isfile(_rooted):
-                return f"{file}"
-            return abort(404, f"{file} cannot be found")
-        raise KeyError(f"template_folder is not defined in the config of Blueprint: {__name__} ")
+    def scoped_render(self, file: str) -> str:
+        _sort_blueprint(self._name)
+        return file
 
-    def tmpl(self, file: str) -> str:
-        return self._find_file(file)
+    def scoped_render_template(self, template_name_or_list, **context) -> str:
+        from flask.templating import _render
+        app = current_app._get_current_object()  # type: ignore[attr-defined]
+        template = app.jinja_env.get_template(template_name_or_list)
+        return _render(app, template, context)
+
+
+def _sort_blueprint(name):
+    _copy = OrderedDict(current_app.blueprints)
+    _copy.move_to_end(name, last=False)
+    current_app.blueprints = dict(_copy)
+    return
