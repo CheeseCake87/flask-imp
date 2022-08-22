@@ -1,7 +1,7 @@
 import flask
 from app._flask_bigapp.src.flask_bigapp import Security
 
-from app.blueprints.example import bp
+from .. import bp
 
 
 @bp.route("/account-fail", methods=["GET"])

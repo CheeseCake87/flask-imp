@@ -1,8 +1,7 @@
 from flask import current_app, render_template
-
 from app import bigapp
 
-from .. import bp
+from .. import bp, page_needs
 
 
 @bp.route("/app-models", methods=["GET"])
@@ -12,11 +11,8 @@ def app_models():
     """
     models = bigapp.model_classes
 
-    render = bp.render("app-models.html")
-    extend = bigapp.extend("bigapp_default", "main.html")
-    footer = bigapp.include("bigapp_default", "footer.html")
-
-    return render_template(render, extend=extend, footer=footer, models=models)
+    render = bp.tmpl("app-models.html")
+    return render_template(render, models=models, **page_needs)
 
 
 @bp.route("/app-url-map", methods=["GET"])
@@ -28,8 +24,5 @@ def app_url_map():
     for rule in current_app.url_map.iter_rules():
         output += f"{rule.endpoint} : {rule.rule} <br/>"
 
-    render = bp.render("app-url-map.html")
-    extend = bigapp.extend("bigapp_default", "main.html")
-    footer = bigapp.include("bigapp_default", "footer.html")
-
-    return render_template(render, extend=extend, footer=footer, output=output)
+    render = bp.tmpl("app-url-map.html")
+    return render_template(render, output=output, **page_needs)

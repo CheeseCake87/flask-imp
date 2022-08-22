@@ -1,8 +1,7 @@
 from app._flask_bigapp.src.flask_bigapp import Auth
 from flask import render_template
 
-from app import bigapp
-from app.blueprints.example import bp
+from .. import bp, page_needs
 
 
 @bp.route("/auth-example", methods=["GET"])
@@ -49,8 +48,5 @@ def auth_example():
         "Auth.sha_password(password, salt, encrypt=128)": Auth.sha_password(password, salt, encrypt=128)
     })
 
-    render = bp.render("auth-example.html")
-    extend = bigapp.extend("bigapp_default", "main.html")
-    footer = bigapp.include("bigapp_default", "footer.html")
-
-    return render_template(render, extend=extend, footer=footer, examples=examples)
+    render = bp.tmpl("auth-example.html")
+    return render_template(render, examples=examples, **page_needs)

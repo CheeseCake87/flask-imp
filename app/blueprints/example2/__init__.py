@@ -1,9 +1,11 @@
 from ..._flask_bigapp.src.flask_bigapp import Blueprint
+from app import structures
 
+page_needs = {
+    "extend": structures.tmpl("bigapp_default", "extends/main.html"),
+    "footer": structures.tmpl("bigapp_default", "includes/footer.html"),
+}
 bp = Blueprint(__name__)
-
-# Set the default structure theme for this blueprint ( this can be done route by route also )
-stru = "bigapp_default"
 
 bp.import_routes("routes")
 
