@@ -25,9 +25,9 @@ Below is an example of a minimal app that allows you to auto import app routes.
 
 ## Minimal Flask-BigApp app
 
-```app_config.toml``` file is required to sit next to your app's ```__init__.py``` file.
+A config file is required to sit next to your app's ```__init__.py``` file. This defaults to ```config.toml```
 
-The ```app_config.toml``` file contains Flask config settings, a minimal version of this file looks like this:
+The ```config.toml``` file contains Flask config settings, a minimal version of this file looks like this:
 
 ```toml
 # Updates the Flask app config with the variables below.
@@ -58,7 +58,7 @@ bigapp = BigApp()
 def create_app():
     main = Flask(__name__)
     bigapp.init_app(main)
-    bigapp.app_config("app_config.toml")
+    bigapp.app_config("config.toml")
     bigapp.import_builtins("routes")
     return main
 ```
