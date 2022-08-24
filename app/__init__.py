@@ -12,6 +12,7 @@ def create_app(config: str):
     bigapp.import_structures("structures")
 
     bigapp.import_models(folder="models")
+    bigapp.create_all_models()
 
     bigapp.import_builtins("flask/routes")
     bigapp.import_builtins("flask/template_filters")
