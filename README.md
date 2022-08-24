@@ -7,27 +7,14 @@ pip install flask-bigapp
 
 ## What is Flask-BigApp?
 
-Flask-BigApp's main purpose is to help simplify the importing of blueprints, routes and models.
-
-It has a few extra features built in to help with theming, securing pages and password authentication.
-
-You can import model classes using `bigapp.import_models(file="models.py")`
-
-You can auto import routes from a folder using `bigapp.import_builtins("folder that contains routes")`
-
-You can auto import blueprints using `bigapp.import_blueprints("folder that contains blueprint modules")`
-
-You can register a theme (structure) folder using `bigapp.import_structures("folder that containes themes(structures)")`
-
-I have yet to write a guide on how to use Flask-BigApp, but if you click around this project you will see how it's working. 
-
-Below is an example of a minimal app that allows you to auto import app routes.
+Flask-BigApp's main purpose is to help simplify the importing of blueprints, routes and models. It has a few extra features built in to help with theming, securing pages and password authentication.
 
 ## Minimal Flask-BigApp app
 
 A config file is required to sit next to your app's ```__init__.py``` file. This defaults to ```config.toml```
 
 The ```config.toml``` file contains Flask config settings, a minimal version of this file looks like this:
+
 
 ```toml
 # Updates the Flask app config with the variables below.
@@ -57,8 +44,7 @@ bigapp = BigApp()
 
 def create_app():
     main = Flask(__name__)
-    bigapp.init_app(main)
-    bigapp.app_config("config.toml")
+    bigapp.init_app(main, "config.toml")
     bigapp.import_builtins("routes")
     return main
 ```
@@ -70,15 +56,16 @@ Let's say we have this folder structure:
 
 ```
 Flask-BigApp
-    app
-        static
-        templates
-        routes
-            index.py
-        __init__.py
-        app_config.toml
-    venv
-    run.py
+|
+- app/
+-- static/
+-- templates/
+--- routes/
+------ index.py
+-- __init__.py
+-- app_config.toml
+- venv
+- run.py
 ```
 
 The ```index.py``` file should look like this:
@@ -116,16 +103,17 @@ So now our folder structure looks like this:
 
 ```
 Flask-BigApp
-    main
-        static
-        templates
-        routes
-            index.py
-            my_page.py
-        __init__.py
-        app_config.toml
-    venv
-    run.py
+|
+- app/
+-- static/
+-- templates/
+--- routes/
+------ index.py
+------ my_page.py
+-- __init__.py
+-- app_config.toml
+- venv
+- run.py
 ```
 
 The ```my_page.py``` routes will also be imported into the main app.
@@ -133,10 +121,184 @@ The ```my_page.py``` routes will also be imported into the main app.
 Using this method you can keep your routes in different files, and not have to worry about adding the import into
 your ```__init__.py``` file.
 
-This is an example of a very basic app in Flask-BigApp.
+
+# More Flask-BigApp Features
+
+## Importing Models
+
+You can import model classes using:
+- `bigapp.import_models(file="models.py", folder="models")`
+
+This also inits the SQLAlchemy database, if you prefer to do this yourself add the argument `auto_init=False`
+
+An example model file looks like this:
+
+```python
+from app import bigapp
+from sqlalchemy import ForeignKey
+
+# change this to your own database object if you're using auto_init=False
+db = bigapp.db
 
 
-## More Examples
+class ExampleTable(db.Model):
+    __tablename__ = "fl_example_table"
+    example_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey('fl_example_user.user_id'))
+    thing = db.Column(db.String(256), nullable=False)
+```
+
+## Working with models
+
+You can use models as normal but no longer have to import them. Here's an example of how you can query using the `bigapp.model_class` method:
+( this assumes you have `bigapp = BigApp()` in your apps `__init__.py` file )
+```python
+from flask import render_template
+
+from app import bigapp
+from .. import bp
+
+@bp.route("/database-example", methods=["GET"])
+def database_example():
+    # Load the ExampleUser class found in the import_models folder, this way saves having to import files
+    example_user = bigapp.model_class("ExampleUser")
+
+    user_id = 1
+    result = "NULL"
+    find_username = True
+
+    # Normal query
+    nq_example_user = example_user.query
+
+    # Query class using sql_do session
+    sq_example_user = bigapp.sql_do.query(example_user)
+
+    if find_username:
+        sq_example_user = sq_example_user.filter(example_user.user_id == user_id).first()
+        if sq_example_user is not None:
+            username = sq_example_user.username
+            result = f"Session Query: Username is {username}"
+
+        nq_example_user = nq_example_user.filter(example_user.user_id == user_id).first()
+        if nq_example_user is not None:
+            username = nq_example_user.username
+            example_table_join = nq_example_user.rel_example_table[0].thing
+            result = f"{result}, Normal Query: Username is {username} -> ExampleTable Join: {example_table_join}"
+
+    render = "blueprint1/database-example.html"
+    return render_template(render, result=result)
+```
+
+The `bigapp.sql_do` method is just a proxy for `db.session`
+
+## Importing Builtins (routes, template filters, context processors)
+
+You can auto import routes, template filters, context processors, etc.. from a folder using:
+- `bigapp.import_builtins("builtins")`
+
+Here's an example of the builtins folder structure:
+
+```text
+builtins/
+|
+-- routes.py
+-- template_filters.py
+```
+
+Importing builtins uses Flask's `current_app` to register the routes, here's an example of a file in the builtins folder:
+
+```python
+from flask import current_app
+from flask import Response
+from flask import render_template
+from markupsafe import Markup
+
+
+@current_app.template_filter('example')
+def decorate_code(value: str) -> str:
+    return Markup(f"The string value passed in is: {value} -> here is something after that value.")
+
+@current_app.before_request
+def before_request():
+    pass
+
+@current_app.errorhandler(404)
+def request_404(error):
+    return Response(error, 404)
+
+@current_app.route("/builtin/route")
+def builtin_route():
+    render = "theme1/renders/builtin-route.html"
+    return render_template(render)
+```
+
+## Importing Blueprints
+
+You can auto import blueprints using:
+- `bigapp.import_blueprints("blueprints")`
+
+The shape of your folder to import blueprints from should look like this:
+
+```text
+blueprints/
+|
+- blueprint1/
+-- routes/
+---- index.py
+-- templates/
+---- blueprint1/
+------ index.html
+-- static/
+-- __init__.py
+-- config.toml
+```
+
+Blueprints require a config file to configure their settings. The config file should look like this:
+
+```toml
+enabled = "yes"
+
+[settings]
+url_prefix = "/"
+template_folder = "templates"
+static_folder = "static"
+static_url_path = "/exmaple_blueprint/static"
+
+[session]
+var_in_session = "this can be loaded using fl_bp.session"
+permissions = ["this", "that"]
+logged_in = true
+not_logged_in = false
+```
+
+The session section can be initialised using the `bp.init_session()` method. This places the values into the Flask session -> `from flask import session`
+
+## Importing Structures (themes)
+
+You can register a structures (theme) folder using: 
+- `bigapp.import_structures("structures")`
+
+Structures work the same as blueprints but are used for theming and do not have a config file, here's an example of the folder layout of the structures folder:
+```text
+structures/
+|
+- theme1/
+-- templates/
+--- theme1/
+---- extend/
+------ main.html
+---- includes/
+------ footer.html
+---- macros/
+------ theme1_menu.html
+-- static/
+---- logo.png
+---- style.css
+-- __init__.py
+-- config.toml
+```
+
+# GitHub Project
 
 This github project is a working example, and can do much more than the minimal app above.
 
@@ -165,9 +327,13 @@ python3 -m venv venv
 ```bash
 source venv/bin/activate
 ```
-
+Install requirements:
 ```bash
 pip install -r requirements.txt
+```
+or
+```bash
+python3 pip-update.py
 ```
 
 #### Manual:
@@ -182,7 +348,11 @@ python3 -m venv venv
 ```bash
 source venv/bin/activate
 ```
-
+Install requirements:
 ```bash
 pip install -r requirements.txt
+```
+or
+```bash
+python3 pip-update.py
 ```

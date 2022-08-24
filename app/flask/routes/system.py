@@ -4,11 +4,6 @@ from flask import request
 from flask import session
 
 
-@current_app.before_first_request
-def before_first_request():
-    pass
-
-
 @current_app.before_request
 def before_request():
     if "version" not in session:
