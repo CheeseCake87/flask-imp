@@ -248,9 +248,10 @@ class BigApp(object):
     def model_class(self, class_name: str):
         return self.model_classes[class_name]
 
-    def create_all_models(self):
-        if self.db is not None:
-            SQLAlchemy.create_all(self.db)
+    @staticmethod
+    def create_all_models(database_object):
+        if database_object is not None:
+            SQLAlchemy.create_all(database_object)
             logging.info("All database models built.")
             return
         logging.warning("No database has been defined, you have likely chosen not to auto_init the database")
