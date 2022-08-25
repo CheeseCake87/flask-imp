@@ -110,6 +110,7 @@ class BigApp(object):
 
     def import_blueprints(self, folder: str) -> None:
         from .utilities import contains_illegal_chars
+        from .Blueprint import BigAppBlueprint
 
         _imported_blueprints = set()
 
@@ -131,8 +132,12 @@ class BigApp(object):
                     continue
 
             for blueprint in _imported_blueprints:
+                instance_name = None
+                for value in dir(blueprint):
+                    if isinstance(getattr(blueprint, value), BigAppBlueprint):
+                        instance_name = value
                 try:
-                    blueprint_object = getattr(blueprint, "bp")
+                    blueprint_object = getattr(blueprint, instance_name)
                     if blueprint_object.enabled:
                         current_app.register_blueprint(blueprint_object)
                 except AttributeError as e:
