@@ -1,6 +1,7 @@
 bpyutils>=0.5.2
 click>=8.1.3
 Flask>=2.2.2
+Flask-BigApp>=1.0.6
 Flask-SQLAlchemy>=2.5.1
 greenlet>=1.1.2
 importlib-metadata>=4.12.0
