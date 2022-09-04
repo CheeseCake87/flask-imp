@@ -1,5 +1,5 @@
 import flask
-from _flask_bigapp.src.flask_bigapp import Security
+from flask_bigapp import Security
 
 from .. import bp
 

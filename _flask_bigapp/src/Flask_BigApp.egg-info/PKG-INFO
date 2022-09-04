@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Flask-BigApp
-Version: 1.0.5
+Version: 1.0.6
 Summary: A Flask auto importer that allows your Flask apps to grow big.
 Home-page: https://github.com/CheeseCake87/Flask-BigApp
 Author: David Carmichael
@@ -271,7 +271,19 @@ blueprints/
 -- static/
 -- __init__.py
 -- config.toml
+|
+- another_blueprint/
+-- routes/
+---- index.py
+-- templates/
+---- another_blueprint/
+------ index.html
+-- static/
+-- __init__.py
+-- config.toml
 ```
+
+In the above we are nesting all templates under a folder with the same name as the blueprint. This is a workaround to allow you to have template files with the same names in different blueprint folders.
 
 Blueprints require a config file to configure their settings. The config file should look like this:
 
@@ -282,16 +294,59 @@ enabled = "yes"
 url_prefix = "/"
 template_folder = "templates"
 static_folder = "static"
-static_url_path = "/exmaple_blueprint/static"
+static_url_path = "/blueprint1/static"
 
 [session]
-var_in_session = "this can be loaded using fl_bp.session"
+var_in_session = "this can be loaded using bp.init_session()"
 permissions = ["this", "that"]
 logged_in = true
 not_logged_in = false
 ```
 
 The session section can be initialised using the `bp.init_session()` method. This places the values into the Flask session -> `from flask import session`
+
+Here's an example of what your blueprints `__init__.py` file should look like:
+
+```python
+from flask_bigapp import Blueprint
+
+bp = Blueprint(__name__, "config.toml")
+
+bp.import_routes("routes")
+
+
+@bp.before_app_request
+def before_app_request():
+    bp.init_session()
+
+
+@bp.after_app_request
+def after_app_request(response):
+    return response
+```
+
+Flask-BigApp inherits from Flask's Blueprint class in order to load from the config file. In the example above it states the config file name, however you can omit this as it defaults to `config.toml`. Of course, you can specify your own config file name.
+
+`bp.import_routes("routes")` method works much the same as `bigapp.import_builtins` except it is scoped to work with the blueprint object.
+
+Here's an example of `routes/index.py`
+
+```python
+from flask import render_template
+
+from .. import bp
+
+
+@bp.route("/", methods=["GET"])
+def index():
+    render = bp.tmpl("index.html")
+
+    return render_template(render)
+```
+
+The `bp.tmpl` method just decorates the string with the name of the blueprint, changing `"index.html"` to `"blueprint1/index.html"`. 
+
+Of course this only works if your templates are nested under a folder with the same name as your blueprint, however it does make it possible to change the blueprint name later and not have to worry about search and replace.
 
 ## Importing Structures (themes)
 

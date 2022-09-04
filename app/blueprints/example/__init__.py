@@ -1,4 +1,4 @@
-from _flask_bigapp.src.flask_bigapp import Blueprint
+from flask_bigapp import Blueprint
 
 page_needs = {
     "extend": "bigapp_default/extends/main.html",
