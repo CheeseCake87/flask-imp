@@ -1,4 +1,4 @@
-from flask_bigapp import Auth
+from _flask_bigapp.src.flask_bigapp import Auth
 from flask import render_template
 
 from .. import bp, page_needs

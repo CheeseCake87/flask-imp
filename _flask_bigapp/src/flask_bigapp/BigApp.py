@@ -6,90 +6,37 @@ from os import listdir
 from os import path
 from sys import modules
 
-from flask import current_app
 from flask import Blueprint
+from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
-from toml import load as toml_load
+
+from .Config import Config
 
 
 class BigApp(object):
     smtp = dict()
     structures = dict()
     model_classes = dict()
-    config = dict()
 
+    _temp_config = dict()
     _app = None
 
     db = None
     sql_do = None
 
-    def __init__(self, flask_app=None, app_config_file: str = None):
-        if flask_app is not None:
-            self.init_app(flask_app, app_config_file)
+    def __init__(self, app=None, app_config_file: str = None):
+        if app is not None:
+            self.init_app(app, app_config_file)
 
-    def init_app(self, flask_app, app_config_file: str):
-        if flask_app is None:
+    def init_app(self, app, app_config_file: str):
+        if app is None:
             raise ImportError("No app passed into BigApp")
-        self._app = flask_app
+        self._app = app
 
-        _file = app_config_file
-
-        if app_config_file is None:
-            _file = "config.toml"
-
-        with self._app.app_context():
-            if not path.isfile(f"{current_app.root_path}/{_file}"):
-                raise ImportError(
-                    """Flask app has no valid config file, must be like config.toml and be in the root of the app.""")
-
-            _config = toml_load(f"{current_app.root_path}/{_file}")
-            current_app.config["SQLALCHEMY_BINDS"] = dict()
-
-            if "flask" in _config:
-                self.config.update({"flask": _config['flask']})
-
-                if "static_folder" in _config['flask']:
-                    current_app.static_folder = f"{current_app.root_path}/{_config['flask']['static_folder']}"
-                    del _config["flask"]["static_folder"]
-
-                if "template_folder" in _config['flask']:
-                    current_app.template_folder = f"{current_app.root_path}/{_config['flask']['template_folder']}"
-                    del _config["flask"]["template_folder"]
-
-                for key, value in _config['flask'].items():
-                    current_app.config[key.upper()] = value
-                del _config["flask"]
-
-            if "database" in _config:
-                self.config.update({"database": _config['database']})
-
-                if "main" in _config["database"]:
-                    if _config['database']['main']['type'] == "sqlite":
-                        current_app.config[
-                            "SQLALCHEMY_DATABASE_URI"
-                        ] = f"sqlite:////{current_app.root_path}/{_config['database']['main']['database_name']}.sqlite"
-                    else:
-                        type_user_pass = f"{_config['database']['main']['type']}://{_config['database']['main']['username']}:{_config['database']['main']['password']}"
-                        server_database = f"@{_config['database']['main']['server']}/{_config['database']['main']['database_name']}"
-                        current_app.config["SQLALCHEMY_DATABASE_URI"] = type_user_pass + server_database
-                    del _config["database"]["main"]
-
-                for key, value in _config["database"].items():
-                    if value["enabled"]:
-                        if value["type"] == "sqlite":
-                            database = f"sqlite:////{current_app.root_path}/{value['database_name']}.sqlite"
-                            current_app.config["SQLALCHEMY_BINDS"].update({key: database})
-                        else:
-                            type_user_pass = f"{value['type']}://{value['username']}:{value['password']}"
-                            server_database = f"@{value['server']}/{value['database_name']}"
-                            current_app.config["SQLALCHEMY_BINDS"].update({key: type_user_pass + server_database})
-                del _config["database"]
-
-            if "smtp" in _config:
-                self.config.update({"smtp": _config['smtp']})
-
-                _smtp = _config["smtp"]
-                del _config["smtp"]
+        config = Config(app, app_config_file)
+        config.set_app_config()
+        config.set_database_config()
+        self.smtp = config.set_smtp_config()
 
     def import_builtins(self, folder: str = "routes") -> None:
         from .utilities import contains_illegal_chars

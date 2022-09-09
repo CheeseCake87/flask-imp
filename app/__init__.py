@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_bigapp import BigApp
+from _flask_bigapp.src.flask_bigapp import BigApp
 
 bigapp = BigApp()
 
