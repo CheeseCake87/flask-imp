@@ -4,7 +4,7 @@ from _flask_bigapp.src.flask_bigapp import BigApp
 bigapp = BigApp()
 
 
-def create_app(config: str):
+def create_app(config: str = "development.config.toml"):
     main = Flask(__name__)
     bigapp.init_app(main, config)
     bigapp.import_structures("structures")
@@ -13,4 +13,6 @@ def create_app(config: str):
     bigapp.import_builtins("flask/routes")
     bigapp.import_builtins("flask/template_filters")
     bigapp.import_blueprints("blueprints")
+    print(bigapp.smtp)
+    print(main.config)
     return main

@@ -6,7 +6,7 @@
 app_name = "app_development"
 version = "0.0.1"
 secret_key = "developement_key"
-debug = true
+debug = "<DEBUG>"
 testing = true
 session_time = 480
 static_folder = "flask/static"
@@ -35,7 +35,7 @@ EXPLAIN_TEMPLATE_LOADING = false
 # If your username is different uncomment alt_username and set it there
 [smtp]
 
-    [smtp."email@email.com"]
+    [smtp."email_address"]
     enabled = false
     password = "password"
     server = "smtp-mail.outlook.com"
@@ -44,12 +44,12 @@ EXPLAIN_TEMPLATE_LOADING = false
     reply_to = "email@emial.com"
     #alt_username = "username"
 
-    [smtp."email2@email.com"]
+    [smtp."email_address_2"]
     enabled = false
     password = "password"
     server = "smtp-mail.outlook.com"
     port = 587
-    send_from = "email@emial.com"
+    send_from = "<EMAIL_ADDRESS>"
     reply_to = "email@emial.com"
     #alt_username = "username"
 

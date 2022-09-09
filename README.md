@@ -33,6 +33,33 @@ template_folder = "templates"
 error_404_help = true
 ```
 
+You can also use environment variables markers in the config file, here's an example:
+```toml
+# Updates the Flask app config with the variables below.
+# If any variable below does not exist in the standard Flask env vars it is created and will be accessible using
+# current_app.config["YOUR_VAR_NAME"] or of course, app.config["YOUR_VAR_NAME"] if you are not using app factory.
+
+[flask]
+app_name = "app"
+version = "0.0.0"
+secret_key = "<SECRET_KEY>"
+debug = "<DEBUG>"
+testing = true
+session_time = 480
+static_folder = "static"
+template_folder = "templates"
+error_404_help = true
+random_value = "<TAGS_CAN_BE_ANYTHING>"
+```
+Now if you set environment variables that are included in the tags, Flask-BigApp will replace them with the values. 
+Here's an example of setting environment variables in linux: 
+
+`export SECRET_KEY="asdlasijd90339480239oiqjdpiasdj"` and `export DEBUG=True`
+
+The environment variables to pass in are defined in the config file, have a look at `random_value`. To set this we will need to do: `export TAGS_CAN_BE_ANYTHING="what we put here will be the new value"`
+
+`NOTE:` Some environment variable tags in the config file may not work if you are using `flask run`, you can run the app by using `venv/bin/python sgi.py` instead.
+
 Your app's ```__init__.py``` file should look like this:
 
 ```python

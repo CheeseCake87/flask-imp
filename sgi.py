@@ -6,6 +6,8 @@ from abc import ABC
 
 import gunicorn.app.base
 
+from app import create_app
+
 
 def init_log_files(clear, a_log: str = "sgi.access.log", e_log: str = "sgi.error.log") -> tuple:
     if not os.path.isfile(a_log) or clear:
@@ -46,7 +48,6 @@ class SGIapp(gunicorn.app.base.BaseApplication, ABC):
 
 
 if __name__ == '__main__':
-    from app import create_app
 
     FRAMEWORK = os.environ.get('FRAMEWORK', 'flask')
     ENV = os.environ.get('ENV', 'development')
@@ -65,6 +66,7 @@ if __name__ == '__main__':
         sgi_config['worker_class'] = package_check('gevent')
 
     if ENV == "production":
+        os.environ['FLASK_ENV'] = 'production'
         sgi_config.update({
             'loglevel': 'warning',
             'accesslog': access_log,
@@ -82,3 +84,6 @@ if __name__ == '__main__':
     if ENV == "development":
         app = create_app("development.config.toml")
         app.run()
+else:
+    app = create_app("development.config.toml")
+    app.run()

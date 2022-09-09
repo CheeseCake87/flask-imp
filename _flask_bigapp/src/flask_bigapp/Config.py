@@ -34,7 +34,7 @@ class Config:
         if isinstance(value, str):
             if re.match(self.pattern, value):
                 env_var = re.findall(self.pattern, value)[0]
-                return os.environ.get(env_var, None)
+                return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
         return value
 
     def set_app_config(self) -> None:
@@ -91,7 +91,7 @@ class Config:
                 config_rebuild.update({this_key: {}})
 
                 for ikey, ivalue in value.items():
-                    config_rebuild[this_key][ivalue] = self.if_env_replace(ivalue)
+                    config_rebuild[this_key][ikey] = self.if_env_replace(ivalue)
 
             # Delete the SMTP section from the config to stop it from getting in the way further on
             del self.temp_config["smtp"]
