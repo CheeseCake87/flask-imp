@@ -1,7 +1,7 @@
-from setuptools import setup
 from setuptools import find_packages
+from setuptools import setup
 
-with open("../app/README.md", "r", encoding="utf-8") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
