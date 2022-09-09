@@ -52,19 +52,19 @@ class Config:
             with self.app.app_context():
                 if static_folder:
                     # Set the static folder
-                    current_app.static_folder = f"{current_app.root_path}/{static_folder}"
+                    current_app.static_folder = f"{current_app.root_path}/{self.if_env_replace(static_folder)}"
                     # Delete the key to remove if from the loop below
                     del config_app["static_folder"]
 
                 if template_folder:
                     # Set the template folder
-                    current_app.template_folder = f"{current_app.root_path}/{template_folder}"
+                    current_app.template_folder = f"{current_app.root_path}/{self.if_env_replace(template_folder)}"
                     # Delete the key to remove if from the loop below
                     del config_app["template_folder"]
 
                 # Loop over the rest of the app section and set it into the current apps config
                 for key, value in config_app.items():
-                    current_app.config[key.upper()] = value
+                    current_app.config[key.upper()] = self.if_env_replace(value)
 
             # Delete the flask section from the temp config
             del self.temp_config["flask"]
