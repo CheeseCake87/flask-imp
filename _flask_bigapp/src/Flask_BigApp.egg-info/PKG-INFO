@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Flask-BigApp
-Version: 1.0.8
+Version: 1.1.1
 Summary: A Flask auto importer that allows your Flask apps to grow big.
 Home-page: https://github.com/CheeseCake87/Flask-BigApp
 Author: David Carmichael

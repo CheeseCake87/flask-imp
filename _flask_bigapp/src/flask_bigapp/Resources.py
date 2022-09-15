@@ -28,7 +28,7 @@ EXPLAIN_TEMPLATE_LOADING = false
     [database.main]
     enabled = true
     type = "sqlite"
-    server = "local"
+    location = "db"
     database_name = "database"
     username = "user"
     password = "password"

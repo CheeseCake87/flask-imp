@@ -110,19 +110,19 @@ class Config:
 
             if db_type == 'sqlite':
                 if dbc.get('database_name', None) is None:
-                    raise ImportError("sqlite  database config detected, but no database_name defined")
-                if dbc.get('server', None) is None:
+                    raise ImportError("sqlite database config detected, but no database_name defined")
+                if dbc.get('location', None) is None:
                     return f"{dbc.get('type')}:////{root_path}/{dbc['database_name']}.sqlite"
-                if not os.path.isdir(f"{root_path}/{dbc.get('server', 'db')}"):
-                    os.mkdir(f"{root_path}/{dbc.get('server', 'db')}")
-                    return f"{dbc.get('type')}:////{root_path}/{dbc.get('server', 'db')}/{dbc['database_name']}.sqlite"
-                raise ImportError("sqlite database config detected, but setup failed")
+                if not os.path.isdir(f"{root_path}/{dbc.get('location', 'db')}"):
+                    os.mkdir(f"{root_path}/{dbc.get('location', 'db')}")
+
+                return f"{dbc.get('type')}:////{root_path}/{dbc.get('location', 'db')}/{dbc['database_name']}.sqlite"
 
             accepted_types = ['postgresql', 'mysql', 'oracle']
 
             if db_type in accepted_types:
-                if dbc.get('server', None) is None:
-                    raise ImportError(f"{dbc.get('type', None)} database config detected, but no server defined")
+                if dbc.get('location', None) is None:
+                    raise ImportError(f"{dbc.get('type', None)} database config detected, but no location defined")
                 if dbc.get('database_name', None) is None:
                     raise ImportError(f"{dbc.get('type', None)} database config detected, but no database_name defined")
                 if dbc.get('username', None) is None:
@@ -130,12 +130,12 @@ class Config:
                 if dbc.get('password', None) is None:
                     raise ImportError(f"{dbc.get('type', None)} database config detected, but no password defined")
 
-                server = self.if_env_replace(dbc.get('server', None))
+                location = self.if_env_replace(dbc.get('location', None))
                 database_name = self.if_env_replace(dbc.get('database_name', None))
                 username = self.if_env_replace(dbc.get('username', None))
                 password = self.if_env_replace(dbc.get('password', None))
 
-                return f"{self.if_env_replace(dbc.get('type'))}://{username}:{password}@{server}/{database_name}"
+                return f"{self.if_env_replace(dbc.get('type'))}://{username}:{password}@{location}/{database_name}"
 
         if self.temp_config.get("database", False):
             with self.app.app_context():
