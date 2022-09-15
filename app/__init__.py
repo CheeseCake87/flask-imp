@@ -4,9 +4,9 @@ from _flask_bigapp.src.flask_bigapp import BigApp
 bigapp = BigApp()
 
 
-def create_app(config: str = "development.config.toml"):
+def create_app():
     main = Flask(__name__)
-    bigapp.init_app(main, config)
+    bigapp.init_app(main)
     bigapp.import_structures("structures")
     bigapp.import_models(folder="models")
     bigapp.create_all_models()

@@ -1,4 +1,5 @@
 import logging
+import os
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
@@ -28,7 +29,7 @@ class BigApp(object):
         if app is not None:
             self.init_app(app, app_config_file)
 
-    def init_app(self, app, app_config_file: str):
+    def init_app(self, app, app_config_file: str = os.environ.get("BA_CONFIG", "default.config.toml")):
         if app is None:
             raise ImportError("No app passed into BigApp")
         self._app = app

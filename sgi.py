@@ -72,18 +72,18 @@ if __name__ == '__main__':
             'accesslog': access_log,
             'errorlog': error_log
         })
-        SGIapp(create_app("production.config.toml"), sgi_config).run()
+        SGIapp(create_app(), sgi_config).run()
 
     if ENV == "production_testing":
         sgi_config.update({
             'reload': True,
             'loglevel': 'debug',
         })
-        SGIapp(create_app("development.config.toml"), sgi_config).run()
+        SGIapp(create_app(), sgi_config).run()
 
     if ENV == "development":
-        app = create_app("development.config.toml")
+        app = create_app()
         app.run()
 else:
-    app = create_app("development.config.toml")
+    app = create_app()
     app.run()

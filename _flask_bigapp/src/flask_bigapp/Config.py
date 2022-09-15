@@ -9,26 +9,28 @@ class Config:
     config = None
     pattern = re.compile(r'<(.*?)>')
 
-    def __init__(self, app, config_file):
+    def __init__(self, app, config_file: str = None):
         self.app = app
         self.config_file = config_file
-        self.load_config(config_file)
+        self.temp_config = self.load_config(config_file)
 
-    def load_config(self, config_file):
+    def load_config(self, config_file: str = None) -> dict:
         from flask import current_app
         from toml import load
         import os
-
-        if config_file is None:
-            self.config_file = "config.toml"
+        from .Resources import Resources
 
         with self.app.app_context():
-            if not os.path.isfile(f"{current_app.root_path}/{self.config_file}"):
-                raise ImportError(
-                    """App has no valid config file, must be like config.toml and be in the root of the app.""")
-            current_app.config["SQLALCHEMY_BINDS"] = dict()
+            if config_file is not None:
+                if os.path.isfile(f"{current_app.root_path}/{config_file}"):
+                    return load(f"{current_app.root_path}/{config_file}")
 
-            self.temp_config = load(f"{current_app.root_path}/{self.config_file}")
+            if os.path.isfile(f"{current_app.root_path}/default.config.toml"):
+                return load(f"{current_app.root_path}/default.config.toml")
+
+            with open(f"{current_app.root_path}/default.config.toml", mode="w") as dc:
+                dc.write(Resources.default_config)
+            return load(f"{current_app.root_path}/default.config.toml")
 
     def if_env_replace(self, value):
         if isinstance(value, str):
@@ -132,16 +134,18 @@ class Config:
                 return f"{self.if_env_replace(dbc.get('type'))}://{username}:{password}@{server}/{database_name}"
 
         if self.temp_config.get("database", False):
-            config_database = self.temp_config["database"]
-            if config_database.get("main", False):
-                main_database = config_database["main"]
-                main_database_enabled = main_database.get("enabled", False)
-                with self.app.app_context():
+            with self.app.app_context():
+                config_database = self.temp_config["database"]
+                current_app.config["SQLALCHEMY_BINDS"] = dict()
+
+                if config_database.get("main", False):
+                    main_database = config_database["main"]
+                    main_database_enabled = main_database.get("enabled", False)
                     if main_database_enabled:
                         current_app.config["SQLALCHEMY_DATABASE_URI"] = build_uri(main_database, current_app.root_path)
 
-                # Remove the main key away, so we can loop over the rest
-                del config_database["main"]
+                    # Remove the main key away, so we can loop over the rest
+                    del config_database["main"]
 
-            for key, value in config_database.items():
-                current_app.config["SQLALCHEMY_BINDS"].update({self.if_env_replace(key): build_uri(value, current_app.root_path)})
+                for key, value in config_database.items():
+                    current_app.config["SQLALCHEMY_BINDS"].update({self.if_env_replace(key): build_uri(value, current_app.root_path)})
