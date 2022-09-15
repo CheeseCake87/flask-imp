@@ -17,7 +17,6 @@ class Config:
     def load_config(self, config_file: str = None) -> dict:
         from flask import current_app
         from toml import load
-        import os
         from .Resources import Resources
 
         with self.app.app_context():
@@ -112,7 +111,12 @@ class Config:
             if db_type == 'sqlite':
                 if dbc.get('database_name', None) is None:
                     raise ImportError("sqlite  database config detected, but no database_name defined")
-                return f"{dbc.get('type')}:////{root_path}/{dbc.get('database_name', None)}.sqlite"
+                if dbc.get('server', None) is None:
+                    return f"{dbc.get('type')}:////{root_path}/{dbc['database_name']}.sqlite"
+                if not os.path.isdir(f"{root_path}/{dbc.get('server', 'db')}"):
+                    os.mkdir(f"{root_path}/{dbc.get('server', 'db')}")
+                    return f"{dbc.get('type')}:////{root_path}/{dbc.get('server', 'db')}/{dbc['database_name']}.sqlite"
+                raise ImportError("sqlite database config detected, but setup failed")
 
             accepted_types = ['postgresql', 'mysql', 'oracle']
 
