@@ -12,6 +12,7 @@ src/flask_bigapp/Auth.py
 src/flask_bigapp/BigApp.py
 src/flask_bigapp/Blueprint.py
 src/flask_bigapp/Config.py
+src/flask_bigapp/Resources.py
 src/flask_bigapp/Security.py
 src/flask_bigapp/__init__.py
 src/flask_bigapp/utilities.py
