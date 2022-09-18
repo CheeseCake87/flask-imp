@@ -1,10 +1,8 @@
 src/old
 src/flask_bigapp.egg-info
 src/dist
-/_tools/
-/_build.sh
-/_upload_pip.sh
-
+_tools/
+_tools/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
