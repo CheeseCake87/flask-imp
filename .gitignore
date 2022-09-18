@@ -2,5 +2,7 @@
 /src/flask_bigapp.egg-info
 /src/dist
 /venv
+/_tools/
 /_build.sh
 /_upload_pip.sh
+
