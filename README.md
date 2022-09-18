@@ -398,7 +398,6 @@ This github project is a working example, and can do much more than the minimal 
 
 This project covers how to work with models, blueprints and themes (structures)
 
-! This project imports Flask-BigApp from a local directory (_flask_bigapp) !
 
 ### Linux setup
 
@@ -409,44 +408,27 @@ This project covers how to work with models, blueprints and themes (structures)
 ```bash
 git clone https://github.com/CheeseCake87/Flask-BigApp.git
 ```
-
+**OR**
+1. Download zip and unpack
+2. cd into unpacked folder
+---
+Move into the Flask-BigApp directory:
 ```bash
 cd Flask-BigApp
 ```
-
+Create a virtual environment:
 ```bash
 python3 -m venv venv
 ```
-
+Enter virtual environment:
 ```bash
 source venv/bin/activate
 ```
-Install requirements:
+Install Flask-BigApp from src:
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ```
-or
+Run Flask:
 ```bash
-python3 pip-update.py
-```
-
-#### Manual:
-
-1. Download zip and unpack
-2. cd into unpacked folder
-
-```bash
-python3 -m venv venv
-```
-
-```bash
-source venv/bin/activate
-```
-Install requirements:
-```bash
-pip install -r requirements.txt
-```
-or
-```bash
-python3 pip-update.py
+flask run
 ```
