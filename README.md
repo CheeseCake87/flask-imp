@@ -432,3 +432,7 @@ Run Flask:
 ```bash
 flask run
 ```
+Or run from file:
+```bash
+python3 run_example.py
+```
