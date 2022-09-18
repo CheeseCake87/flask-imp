@@ -11,16 +11,16 @@ def auth_example():
     examples = dict()
 
     examples.update({
-        "Auth.is_username_safe('&HEOI_')": Auth.is_username_safe("&HEOI_")
+        "Auth.is_username_valid('&HEOI_')": Auth.is_username_valid("&HEOI_")
     })
     examples.update({
-        "Auth.is_username_safe('email@email.com')": Auth.is_username_safe('email@email.com')
+        "Auth.is_email_address_valid('email@email.com')": Auth.is_email_address_valid('email@email.com')
     })
     examples.update({
-        "Auth.is_username_safe('email@email@email.com')": Auth.is_username_safe('email@email@email.com')
+        "Auth.is_email_address_valid('email@email@email.com')": Auth.is_email_address_valid('email@email@email.com')
     })
     examples.update({
-        "Info": "Special characters are not allow in usernames, but email addresses are allowed: @ . - _ "
+        "Info": "Usernames can only contain letters, numbers, ., -, and _ but not begin or end with the last three mentioned."
     })
 
     examples.update({
