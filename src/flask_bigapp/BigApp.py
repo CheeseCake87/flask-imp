@@ -22,6 +22,7 @@ class BigApp(object):
     _temp_config = dict()
     _app = None
 
+    init_sqlalchemy = True
     db = None
     sql_do = None
 
@@ -29,10 +30,15 @@ class BigApp(object):
         if app is not None:
             self.init_app(app, app_config_file)
 
-    def init_app(self, app, app_config_file: str = os.environ.get("BA_CONFIG", "default.config.toml")):
+    def init_app(self, app, app_config_file: str = os.environ.get("BA_CONFIG", "default.config.toml"), init_sqlalchemy: bool = True):
         if app is None:
             raise ImportError("No app passed into BigApp")
         self._app = app
+        self.init_sqlalchemy = init_sqlalchemy
+
+        if self.init_sqlalchemy:
+            self.db = SQLAlchemy()
+            self.sql_do = self.db.session
 
         config = Config(app, app_config_file)
         config.set_app_config()
@@ -128,10 +134,6 @@ class BigApp(object):
         if file is None and folder is None:
             raise ImportError("You must pass in a file or folder located at the root of the app.")
 
-        if auto_init:
-            self.db = SQLAlchemy()
-            self.sql_do = self.db.session
-
         with self._app.app_context():
             if folder is not None:
                 _folder = f"{current_app.root_path}/{folder}"
@@ -191,7 +193,7 @@ class BigApp(object):
                 else:
                     logging.info("Model file not found: ", f"{current_app.root_path}/{file}")
 
-            if auto_init:
+            if isinstance(self.db, SQLAlchemy):
                 self.db.init_app(current_app)
 
     def smtp_settings(self, email_address: str) -> dict:
@@ -204,7 +206,8 @@ class BigApp(object):
     def create_all_models(self):
         if self.db is not None:
             with self._app.app_context():
-                self.db.create_all()
+                if isinstance(self.db, SQLAlchemy):
+                    self.db.create_all()
                 logging.info("All database models created.")
             return
         logging.warning("No database has been defined, you have likely chosen not to auto_init the database")

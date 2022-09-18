@@ -1,5 +1,5 @@
 from flask import Flask
-from _flask_bigapp.src.flask_bigapp import BigApp
+from flask_bigapp import BigApp
 
 bigapp = BigApp()
 
@@ -13,6 +13,4 @@ def create_app():
     bigapp.import_builtins("flask/routes")
     bigapp.import_builtins("flask/template_filters")
     bigapp.import_blueprints("blueprints")
-    print(bigapp.smtp)
-    print(main.config)
     return main

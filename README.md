@@ -7,13 +7,19 @@ pip install flask-bigapp
 
 ## What is Flask-BigApp?
 
-Flask-BigApp's main purpose is to help simplify the importing of blueprints, routes and models. It has a few extra features built in to help with theming, securing pages and password authentication.
+Flask-BigApp's main purpose is to help simplify the importing of blueprints, routes and models. 
+It has a few extra features built in to help with theming, securing pages and password authentication.
 
 ## Minimal Flask-BigApp app
 
-A config file is required to sit next to your app's ```__init__.py``` file. This defaults to ```config.toml```
+A config file is required to sit next to your app's ```__init__.py``` file. This defaults to ```default.config.toml```
 
-The ```config.toml``` file contains Flask config settings, a minimal version of this file looks like this:
+If Flask-BigApp is unable to find the `default.config.toml` file, it will create one.
+
+You can also set the config file by setting the `BA_CONFIG` environment variable. 
+For example: (in terminal) `export BA_CONFIG=production.config.toml` 
+
+The ```default.config.toml``` file contains Flask config settings, a minimal version of this file looks like this:
 
 
 ```toml
@@ -56,9 +62,11 @@ Here's an example of setting environment variables in linux:
 
 `export SECRET_KEY="asdlasijd90339480239oiqjdpiasdj"` and `export DEBUG=True`
 
-The environment variables to pass in are defined in the config file, have a look at `random_value`. To set this we will need to do: `export TAGS_CAN_BE_ANYTHING="what we put here will be the new value"`
+The environment variables to pass in are defined in the config file, have a look at `random_value`. 
+To set this we will need to do: `export TAGS_CAN_BE_ANYTHING="what we put here will be the new value"`
 
-`NOTE:` Some environment variable tags in the config file may not work if you are using `flask run`, you can run the app by using `venv/bin/python sgi.py` instead.
+**NOTE:** Some environment variable tags in the config file may not work if you are using `flask run`, 
+you can run the app by using `venv/bin/python run_example.py` instead.
 
 Your app's ```__init__.py``` file should look like this:
 
@@ -71,10 +79,16 @@ bigapp = BigApp()
 
 def create_app():
     main = Flask(__name__)
-    bigapp.init_app(main, "config.toml")
+    bigapp.init_app(main)
     bigapp.import_builtins("routes")
     return main
 ```
+
+**NOTE:** `bigapp.init_app(main)` automatically creates an SQLAlchemy object: `bigapp.db` 
+
+to switch this behavior off, set `init_sqlalchemy` argument to `False` like this: `bigapp.init_app(main, init_sqlalchemy=False)`
+
+**NOTE:** You can also manually set the config file by doing `bigapp.init_app(main, app_config_file="dev.config.toml")`
 
 The ```bigapp.import_builtins("routes")``` method looks in the ```routes``` folder for ```.py``` files to import app routes
 from.
@@ -155,8 +169,6 @@ your ```__init__.py``` file.
 
 You can import model classes using:
 - `bigapp.import_models(file="models.py", folder="models")`
-
-This also inits the SQLAlchemy database, if you prefer to do this yourself add the argument `auto_init=False`
 
 An example model file looks like this:
 
