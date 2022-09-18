@@ -94,10 +94,7 @@ class BigAppBlueprint(Blueprint):
             try:
                 import_module(f"{self.import_name}.{folder}.{route}")
             except ImportError as e:
-                logging.warning(f"""
-Error when importing {self.import_name} - {self.name} - {route}: 
-{e}
-                """)
+                logging.warning(f"Error when importing {self.import_name} - {self.name} - {route}: {e}")
                 continue
 
     def init_session(self):
@@ -109,32 +106,3 @@ Error when importing {self.import_name} - {self.name} - {route}:
 
     def tmpl(self, template):
         return f"{self.name}/{template}"
-
-    """
-    Here lays old code that was an attempt at loading a template from a scoped folder.
-    
-    This attempt was successful by making a new jinja environment. Although, by doing so
-    the methods url_for were not usable
-    """
-
-    # def _sort_blueprint(name):
-    #     _copy = OrderedDict(current_app.blueprints)
-    #     _copy.move_to_end(name, last=False)
-    #     current_app.blueprints = dict(_copy)
-    #     return
-    #
-    # def scoped_render(self, file: str) -> str:
-    #     """
-    #     This is an attempt to reorder the lookup dict
-    #     """
-    #     current_app.jinja_options.clear()
-    #     self._sort_blueprint(self.name)
-    #     return file
-    #
-    # def scoped_render_template(self, template, **context) -> str:
-    #     """
-    #     This is an attempt to create a custom loader
-    #     """
-    #     from flask.templating import _render
-    #     template = self._env.get_template(template)
-    #     return _render(current_app, template, context)

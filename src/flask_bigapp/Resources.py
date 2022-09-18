@@ -3,8 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Resources:
-    default_config = \
-"""
+    default_config = """
 # Updates the Flask app config with the variables below.
 # If any variable below does not exist in the standard Flask env vars it is created and will be accessible using
 # current_app.config["YOUR_VAR_NAME"] or of course, app.config["YOUR_VAR_NAME"] if you are not using app factory.

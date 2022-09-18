@@ -150,13 +150,12 @@ class BigApp(object):
                         folder_import_path = f"{'.'.join(strip_folder)}.{folder_model}"
                         try:
                             _folder_model_module = import_module(folder_import_path)
-                            _folder_model_object = getattr(_folder_model_module, import_attribute)
-
+                            getattr(_folder_model_module, import_attribute)
                         except ImportError as e:
-                            print("Error importing model: ", e, f" from {folder_import_path}")
+                            logging.critical("Error importing model: ", e, f" from {folder_import_path}")
                             continue
                         except AttributeError as e:
-                            print("Error importing model: ", e, f" from {folder_import_path}")
+                            logging.critical("Error importing model: ", e, f" from {folder_import_path}")
                             continue
 
                         folder_model_members = getmembers(modules[folder_import_path], isclass)
@@ -176,12 +175,12 @@ class BigApp(object):
                     file_import_path = f"{'.'.join(strip_file)}.{file}"
                     try:
                         _file_model_module = import_module(file_import_path)
-                        _file_model_object = getattr(_file_model_module, import_attribute)
+                        getattr(_file_model_module, import_attribute)
 
                     except ImportError as e:
-                        print("Error importing model: ", e, f" from {file_import_path}")
+                        logging.critical("Error importing model: ", e, f" from {file_import_path}")
                     except AttributeError as e:
-                        print("Error importing model: ", e, f" from {file_import_path}")
+                        logging.critical("Error importing model: ", e, f" from {file_import_path}")
 
                     file_model_members = getmembers(modules[file_import_path], isclass)
                     for file_member in file_model_members:

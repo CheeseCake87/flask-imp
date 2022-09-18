@@ -1,46 +1,47 @@
+import re
+from dataclasses import dataclass
+from datetime import datetime
 from hashlib import sha1, sha256, sha512
-from string import punctuation, digits, ascii_letters
 from random import choice
 from random import randrange
-from datetime import datetime
-from dataclasses import dataclass
-from re import search
+from string import punctuation, ascii_letters
 
 
 class Auth:
 
     @classmethod
-    def valid_email_chars(cls) -> list:
-        special_chars = ["@", ".", "-", "_"]
-        alpha = []
-        numeric = []
-        for letter in ascii_letters:
-            alpha.append(letter)
-        for number in digits:
-            numeric.append(number)
-        return special_chars + alpha + numeric
+    def is_email_address_valid(cls, email_address) -> bool:
+        """
+        Checks if email_address is a valid email address.
+        :param email_address:
+        :return bool:
+        """
+        pattern = re.compile(
+            r"[a-z\d!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?",
+            re.IGNORECASE
+        )
+        return bool(pattern.match(email_address))
 
     @classmethod
-    def is_username_safe(cls, username: str) -> bool:
+    def is_username_valid(cls, username: str) -> bool:
         """
-        Checks username for any special characters.
+        Checks if a username is valid.
+        Valid usernames can only include
+        letters, numbers, ., -, and _ but can not begin or
+        end with the last three mentioned
         :param username:
         :return bool:
         """
-        vec = cls.valid_email_chars()
-        if "@" in username:
-            for char in username:
-                if char not in vec:
-                    return False
-            return bool(search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", username))
-        if username.isalnum():
-            return True
-        return False
+        pattern = re.compile(
+            r"^\w+[.\-_]\w*$",
+            re.IGNORECASE
+        )
+        return bool(pattern.match(username))
 
     @classmethod
     def generate_form_token(cls) -> str:
         """
-        Generates a SHA1 using todays date and time.
+        Generates a SHA1 using today's date and time.
         :return str: hash:
         """
         sha = sha1()
@@ -71,7 +72,7 @@ class Auth:
         Generates a string of 8 random numbers, for use in MFA email
         :return str:
         """
-        return "".join(choice(digits) for _ in range(8))
+        return str(randrange(11111111, 99999999))
 
     @classmethod
     def generate_pepper(cls, password: str):
@@ -132,11 +133,11 @@ class Auth:
         :return: str:
         """
         if style == "animals":
-            _final = []
+            final = []
             for i in range(length):
-                _random_index = randrange(0, len(PasswordGeneration.animals))
-                _final.append(PasswordGeneration.animals[_random_index])
-            return '-'.join(_final)
+                random_index = randrange(0, len(PasswordGeneration.animals))
+                final.append(PasswordGeneration.animals[random_index])
+            return '-'.join(final)
 
 
 @dataclass
