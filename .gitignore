@@ -1,6 +1,6 @@
-src/old
-src/flask_bigapp.egg-info
-src/dist
-venv
-_build.sh
-_upload_pip.sh
+/src/old
+/src/flask_bigapp.egg-info
+/src/dist
+/venv
+/_build.sh
+/_upload_pip.sh
