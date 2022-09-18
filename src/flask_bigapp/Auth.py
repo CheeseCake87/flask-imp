@@ -1,4 +1,3 @@
-# (c) 2021 - David Carmichael MIT License - version 2.0
 from hashlib import sha1, sha256, sha512
 from string import punctuation, digits, ascii_letters
 from random import choice
