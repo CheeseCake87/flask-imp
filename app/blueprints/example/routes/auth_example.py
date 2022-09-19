@@ -1,26 +1,45 @@
-from flask_bigapp import Auth
 from flask import render_template
 
+from flask_bigapp import Auth
 from .. import bp, page_needs
 
 
 @bp.route("/auth-example", methods=["GET"])
 def auth_example():
-
-
     examples = dict()
-
     examples.update({
-        "Auth.is_username_valid('&HEOI_')": Auth.is_username_valid("&HEOI_")
+        "Info": "Usernames can only contain letters, numbers, ., -, and _ but not begin or end with the last three mentioned. You can scope allowed usernames"
+                " by using the allowed arg allowed='dot' , this will only allow usernames with dots"
+    })
+    examples.update({
+        "Auth.is_username_valid('username')": Auth.is_username_valid("username")
+    })
+    examples.update({
+        "Auth.is_username_valid('able.to-mix_separators')": Auth.is_username_valid("able.to-mix_separators")
+    })
+    examples.update({
+        "Auth.is_username_valid('underscore_user')": Auth.is_username_valid("underscore_user")
+    })
+    examples.update({
+        "Auth.is_username_valid('underscore_user', allowed='dot')": Auth.is_username_valid("underscore_user", allowed="dot")
+    })
+    examples.update({
+        "Auth.is_username_valid('underscoreuser', allowed='dot')": Auth.is_username_valid("underscoreuser", allowed="dot")
+    })
+    examples.update({
+        "Auth.is_username_valid('dot.user')": Auth.is_username_valid("dot.user")
+    })
+    examples.update({
+        "Auth.is_username_valid('dash-user')": Auth.is_username_valid("dash-user")
+    })
+    examples.update({
+        "Auth.is_username_valid('amp&user')": Auth.is_username_valid("amp&user")
     })
     examples.update({
         "Auth.is_email_address_valid('email@email.com')": Auth.is_email_address_valid('email@email.com')
     })
     examples.update({
         "Auth.is_email_address_valid('email@email@email.com')": Auth.is_email_address_valid('email@email@email.com')
-    })
-    examples.update({
-        "Info": "Usernames can only contain letters, numbers, ., -, and _ but not begin or end with the last three mentioned."
     })
 
     examples.update({

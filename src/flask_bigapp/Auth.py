@@ -1,4 +1,5 @@
 import re
+import typing as t
 from dataclasses import dataclass
 from datetime import datetime
 from hashlib import sha1, sha256, sha512
@@ -10,7 +11,7 @@ from string import punctuation, ascii_letters
 class Auth:
 
     @classmethod
-    def is_email_address_valid(cls, email_address) -> bool:
+    def is_email_address_valid(cls, email_address: str) -> bool:
         """
         Checks if email_address is a valid email address.
         :param email_address:
@@ -23,20 +24,34 @@ class Auth:
         return bool(pattern.match(email_address))
 
     @classmethod
-    def is_username_valid(cls, username: str) -> bool:
+    def is_username_valid(cls, username: str, allowed: t.Literal["all", "dot", "dash", "under"] = "all") -> bool:
         """
         Checks if a username is valid.
         Valid usernames can only include
         letters, numbers, ., -, and _ but can not begin or
         end with the last three mentioned
+        :param allowed:
         :param username:
         :return bool:
         """
-        pattern = re.compile(
-            r"^\w+[.\-_]\w*$",
-            re.IGNORECASE
-        )
-        return bool(pattern.match(username))
+        matches = list()
+        if username.isalnum():
+            return True
+        if re.findall(r"([a-zA-Z\d]+(\.+[a-zA-Z\d]+)+)", username):
+            matches.append("dot")
+        if re.findall(r"([a-zA-Z\d]+(-[a-zA-Z\d]+)+)", username):
+            matches.append("dash")
+        if re.findall(r"([a-zA-Z\d]+(_[a-zA-Z\d]+)+)", username):
+            matches.append("under")
+        if allowed == "all" and matches:
+            return True
+        if allowed == "dot" and matches:
+            return False
+        if allowed == "dash" and matches:
+            return False
+        if allowed == "under" and matches:
+            return False
+        return False
 
     @classmethod
     def generate_form_token(cls) -> str:

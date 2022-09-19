@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
-from pytz import timezone
-from os import path
+from distutils import util
 from os import mkdir
-from shutil import rmtree
+from os import path
 from os import remove
 from re import sub
-from distutils import util
+from shutil import rmtree
+
+from pytz import timezone
 
 
 def remove_escapes(string: str, remove_these: list = None) -> str:
@@ -147,9 +148,8 @@ def get_filename_with_extension(file_path: str) -> str:
 def make_filename_safe(file_path: str):
     """
     Replaces non-alpha-numeric characters with _
-    "\W+", "_",
     """
-    safe_filename = sub("\W+", "_", get_filename_without_extension(file_path))
+    safe_filename = sub(r"\W+", "_", get_filename_without_extension(file_path))
     return f"{safe_filename}{get_file_extension(file_path)}"
 
 

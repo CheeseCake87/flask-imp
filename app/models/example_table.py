@@ -1,5 +1,6 @@
-from app import bigapp
 from sqlalchemy import ForeignKey
+
+from app import bigapp
 
 db = bigapp.db
 
@@ -9,5 +10,3 @@ class ExampleTable(db.Model):
     example_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey('fl_example_user.user_id'))
     thing = db.Column(db.String(256), nullable=False)
-
-

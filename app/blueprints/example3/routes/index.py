@@ -1,5 +1,4 @@
-from flask import render_template_string, render_template
-from app import structures
+from flask import render_template
 
 from .. import bp, page_needs
 
