@@ -26,10 +26,8 @@ class Auth:
     @classmethod
     def is_username_valid(cls, username: str, allowed: t.Literal["all", "dot", "dash", "under"] = "all") -> bool:
         """
-        Checks if a username is valid.
-        Valid usernames can only include
-        letters, numbers, ., -, and _ but can not begin or
-        end with the last three mentioned
+        Checks if a username is valid. Valid usernames can only include
+        letters, numbers, ., -, and _ but can not begin or end with the last three mentioned
         :param allowed:
         :param username:
         :return bool:
