@@ -1,7 +1,14 @@
-import typing as t
+from typing import Literal
+from os import path
+from toml import load as toml_load
 
 
 def contains_illegal_chars(name: str, exception: list = None) -> bool:
+    """
+    Checks if a string contains illegal characters.
+
+    is able to handle exceptions
+    """
     _illegal_characters = ['%', '$', '£', ' ', '#', 'readme', '__', '.py']
     if exception is not None:
         for value in exception:
@@ -13,9 +20,9 @@ def contains_illegal_chars(name: str, exception: list = None) -> bool:
 
 
 def load_config(config_path: str) -> dict:
-    from os import path
-    from toml import load as toml_load
-
+    """
+    Primarily used by BigAppBlueprint to load configuration files.
+    """
     _config = {}
     _path = config_path
 
@@ -33,7 +40,10 @@ Config file is invalid, must be config.toml and be found in the root of the modu
     return _config
 
 
-def str_bool(bool_as_string: t.Literal["yes", "true", "1", "no", "false", "0"]) -> bool:
+def str_bool(bool_as_string: Literal["yes", "true", "1", "no", "false", "0"]) -> bool:
+    """
+    Checks if the passed in string is a boolean.
+    """
     true = ["yes", "true", "1"]
     false = ["no", "false", "0"]
     if bool_as_string.lower() in true:

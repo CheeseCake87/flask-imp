@@ -1,7 +1,13 @@
 import logging
 from flask import Blueprint
+from flask import session
 from inspect import stack
 from jinja2 import Environment, FileSystemLoader
+from os import listdir
+from importlib import import_module
+
+from .utilities import contains_illegal_chars
+from .utilities import load_config, str_bool
 
 
 class BigAppBlueprint(Blueprint):
@@ -46,8 +52,9 @@ class BigAppBlueprint(Blueprint):
         super().__init__(self.name, self.import_location, **self.config)
 
     def _process_config(self, config_file) -> None:
-        from .utilities import load_config, str_bool
-
+        """
+        Load the config file.
+        """
         try:
             config_from_file = load_config(f"{self.location}/{config_file}")
         except FileNotFoundError:
@@ -80,10 +87,11 @@ class BigAppBlueprint(Blueprint):
             del config_from_file["import_name"]
 
     def import_routes(self, folder: str = "routes"):
-        from os import listdir
-        from importlib import import_module
-        from .utilities import contains_illegal_chars
+        """
+        Imports all the routes in the given folder.
 
+        If no folder is specified defaults to a folder named 'routes'
+        """
         routes_raw, routes_clean = listdir(f"{self.location}/{folder}"), []
         for route in routes_raw:
             if contains_illegal_chars(route, exception=[".py"]):
@@ -98,11 +106,21 @@ class BigAppBlueprint(Blueprint):
                 continue
 
     def init_session(self):
-        from flask import session
+        """
+        Initialize the session variables found in the config file.
+
+        Use this method in the before_request route
+        """
         for key in self.session:
             if key not in session:
                 session.update(self.session)
                 break
 
     def tmpl(self, template):
+        """
+        Pushes together the name of the blueprint and the template file to look for.
+
+        This is a small time saving method to allow you to only type
+        bp.tmpl("index.html") when looking for template files.
+        """
         return f"{self.name}/{template}"

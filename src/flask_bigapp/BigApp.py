@@ -15,7 +15,9 @@ from flask_sqlalchemy import SQLAlchemy  # type: ignore
 
 from typing import Dict, TextIO, Union, Optional
 
+from .Blueprint import BigAppBlueprint
 from .Config import Config
+from .utilities import contains_illegal_chars
 
 
 class BigApp(object):
@@ -32,11 +34,34 @@ class BigApp(object):
     db = None
     sql_do = None
 
-    def __init__(self, app: Flask = None, app_config_file: Optional[Union[str, TextIO, None]] = None):
+    def __init__(
+            self,
+            app: Flask = None,
+            init_sqlalchemy: bool = True,
+            app_config_file: Optional[Union[str, TextIO, None]] = None
+    ):
         if app is not None:
-            self.init_app(app, app_config_file)
+            self.init_app(app, init_sqlalchemy, app_config_file)
 
-    def init_app(self, app: Flask, app_config_file: Union[str, TextIO, None] = _default_config, init_sqlalchemy: bool = True):
+    def init_app(
+            self,
+            app: Flask,
+            init_sqlalchemy: bool = True,
+            app_config_file: Union[str, TextIO, None] = _default_config
+    ):
+        """
+        Initializes the application.
+
+        -> Expects a Flask application
+
+        sqlalchemy object by default will be created unless init_sqlalchemy arg is set to False.
+
+        Optional config file passed in. If no config file is given an
+        attempt will be made to read from the environment for the variable BA_CONFIG
+        If the environment variable is not found it will create a new config file
+        called default.config.toml and proceed to load the values from there.
+        """
+
         if app is None:
             raise ImportError("No app was passed in, do ... = BigApp(flaskapp) or ....init_app(flaskapp)")
         if not isinstance(app, Flask):
@@ -55,8 +80,9 @@ class BigApp(object):
         self.smtp = config.set_smtp_config()
 
     def import_builtins(self, folder: str = "routes") -> None:
-        from .utilities import contains_illegal_chars
-
+        """
+        Imports all the routes in the given folder.
+        """
         with self._app.app_context():
             routes_raw, routes_clean = listdir(f"{current_app.root_path}/{folder}"), []
             for route in routes_raw:
@@ -72,9 +98,9 @@ class BigApp(object):
                     continue
 
     def import_blueprints(self, folder: str) -> None:
-        from .utilities import contains_illegal_chars
-        from .Blueprint import BigAppBlueprint
-
+        """
+        Imports all the blueprints in the given folder.
+        """
         _imported_blueprints: Dict[str, ModuleType] = dict()
 
         with self._app.app_context():
@@ -108,8 +134,11 @@ class BigApp(object):
                     continue
 
     def import_structures(self, structures_folder: str) -> None:
-        from .utilities import contains_illegal_chars
-
+        """
+        Imports all the structures in the given folder, this works the
+        same as import_blueprints but does not require a config file and the
+        settings are pulled from the environment of the folder.
+        """
         with self._app.app_context():
             structures_raw, structures_clean = listdir(f"{current_app.root_path}/{structures_folder}/"), []
             dunder_name = __name__
@@ -134,11 +163,19 @@ class BigApp(object):
                 current_app.register_blueprint(bp)
 
     @staticmethod
-    def structure_tmpl(structure, template):
+    def structure_tmpl(structure: str, template: Union[str, TextIO]) -> str:
+        """
+        pushes together a structure name to a template location.
+        """
         return f"{structure}/{template}"
 
     def import_models(self, file: str = None, folder: str = None, import_attribute: str = "db") -> None:
-        from .utilities import contains_illegal_chars
+        """
+        Imports model files from a single file or a folder. Both are allowed to be set.
+
+        You can also specify a different import attribute that you are using for your
+        sqlalchemy object. A common one is db = SQLAlchemy(), so this is set as the default.
+        """
 
         if file is None and folder is None:
             raise ImportError("You must pass in a file or folder located at the root of the app.")
@@ -201,18 +238,29 @@ class BigApp(object):
                 else:
                     logging.info("Model file not found: ", f"{current_app.root_path}/{file}")
 
+            "this is checking if the built in db initialization happened, if so it registers all the model files to it"
             if isinstance(self.db, SQLAlchemy):
                 self.db.init_app(current_app)
 
         return
 
     def smtp_settings(self, email_address: str) -> dict:
+        """
+        Returns the SMTP settings for the given email address
+        :param email_address:
+        """
         if email_address in self.smtp:
             return self.smtp[email_address]
         return {}
 
-    def model_class(self, class_name: str):
-        return self.model_classes[class_name]
+    def model_class(self, class_name: str) -> ModuleType:
+        """
+        Returns the model class for the given class name
+        :param class_name:
+        """
+        if class_name in self.model_classes:
+            return self.model_classes[class_name]
+        raise ValueError(f"{class_name} was not found in the list of model_classes")
 
     def create_all_models(self):
         if self.db is not None:

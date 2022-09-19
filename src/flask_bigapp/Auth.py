@@ -1,5 +1,5 @@
 import re
-import typing as t
+from typing import Literal
 from dataclasses import dataclass
 from datetime import datetime
 from hashlib import sha1, sha256, sha512
@@ -24,7 +24,7 @@ class Auth:
         return bool(pattern.match(email_address))
 
     @classmethod
-    def is_username_valid(cls, username: str, allowed: t.Literal["all", "dot", "dash", "under"] = "all") -> bool:
+    def is_username_valid(cls, username: str, allowed: Literal["all", "dot", "dash", "under"] = "all") -> bool:
         """
         Checks if a username is valid. Valid usernames can only include
         letters, numbers, ., -, and _ but can not begin or end with the last three mentioned
@@ -133,7 +133,7 @@ class Auth:
         return False
 
     @classmethod
-    def generate_password(cls, style: t.Literal["animals"], length: int = 3) -> str:
+    def generate_password(cls, style: Literal["animals"], length: int = 3) -> str:
         """
         Will return a plain text password based on choice of style and length.
 
