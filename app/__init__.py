@@ -13,5 +13,4 @@ def create_app():
     bigapp.import_builtins("flask/routes")
     bigapp.import_builtins("flask/template_filters")
     bigapp.import_blueprints("blueprints")
-    print(dir(bigapp.sql_do))
     return main

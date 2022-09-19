@@ -6,6 +6,9 @@ build-backend = "setuptools.build_meta"
 addopts = [
     "--import-mode=importlib",
 ]
+pythonpath = [
+    ".", "src",
+]
 filterwarnings = [
     "ignore::UserWarning",
     "ignore::DeprecationWarning"
