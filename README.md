@@ -1,12 +1,13 @@
 ![](https://raw.githubusercontent.com/CheeseCake87/Flask-BigApp/master/app/structures/bigapp_default/static/img/Flask-BigApp-Logo-white-bg.png)
 # Flask-BigApp
 
-![Tests](https://github.com/CheeseCake87/Flask-BigApp/actions/workflows/tests.yml/badge.svg)
 
 
 ```bash
 pip install flask-bigapp
 ```
+![Tests](https://github.com/CheeseCake87/Flask-BigApp/actions/workflows/tests.yml/badge.svg)
+
 
 ## What is Flask-BigApp?
 
