@@ -39,7 +39,7 @@ class BigApp(object):
             app: Flask = None,
             init_sqlalchemy: bool = True,
             app_config_file: Optional[Union[str, TextIO, None]] = None
-    ):
+    ) -> None:
         if app is not None:
             self.init_app(app, init_sqlalchemy, app_config_file)
 
@@ -48,7 +48,7 @@ class BigApp(object):
             app: Flask,
             init_sqlalchemy: bool = True,
             app_config_file: Union[str, TextIO, None] = _default_config
-    ):
+    ) -> None:
         """
         Initializes the application.
 
