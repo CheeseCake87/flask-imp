@@ -6,33 +6,42 @@ from inspect import isclass
 from os import listdir
 from os import path
 from sys import modules
+from types import ModuleType
 
+from flask import Flask
 from flask import Blueprint
 from flask import current_app
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy  # type: ignore
+
+from typing import Dict, TextIO, Union, Optional
 
 from .Config import Config
 
 
 class BigApp(object):
-    smtp = dict()
-    structures = dict()
-    model_classes = dict()
+    smtp: Dict = dict()
+    structures: Dict = dict()
+    model_classes: Dict = dict()
 
-    _temp_config = dict()
-    _app = None
+    _temp_config: Dict = dict()
+    _app: Flask
+
+    _default_config: Union[str, TextIO] = os.environ.get("BA_CONFIG", "default.config.toml")
 
     init_sqlalchemy = True
     db = None
     sql_do = None
 
-    def __init__(self, app=None, app_config_file: str = None):
+    def __init__(self, app: Flask = None, app_config_file: Optional[Union[str, TextIO, None]] = None):
         if app is not None:
             self.init_app(app, app_config_file)
 
-    def init_app(self, app, app_config_file: str = os.environ.get("BA_CONFIG", "default.config.toml"), init_sqlalchemy: bool = True):
+    def init_app(self, app: Flask, app_config_file: Union[str, TextIO, None] = _default_config, init_sqlalchemy: bool = True):
         if app is None:
-            raise ImportError("No app passed into BigApp")
+            raise ImportError("No app was passed in, do ... = BigApp(flaskapp) or ....init_app(flaskapp)")
+        if not isinstance(app, Flask):
+            raise TypeError("The app that was passed in is not an instance of a Flask app")
+
         self._app = app
         self.init_sqlalchemy = init_sqlalchemy
 
@@ -66,7 +75,7 @@ class BigApp(object):
         from .utilities import contains_illegal_chars
         from .Blueprint import BigAppBlueprint
 
-        _imported_blueprints = set()
+        _imported_blueprints: Dict[str, ModuleType] = dict()
 
         with self._app.app_context():
             blueprints_raw, blueprints_clean = listdir(f"{current_app.root_path}/{folder}/"), []
@@ -77,21 +86,21 @@ class BigApp(object):
                         blueprints_clean.append(blueprint)
 
             for blueprint in blueprints_clean:
-                _bp_root_folder = f"{current_app.root_path}/{folder}/{blueprint}"
+                _bp_root_folder: str = f"{current_app.root_path}/{folder}/{blueprint}"
+                _bp_module_path: str = f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}"
                 try:
-                    blueprint_module = import_module(f"{current_app.name}.{folder.replace('/', '.')}.{blueprint}")
-                    _imported_blueprints.add(blueprint_module)
+                    blueprint_module = import_module(_bp_module_path)
+                    _imported_blueprints.update({_bp_module_path: blueprint_module})
                 except AttributeError as e:
-                    logging.critical("Error importing blueprint: ", e, f" from {_bp_root_folder}")
+                    logging.critical("Error importing blueprint: ", e, f" from {_bp_module_path}")
                     continue
 
-            for blueprint in _imported_blueprints:
-                instance_name = None
-                for value in dir(blueprint):
-                    if isinstance(getattr(blueprint, value), BigAppBlueprint):
-                        instance_name = value
+            for module_path, module in _imported_blueprints.items():
+                for dir_item in dir(module):
+                    if isinstance(getattr(module, dir_item), BigAppBlueprint):
+                        instance_name: str = dir_item
                 try:
-                    blueprint_object = getattr(blueprint, instance_name)
+                    blueprint_object = getattr(module, instance_name)
                     if blueprint_object.enabled:
                         current_app.register_blueprint(blueprint_object)
                 except AttributeError as e:
@@ -128,7 +137,7 @@ class BigApp(object):
     def structure_tmpl(structure, template):
         return f"{structure}/{template}"
 
-    def import_models(self, file: str = None, folder: str = None, import_attribute: str = "db", auto_init: bool = True) -> None:
+    def import_models(self, file: str = None, folder: str = None, import_attribute: str = "db") -> None:
         from .utilities import contains_illegal_chars
 
         if file is None and folder is None:
@@ -195,9 +204,12 @@ class BigApp(object):
             if isinstance(self.db, SQLAlchemy):
                 self.db.init_app(current_app)
 
+        return
+
     def smtp_settings(self, email_address: str) -> dict:
         if email_address in self.smtp:
             return self.smtp[email_address]
+        return {}
 
     def model_class(self, class_name: str):
         return self.model_classes[class_name]

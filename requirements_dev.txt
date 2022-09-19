@@ -1,4 +1,4 @@
-flake8==3.9.2
+flake8==5.0.4
 tox==3.24.3
 pytest==6.2.5
 pytest-cov==2.12.1

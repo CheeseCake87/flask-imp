@@ -1,3 +1,6 @@
+import typing as t
+
+
 def contains_illegal_chars(name: str, exception: list = None) -> bool:
     _illegal_characters = ['%', '$', '£', ' ', '#', 'readme', '__', '.py']
     if exception is not None:
@@ -30,10 +33,11 @@ Config file is invalid, must be config.toml and be found in the root of the modu
     return _config
 
 
-def str_bool(bool_as_string: str) -> bool:
+def str_bool(bool_as_string: t.Literal["yes", "true", "1", "no", "false", "0"]) -> bool:
     true = ["yes", "true", "1"]
     false = ["no", "false", "0"]
     if bool_as_string.lower() in true:
         return True
     if bool_as_string.lower() in false:
         return False
+    raise ValueError(f"Invalid bool_as_string: {bool_as_string}")

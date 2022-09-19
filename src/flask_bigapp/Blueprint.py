@@ -8,19 +8,19 @@ class BigAppBlueprint(Blueprint):
     """
     Class that handles Blueprints from within the Blueprint __init__ file
     """
-    enabled = True
-    name = None
-    config = dict()
-    session = dict()
-    location = str()
+    enabled: bool = True
+    name: str = str()
+    config: dict = dict()
+    session: dict = dict()
+    location: str = str()
 
     import_location = None
     app_name_from_import = None
     nested_folder_from_import = None
     blueprint_name_from_import = None
 
-    _loader = None
-    _env = None
+    _loader: FileSystemLoader
+    _env: Environment
 
     def __init__(self, dunder_name, config_file: str = "config.toml"):
         """

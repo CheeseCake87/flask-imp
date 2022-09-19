@@ -133,7 +133,7 @@ class Auth:
         return False
 
     @classmethod
-    def generate_password(cls, style: str, length: int) -> str:
+    def generate_password(cls, style: t.Literal["animals"], length: int = 3) -> str:
         """
         Will return a plain text password based on choice of style and length.
 
@@ -151,6 +151,7 @@ class Auth:
                 random_index = randrange(0, len(PasswordGeneration.animals))
                 final.append(PasswordGeneration.animals[random_index])
             return '-'.join(final)
+        raise ValueError(f"Invalid style passed in {style}")
 
 
 @dataclass
