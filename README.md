@@ -83,14 +83,9 @@ bigapp = BigApp()
 
 def create_app():
     main = Flask(__name__)
-    bigapp.init_app(main)
     bigapp.import_builtins("routes")
     return main
 ```
-
-**NOTE:** `bigapp.init_app(main)` automatically creates an SQLAlchemy object: `bigapp.db` 
-
-to switch this behavior off, set `init_sqlalchemy` argument to `False` like this: `bigapp.init_app(main, init_sqlalchemy=False)`
 
 **NOTE:** You can also manually set the config file by doing `bigapp.init_app(main, app_config_file="dev.config.toml")`
 
@@ -193,7 +188,29 @@ class ExampleTable(db.Model):
 
 ## Working with models
 
-You can use models as normal but no longer have to import them. Here's an example of how you can query using the `bigapp.model_class` method:
+You can use models as normal but no longer have to import them one by one. 
+
+Here's an example of how you can setup Flask-BigApp to import model files:
+
+```python
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_bigapp import BigApp
+
+bigapp = BigApp()
+db = SQLAlchemy
+
+def create_app():
+    main = Flask(__name__)
+    bigapp.import_builtins("routes")
+    bigapp.import_models(file="models.py")
+    # or
+    bigapp.import_models(folder="models")
+    return main
+```
+
+
+Here's an example of how you can query using the `bigapp.model_class` method:
 ( this assumes you have `bigapp = BigApp()` in your apps `__init__.py` file )
 ```python
 from flask import render_template

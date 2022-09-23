@@ -7,13 +7,12 @@ from os import listdir
 from os import path
 from sys import modules
 from types import ModuleType
+from typing import Dict, TextIO, Union, Optional
 
-from flask import Flask
 from flask import Blueprint
+from flask import Flask
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
-
-from typing import Dict, TextIO, Union, Optional
 
 from .Blueprint import BigAppBlueprint
 from .Config import Config
@@ -27,26 +26,26 @@ class BigApp(object):
 
     _temp_config: Dict = dict()
     _app: Flask
+    _app_name: str
 
     _default_config: Union[str, TextIO] = os.environ.get("BA_CONFIG", "default.config.toml")
 
-    init_sqlalchemy = True
     db = None
     sql_do = None
 
     def __init__(
             self,
             app: Flask = None,
-            init_sqlalchemy: bool = True,
+            sqlalchemy_db: Optional[Union[SQLAlchemy, None]] = None,
             app_config_file: Optional[Union[str, TextIO, None]] = None
     ) -> None:
         if app is not None:
-            self.init_app(app, init_sqlalchemy, app_config_file)
+            self.init_app(app, sqlalchemy_db, app_config_file)
 
     def init_app(
             self,
             app: Flask,
-            init_sqlalchemy: bool = True,
+            sqlalchemy_db: Union[SQLAlchemy, None] = None,
             app_config_file: Union[str, TextIO, None] = _default_config
     ) -> None:
         """
@@ -68,10 +67,10 @@ class BigApp(object):
             raise TypeError("The app that was passed in is not an instance of a Flask app")
 
         self._app = app
-        self.init_sqlalchemy = init_sqlalchemy
+        self._app_name = app.name
+        self.db = sqlalchemy_db
 
-        if self.init_sqlalchemy:
-            self.db = SQLAlchemy()
+        if isinstance(self.db, SQLAlchemy):
             self.sql_do = self.db.session
 
         config = Config(app, app_config_file)
@@ -184,15 +183,24 @@ class BigApp(object):
             if folder is not None:
                 _folder = f"{current_app.root_path}/{folder}"
                 if path.isdir(_folder):
+                    # Pull contents of passed in folder, init a new list
                     folder_models_raw, folder_modules_clean = listdir(_folder), []
                     for model in folder_models_raw:
+                        # Sort out files with illegal chars
                         if contains_illegal_chars(model, exception=[".py"]):
                             continue
+                        # add to clean list pulling off .py from the name
                         folder_modules_clean.append(model.replace(".py", ""))
 
+                    split_folder = _folder.split("/")  # convert folder path to list
+                    split_folder.reverse()  # reverse for the .index to find the correct app name folder
+                    strip_folder = split_folder[:split_folder.index(self._app.name) + 1]  # extract the import using the apps name
+                    strip_folder.reverse()  # reverse back to build the import value
+
+                    print(strip_folder)
+
+                    # loop ovr the clean list of files found
                     for folder_model in folder_modules_clean:
-                        split_folder = _folder.split("/")
-                        strip_folder = split_folder[split_folder.index(current_app.name):]
                         folder_import_path = f"{'.'.join(strip_folder)}.{folder_model}"
                         try:
                             _folder_model_module = import_module(folder_import_path)
@@ -216,9 +224,15 @@ class BigApp(object):
             if file is not None:
                 _file = f"{current_app.root_path}/{file}"
                 if path.isfile(_file):
-                    split_file = _file.split("/")
-                    strip_file = split_file[split_file.index(current_app.name):]
-                    file_import_path = f"{'.'.join(strip_file)}.{file}"
+
+                    split_file = _file.split("/")  # convert folder path to list
+                    split_file.reverse()  # reverse for the .index to find the correct app name folder
+                    strip_file = split_file[:split_file.index(self._app.name) + 1]  # extract the import using the apps name
+                    strip_file.reverse()  # reverse back to build the import value
+
+                    print(strip_file)
+
+                    file_import_path = f"{'.'.join(strip_file)}.{file.replace('.py', '')}"
                     try:
                         _file_model_module = import_module(file_import_path)
                         getattr(_file_model_module, import_attribute)
