@@ -79,7 +79,7 @@ class BigApp(object):
         if isinstance(self.db, SQLAlchemy):
             self.sql_do = self.db.session
 
-    def import_builtins(self, folder: Union[str, bytes, os.PathLike] = "routes") -> None:
+    def import_builtins(self, folder: Union[Any, os.PathLike] = "routes") -> None:
         """
         Imports all the routes in the given folder.
         """
@@ -92,7 +92,7 @@ class BigApp(object):
                 for builtin in builtin_files:
                     import_module(f"{'.'.join(tuple(reversed(shrink_parts_to_app)))}.{builtin.stem}")
 
-    def import_blueprints(self, folder: Union[str, bytes, os.PathLike]) -> None:
+    def import_blueprints(self, folder: Union[Any, os.PathLike]) -> None:
         """
         Imports all the blueprints in the given folder.
         """
@@ -119,7 +119,7 @@ class BigApp(object):
                 logging.critical("Error importing blueprint: ", e, f" from {folder_path}")
                 continue
 
-    def import_structures(self, structures_folder: Union[str, bytes, os.PathLike]) -> None:
+    def import_structures(self, structures_folder: Union[Any, os.PathLike]) -> None:
         """
         Imports all the structures in the given folder, this works the
         same as import_blueprints but does not require a config file and the
@@ -157,8 +157,8 @@ class BigApp(object):
 
     def import_models(
             self,
-            file: Optional[Union[str, bytes, os.PathLike]] = None,
-            folder: Optional[Union[str, bytes, os.PathLike]] = None
+            file: Optional[Union[Any, os.PathLike]] = None,
+            folder: Optional[Union[Any, os.PathLike]] = None
     ) -> None:
         """
         Imports model files from a single file or a folder. Both are allowed to be set.
@@ -212,7 +212,7 @@ class BigApp(object):
                 return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
         return value
 
-    def __load_config_file(self, config_file: Union[str, bytes, os.PathLike, None]) -> Dict:
+    def __load_config_file(self, config_file: Union[Any, os.PathLike]) -> Dict:
         config_suffix = ('.toml', '.tml')
 
         if config_file is not None:

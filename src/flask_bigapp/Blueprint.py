@@ -5,7 +5,7 @@ import os
 from flask import Blueprint
 from flask import session
 from inspect import stack
-from typing import Dict, Union
+from typing import Dict, Union, Any
 from importlib import import_module
 from toml import load
 
@@ -35,7 +35,7 @@ class BigAppBlueprint(Blueprint):
 
         super().__init__(self.ba_name, self.package, **self.__kwargs)
 
-    def __load_config_file(self, config_file: Union[str, bytes, os.PathLike]) -> Dict:
+    def __load_config_file(self, config_file: Union[Any, os.PathLike]) -> Dict:
         config_suffix = ('.toml', '.tml')
 
         if config_file is None:
