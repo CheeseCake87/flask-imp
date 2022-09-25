@@ -1,17 +1,16 @@
 ![](https://raw.githubusercontent.com/CheeseCake87/Flask-BigApp/master/app/structures/bigapp_default/static/img/Flask-BigApp-Logo-white-bg.png)
+
 # Flask-BigApp
-
-
 
 ```bash
 pip install flask-bigapp
 ```
-![Tests](https://github.com/CheeseCake87/Flask-BigApp/actions/workflows/tests.yml/badge.svg)
 
+![Tests](https://github.com/CheeseCake87/Flask-BigApp/actions/workflows/tests.yml/badge.svg)
 
 ## What is Flask-BigApp?
 
-Flask-BigApp's main purpose is to help simplify the importing of blueprints, routes and models. 
+Flask-BigApp's main purpose is to help simplify the importing of blueprints, routes and models.
 It has a few extra features built in to help with theming, securing pages and password authentication.
 
 ## Minimal Flask-BigApp app
@@ -20,11 +19,10 @@ A config file is required to sit next to your app's ```__init__.py``` file. This
 
 If Flask-BigApp is unable to find the `default.config.toml` file, it will create one.
 
-You can also set the config file by setting the `BA_CONFIG` environment variable. 
-For example: (in terminal) `export BA_CONFIG=production.config.toml` 
+You can also set the config file by setting the `BA_CONFIG` environment variable.
+For example: (in terminal) `export BA_CONFIG=production.config.toml`
 
 The ```default.config.toml``` file contains Flask config settings, a minimal version of this file looks like this:
-
 
 ```toml
 # Updates the Flask app config with the variables below.
@@ -44,6 +42,7 @@ error_404_help = true
 ```
 
 You can also use environment variables markers in the config file, here's an example:
+
 ```toml
 # Updates the Flask app config with the variables below.
 # If any variable below does not exist in the standard Flask env vars it is created and will be accessible using
@@ -61,15 +60,16 @@ template_folder = "templates"
 error_404_help = true
 random_value = "<TAGS_CAN_BE_ANYTHING>"
 ```
-Now if you set environment variables that are included in the tags, Flask-BigApp will replace them with the values. 
-Here's an example of setting environment variables in linux: 
+
+Now if you set environment variables that are included in the tags, Flask-BigApp will replace them with the values.
+Here's an example of setting environment variables in linux:
 
 `export SECRET_KEY="asdlasijd90339480239oiqjdpiasdj"` and `export DEBUG=True`
 
-The environment variables to pass in are defined in the config file, have a look at `random_value`. 
+The environment variables to pass in are defined in the config file, have a look at `random_value`.
 To set this we will need to do: `export TAGS_CAN_BE_ANYTHING="what we put here will be the new value"`
 
-**NOTE:** Some environment variable tags in the config file may not work if you are using `flask run`, 
+**NOTE:** Some environment variable tags in the config file may not work if you are using `flask run`,
 you can run the app by using `venv/bin/python run_example.py` instead.
 
 Your app's ```__init__.py``` file should look like this:
@@ -161,12 +161,12 @@ The ```my_page.py``` routes will also be imported into the main app.
 Using this method you can keep your routes in different files, and not have to worry about adding the import into
 your ```__init__.py``` file.
 
-
 # More Flask-BigApp Features
 
 ## Importing Models
 
 You can import model classes using:
+
 - `bigapp.import_models(file="models.py", folder="models")`
 
 An example model file looks like this:
@@ -175,7 +175,6 @@ An example model file looks like this:
 from app import bigapp
 from sqlalchemy import ForeignKey
 
-# change this to your own database object if you're using auto_init=False
 db = bigapp.db
 
 
@@ -188,7 +187,7 @@ class ExampleTable(db.Model):
 
 ## Working with models
 
-You can use models as normal but no longer have to import them one by one. 
+You can use models as normal but no longer have to import them one by one.
 
 Here's an example of how you can setup Flask-BigApp to import model files:
 
@@ -200,6 +199,7 @@ from flask_bigapp import BigApp
 bigapp = BigApp()
 db = SQLAlchemy
 
+
 def create_app():
     main = Flask(__name__)
     bigapp.import_builtins("routes")
@@ -209,14 +209,15 @@ def create_app():
     return main
 ```
 
-
 Here's an example of how you can query using the `bigapp.model_class` method:
 ( this assumes you have `bigapp = BigApp()` in your apps `__init__.py` file )
+
 ```python
 from flask import render_template
 
 from app import bigapp
 from .. import bp
+
 
 @bp.route("/database-example", methods=["GET"])
 def database_example():
@@ -254,6 +255,7 @@ The `bigapp.sql_do` method is just a proxy for `db.session`
 ## Importing Builtins (routes, template filters, context processors)
 
 You can auto import routes, template filters, context processors, etc.. from a folder using:
+
 - `bigapp.import_builtins("builtins")`
 
 Here's an example of the builtins folder structure:
@@ -278,13 +280,16 @@ from markupsafe import Markup
 def decorate_code(value: str) -> str:
     return Markup(f"The string value passed in is: {value} -> here is something after that value.")
 
+
 @current_app.before_request
 def before_request():
     pass
 
+
 @current_app.errorhandler(404)
 def request_404(error):
     return Response(error, 404)
+
 
 @current_app.route("/builtin/route")
 def builtin_route():
@@ -295,6 +300,7 @@ def builtin_route():
 ## Importing Blueprints
 
 You can auto import blueprints using:
+
 - `bigapp.import_blueprints("blueprints")`
 
 The shape of your folder to import blueprints from should look like this:
@@ -323,7 +329,8 @@ blueprints/
 -- config.toml
 ```
 
-In the above we are nesting all templates under a folder with the same name as the blueprint. This is a workaround to allow you to have template files with the same names in different blueprint folders.
+In the above we are nesting all templates under a folder with the same name as the blueprint. This is a workaround to allow you to have template files with the
+same names in different blueprint folders.
 
 Blueprints require a config file to configure their settings. The config file should look like this:
 
@@ -365,7 +372,8 @@ def after_app_request(response):
     return response
 ```
 
-Flask-BigApp inherits from Flask's Blueprint class in order to load from the config file. In the example above it states the config file name, however you can omit this as it defaults to `config.toml`. Of course, you can specify your own config file name.
+Flask-BigApp inherits from Flask's Blueprint class in order to load from the config file. In the example above it states the config file name, however you can
+omit this as it defaults to `config.toml`. Of course, you can specify your own config file name.
 
 `bp.import_routes("routes")` method works much the same as `bigapp.import_builtins` except it is scoped to work with the blueprint object.
 
@@ -384,16 +392,19 @@ def index():
     return render_template(render)
 ```
 
-The `bp.tmpl` method just decorates the string with the name of the blueprint, changing `"index.html"` to `"blueprint1/index.html"`. 
+The `bp.tmpl` method just decorates the string with the name of the blueprint, changing `"index.html"` to `"blueprint1/index.html"`.
 
-Of course this only works if your templates are nested under a folder with the same name as your blueprint, however it does make it possible to change the blueprint name later and not have to worry about search and replace.
+Of course this only works if your templates are nested under a folder with the same name as your blueprint, however it does make it possible to change the
+blueprint name later and not have to worry about search and replace.
 
 ## Importing Structures (themes)
 
-You can register a structures (theme) folder using: 
+You can register a structures (theme) folder using:
+
 - `bigapp.import_structures("structures")`
 
 Structures work the same as blueprints but are used for theming and do not have a config file, here's an example of the folder layout of the structures folder:
+
 ```text
 structures/
 |
@@ -419,7 +430,6 @@ This github project is a working example, and can do much more than the minimal 
 
 This project covers how to work with models, blueprints and themes (structures)
 
-
 ### Linux setup
 
 (Assuming location is home directory)
@@ -429,31 +439,45 @@ This project covers how to work with models, blueprints and themes (structures)
 ```bash
 git clone https://github.com/CheeseCake87/Flask-BigApp.git
 ```
+
 **OR**
+
 1. Download zip and unpack
 2. cd into unpacked folder
+
 ---
 Move into the Flask-BigApp directory:
+
 ```bash
 cd Flask-BigApp
 ```
+
 Create a virtual environment:
+
 ```bash
 python3 -m venv venv
 ```
+
 Enter virtual environment:
+
 ```bash
 source venv/bin/activate
 ```
+
 Install Flask-BigApp from src:
+
 ```bash
 pip install -e .
 ```
+
 Run Flask:
+
 ```bash
 flask run
 ```
+
 Or run from file:
+
 ```bash
 python3 run_example.py
 ```
