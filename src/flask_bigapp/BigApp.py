@@ -26,7 +26,6 @@ class BigApp(object):
     sql_do = None
 
     __config: Dict = dict()
-    __pattern = re.compile(r'<(.*?)>')
     __app: Flask
     __app_name: str
     __app_path: pathlib.PurePath
@@ -54,7 +53,7 @@ class BigApp(object):
 
         -> Expects a Flask application
 
-        sqlalchemy object by default will be created unless init_sqlalchemy arg is set to False.
+        Can be passed an SQLAlchemy object, doing this will enable the use of the model_class.
 
         Optional config file passed in. If no config file is given an
         attempt will be made to read from the environment for the variable BA_CONFIG
@@ -82,6 +81,8 @@ class BigApp(object):
     def import_builtins(self, folder: Union[Any, os.PathLike] = "routes") -> None:
         """
         Imports all the routes in the given folder.
+
+        Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
         """
         folder_path = pathlib.Path(pathlib.PurePath(self.__app_path) / folder)
         location_parts_reversed = tuple(reversed(folder_path.parts))
@@ -95,6 +96,8 @@ class BigApp(object):
     def import_blueprints(self, folder: Union[Any, os.PathLike]) -> None:
         """
         Imports all the blueprints in the given folder.
+
+        Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
         """
 
         folder_path = pathlib.Path(pathlib.PurePath(self.__app_path) / folder)
@@ -122,8 +125,10 @@ class BigApp(object):
     def import_structures(self, structures_folder: Union[Any, os.PathLike]) -> None:
         """
         Imports all the structures in the given folder, this works the
-        same as import_blueprints but does not require a config file and the
+        same as import_blueprints but does not require a config file. The
         settings are pulled from the environment of the folder.
+
+        Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
         """
 
         folder_path = pathlib.Path(pathlib.PurePath(self.__app_path) / structures_folder)
@@ -148,13 +153,6 @@ class BigApp(object):
                 logging.critical("Error importing blueprint: ", e, f" from {folder_path}")
                 continue
 
-    @staticmethod
-    def structure_tmpl(structure: str, template: Union[str, TextIO]) -> str:
-        """
-        pushes together a structure name to a template location.
-        """
-        return f"{structure}/{template}"
-
     def import_models(
             self,
             file: Optional[Union[Any, os.PathLike]] = None,
@@ -163,8 +161,7 @@ class BigApp(object):
         """
         Imports model files from a single file or a folder. Both are allowed to be set.
 
-        You can also specify a different import attribute that you are using for your
-        sqlalchemy object. A common one is db = SQLAlchemy(), so this is set as the default.
+        File and Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
         """
         if file is None and folder is None:
             raise ImportError("You must pass in a file or folder located at the root of the app.")
@@ -190,7 +187,9 @@ class BigApp(object):
     def model_class(self, class_name: str) -> ModuleType:
         """
         Returns the model class for the given class name
-        :param class_name:
+
+        table_class = bigapp.model_class("ExampleTable")
+        table_query = table_class.query.all()
         """
         if class_name in self.model_classes:
             return self.model_classes[class_name]
@@ -198,21 +197,21 @@ class BigApp(object):
 
     def get_smtp_settings(self, email_address: str) -> dict:
         """
-        Returns the SMTP settings for the given email address
-        :param email_address:
+        Returns the SMTP settings from the config for the given email address
+
+        email = bigapp.get_smtp_settings("example@example.com")
+        email_server = email['server']
         """
         if email_address in self.smtp:
             return self.smtp[email_address]
         return {}
 
-    def __if_env_replace(self, value: Optional[Any]) -> Any:
-        if isinstance(value, str):
-            if re.match(self.__pattern, value):
-                env_var = re.findall(self.__pattern, value)[0]
-                return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
-        return value
-
     def __load_config_file(self, config_file: Union[Any, os.PathLike]) -> Dict:
+        """
+        Attempts to load the passed in config file, if no config file is passed in
+        an attempt will be made to first read the default config file. If this fails
+        an attempt will be made to create a default config file, then read it.
+        """
         config_suffix = ('.toml', '.tml')
 
         if config_file is not None:
@@ -231,6 +230,9 @@ class BigApp(object):
         return load(create_default_config)
 
     def __config_processor(self, config: Dict):
+        """
+        Processes the values from the configuration file.
+        """
         flask_config = config.get("flask")
         database_config = config.get("database")
         smtp_config = config.get("smtp")
@@ -261,6 +263,9 @@ class BigApp(object):
                     self.smtp[this_key].update({___key: self.__if_env_replace(___value)})
 
     def __import_model_processor(self, path: pathlib.PurePath):
+        """
+        Picks apart the model file and builds a registry of the models found.
+        """
         # Reverse the path to find the first index of the app name, incase any parent dir has the same name.
         folder_location_parts_reversed = tuple(reversed(path.parts))
         folder_shrink_parts_to_app = folder_location_parts_reversed[:folder_location_parts_reversed.index(self.__app_name) + 1]
@@ -276,6 +281,11 @@ class BigApp(object):
             logging.critical("Error importing model: ", e, f" {module_import_path}")
 
     def __build_database_uri(self, block: dict) -> str:
+        """
+        Puts together the correct database URI depending on the type specified.
+
+        Fails if type is not supported.
+        """
         db_type = block.get("type")
         db_location = block.get("location")
 
@@ -292,4 +302,24 @@ class BigApp(object):
                    f"@{block.get('location', 'None')}:{str(block.get('port', 'None'))}/" \
                    f"{block.get('database_name', 'None')}"
 
-        raise ValueError(f"Unknown database type: {db_type}")
+        raise ValueError(f"Unknown database type: {db_type}, must be: postgresql / mysql / oracle / sqlite")
+
+    @staticmethod
+    def __if_env_replace(value: Optional[Any]) -> Any:
+        """
+        Looks for the replacement pattern to swap out values in the config file with environment variables.
+        """
+        pattern = re.compile(r'<(.*?)>')
+
+        if isinstance(value, str):
+            if re.match(pattern, value):
+                env_var = re.findall(pattern, value)[0]
+                return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
+        return value
+
+    @staticmethod
+    def structure_tmpl(structure: str, template: Union[str, TextIO]) -> str:
+        """
+        pushes together a structure name to a template location.
+        """
+        return f"{structure}/{template}"
