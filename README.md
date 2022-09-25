@@ -8,6 +8,8 @@ pip install flask-bigapp
 
 ![Tests](https://github.com/CheeseCake87/Flask-BigApp/actions/workflows/tests.yml/badge.svg)
 
+`NOTE:` This version; Being 1.2.* and above includes some breaking changes from anything on version 1.1.*
+
 ## What is Flask-BigApp?
 
 Flask-BigApp's main purpose is to help simplify the importing of blueprints, routes and models.
