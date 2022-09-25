@@ -164,7 +164,6 @@ The ```my_page.py``` routes will also be imported into the main app.
 Using this method you can keep your routes in different files, and not have to worry about adding the import into
 your ```__init__.py``` file.
 
-# More Flask-BigApp Features
 
 ## Setting up to work with models using SQLAlchemy
 
