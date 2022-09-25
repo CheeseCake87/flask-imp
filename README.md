@@ -85,6 +85,7 @@ bigapp = BigApp()
 
 def create_app():
     main = Flask(__name__)
+    bigapp.init_app(main)
     bigapp.import_builtins("routes")
     return main
 ```
@@ -165,13 +166,126 @@ your ```__init__.py``` file.
 
 # More Flask-BigApp Features
 
+## Setting up to work with models using SQLAlchemy
+
+To work with models using SQLAlchemy, your app `__init__.py` file should look like this:
+
+```python
+from flask import Flask
+from flask_bigapp import BigApp
+from flask_sqlalchemy import SQLAlchemy
+
+bigapp = BigApp()
+db = SQLAlchemy()
+
+
+def create_app():
+    main = Flask(__name__)
+    bigapp.init_app(main, db)  # Here we are passing in the SQLAlchemy object.
+    bigapp.import_builtins("routes")
+    return main
+```
+
+Giving Flask-BigApp the database object will auto init the model files 
+and load a registry of models that can then be accessed from the model_class method.
+See Importing Models below, for more information.
+
+The database settings can either be added by setting the flask-sqlalchemy 
+app config manually `main.config['SQLALCHEMY_DATABASE_URI'] = WHATEVER_URI` or by
+including the settings your config file. Here's an example:
+
+```toml
+[flask]
+app_name = "app"
+version = "0.0.0"
+secret_key = "sdflskjdflksjdflksjdflkjsdf"
+debug = true
+testing = true
+session_time = 480
+static_folder = "static"
+template_folder = "templates"
+error_404_help = true
+
+[database]
+    [database.main]
+    enabled = true
+    type = "sqlite"
+    database_name = "database"
+    location = "db"
+    port = ""
+    username = "user"
+    password = "password"
+```
+
+`NOTE:` The only accepted types of databases are: mysql / postgresql / sqlite / oracle
+
+Flask-BigApp will also handle any binds. Any database settings added after the database.main section, will be added as a bind.
+
+```toml
+...
+[database]
+    [database.main]
+    enabled = true
+    type = "sqlite"
+    database_name = "database"
+    location = "db"
+    port = ""
+    username = "user"
+    password = "password"
+
+    [database."defined_name"]
+        enabled = true
+        type = "sqlite"
+        database_name = "other_database"
+        location = "db"
+        port = ""
+        username = "user"
+        password = "password"
+```
+
+This is the same as the configuration:
+
+```text
+SQLALCHEMY_DATABASE_URI = 'sqlite:////absolute_app_path/db/database.sqlite'
+SQLALCHEMY_BINDS = {
+    'defined_name': 'sqlite:////absolute_app_path/db/other_database.sqlite',
+}
+```
+
+
+
 ## Importing Models
 
-You can import model classes using:
+You can import model classes from a single file, of a folder of 
+model files by using the `bigapp.import_models(file="models.py", folder="models")` method.
 
-- `bigapp.import_models(file="models.py", folder="models")`
+Here's an example of how you can setup Flask-BigApp to import model classes:
 
-An example model file looks like this:
+```python
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_bigapp import BigApp
+
+bigapp = BigApp()
+db = SQLAlchemy()
+
+
+def create_app():
+    main = Flask(__name__)
+    bigapp.init_app(main, db)  # Here we are passing in the SQLAlchemy object.
+    bigapp.import_builtins("routes")
+    bigapp.import_models(file="models.py")
+    # OR
+    bigapp.import_models(folder="models")
+    # OR
+    bigapp.import_models(file="models.py", folder="models")
+    return main
+```
+
+## Model Files
+
+Here's an example of what a model file looks like:
+
 
 ```python
 from app import bigapp
@@ -187,29 +301,7 @@ class ExampleTable(db.Model):
     thing = db.Column(db.String(256), nullable=False)
 ```
 
-## Working with models
-
-You can use models as normal but no longer have to import them one by one.
-
-Here's an example of how you can setup Flask-BigApp to import model files:
-
-```python
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_bigapp import BigApp
-
-bigapp = BigApp()
-db = SQLAlchemy
-
-
-def create_app():
-    main = Flask(__name__)
-    bigapp.import_builtins("routes")
-    bigapp.import_models(file="models.py")
-    # or
-    bigapp.import_models(folder="models")
-    return main
-```
+## Working with the model_class method
 
 Here's an example of how you can query using the `bigapp.model_class` method:
 ( this assumes you have `bigapp = BigApp()` in your apps `__init__.py` file )
