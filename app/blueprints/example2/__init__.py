@@ -7,7 +7,7 @@ page_needs = {
 }
 bp = Blueprint(__name__)
 
-# bp.import_routes("routes")
+bp.import_routes("routes")
 
 
 @bp.before_app_request

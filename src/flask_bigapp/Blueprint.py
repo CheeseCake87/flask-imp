@@ -16,7 +16,7 @@ class BigAppBlueprint(Blueprint):
     """
     enabled: bool = False
     location: pathlib.Path
-    name: str
+    ba_name: str
     package: str
     config: dict
     session: dict
@@ -28,12 +28,12 @@ class BigAppBlueprint(Blueprint):
         dunder_name must be __name__
         """
         self.location = pathlib.Path(stack()[1].filename).parent
-        self.name = self.location.parts[-1]
+        self.ba_name = self.location.parts[-1]
         self.package = dunder_name
         self.config = self.__load_config_file(config_file)
         self.__config_processor(self.config)
 
-        super().__init__(self.name, self.package, **self.__kwargs)
+        super().__init__(self.ba_name, self.package, **self.__kwargs)
 
     def __load_config_file(self, config_file: Union[str, bytes, os.PathLike]) -> Dict:
         config_suffix = ('.toml', '.tml')
@@ -41,7 +41,7 @@ class BigAppBlueprint(Blueprint):
         if config_file is None:
             raise ImportError(f"The Blueprint {self.package} config file cannot be None!")
 
-        config_path = pathlib.PurePath(self.location / config_file)
+        config_path: pathlib.PurePath = pathlib.PurePath(self.location / config_file)
 
         if not pathlib.Path(config_path).exists():
             raise ImportError(f"The Blueprint {self.package} config file does not exist!")
@@ -52,6 +52,7 @@ class BigAppBlueprint(Blueprint):
         return load(config_path)
 
     def __config_processor(self, config: dict) -> None:
+        self.enabled = config.get('enabled', False)
         self.__kwargs = config.get('settings', None)
         self.session = config.get('session', {})
         if self.__kwargs is None:
@@ -69,9 +70,9 @@ class BigAppBlueprint(Blueprint):
         routes = path.glob("*.py")
         for route in routes:
             try:
-                import_module(f"{folder}.{route.stem}")
+                import_module(f"{self.package}.{folder}.{route.stem}")
             except ImportError as e:
-                # logging.warning(f"Error when importing {self.package}.{route}: {e}")
+                logging.warning(f"Error when importing {self.package}.{route}: {e}")
                 continue
 
     def init_session(self):

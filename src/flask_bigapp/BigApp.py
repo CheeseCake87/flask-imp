@@ -101,24 +101,23 @@ class BigApp(object):
         blueprints_found = folder_path.iterdir()
 
         blueprints_register: Dict[str, ModuleType] = dict()
-        with self.__app.app_context():
-            for blueprint in blueprints_found:
-                location_parts_reversed = tuple(reversed(blueprint.parts))
-                shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.__app_name) + 1]
-                try:
-                    import_blueprint_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
-                    blueprints_register.update({blueprint.name: import_blueprint_module})
-                    for dir_item in dir(import_blueprint_module):
-                        if isinstance(getattr(import_blueprint_module, dir_item), BigAppBlueprint):
-                            try:
-                                blueprint_object = getattr(import_blueprint_module, dir_item)
-                                if blueprint_object.enabled:
-                                    current_app.register_blueprint(blueprint_object)
-                            except AttributeError as e:
-                                logging.critical("Error importing blueprint: ", e, f"{blueprint.name}")
-                except AttributeError as e:
-                    logging.critical("Error importing blueprint: ", e, f" from {folder_path}")
-                    continue
+        for blueprint in blueprints_found:
+            location_parts_reversed = tuple(reversed(blueprint.parts))
+            shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.__app_name) + 1]
+            try:
+                import_blueprint_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
+                blueprints_register.update({blueprint.name: import_blueprint_module})
+                for dir_item in dir(import_blueprint_module):
+                    if isinstance(getattr(import_blueprint_module, dir_item), BigAppBlueprint):
+                        try:
+                            blueprint_object = getattr(import_blueprint_module, dir_item)
+                            if blueprint_object.enabled:
+                                self.__app.register_blueprint(blueprint_object)
+                        except AttributeError as e:
+                            logging.critical("Error importing blueprint: ", e, f"{blueprint.name}")
+            except AttributeError as e:
+                logging.critical("Error importing blueprint: ", e, f" from {folder_path}")
+                continue
 
     def import_structures(self, structures_folder: Union[str, bytes, os.PathLike]) -> None:
         """
@@ -128,27 +127,26 @@ class BigApp(object):
         """
 
         folder_path = pathlib.Path(pathlib.PurePath(self.__app_path) / structures_folder)
-        structures_folder = folder_path.iterdir()
+        structures_folder_files = folder_path.iterdir()
 
         structures_register: Dict[str, ModuleType] = dict()
-        with self.__app.app_context():
-            for structure in structures_folder:
-                location_parts_reversed = tuple(reversed(structure.parts))
-                shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.__app_name) + 1]
-                try:
-                    import_structure_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
-                    structures_register.update({structure.name: import_structure_module})
-                    structure_blueprint = Blueprint(
-                        name=structure.name,
-                        import_name=f"{structure.name}",
-                        static_folder=f"{structure.absolute()}/static",
-                        template_folder=f"{structure.absolute()}/templates",
-                        static_url_path=f"/{structure.name}/static"
-                    )
-                    current_app.register_blueprint(structure_blueprint)
-                except AttributeError as e:
-                    logging.critical("Error importing blueprint: ", e, f" from {folder_path}")
-                    continue
+        for structure in structures_folder_files:
+            location_parts_reversed = tuple(reversed(structure.parts))
+            shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.__app_name) + 1]
+            try:
+                import_structure_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
+                structures_register.update({structure.name: import_structure_module})
+                structure_blueprint = Blueprint(
+                    name=structure.name,
+                    import_name=f"{structure.name}",
+                    static_folder=f"{structure.absolute()}/static",
+                    template_folder=f"{structure.absolute()}/templates",
+                    static_url_path=f"/{structure.name}/static"
+                )
+                self.__app.register_blueprint(structure_blueprint)
+            except AttributeError as e:
+                logging.critical("Error importing blueprint: ", e, f" from {folder_path}")
+                continue
 
     @staticmethod
     def structure_tmpl(structure: str, template: Union[str, TextIO]) -> str:
@@ -207,18 +205,18 @@ class BigApp(object):
             return self.smtp[email_address]
         return {}
 
-    def __if_env_replace(self, value: str) -> str:
+    def __if_env_replace(self, value: Optional[Any]) -> Any:
         if isinstance(value, str):
             if re.match(self.__pattern, value):
                 env_var = re.findall(self.__pattern, value)[0]
                 return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
         return value
 
-    def __load_config_file(self, config_file: Union[str, bytes, os.PathLike]) -> Dict:
+    def __load_config_file(self, config_file: Union[str, bytes, os.PathLike, None]) -> Dict:
         config_suffix = ('.toml', '.tml')
 
         if config_file is not None:
-            passed_config = pathlib.PurePath(self.__app_path / config_file)
+            passed_config = self.__app_path / config_file
             if pathlib.Path(passed_config).is_file() and passed_config.suffix in config_suffix:
                 return load(passed_config)
 
@@ -238,24 +236,22 @@ class BigApp(object):
         smtp_config = config.get("smtp")
 
         if flask_config is not None and isinstance(flask_config, dict):
-            with self.__app.app_context():
-                if flask_config.get("static_folder", False):
-                    self.__app.static_folder = self.__if_env_replace(flask_config.get("static_folder"))
-                    del flask_config['static_folder']
-                if flask_config.get("template_folder", False):
-                    self.__app.template_folder = self.__if_env_replace(flask_config.get("template_folder"))
-                    del flask_config['template_folder']
-                for __key, __value in flask_config.items():
-                    self.__app.config.update({str(__key).upper(): self.__if_env_replace(__value)})
+            if flask_config.get("static_folder", False):
+                self.__app.static_folder = self.__if_env_replace(flask_config.get("static_folder"))
+                del flask_config['static_folder']
+            if flask_config.get("template_folder", False):
+                self.__app.template_folder = self.__if_env_replace(flask_config.get("template_folder"))
+                del flask_config['template_folder']
+            for __key, __value in flask_config.items():
+                self.__app.config.update({str(__key).upper(): self.__if_env_replace(__value)})
 
         if database_config is not None and isinstance(database_config, dict):
-            with self.__app.app_context():
-                self.__app.config['SQLALCHEMY_BINDS'] = dict()
-                for __key, __value in database_config.items():
-                    if __value.get("enabled", False):
-                        if __key == "main":
-                            self.__app.config['SQLALCHEMY_DATABASE_URI'] = f"{self.__build_database_uri(__value)}"
-                        self.__app.config['SQLALCHEMY_BINDS'].update({__key: f"{self.__build_database_uri(__value)}"})
+            self.__app.config['SQLALCHEMY_BINDS'] = dict()
+            for __key, __value in database_config.items():
+                if __value.get("enabled", False):
+                    if __key == "main":
+                        self.__app.config['SQLALCHEMY_DATABASE_URI'] = f"{self.__build_database_uri(__value)}"
+                    self.__app.config['SQLALCHEMY_BINDS'].update({__key: f"{self.__build_database_uri(__value)}"})
 
         if smtp_config is not None and isinstance(smtp_config, dict):
             for __key, __value in smtp_config.items():
@@ -295,3 +291,5 @@ class BigApp(object):
             return f"{db_type}://{block.get('username', 'None')}:{block.get('password', 'None')}" \
                    f"@{block.get('location', 'None')}:{str(block.get('port', 'None'))}/" \
                    f"{block.get('database_name', 'None')}"
+
+        raise ValueError(f"Unknown database type: {db_type}")

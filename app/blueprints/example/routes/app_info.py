@@ -3,8 +3,6 @@ from app import bigapp
 
 from .. import bp, page_needs
 
-print("imported")
-
 @bp.route("/app-models", methods=["GET"])
 def app_models():
     """

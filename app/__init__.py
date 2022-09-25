@@ -16,6 +16,6 @@ def create_app():
     bigapp.import_builtins("flask/template_filters")
     bigapp.import_blueprints("blueprints")
 
-    for _ in main.url_map.iter_rules():
-        print(_)
+    # for _ in main.url_map.iter_rules():
+    #     print(_)
     return main
