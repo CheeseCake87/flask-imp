@@ -232,14 +232,14 @@ Flask-BigApp will also handle any binds. Any database settings added after the d
     username = "user"
     password = "password"
 
-    [database."defined_name"]
-        enabled = true
-        type = "sqlite"
-        database_name = "other_database"
-        location = "db"
-        port = ""
-        username = "user"
-        password = "password"
+[database."defined_name"]
+    enabled = true
+    type = "sqlite"
+    database_name = "other_database"
+    location = "db"
+    port = ""
+    username = "user"
+    password = "password"
 ```
 
 This is the same as the configuration:
