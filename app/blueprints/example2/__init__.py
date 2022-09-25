@@ -1,4 +1,5 @@
 from flask_bigapp import Blueprint
+from importlib import import_module
 
 page_needs = {
     "extend": "bigapp_default/extends/main.html",
@@ -6,7 +7,7 @@ page_needs = {
 }
 bp = Blueprint(__name__)
 
-bp.import_routes("routes")
+# bp.import_routes("routes")
 
 
 @bp.before_app_request

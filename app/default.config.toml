@@ -15,6 +15,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = false
 EXPLAIN_TEMPLATE_LOADING = false
 
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
+# any futher database block will be added as a database bind
 # type = mysql / postgresql / sqlite
 # if type = sqlite, config parser will ignore username and password
 [database]
@@ -22,8 +23,9 @@ EXPLAIN_TEMPLATE_LOADING = false
     [database.main]
     enabled = true
     type = "sqlite"
-    location = "db"
     database_name = "database"
+    location = "db"
+    port = ""
     username = "user"
     password = "password"
 
@@ -47,7 +49,7 @@ EXPLAIN_TEMPLATE_LOADING = false
     enabled = false
     password = "password"
     server = "smtp-mail.outlook.com"
-    port = 587
+    port = "587"
     send_from = "<EMAIL_ADDRESS>"
     reply_to = "email@emial.com"
     #alt_username = "username"

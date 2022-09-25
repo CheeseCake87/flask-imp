@@ -1,7 +1,6 @@
 enabled = "yes"
 
 [settings]
-#name="example3"
 url_prefix = "/example3"
 template_folder = "templates"
 static_folder = "static"

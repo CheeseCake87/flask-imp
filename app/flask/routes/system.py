@@ -1,13 +1,11 @@
 from flask import current_app
 from flask import Response
 from flask import request
-from flask import session
 
 
 @current_app.before_request
 def before_request():
-    if "version" not in session:
-        session["version"] = current_app.config["VERSION"]
+    pass
 
 
 @current_app.after_request

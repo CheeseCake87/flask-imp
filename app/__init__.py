@@ -11,9 +11,11 @@ def create_app():
     main = Flask(__name__)
     bigapp.init_app(main, sqlalchemy_db=db)
     bigapp.import_structures("structures")
-    bigapp.import_models(file="model_file/model_file.py")
-    bigapp.create_all_models()
+    bigapp.import_models(folder="models")
     bigapp.import_builtins("flask/routes")
     bigapp.import_builtins("flask/template_filters")
     bigapp.import_blueprints("blueprints")
+
+    for _ in main.url_map.iter_rules():
+        print(_)
     return main

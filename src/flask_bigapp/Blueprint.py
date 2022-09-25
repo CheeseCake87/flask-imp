@@ -1,115 +1,83 @@
 import logging
+import pathlib
+import os
+
 from flask import Blueprint
 from flask import session
 from inspect import stack
-from jinja2 import Environment, FileSystemLoader
-from os import listdir
+from typing import Dict, Union
 from importlib import import_module
-
-from .utilities import contains_illegal_chars
-from .utilities import load_config, str_bool
+from toml import load
 
 
 class BigAppBlueprint(Blueprint):
     """
     Class that handles Blueprints from within the Blueprint __init__ file
     """
-    enabled: bool = True
-    name: str = str()
-    config: dict = dict()
-    session: dict = dict()
-    location: str = str()
+    enabled: bool = False
+    location: pathlib.Path
+    name: str
+    package: str
+    config: dict
+    session: dict
 
-    import_location = None
-    app_name_from_import = None
-    nested_folder_from_import = None
-    blueprint_name_from_import = None
-
-    _loader: FileSystemLoader
-    _env: Environment
+    __kwargs: dict
 
     def __init__(self, dunder_name, config_file: str = "config.toml"):
         """
         dunder_name must be __name__
         """
-        caller_stack = stack()[1]
-        split_module_folder = caller_stack.filename.split("/")[:-1]
-        self.location = "/".join(split_module_folder)
+        self.location = pathlib.Path(stack()[1].filename).parent
+        self.name = self.location.parts[-1]
+        self.package = dunder_name
+        self.config = self.__load_config_file(config_file)
+        self.__config_processor(self.config)
 
-        self.import_location = dunder_name
-        split_dunder_name = dunder_name.split(".")
-        self.app_name_from_import = split_dunder_name[0]
-        self.nested_folder_from_import = split_dunder_name[1]
-        self.blueprint_name_from_import = split_dunder_name[2]
+        super().__init__(self.name, self.package, **self.__kwargs)
 
-        self.name = self.blueprint_name_from_import
+    def __load_config_file(self, config_file: Union[str, bytes, os.PathLike]) -> Dict:
+        config_suffix = ('.toml', '.tml')
 
-        self._process_config(config_file)
+        if config_file is None:
+            raise ImportError(f"The Blueprint {self.package} config file cannot be None!")
 
-        self._loader = FileSystemLoader(f"{self.location}/{self.config['template_folder']}")
-        self._env = Environment(loader=self._loader)
+        config_path = pathlib.PurePath(self.location / config_file)
 
-        super().__init__(self.name, self.import_location, **self.config)
+        if not pathlib.Path(config_path).exists():
+            raise ImportError(f"The Blueprint {self.package} config file does not exist!")
 
-    def _process_config(self, config_file) -> None:
-        """
-        Load the config file.
-        """
-        try:
-            config_from_file = load_config(f"{self.location}/{config_file}")
-        except FileNotFoundError:
-            self.enabled = False
-            logging.critical(f"{self.import_location} => Config file not found, skipping import.")
-            return
+        if config_path.suffix not in config_suffix:
+            raise ImportError(f"The Blueprint {self.package} config file must be a toml file!")
 
-        if "enabled" in config_from_file:
-            if not str_bool(config_from_file["enabled"]):
-                self.enabled = False
-                return
+        return load(config_path)
 
-        if "settings" not in config_from_file:
-            self.enabled = False
-            logging.critical(f"{self.import_location} => SETTINGS section is missing from config file.")
-            return
-
-        self.config.update(config_from_file["settings"])
-
-        if "session" in config_from_file:
-            self.session.update(config_from_file["session"])
-
-        if "name" in config_from_file:
-            self.name = config_from_file["name"]
-            del config_from_file["name"]
-
-        if "import_name" in config_from_file:
-            logging.warning(
-                f"{self.import_location} => import_name should not be define in config, this has been ignored.")
-            del config_from_file["import_name"]
+    def __config_processor(self, config: dict) -> None:
+        self.__kwargs = config.get('settings', None)
+        self.session = config.get('session', {})
+        if self.__kwargs is None:
+            raise ImportError(f"The Blueprint {self.package} is missing the settings section")
 
     def import_routes(self, folder: str = "routes"):
         """
         Imports all the routes in the given folder.
-
         If no folder is specified defaults to a folder named 'routes'
         """
-        routes_raw, routes_clean = listdir(f"{self.location}/{folder}"), []
-        for route in routes_raw:
-            if contains_illegal_chars(route, exception=[".py"]):
-                continue
-            routes_clean.append(route.replace(".py", ""))
+        path = self.location / folder
+        if not path.exists():
+            raise NotADirectoryError(f"{path} is not a directory")
 
-        for route in routes_clean:
+        routes = path.glob("*.py")
+        for route in routes:
             try:
-                import_module(f"{self.import_name}.{folder}.{route}")
+                import_module(f"{folder}.{route.stem}")
             except ImportError as e:
-                logging.warning(f"Error when importing {self.import_name} - {self.name} - {route}: {e}")
+                # logging.warning(f"Error when importing {self.package}.{route}: {e}")
                 continue
 
     def init_session(self):
         """
         Initialize the session variables found in the config file.
-
-        Use this method in the before_request route
+        Use this method in the before_request route.
         """
         for key in self.session:
             if key not in session:
@@ -119,7 +87,6 @@ class BigAppBlueprint(Blueprint):
     def tmpl(self, template):
         """
         Pushes together the name of the blueprint and the template file to look for.
-
         This is a small time saving method to allow you to only type
         bp.tmpl("index.html") when looking for template files.
         """
