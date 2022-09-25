@@ -9,7 +9,7 @@ def create_all_models():
     """
     Creates database based on the models file
     """
-    bigapp.create_all_models()
+    bigapp.db.create_all()
     return """If you didn't see an error, this probably worked..."""
 
 
