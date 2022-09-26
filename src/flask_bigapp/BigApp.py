@@ -7,12 +7,12 @@ from inspect import getmembers
 from inspect import isclass
 from types import ModuleType
 from typing import Dict, TextIO, Union, Optional, Any
-from toml import load
 
 from flask import Blueprint
 from flask import Flask
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
+from toml import load
 
 from .Blueprint import BigAppBlueprint
 from .Resources import Resources
@@ -286,8 +286,14 @@ class BigApp(object):
 
         Fails if type is not supported.
         """
-        db_type = block.get("type")
-        db_location = block.get("location")
+        db_type = self.__if_env_replace(block.get("type", "None"))
+        db_name = self.__if_env_replace(block.get('database_name', 'database'))
+
+        db_location = self.__if_env_replace(block.get("location", "db"))
+        db_port = self.__if_env_replace(str(block.get('port', 'None')))
+
+        db_username = self.__if_env_replace(block.get('username', 'None'))
+        db_password = self.__if_env_replace(block.get('password', 'None'))
 
         db_allowed = ('postgresql', 'mysql', 'oracle')
 
@@ -295,12 +301,10 @@ class BigApp(object):
             final_location = self.__app_path
             if db_location is not None:
                 final_location = final_location / db_location
-            return f"{db_type}:////{final_location}/{block.get('database_name', 'database')}.sqlite"
+            return f"{db_type}:////{final_location}/{db_name}.sqlite"
 
         if db_type in db_allowed:
-            return f"{db_type}://{block.get('username', 'None')}:{block.get('password', 'None')}" \
-                   f"@{block.get('location', 'None')}:{str(block.get('port', 'None'))}/" \
-                   f"{block.get('database_name', 'None')}"
+            return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
 
         raise ValueError(f"Unknown database type: {db_type}, must be: postgresql / mysql / oracle / sqlite")
 
