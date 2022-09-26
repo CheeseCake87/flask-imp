@@ -286,14 +286,14 @@ class BigApp(object):
 
         Fails if type is not supported.
         """
-        db_type = self.__if_env_replace(block.get("type"))
+        db_type = self.__if_env_replace(block.get("type", "None"))
         db_name = self.__if_env_replace(block.get('database_name', 'database'))
 
-        db_location = self.__if_env_replace(block.get("location"))
+        db_location = self.__if_env_replace(block.get("location", "db"))
         db_port = self.__if_env_replace(str(block.get('port', 'None')))
 
-        db_username = self.__if_env_replace(block.get('database_name', 'database'))
-        db_password = self.__if_env_replace(block.get('database_name', 'database'))
+        db_username = self.__if_env_replace(block.get('username', 'None'))
+        db_password = self.__if_env_replace(block.get('password', 'None'))
 
         db_allowed = ('postgresql', 'mysql', 'oracle')
 
