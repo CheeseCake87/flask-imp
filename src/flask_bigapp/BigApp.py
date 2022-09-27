@@ -253,6 +253,7 @@ class BigApp(object):
                 if __value.get("enabled", False):
                     if __key == "main":
                         self.__app.config['SQLALCHEMY_DATABASE_URI'] = f"{self.__build_database_uri(__value)}"
+                        continue
                     self.__app.config['SQLALCHEMY_BINDS'].update({__key: f"{self.__build_database_uri(__value)}"})
 
         if smtp_config is not None and isinstance(smtp_config, dict):
