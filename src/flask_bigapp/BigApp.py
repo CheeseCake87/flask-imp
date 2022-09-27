@@ -302,6 +302,7 @@ class BigApp(object):
             final_location = self.__app_path
             if db_location is not None:
                 final_location = final_location / db_location
+                pathlib.Path(final_location).mkdir(parents=True, exist_ok=True)
             return f"{db_type}:////{final_location}/{db_name}.sqlite"
 
         if db_type in db_allowed:
