@@ -184,7 +184,7 @@ class BigApp(object):
                 self.db.init_app(current_app)
         return
 
-    def model_class(self, class_name: str) -> ModuleType:
+    def model_class(self, class_name: str) -> Any:
         """
         Returns the model class for the given class name
 
@@ -192,6 +192,7 @@ class BigApp(object):
         table_query = table_class.query.all()
         """
         if class_name in self.model_classes:
+            print(type(self.model_classes[class_name]))
             return self.model_classes[class_name]
         raise ValueError(f"{class_name} was not found in the list of model_classes")
 

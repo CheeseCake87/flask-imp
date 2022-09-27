@@ -14,3 +14,7 @@ class ExampleUser(db.Model):
     disabled = db.Column(db.Boolean)
 
     rel_example_table = relationship("ExampleTable", lazy='joined', order_by="ExampleTable.thing")
+
+    @classmethod
+    def get_by_id(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).first()
