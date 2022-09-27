@@ -192,7 +192,6 @@ class BigApp(object):
         table_query = table_class.query.all()
         """
         if class_name in self.model_classes:
-            print(type(self.model_classes[class_name]))
             return self.model_classes[class_name]
         raise ValueError(f"{class_name} was not found in the list of model_classes")
 
