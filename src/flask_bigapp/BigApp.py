@@ -10,7 +10,6 @@ from typing import Dict, TextIO, Union, Optional, Any
 
 from flask import Blueprint
 from flask import Flask
-from flask import current_app
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from toml import load
 
@@ -181,7 +180,7 @@ class BigApp(object):
         "this is checking if the built in db initialization happened, if so it registers all the model files to it"
         if isinstance(self.db, SQLAlchemy):
             with self.__app.app_context():
-                self.db.init_app(current_app)
+                self.db.init_app(self.__app)
         return
 
     def model_class(self, class_name: str) -> Any:
