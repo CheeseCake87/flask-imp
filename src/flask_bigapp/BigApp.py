@@ -258,7 +258,7 @@ class BigApp(object):
         if smtp_config is not None and isinstance(smtp_config, dict):
             for __key, __value in smtp_config.items():
                 this_key = self.__if_env_replace(__key)
-                self.smtp.update({this_key: Dict[str, Any]})
+                self.smtp.update({this_key: dict()})
                 for ___key, ___value in __value.items():
                     self.smtp[this_key].update({___key: self.__if_env_replace(___value)})
 
