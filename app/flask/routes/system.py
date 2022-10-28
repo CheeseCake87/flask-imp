@@ -1,6 +1,5 @@
-from flask import current_app
 from flask import Response
-from flask import request
+from flask import current_app
 
 
 @current_app.before_request
@@ -22,11 +21,3 @@ def request_404(error):
 def custom_401(error):
     return Response('You are unauthorized to access this resource.', 401,
                     {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
-
-@current_app.route("/errors/redirect-catch-all", endpoint="errors.redirect_catch_all")
-def redirect_catch_all():
-    endpoint_tried = "The endpoint does not exist"
-    if "tried" in request.args:
-        endpoint_tried += f"{request.args['tried']}"
-    return Response(endpoint_tried)

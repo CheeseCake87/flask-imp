@@ -1,0 +1,26 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block _title %} {% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('default_theme.static', filename='css/custom.css') }}">
+</head>
+
+<body>
+{% block _global %}
+    <div class="d-flex justify-content-center">
+        <div class="window">
+            <div class="text_center">
+                <img src="{{ url_for('default_theme.static', filename='img/Flask-BigApp-Logo.png') }}" alt="Flask-BigApp Logo">
+                <h1>Flask-BigApp</h1>
+            </div>
+            {% block _container %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+<script src="{{ url_for('default_theme.static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 from flask_bigapp import Blueprint
 
 page_needs = {
-    "extend": "bigapp_default/extends/main.html",
-    "footer": "bigapp_default/includes/footer.html",
+    "extend": "default_theme/extends/main.html",
+    "footer": "default_theme/includes/footer.html",
 }
 bp = Blueprint(__name__)
 

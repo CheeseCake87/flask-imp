@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from flask_bigapp import BigApp
 from flask_bigapp import Auth
+from flask_bigapp import BigApp
 
 bigapp = BigApp()
 db = SQLAlchemy()
@@ -10,7 +10,7 @@ db = SQLAlchemy()
 
 def create_app():
     main = Flask(__name__)
-    bigapp.init_app(main, db)
+    bigapp.init_app(main, db, "env.config.toml")
     bigapp.import_structures("structures")
     bigapp.import_models(folder="models")
     bigapp.import_builtins("flask/routes")
@@ -51,7 +51,7 @@ def create_app():
     """
     This prints all the available routes in the app
     """
-    for _ in main.url_map.iter_rules():
-        print(_)
+    # for _ in main.url_map.iter_rules():
+    #     print(_)
 
     return main

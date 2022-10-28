@@ -1,12 +1,12 @@
 import logging
-import pathlib
 import os
+import pathlib
+from importlib import import_module
+from inspect import stack
+from typing import Dict, Union, Any
 
 from flask import Blueprint
 from flask import session
-from inspect import stack
-from typing import Dict, Union, Any
-from importlib import import_module
 from toml import load
 
 
@@ -21,20 +21,18 @@ class BigAppBlueprint(Blueprint):
     config: dict
     session: dict
 
-    __kwargs: dict
-
     def __init__(self, dunder_name, config_file: str = "config.toml") -> None:
         """
         dunder_name must be __name__
         config_file must be relative to the location of the blueprint.
         """
         self.location = pathlib.Path(stack()[1].filename).parent
+        print(self.location.name)
         self.ba_name = self.location.parts[-1]
         self.package = dunder_name
         self.config = self.__load_config_file(config_file)
-        self.__config_processor(self.config)
 
-        super().__init__(self.ba_name, self.package, **self.__kwargs)
+        super().__init__(self.ba_name, self.package, **self.__config_processor(self.config))
 
     def import_routes(self, folder: str = "routes") -> None:
         """
@@ -92,12 +90,61 @@ class BigAppBlueprint(Blueprint):
 
         return load(config_path)
 
-    def __config_processor(self, config: dict) -> None:
+    def __config_processor(self, config: dict) -> dict:
         """
         Process the configuration file.
         """
+        """Pull values from configuration dict"""
         self.enabled = config.get('enabled', False)
-        self.__kwargs = config.get('settings', None)
         self.session = config.get('session', {})
-        if self.__kwargs is None:
-            raise ImportError(f"The Blueprint {self.package} is missing the settings section")
+        settings = config.get('settings', {})
+
+        __kwargs = dict()
+
+        """Pull values from settings"""
+        subdomain = settings.get('subdomain', False)
+        url_defaults = settings.get('url_defaults', False)
+        static_folder = settings.get('static_folder', False)
+        template_folder = settings.get('template_folder', False)
+        url_prefix = settings.get('url_prefix', False)
+        static_url_path = settings.get('static_url_path', False)
+
+        """If values exist in the configuration file, set values"""
+        if static_folder:
+            __kwargs.update({'static_folder': static_folder})
+
+        if template_folder:
+            __kwargs.update({'template_folder': template_folder})
+
+        if url_prefix:
+            __kwargs.update({'url_prefix': url_prefix})
+
+        if static_url_path:
+            __kwargs.update({'static_url_path': static_url_path})
+
+        if subdomain:
+            __kwargs.update({'subdomain': subdomain})
+
+        if url_defaults:
+            __kwargs.update({'url_defaults': url_defaults})
+
+        """If values get set to False, set defaults"""
+        if static_folder is False:
+            __kwargs.update({'static_folder': "static"})
+            default_static_folder = self.location / "static"
+            pathlib.Path.mkdir(default_static_folder, exist_ok=True)
+
+        if template_folder is False:
+            __kwargs.update({'template_folder': "templates"})
+            default_template_folder = self.location / "templates"
+            default_nested_template_folder = default_template_folder / self.location.name
+            pathlib.Path.mkdir(default_template_folder, exist_ok=True)
+            pathlib.Path.mkdir(default_nested_template_folder, exist_ok=True)
+
+        if url_prefix is False:
+            __kwargs.update({'url_prefix': f"/{self.location.name}"})
+
+        if static_url_path is False:
+            __kwargs.update({'static_url_path': f"/{self.location.name}/static"})
+
+        return __kwargs
