@@ -1,10 +1,6 @@
 enabled = "yes"
-
-[settings]
 url_prefix = "/"
-template_folder = "templates"
-static_folder = "static"
-static_url_path = "/exmaple_blueprint/static"
+
 
 [session]
 var_in_session = "this can be loaded using bp.init_session()"

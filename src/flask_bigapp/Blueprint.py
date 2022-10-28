@@ -107,6 +107,7 @@ class BigAppBlueprint(Blueprint):
         static_folder = settings.get('static_folder', False)
         template_folder = settings.get('template_folder', False)
         url_prefix = settings.get('url_prefix', False)
+        upper_url_prefix = config.get('url_prefix', False)
         static_url_path = settings.get('static_url_path', False)
 
         """If values exist in the configuration file, set values"""
@@ -141,8 +142,12 @@ class BigAppBlueprint(Blueprint):
             pathlib.Path.mkdir(default_template_folder, exist_ok=True)
             pathlib.Path.mkdir(default_nested_template_folder, exist_ok=True)
 
-        if url_prefix is False:
-            __kwargs.update({'url_prefix': f"/{self.location.name}"})
+        if not __kwargs.get('url_prefix'):
+            if upper_url_prefix:
+                __kwargs.update({'url_prefix': f"/{upper_url_prefix}"})
+
+            if url_prefix is False:
+                __kwargs.update({'url_prefix': f"/{self.location.name}"})
 
         if static_url_path is False:
             __kwargs.update({'static_url_path': f"/{self.location.name}/static"})
