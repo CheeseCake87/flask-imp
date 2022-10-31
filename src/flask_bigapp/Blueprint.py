@@ -27,7 +27,6 @@ class BigAppBlueprint(Blueprint):
         config_file must be relative to the location of the blueprint.
         """
         self.location = pathlib.Path(stack()[1].filename).parent
-        print(self.location.name)
         self.ba_name = self.location.parts[-1]
         self.package = dunder_name
         self.config = self.__load_config_file(config_file)
