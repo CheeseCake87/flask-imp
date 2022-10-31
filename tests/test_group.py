@@ -5,7 +5,7 @@ def test_import_builtins(client):
 
 def test_import_structures(client):
     response = client.get('/test-structure')
-    assert b"/bigapp_default/static/img/Flask-BigApp-Logo.png" in response.data
+    assert b"/default_theme/static/img/Flask-BigApp-Logo.png" in response.data
 
 
 def test_create_all_models(client):
