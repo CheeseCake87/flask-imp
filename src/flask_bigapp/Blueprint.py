@@ -145,8 +145,7 @@ class BigAppBlueprint(Blueprint):
         if not __kwargs.get('url_prefix'):
             if upper_url_prefix:
                 __kwargs.update({'url_prefix': f"/{upper_url_prefix}"})
-
-            if url_prefix is False:
+            else:
                 __kwargs.update({'url_prefix': f"/{self.location.name}"})
 
         if static_url_path is False:
