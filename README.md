@@ -443,6 +443,27 @@ logged_in = true
 not_logged_in = false
 ```
 
+`NEW IN 1.3.*`
+Blueprint config.toml can also look like this:
+```toml
+enabled = "yes"
+url_prefix = "/"
+
+[session]
+var_in_session = "this can be loaded using bp.init_session()"
+permissions = ["this", "that"]
+logged_in = true
+not_logged_in = false
+```
+Using this method, bigapp will automatically look for and create the following folder structure:
+
+```
+- blueprint1/
+-- templates/ <- creates if not found
+---- blueprint1/ <- creates if not found
+-- static/ <- creates if not found
+```
+
 The session section can be initialised using the `bp.init_session()` method. This places the values into the Flask session -> `from flask import session`
 
 Here's an example of what your blueprints `__init__.py` file should look like:
