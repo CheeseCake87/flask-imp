@@ -10,7 +10,7 @@ db = SQLAlchemy()
 
 def create_app():
     main = Flask(__name__)
-    bigapp.init_app(main, db, "env.config.toml")
+    bigapp.init_app(main, db)
     bigapp.import_structures("structures")
     bigapp.import_models(folder="models")
     bigapp.import_builtins("flask/routes")
