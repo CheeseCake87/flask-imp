@@ -511,6 +511,28 @@ The `bp.tmpl` method just decorates the string with the name of the blueprint, c
 Of course this only works if your templates are nested under a folder with the same name as your blueprint, however it does make it possible to change the
 blueprint name later and not have to worry about search and replace.
 
+## Creating a Blueprint via the CLI (NEW)
+
+You can create a blueprint via the CLI using:
+
+`python3 -m flask_bigapp --add-bp-in "app/blueprints" --called "new_blueprint"`
+
+This will create a new blueprint called `new_blueprint` and place it in the folder you specified. It creates the following folder structure:
+
+```bash
+blueprints/
+|
+- new_blueprint/
+-- routes/
+---- index.py
+-- templates/
+---- new_blueprint/
+------ index.html
+-- static/
+-- __init__.py
+-- config.toml
+```
+
 ## Importing Structures (themes)
 
 You can register a structures (theme) folder using:

@@ -1,6 +1,6 @@
 Flask>=2.2.2
 Flask-SQLAlchemy==3.0.2
 toml>=0.10.2
-pytz==2022.5
+pytz==2022.6
 types-toml==0.10.8
 python-dotenv==0.21.0
