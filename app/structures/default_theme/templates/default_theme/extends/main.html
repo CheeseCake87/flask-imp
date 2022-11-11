@@ -16,8 +16,12 @@
                 <img src="{{ url_for('default_theme.static', filename='img/Flask-BigApp-Logo.png') }}" alt="Flask-BigApp Logo">
                 <h1>Flask-BigApp</h1>
             </div>
+            <div class="text_center">
+{% include "default_theme/includes/menu.html" %}
+            </div>
             {% block _container %}
             {% endblock %}
+            {% include "default_theme/includes/footer.html" %}
         </div>
     </div>
 {% endblock %}
