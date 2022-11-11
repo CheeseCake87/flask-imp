@@ -9,7 +9,7 @@ def create_blueprint(path, name):
     Path.mkdir(path / name / "templates" / name)
 
     with open(path / name / "__init__.py", "w") as f:
-        f.write(f"""\
+        f.write("""\
 from flask_bigapp import Blueprint
 
 bp = Blueprint(__name__)
@@ -44,7 +44,7 @@ static_folder = "static"
 """)
 
     with open(path / name / "routes" / "index.py", "w") as f:
-        f.write(f"""\
+        f.write("""\
 from flask import render_template
 
 from .. import bp

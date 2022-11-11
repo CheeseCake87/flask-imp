@@ -10,7 +10,6 @@ from typing import Dict, TextIO, Union, Optional, Any
 
 from flask import Blueprint
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from toml import load
 
 from .Blueprint import BigAppBlueprint
@@ -21,8 +20,6 @@ class BigApp(object):
     smtp: Dict = dict()
     structures: Dict = dict()
     model_classes: Dict = dict()
-    db = None
-    sql_do = None
 
     __config: Dict = dict()
     __app: Flask
@@ -35,16 +32,14 @@ class BigApp(object):
     def __init__(
             self,
             app: Flask = None,
-            sqlalchemy_db: Optional[Union[SQLAlchemy, None]] = None,
             app_config_file: Optional[Union[str, bytes, os.PathLike, None]] = None
     ) -> None:
         if app is not None:
-            self.init_app(app, sqlalchemy_db, app_config_file)
+            self.init_app(app, app_config_file)
 
     def init_app(
             self,
             app: Flask,
-            sqlalchemy_db: Union[SQLAlchemy, None] = None,
             app_config_file: Union[str, bytes, os.PathLike, None] = __default_config
     ) -> None:
         """
@@ -71,11 +66,6 @@ class BigApp(object):
         self.__app_folder = self.__app_path.parts[-1]
         self.__config = self.__load_config_file(app_config_file)
         self.__config_processor(self.__config)
-
-        self.db = sqlalchemy_db
-
-        if isinstance(self.db, SQLAlchemy):
-            self.sql_do = self.db.session
 
     def import_builtins(self, folder: Union[Any, os.PathLike] = "routes") -> None:
         """
@@ -176,12 +166,6 @@ class BigApp(object):
             file_path = pathlib.Path(pathlib.PurePath(self.__app_path) / file)
             if file_path.is_file() and file_path.suffix == ".py":
                 self.__import_model_processor(file_path)
-
-        "this is checking if the built in db initialization happened, if so it registers all the model files to it"
-        if isinstance(self.db, SQLAlchemy):
-            with self.__app.app_context():
-                self.db.init_app(self.__app)
-        return
 
     def model_class(self, class_name: str) -> Any:
         """
@@ -298,11 +282,9 @@ class BigApp(object):
         db_allowed = ('postgresql', 'mysql', 'oracle')
 
         if db_type == "sqlite":
-            final_location = self.__app_path
             if db_location is not None:
-                final_location = final_location / db_location
-                pathlib.Path(final_location).mkdir(parents=True, exist_ok=True)
-            return f"{db_type}:////{final_location}/{db_name}.sqlite"
+                pathlib.Path(self.__app_path / db_location).mkdir(parents=True, exist_ok=True)
+            return f"{db_type}:////{self.__app_path}/{db_name}.db"
 
         if db_type in db_allowed:
             return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"

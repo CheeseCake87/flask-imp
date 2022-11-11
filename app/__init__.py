@@ -10,7 +10,9 @@ db = SQLAlchemy()
 
 def create_app():
     main = Flask(__name__)
-    bigapp.init_app(main, db)
+    bigapp.init_app(main)
+    db.init_app(main)
+
     bigapp.import_structures("structures")
     bigapp.import_models(folder="models")
     bigapp.import_builtins("flask/routes")
@@ -22,7 +24,7 @@ def create_app():
         The following creates all tables from the model files and populates the database
         with test data.
         """
-        bigapp.db.create_all()
+        db.create_all()
 
         m_example_user = bigapp.model_class("ExampleUser")
         m_example_table = bigapp.model_class("ExampleTable")
@@ -39,14 +41,14 @@ def create_app():
                 private_key=Auth.generate_private_key(salt),
                 disabled=False
             )
-            bigapp.sql_do.add(new_example_user)
-            bigapp.sql_do.flush()
+            db.session.add(new_example_user)
+            db.session.flush()
             new_example_user_rel = m_example_table(
                 user_id=new_example_user.user_id,
                 thing=gen_password
             )
-            bigapp.sql_do.add(new_example_user_rel)
-            bigapp.sql_do.commit()
+            db.session.add(new_example_user_rel)
+            db.session.commit()
 
     """
     This prints all the available routes in the app

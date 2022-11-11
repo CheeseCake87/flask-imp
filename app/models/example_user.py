@@ -1,7 +1,6 @@
-from app import bigapp
 from sqlalchemy.orm import relationship
 
-db = bigapp.db
+from app import db
 
 
 class ExampleUser(db.Model):

@@ -1,6 +1,6 @@
 from flask import render_template
 
-from app import bigapp
+from app import db, bigapp
 from .. import bp, page_needs
 
 
@@ -9,7 +9,7 @@ def create_all_models():
     """
     Creates database based on the models file
     """
-    bigapp.db.create_all()
+    db.create_all()
     return """If you didn't see an error, this probably worked..."""
 
 
@@ -26,7 +26,7 @@ def database_example():
     nq_example_user = example_user.query
 
     # Query class using sql_do session
-    sq_example_user = bigapp.sql_do.query(example_user)
+    sq_example_user = db.session.query(example_user)
 
     if find_username:
         sq_example_user = sq_example_user.filter(example_user.user_id == user_id).first()

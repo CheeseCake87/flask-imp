@@ -18,8 +18,8 @@ example_user = bigapp.model_class("ExampleUser")
 # Normal query
 nq_example_user = example_user.query
 
-# Query class using sql_do session
-sq_example_user = bigapp.sql_do.query(example_user)
+# Query class using db.session
+sq_example_user = db.session.query(example_user)
 
 
 if find_username:

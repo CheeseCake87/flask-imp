@@ -1,8 +1,6 @@
 from sqlalchemy import ForeignKey
 
-from app import bigapp
-
-db = bigapp.db
+from app import db
 
 
 class ExampleTable(db.Model):

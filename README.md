@@ -1,14 +1,12 @@
-![](https://raw.githubusercontent.com/CheeseCake87/Flask-BigApp/master/app/structures/bigapp_default/static/img/Flask-BigApp-Logo-white-bg.png)
+![](https://raw.githubusercontent.com/CheeseCake87/Flask-BigApp/master/app/structures/bigapp_default/static/img/Flask-BigApp-Logo-white-bg.png)  
 
 # Flask-BigApp
 
-```bash
-pip install flask-bigapp
-```
+`pip install flask-bigapp`
 
 ![Tests](https://github.com/CheeseCake87/Flask-BigApp/actions/workflows/tests.yml/badge.svg)
 
-`NOTE:` This version; Being 1.2.* and above includes some breaking changes from anything on version 1.1.*
+`NOTE:` This version; Being 1.4.* and above includes some breaking changes from anything on version 1.3.* and below.
 
 ## What is Flask-BigApp?
 
@@ -34,7 +32,7 @@ The ```default.config.toml``` file contains Flask config settings, a minimal ver
 [flask]
 app_name = "app"
 version = "0.0.0"
-secret_key = "sdflskjdflksjdflksjdflkjsdf"
+secret_key = "super-secret-key"
 debug = true
 testing = true
 session_time = 480
@@ -66,7 +64,7 @@ random_value = "<TAGS_CAN_BE_ANYTHING>"
 Now if you set environment variables that are included in the tags, Flask-BigApp will replace them with the values.
 Here's an example of setting environment variables in linux:
 
-`export SECRET_KEY="asdlasijd90339480239oiqjdpiasdj"` and `export DEBUG=True`
+`export SECRET_KEY="super-secret-env-key"` and `export DEBUG=True`
 
 The environment variables to pass in are defined in the config file, have a look at `random_value`.
 To set this we will need to do: `export TAGS_CAN_BE_ANYTHING="what we put here will be the new value"`
@@ -168,7 +166,7 @@ your ```__init__.py``` file.
 ## Setting up to work with models using SQLAlchemy
 
 To work with models using SQLAlchemy, your app `__init__.py` file should look like this:
-
+`NOTE: Passing the SQLAlchemy instance was removed in ver 1.4`
 ```python
 from flask import Flask
 from flask_bigapp import BigApp
@@ -180,18 +178,13 @@ db = SQLAlchemy()
 
 def create_app():
     main = Flask(__name__)
-    bigapp.init_app(main, db)  # Here we are passing in the SQLAlchemy object.
+    bigapp.init_app(main)  # This will set the SQLALCHEMY_DATABASE_URI
+    db.init_app(main)  # init the SQLAlchemy instance
     bigapp.import_builtins("routes")
     return main
 ```
 
-Giving Flask-BigApp the database object will auto init the model files 
-and load a registry of models that can then be accessed from the model_class method.
-See Importing Models below, for more information.
-
-The database settings can either be added by setting the flask-sqlalchemy 
-app config manually `main.config['SQLALCHEMY_DATABASE_URI'] = WHATEVER_URI` or by
-including the settings your config file. Here's an example:
+The database settings added by including the settings your config file. Here's an example:
 
 ```toml
 [flask]
@@ -245,9 +238,9 @@ Flask-BigApp will also handle any binds. Any database settings added after the d
 This is the same as the configuration:
 
 ```text
-SQLALCHEMY_DATABASE_URI = 'sqlite:////absolute_app_path/db/database.sqlite'
+SQLALCHEMY_DATABASE_URI = 'sqlite:////absolute_app_path/db/database.db'
 SQLALCHEMY_BINDS = {
-    'defined_name': 'sqlite:////absolute_app_path/db/other_database.sqlite',
+    'defined_name': 'sqlite:////absolute_app_path/db/other_database.db',
 }
 ```
 
@@ -271,7 +264,8 @@ db = SQLAlchemy()
 
 def create_app():
     main = Flask(__name__)
-    bigapp.init_app(main, db)  # Here we are passing in the SQLAlchemy object.
+    bigapp.init_app(main)  # This will set the SQLALCHEMY_DATABASE_URI
+    db.init_app(main)  # init the SQLAlchemy instance
     bigapp.import_builtins("routes")
     bigapp.import_models(file="models.py")
     # OR
@@ -285,12 +279,9 @@ def create_app():
 
 Here's an example of what a model file looks like:
 
-
 ```python
-from app import bigapp
+from app import db
 from sqlalchemy import ForeignKey
-
-db = bigapp.db
 
 
 class ExampleTable(db.Model):
@@ -308,7 +299,7 @@ Here's an example of how you can query using the `bigapp.model_class` method:
 ```python
 from flask import render_template
 
-from app import bigapp
+from app import db, bigapp
 from .. import bp
 
 
@@ -324,8 +315,8 @@ def database_example():
     # Normal query
     nq_example_user = example_user.query
 
-    # Query class using sql_do session
-    sq_example_user = bigapp.sql_do.query(example_user)
+    # Query class using db.session
+    sq_example_user = db.session.query(example_user)
 
     if find_username:
         sq_example_user = sq_example_user.filter(example_user.user_id == user_id).first()
@@ -342,8 +333,6 @@ def database_example():
     render = "blueprint1/database-example.html"
     return render_template(render, result=result)
 ```
-
-The `bigapp.sql_do` method is just a proxy for `db.session`
 
 ## Importing Builtins (routes, template filters, context processors)
 
