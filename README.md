@@ -165,7 +165,7 @@ your ```__init__.py``` file.
 
 ## Adding values to the session
 
-You can session values to the config file, here's an example:
+You can add values to Flask session from the config file, here's an example:
 
 ```toml
 [flask]
