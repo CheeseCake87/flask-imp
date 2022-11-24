@@ -204,6 +204,8 @@ def create_app():
     return main
 ```
 
+## Setting up to work with models using SQLAlchemy
+
 `NOTE:` The only accepted types of databases are: mysql / postgresql / sqlite / oracle
 
 Flask-BigApp will also handle any binds. Any database settings added after the database.main section, will be added as a bind.
