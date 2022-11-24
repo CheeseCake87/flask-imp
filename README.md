@@ -163,34 +163,15 @@ Using this method you can keep your routes in different files, and not have to w
 your ```__init__.py``` file.
 
 
-## Setting up to work with models using SQLAlchemy
+## Adding values to the session
 
-To work with models using SQLAlchemy, your app `__init__.py` file should look like this:
-`NOTE: Passing the SQLAlchemy instance was removed in ver 1.4`
-```python
-from flask import Flask
-from flask_bigapp import BigApp
-from flask_sqlalchemy import SQLAlchemy
-
-bigapp = BigApp()
-db = SQLAlchemy()
-
-
-def create_app():
-    main = Flask(__name__)
-    bigapp.init_app(main)  # This will set the SQLALCHEMY_DATABASE_URI
-    db.init_app(main)  # init the SQLAlchemy instance
-    bigapp.import_builtins("routes")
-    return main
-```
-
-The database settings added by including the settings your config file. Here's an example:
+You can session values to the config file, here's an example:
 
 ```toml
 [flask]
 app_name = "app"
 version = "0.0.0"
-secret_key = "sdflskjdflksjdflksjdflkjsdf"
+secret_key = "super-secret-key"
 debug = true
 testing = true
 session_time = 480
@@ -198,15 +179,29 @@ static_folder = "static"
 template_folder = "templates"
 error_404_help = true
 
-[database]
-    [database.main]
-    enabled = true
-    type = "sqlite"
-    database_name = "database"
-    location = "db"
-    port = ""
-    username = "user"
-    password = "password"
+[session]
+my_session_value = "my session value"
+```
+
+Initialise the session values by doing the following:
+
+```python
+from flask import Flask
+from flask_bigapp import BigApp
+
+bigapp = BigApp()
+
+
+def create_app():
+    main = Flask(__name__)
+    bigapp.init_app(main)
+    bigapp.import_builtins("routes")
+
+    @main.before_request
+    def before_request():
+        bigapp.init_session()
+
+    return main
 ```
 
 `NOTE:` The only accepted types of databases are: mysql / postgresql / sqlite / oracle
