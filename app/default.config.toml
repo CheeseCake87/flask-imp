@@ -14,6 +14,9 @@ error_404_help = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false
 EXPLAIN_TEMPLATE_LOADING = false
 
+[session]
+test_value = "test"
+
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
 # any futher database block will be added as a database bind
 # type = mysql / postgresql / sqlite

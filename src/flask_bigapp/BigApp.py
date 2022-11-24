@@ -10,6 +10,7 @@ from typing import Dict, TextIO, Union, Optional, Any
 
 from flask import Blueprint
 from flask import Flask
+from flask import session
 from toml import load
 
 from .Blueprint import BigAppBlueprint
@@ -17,6 +18,7 @@ from .Resources import Resources
 
 
 class BigApp(object):
+    session: Dict = dict()
     smtp: Dict = dict()
     structures: Dict = dict()
     model_classes: Dict = dict()
@@ -31,7 +33,7 @@ class BigApp(object):
 
     def __init__(
             self,
-            app: Flask = None,
+            app: Optional[Flask] = None,
             app_config_file: Optional[Union[str, bytes, os.PathLike, None]] = None
     ) -> None:
         if app is not None:
@@ -66,6 +68,16 @@ class BigApp(object):
         self.__app_folder = self.__app_path.parts[-1]
         self.__config = self.__load_config_file(app_config_file)
         self.__config_processor(self.__config)
+
+    def init_session(self) -> None:
+        """
+        Initialize the session variables found in the config file.
+        Use this method in the before_request route.
+        """
+        for key in self.session:
+            if key not in session:
+                session.update(self.session)
+                break
 
     def import_builtins(self, folder: Union[Any, os.PathLike] = "routes") -> None:
         """
@@ -217,6 +229,7 @@ class BigApp(object):
         Processes the values from the configuration file.
         """
         flask_config = config.get("flask")
+        session_config = config.get("session")
         database_config = config.get("database")
         smtp_config = config.get("smtp")
 
@@ -229,6 +242,9 @@ class BigApp(object):
                 del flask_config['template_folder']
             for __key, __value in flask_config.items():
                 self.__app.config.update({str(__key).upper(): self.__if_env_replace(__value)})
+
+        if session_config is not None and isinstance(session_config, dict):
+            self.session = session_config
 
         if database_config is not None and isinstance(database_config, dict):
             self.__app.config['SQLALCHEMY_BINDS'] = dict()

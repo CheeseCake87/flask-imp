@@ -1,6 +1,7 @@
 from functools import wraps
-from flask import redirect
+
 from flask import flash
+from flask import redirect
 from flask import session
 from flask import url_for
 
@@ -15,10 +16,8 @@ class BigAppSecurity:
             redirect_endpoint: str,
             bool_key_name: str,
             show_message: bool = True,
-            message: str = None
+            message: str = "You need to be logged in to access this page."
     ):
-        if message is None:
-            message = "You need to be logged in to access this page."
 
         def login_required_wrapper(func):
             @wraps(func)
@@ -44,10 +43,8 @@ class BigAppSecurity:
             redirect_endpoint: str,
             session_bool_key_name: str,
             show_message: bool = True,
-            message: str = None
+            message: str = "You are already logged in."
     ):
-        if message is None:
-            message = "You are already logged in."
 
         def no_login_required_wrapper(func):
             @wraps(func)
@@ -70,10 +67,8 @@ class BigAppSecurity:
             session_list_key: str,
             permission_needed: str,
             show_message: bool = True,
-            message: str = None
+            message: str = "You don't have the required permissions to access this page."
     ):
-        if message is None:
-            message = "You don't have the required permissions to access this page."
 
         def permission_required(func):
             @wraps(func)
