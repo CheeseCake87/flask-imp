@@ -1,4 +1,4 @@
-![](https://github.com/CheeseCake87/Flask-BigApp/blob/master/app/structures/default_theme/static/img/Flask-BigApp-Logo-white-bg.png)  
+![](https://github.com/CheeseCake87/Flask-BigApp/blob/master/app/structures/default_theme/static/img/Flask-BigApp-Logo-white-bg.png)
 
 # Flask-BigApp
 
@@ -96,17 +96,16 @@ from.
 Let's say we have this folder structure:
 
 ```
-Flask-BigApp
-|
-- app/
--- static/
--- templates/
---- routes/
------- index.py
--- __init__.py
--- app_config.toml
-- venv
-- run.py
+Flask-BigApp/
+├── app/
+│   ├── static/
+│   ├── templates/
+│   ├── routes/
+│   │   └── index.py
+│   ├── __init__.py
+│   └── default.config.toml
+├── venv
+└── run.py
 ```
 
 The ```index.py``` file should look like this:
@@ -143,25 +142,23 @@ def my_page():
 So now our folder structure looks like this:
 
 ```
-Flask-BigApp
-|
-- app/
--- static/
--- templates/
---- routes/
------- index.py
------- my_page.py
--- __init__.py
--- app_config.toml
-- venv
-- run.py
+Flask-BigApp/
+├── app/
+│   ├── static/
+│   ├── templates/
+│   ├── routes/
+│   │   ├── index.py
+│   │   └── my_page.py
+│   ├── __init__.py
+│   └── default.config.toml
+├── venv
+└── run.py
 ```
 
 The ```my_page.py``` routes will also be imported into the main app.
 
 Using this method you can keep your routes in different files, and not have to worry about adding the import into
 your ```__init__.py``` file.
-
 
 ## Adding values to the session
 
@@ -213,23 +210,23 @@ Flask-BigApp will also handle any binds. Any database settings added after the d
 ```toml
 ...
 [database]
-    [database.main]
-    enabled = true
-    type = "sqlite"
-    database_name = "database"
-    location = "db"
-    port = ""
-    username = "user"
-    password = "password"
+[database.main]
+enabled = true
+type = "sqlite"
+database_name = "database"
+location = "db"
+port = ""
+username = "user"
+password = "password"
 
-    [database."defined_name"]
-        enabled = true
-        type = "sqlite"
-        database_name = "other_database"
-        location = "db"
-        port = ""
-        username = "user"
-        password = "password"
+[database."defined_name"]
+enabled = true
+type = "sqlite"
+database_name = "other_database"
+location = "db"
+port = ""
+username = "user"
+password = "password"
 ```
 
 This is the same as the configuration:
@@ -241,11 +238,9 @@ SQLALCHEMY_BINDS = {
 }
 ```
 
-
-
 ## Importing Models
 
-You can import model classes from a single file, of a folder of 
+You can import model classes from a single file, of a folder of
 model files by using the `bigapp.import_models(file="models.py", folder="models")` method.
 
 Here's an example of how you can setup Flask-BigApp to import model classes:
@@ -341,9 +336,8 @@ Here's an example of the builtins folder structure:
 
 ```text
 builtins/
-|
--- routes.py
--- template_filters.py
+├── routes.py
+└── template_filters.py
 ```
 
 Importing builtins uses Flask's `current_app` to register the routes, here's an example of a file in the builtins folder:
@@ -386,26 +380,24 @@ The shape of your folder to import blueprints from should look like this:
 
 ```text
 blueprints/
-|
-- blueprint1/
--- routes/
----- index.py
--- templates/
----- blueprint1/
------- index.html
--- static/
--- __init__.py
--- config.toml
-|
-- another_blueprint/
--- routes/
----- index.py
--- templates/
----- another_blueprint/
------- index.html
--- static/
--- __init__.py
--- config.toml
+├── blueprint1/
+│   ├── routes/
+│   │   └── index.py
+│   ├── static/
+│   ├── templates/
+│   │   └── blueprint1/
+│   │       └── index.html
+│   ├── __init__.py
+│   └── config.toml
+└── another_blueprint/
+    ├── routes/
+    │   └── index.py
+    ├── static/
+    ├── templates/
+    │   └── another_blueprint/
+    │       └── index.html
+    ├── __init__.py
+    └── config.toml
 ```
 
 In the above we are nesting all templates under a folder with the same name as the blueprint. This is a workaround to allow you to have template files with the
@@ -431,6 +423,7 @@ not_logged_in = false
 
 `NEW IN 1.3.*`
 Blueprint config.toml can also look like this:
+
 ```toml
 enabled = "yes"
 url_prefix = "/"
@@ -441,13 +434,14 @@ permissions = ["this", "that"]
 logged_in = true
 not_logged_in = false
 ```
+
 Using this method, bigapp will automatically look for and create the following folder structure:
 
 ```
-- blueprint1/
--- templates/ <- creates if not found
----- blueprint1/ <- creates if not found
--- static/ <- creates if not found
+blueprint1/
+├── templates/ <- creates if not found/
+│   └── blueprint1/ <- creates if not found
+└── static/ <- creates if not found
 ```
 
 The session section can be initialised using the `bp.init_session()` method. This places the values into the Flask session -> `from flask import session`
@@ -497,7 +491,120 @@ The `bp.tmpl` method just decorates the string with the name of the blueprint, c
 Of course this only works if your templates are nested under a folder with the same name as your blueprint, however it does make it possible to change the
 blueprint name later and not have to worry about search and replace.
 
-## Creating a Blueprint via the CLI (NEW)
+## Importing Nested Blueprints
+
+You can import nexted blueprints from within a blueprint. Say our folder structure currently looks like this:
+
+```text
+blueprints/
+└── blueprint1/
+    ├── routes/...
+    ├── static/...
+    ├── templates/...
+    ├── __init__.py
+    └── config.toml
+```
+
+We can add a nested blueprint to the folder by doing the following:
+
+```text
+blueprints/
+└── blueprint1/
+    ├── nested_blueprint/
+    │   ├── routes/
+    │   │   └── index.py
+    │   ├── static/
+    │   ├── templates/
+    │   │   └── nested_blueprint/
+    │   │       └── index.html
+    │   ├── __init__.py
+    │   └── config.toml
+    ├── routes/...
+    ├── static/...
+    ├── templates/...
+    ├── __init__.py
+    └── config.toml
+```
+
+You then import the nested blueprint in the parent blueprint's `__init__.py` file:
+
+```python
+# blueprint1's __init__.py file
+
+from flask_bigapp import Blueprint
+
+bp = Blueprint(__name__, "config.toml")
+
+bp.import_routes("routes")
+bp.import_nested_blueprint("nested_blueprint")
+
+
+@bp.before_app_request
+def before_app_request():
+    bp.init_session()
+
+
+@bp.after_app_request
+def after_app_request(response):
+    return response
+```
+
+This will now allow for using url_for like this:
+
+`url_for("blueprint1.nested_blueprint.index")`
+
+### Importing multiple nested blueprints
+
+You can import multiple nested blueprints by placing the nested blueprints in a folder, here's an example folder structure:
+
+```text
+blueprints/
+└── blueprint1/
+    ├── nested_blueprints/
+    │   ├── nested_blueprint1/
+    │   │   ├── routes/...
+    │   │   ├── static/...
+    │   │   ├── templates/...
+    │   │   ├── __init__.py
+    │   │   └── config.toml
+    │   └── nested_blueprint2/
+    │       ├── routes/...
+    │       ├── static/...
+    │       ├── templates/...
+    │       ├── __init__.py
+    │       └── config.toml
+    ├── routes/
+    ├── static/
+    ├── templates/
+    ├── __init__.py
+    └── config.toml
+```
+
+You then import the nested blueprints in the parent blueprint's `__init__.py` file:
+
+```python
+# blueprint1's __init__.py file
+
+from flask_bigapp import Blueprint
+
+bp = Blueprint(__name__, "config.toml")
+
+bp.import_routes("routes")
+# bp.import_nested_blueprint("nested_blueprint")
+bp.import_nested_blueprints("nested_blueprints")
+
+
+@bp.before_app_request
+def before_app_request():
+    bp.init_session()
+
+
+@bp.after_app_request
+def after_app_request(response):
+    return response
+```
+
+## Creating a Blueprint via the CLI (NEW, BETA Feature)
 
 You can create a blueprint via the CLI using:
 
@@ -505,46 +612,110 @@ You can create a blueprint via the CLI using:
 
 This will create a new blueprint called `new_blueprint` and place it in the folder you specified. It creates the following folder structure:
 
-```bash
+```text
 blueprints/
-|
-- new_blueprint/
--- routes/
----- index.py
--- templates/
----- new_blueprint/
------- index.html
--- static/
--- __init__.py
--- config.toml
+└── new_blueprint/
+    ├── routes/
+    │   └── index.py
+    ├── templates/
+    │   └── new_blueprint/
+    │       └── index.html
+    ├── static/
+    ├── __init__.py
+    └── config.toml
 ```
 
 ## Importing Structures (themes)
 
-You can register a structures (theme) folder using:
+You can register structures (themes) from a folder using:
 
 - `bigapp.import_structures("structures")`
 
-Structures work the same as blueprints but are used for theming and do not have a config file, here's an example of the folder layout of the structures folder:
+Structures work the same as blueprints but are used for
+theming and do not have the need for a config file or `__init__.py` file.
+
+Here's an example of the folder layout of the `structures` folder:
 
 ```text
 structures/
-|
-- theme1/
--- templates/
---- theme1/
----- extend/
------- main.html
----- includes/
------- footer.html
----- macros/
------- theme1_menu.html
--- static/
----- logo.png
----- style.css
--- __init__.py
--- config.toml
+└── theme1/
+    ├── static/
+    │   ├── logo.png
+    │   └── style.css
+    └── templates/
+        └── theme1/
+            ├── extend/
+            │   └── main.html
+            ├── includes/
+            │   └── footer.html
+            └── macros/
+                └── theme1_menu.html
 ```
+
+Here's a few examples of how you would work with structures:
+
+**extending a template:**
+
+```html
+{% extends "theme1/extend/main.html" %}
+```
+
+This would be placed at the top of a template file of a blueprint,
+`blueprint1/templates/blueprint1/index.html` for exmaple.
+
+**including a template:**
+
+```html
+{% include "theme1/includes/footer.html" %}
+```
+
+**including a macro:**
+
+```html
+{% import "theme1/macros/theme1_menu.html" as theme1_menu %}
+```
+
+**pulling a static file:**
+
+```html
+<img src="{{ url_for('theme1.static', filename='logo.png') }}" alt="logo">
+```
+
+A structures (themes) main purpose is to allow blueprints templates to work with structure blocks and static files.
+
+Say, for example you set a blueprint template to extend a structure template, you can then use the structure blocks in the blueprint template.
+
+```jinja
+{% extends "theme1/extend/main.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>Home</h1>
+{% endblock %}
+```
+
+`theme1/extend/main.html` file:
+
+```jinja
+...
+
+{% block title %}{% endblock %}
+
+...
+
+<body>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+
+...
+```
+
+This allows for switching between structures, or working with similar structures.
 
 # GitHub Project
 

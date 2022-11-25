@@ -1,0 +1,13 @@
+enabled = "yes"
+
+[settings]
+url_prefix = "/example2"
+template_folder = "templates"
+static_folder = "static"
+#static_url_path = "/exmaple_blueprint/static"
+
+[session]
+var_in_session = "this can be loaded using fl_bp.session"
+permissions = ["this", "that"]
+logged_in = true
+not_logged_in = false

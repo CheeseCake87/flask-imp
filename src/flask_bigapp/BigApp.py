@@ -106,22 +106,24 @@ class BigApp(object):
 
         blueprints_register: Dict[str, ModuleType] = dict()
         for blueprint in blueprints_found:
-            location_parts_reversed = tuple(reversed(blueprint.parts))
-            shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.__app_name) + 1]
-            try:
-                import_blueprint_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
-                blueprints_register.update({blueprint.name: import_blueprint_module})
-                for dir_item in dir(import_blueprint_module):
-                    if isinstance(getattr(import_blueprint_module, dir_item), BigAppBlueprint):
-                        try:
-                            blueprint_object = getattr(import_blueprint_module, dir_item)
-                            if blueprint_object.enabled:
-                                self.__app.register_blueprint(blueprint_object)
-                        except AttributeError as e:
-                            logging.critical("Error importing blueprint: ", e, f"{blueprint.name}")
-            except AttributeError as e:
-                logging.critical("Error importing blueprint: ", e, f" from {folder_path}")
-                continue
+            if blueprint.is_dir():
+                location_parts_reversed = tuple(reversed(blueprint.parts))
+                shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.__app_name) + 1]
+                try:
+                    import_blueprint_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
+                    blueprints_register.update({blueprint.name: import_blueprint_module})
+                    for dir_item in dir(import_blueprint_module):
+                        if isinstance(getattr(import_blueprint_module, dir_item), BigAppBlueprint):
+                            try:
+                                blueprint_object = getattr(import_blueprint_module, dir_item)
+                                if blueprint_object.enabled:
+                                    self.__app.register_blueprint(blueprint_object)
+                                    break
+                            except AttributeError as e:
+                                logging.critical("Error importing blueprint: ", e, f"{blueprint.name}")
+                except AttributeError as e:
+                    logging.critical("Error importing blueprint: ", e, f" from {folder_path}")
+                    continue
 
     def import_structures(self, structures_folder: Union[Any, os.PathLike]) -> None:
         """

@@ -3,6 +3,7 @@ import os
 import pathlib
 from importlib import import_module
 from inspect import stack
+from types import ModuleType
 from typing import Dict, Union, Any
 
 from flask import Blueprint
@@ -52,6 +53,62 @@ class BigAppBlueprint(Blueprint):
                 logging.warning(f"Error when importing {self.package}.{route}: {e}")
                 continue
 
+    def import_nested_blueprint(self, blueprint: str) -> None:
+        """
+        Imports a single nested blueprint.
+
+        Folder must be relative ( folder="blueprint" not folder="/home/user/app/folder/blueprint/blueprint" )
+        """
+        path = self.location / blueprint
+        config = path / "config.toml"
+        init = path / "__init__.py"
+
+        if config.exists() and init.exists():
+            location_parts_reversed = tuple(reversed(path.parts))
+            shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.ba_name) + 3]
+            try:
+                import_blueprint_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
+                for dir_item in dir(import_blueprint_module):
+                    if isinstance(getattr(import_blueprint_module, dir_item), BigAppBlueprint):
+                        try:
+                            blueprint_object = getattr(import_blueprint_module, dir_item)
+                            if blueprint_object.enabled:
+                                self.register_blueprint(blueprint_object)
+                                break
+                        except AttributeError as e:
+                            logging.critical(f"Error registering nested blueprint for {self.ba_name}", e, f"{blueprint}")
+            except AttributeError as e:
+                logging.critical(f"Error importing nested blueprint for {self.ba_name}", e, f" from {shrink_parts_to_app}")
+
+    def import_nested_blueprints(self, folder: str) -> None:
+        """
+        Imports all nested blueprints in the given folder.
+
+        Folder must be relative ( folder="folder_of_blueprints" not folder="/home/user/app/folder/blueprint/folder_of_blueprints" )
+        """
+        path = self.location / folder
+        blueprints_found = path.iterdir()
+        nested_blueprints_register: Dict[str, ModuleType] = dict()
+
+        for blueprint in blueprints_found:
+            location_parts_reversed = tuple(reversed(blueprint.parts))
+            shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.ba_name) + 3]
+            try:
+                import_blueprint_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
+                nested_blueprints_register.update({blueprint.name: import_blueprint_module})
+                for dir_item in dir(import_blueprint_module):
+                    if isinstance(getattr(import_blueprint_module, dir_item), BigAppBlueprint):
+                        try:
+                            blueprint_object = getattr(import_blueprint_module, dir_item)
+                            if blueprint_object.enabled:
+                                self.register_blueprint(blueprint_object)
+                                break
+                        except AttributeError as e:
+                            logging.critical(f"Error registering nested blueprint for {self.ba_name}", e, f"{blueprint.name}")
+            except AttributeError as e:
+                logging.critical(f"Error importing nested blueprint for {self.ba_name}", e, f" from {shrink_parts_to_app}")
+                continue
+
     def init_session(self) -> None:
         """
         Initialize the session variables found in the config file.
@@ -65,7 +122,7 @@ class BigAppBlueprint(Blueprint):
     def tmpl(self, template) -> str:
         """
         Pushes together the name of the blueprint and the template file to look for.
-        This is a small time saving method to allow you to only type
+        This is a small-time saving method to allow you to only type
         bp.tmpl("index.html") when looking for template files.
         """
         return f"{self.name}/{template}"
