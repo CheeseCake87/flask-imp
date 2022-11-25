@@ -493,7 +493,7 @@ blueprint name later and not have to worry about search and replace.
 
 ## Importing Nested Blueprints
 
-You can import nexted blueprints from within a blueprint. Say our folder structure currently looks like this:
+You can import nested blueprints from within a blueprint. Say our folder structure currently looks like this:
 
 ```text
 blueprints/
