@@ -19,17 +19,16 @@ from .Resources import Resources
 
 class BigApp(object):
     session: Dict = dict()
-    smtp: Dict = dict()
     structures: Dict = dict()
     model_classes: Dict = dict()
 
-    __config: Dict = dict()
-    __app: Flask
-    __app_name: str
-    __app_path: pathlib.PurePath
-    __app_folder: str
+    _config: Dict = dict()
+    _app: Flask
+    _app_name: str
+    _app_path: pathlib.PurePath
+    _app_folder: str
 
-    __default_config: Union[str, bytes, os.PathLike, None] = os.environ.get("BA_CONFIG", None)
+    _default_config: Union[str, bytes, os.PathLike, None] = os.environ.get("BA_CONFIG", None)
 
     def __init__(
             self,
@@ -42,7 +41,7 @@ class BigApp(object):
     def init_app(
             self,
             app: Flask,
-            app_config_file: Union[str, bytes, os.PathLike, None] = __default_config
+            app_config_file: Union[str, bytes, os.PathLike, None] = _default_config
     ) -> None:
         """
         Initializes the application.
@@ -62,12 +61,12 @@ class BigApp(object):
         if not isinstance(app, Flask):
             raise TypeError("The app that was passed in is not an instance of a Flask app")
 
-        self.__app = app
-        self.__app_name = app.name
-        self.__app_path = pathlib.PurePath(self.__app.root_path)
-        self.__app_folder = self.__app_path.parts[-1]
-        self.__config = self.__load_config_file(app_config_file)
-        self.__config_processor(self.__config)
+        self._app = app
+        self._app_name = app.name
+        self._app_path = pathlib.PurePath(self._app.root_path)
+        self._app_folder = self._app_path.parts[-1]
+        self._config = self._load_config_file(app_config_file)
+        self._config_processor(self._config)
 
     def init_session(self) -> None:
         """
@@ -85,12 +84,12 @@ class BigApp(object):
 
         Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
         """
-        folder_path = pathlib.Path(pathlib.PurePath(self.__app_path) / folder)
+        folder_path = pathlib.Path(pathlib.PurePath(self._app_path) / folder)
         location_parts_reversed = tuple(reversed(folder_path.parts))
-        shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.__app_name) + 1]
+        shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self._app_name) + 1]
         if folder_path.is_dir():
             builtin_files = folder_path.glob("*.py")
-            with self.__app.app_context():
+            with self._app.app_context():
                 for builtin in builtin_files:
                     import_module(f"{'.'.join(tuple(reversed(shrink_parts_to_app)))}.{builtin.stem}")
 
@@ -101,14 +100,14 @@ class BigApp(object):
         Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
         """
 
-        folder_path = pathlib.Path(pathlib.PurePath(self.__app_path) / folder)
+        folder_path = pathlib.Path(pathlib.PurePath(self._app_path) / folder)
         blueprints_found = folder_path.iterdir()
 
         blueprints_register: Dict[str, ModuleType] = dict()
         for blueprint in blueprints_found:
             if blueprint.is_dir():
                 location_parts_reversed = tuple(reversed(blueprint.parts))
-                shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.__app_name) + 1]
+                shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self._app_name) + 1]
                 try:
                     import_blueprint_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
                     blueprints_register.update({blueprint.name: import_blueprint_module})
@@ -117,7 +116,7 @@ class BigApp(object):
                             try:
                                 blueprint_object = getattr(import_blueprint_module, dir_item)
                                 if blueprint_object.enabled:
-                                    self.__app.register_blueprint(blueprint_object)
+                                    self._app.register_blueprint(blueprint_object)
                                     break
                             except AttributeError as e:
                                 logging.critical("Error importing blueprint: ", e, f"{blueprint.name}")
@@ -134,13 +133,13 @@ class BigApp(object):
         Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
         """
 
-        folder_path = pathlib.Path(pathlib.PurePath(self.__app_path) / structures_folder)
+        folder_path = pathlib.Path(pathlib.PurePath(self._app_path) / structures_folder)
         structures_folder_files = folder_path.iterdir()
 
         structures_register: Dict[str, ModuleType] = dict()
         for structure in structures_folder_files:
             location_parts_reversed = tuple(reversed(structure.parts))
-            shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self.__app_name) + 1]
+            shrink_parts_to_app = location_parts_reversed[:location_parts_reversed.index(self._app_name) + 1]
             try:
                 import_structure_module = import_module(".".join(tuple(reversed(shrink_parts_to_app))))
                 structures_register.update({structure.name: import_structure_module})
@@ -151,7 +150,7 @@ class BigApp(object):
                     template_folder=f"{structure.absolute()}/templates",
                     static_url_path=f"/{structure.name}/static"
                 )
-                self.__app.register_blueprint(structure_blueprint)
+                self._app.register_blueprint(structure_blueprint)
             except AttributeError as e:
                 logging.critical("Error importing blueprint: ", e, f" from {folder_path}")
                 continue
@@ -170,16 +169,16 @@ class BigApp(object):
             raise ImportError("You must pass in a file or folder located at the root of the app.")
 
         if folder is not None:
-            folder_path = pathlib.Path(pathlib.PurePath(self.__app_path) / folder)
+            folder_path = pathlib.Path(pathlib.PurePath(self._app_path) / folder)
             if folder_path.is_dir():
                 model_files = folder_path.glob("*.py")
                 for model_file in model_files:
-                    self.__import_model_processor(model_file)
+                    self._import_model_processor(model_file)
 
         if file is not None:
-            file_path = pathlib.Path(pathlib.PurePath(self.__app_path) / file)
+            file_path = pathlib.Path(pathlib.PurePath(self._app_path) / file)
             if file_path.is_file() and file_path.suffix == ".py":
-                self.__import_model_processor(file_path)
+                self._import_model_processor(file_path)
 
     def model_class(self, class_name: str) -> Any:
         """
@@ -192,18 +191,7 @@ class BigApp(object):
             return self.model_classes[class_name]
         raise ValueError(f"{class_name} was not found in the list of model_classes")
 
-    def get_smtp_settings(self, email_address: str) -> dict:
-        """
-        Returns the SMTP settings from the config for the given email address
-
-        email = bigapp.get_smtp_settings("example@example.com")
-        email_server = email['server']
-        """
-        if email_address in self.smtp:
-            return self.smtp[email_address]
-        return {}
-
-    def __load_config_file(self, config_file: Union[Any, os.PathLike]) -> Dict:
+    def _load_config_file(self, config_file: Union[Any, os.PathLike]) -> Dict:
         """
         Attempts to load the passed in config file, if no config file is passed in
         an attempt will be made to first read the default config file. If this fails
@@ -212,11 +200,11 @@ class BigApp(object):
         config_suffix = ('.toml', '.tml')
 
         if config_file is not None:
-            passed_config = self.__app_path / config_file
+            passed_config = self._app_path / config_file
             if pathlib.Path(passed_config).is_file() and passed_config.suffix in config_suffix:
                 return load(passed_config)
 
-        default_config = pathlib.PurePath(self.__app_path / "default.config.toml")
+        default_config = pathlib.PurePath(self._app_path / "default.config.toml")
         if pathlib.Path(default_config).is_file():
             return load(default_config)
 
@@ -226,7 +214,7 @@ class BigApp(object):
 
         return load(create_default_config)
 
-    def __config_processor(self, config: Dict):
+    def _config_processor(self, config: Dict):
         """
         Processes the values from the configuration file.
         """
@@ -237,40 +225,33 @@ class BigApp(object):
 
         if flask_config is not None and isinstance(flask_config, dict):
             if flask_config.get("static_folder", False):
-                self.__app.static_folder = self.__if_env_replace(flask_config.get("static_folder"))
+                self._app.static_folder = self._if_env_replace(flask_config.get("static_folder"))
                 del flask_config['static_folder']
             if flask_config.get("template_folder", False):
-                self.__app.template_folder = self.__if_env_replace(flask_config.get("template_folder"))
+                self._app.template_folder = self._if_env_replace(flask_config.get("template_folder"))
                 del flask_config['template_folder']
             for __key, __value in flask_config.items():
-                self.__app.config.update({str(__key).upper(): self.__if_env_replace(__value)})
+                self._app.config.update({str(__key).upper(): self._if_env_replace(__value)})
 
         if session_config is not None and isinstance(session_config, dict):
             self.session = session_config
 
         if database_config is not None and isinstance(database_config, dict):
-            self.__app.config['SQLALCHEMY_BINDS'] = dict()
+            self._app.config['SQLALCHEMY_BINDS'] = dict()
             for __key, __value in database_config.items():
                 if __value.get("enabled", False):
                     if __key == "main":
-                        self.__app.config['SQLALCHEMY_DATABASE_URI'] = f"{self.__build_database_uri(__value)}"
+                        self._app.config['SQLALCHEMY_DATABASE_URI'] = f"{self._build_database_uri(__value)}"
                         continue
-                    self.__app.config['SQLALCHEMY_BINDS'].update({__key: f"{self.__build_database_uri(__value)}"})
+                    self._app.config['SQLALCHEMY_BINDS'].update({__key: f"{self._build_database_uri(__value)}"})
 
-        if smtp_config is not None and isinstance(smtp_config, dict):
-            for __key, __value in smtp_config.items():
-                this_key = self.__if_env_replace(__key)
-                self.smtp.update({this_key: dict()})
-                for ___key, ___value in __value.items():
-                    self.smtp[this_key].update({___key: self.__if_env_replace(___value)})
-
-    def __import_model_processor(self, path: pathlib.PurePath):
+    def _import_model_processor(self, path: pathlib.PurePath):
         """
         Picks apart the model file and builds a registry of the models found.
         """
         # Reverse the path to find the first index of the app name, incase any parent dir has the same name.
         folder_location_parts_reversed = tuple(reversed(path.parts))
-        folder_shrink_parts_to_app = folder_location_parts_reversed[:folder_location_parts_reversed.index(self.__app_name) + 1]
+        folder_shrink_parts_to_app = folder_location_parts_reversed[:folder_location_parts_reversed.index(self._app_name) + 1]
         module_import_path = ".".join(tuple(reversed(folder_shrink_parts_to_app))).replace(".py", "")
         try:
             model_module = import_module(module_import_path)
@@ -282,28 +263,28 @@ class BigApp(object):
         except ImportError as e:
             logging.critical("Error importing model: ", e, f" {module_import_path}")
 
-    def __build_database_uri(self, block: dict) -> str:
+    def _build_database_uri(self, block: dict) -> str:
         """
         Puts together the correct database URI depending on the type specified.
 
         Fails if type is not supported.
         """
-        db_type = self.__if_env_replace(block.get("type", "None"))
-        db_name = self.__if_env_replace(block.get('database_name', 'database'))
+        db_type = self._if_env_replace(block.get("type", "None"))
+        db_name = self._if_env_replace(block.get('database_name', 'database'))
 
-        db_location = self.__if_env_replace(block.get("location", "db"))
-        db_port = self.__if_env_replace(str(block.get('port', 'None')))
+        db_location = self._if_env_replace(block.get("location", "db"))
+        db_port = self._if_env_replace(str(block.get('port', 'None')))
 
-        db_username = self.__if_env_replace(block.get('username', 'None'))
-        db_password = self.__if_env_replace(block.get('password', 'None'))
+        db_username = self._if_env_replace(block.get('username', 'None'))
+        db_password = self._if_env_replace(block.get('password', 'None'))
 
         db_allowed = ('postgresql', 'mysql', 'oracle')
 
         if db_type == "sqlite":
             if db_location is not None:
-                pathlib.Path(self.__app_path / db_location).mkdir(parents=True, exist_ok=True)
-                return f"{db_type}:////{self.__app_path}/{db_location}/{db_name}.db"
-            return f"{db_type}:////{self.__app_path}/{db_name}.db"
+                pathlib.Path(self._app_path / db_location).mkdir(parents=True, exist_ok=True)
+                return f"{db_type}:////{self._app_path}/{db_location}/{db_name}.db"
+            return f"{db_type}:////{self._app_path}/{db_name}.db"
 
         if db_type in db_allowed:
             return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
@@ -311,7 +292,7 @@ class BigApp(object):
         raise ValueError(f"Unknown database type: {db_type}, must be: postgresql / mysql / oracle / sqlite")
 
     @staticmethod
-    def __if_env_replace(value: Optional[Any]) -> Any:
+    def _if_env_replace(value: Optional[Any]) -> Any:
         """
         Looks for the replacement pattern to swap out values in the config file with environment variables.
         """
