@@ -221,7 +221,6 @@ class BigApp(object):
         flask_config = config.get("flask")
         session_config = config.get("session")
         database_config = config.get("database")
-        smtp_config = config.get("smtp")
 
         if flask_config is not None and isinstance(flask_config, dict):
             if flask_config.get("static_folder", False):
@@ -282,6 +281,10 @@ class BigApp(object):
 
         if db_type == "sqlite":
             if db_location is not None:
+
+                if db_location.startswith("/"):
+                    return f"sqlite:///{db_location}/{db_name}"
+
                 pathlib.Path(self._app_path / db_location).mkdir(parents=True, exist_ok=True)
                 return f"{db_type}:////{self._app_path}/{db_location}/{db_name}.db"
             return f"{db_type}:////{self._app_path}/{db_name}.db"
