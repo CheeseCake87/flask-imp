@@ -13,12 +13,16 @@ def create_app():
     bigapp.init_app(main)
     db.init_app(main)
 
-    bigapp.import_structures("structures")
+
     bigapp.import_builtins("flask/routes")
     bigapp.import_builtins("flask/template_filters")
     bigapp.import_blueprints("blueprints")
+    bigapp.import_blueprint("root_blueprint")
 
     bigapp.import_models(folder="models")
+
+    bigapp.import_themes("themes")
+    bigapp.import_theme("root_theme")
 
     @main.before_request
     def before_request():

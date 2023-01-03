@@ -13,10 +13,11 @@
     <p>If you don't have name defined in the Blueprint config file, it will set the endpoint to the name of the folder the Blueprint is in.</p>
     <p>Being able to set this name can avoid any endpoint duplicates if you have are importing blueprints from different folders.</p>
 
-    <strong>Structures (themes) are blueprints to.</strong>
-    <p>When importing structures, these are the same as blueprint in the way they work, although they have more of a focus on controlling the page layout
-    and styling. Structures usually don't have any routes assigned</p>
-    <p>You can see the URL map for the structure</p>
+    <strong>Themes are blueprints to.</strong>
+    <p>When importing themes, these are the same as blueprints in the way they work, although they have more of a focus on controlling the page layout
+    and styling. Themes usually don't have any routes assigned</p>
+    <p>You can see the URL map for the themes</p>
+    <p>Their roots are place in the template lookup to allow for the templates found in their folder to be found by other blueprints</p>
 
     {% include footer %}
 {% endblock %}

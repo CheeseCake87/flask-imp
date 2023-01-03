@@ -1,0 +1,18 @@
+{% extends extend %}
+
+{% block _title %}
+Flask-BigApp - Structure Example
+{% endblock %}
+
+{% block _container %}
+
+    <p><strong>The following img is pulled from themes/default_theme/static/img/Flask-BigApp-Logo-white-bg.png</strong></p>
+    <p><strong>url_for('default_theme.static', filename='img/Flask-BigApp-Logo-white-bg.png')</strong></p>
+    <img src="{{ url_for('default_theme.static', filename='img/Flask-BigApp-Logo-white-bg.png') }}" alt="Flask-BigApp Logo" />
+
+
+    <p><strong>The following img is pulled from root_theme/static/img/Flask-BigApp-Logo-white-bg.png</strong></p>
+    <p><strong>url_for('root_theme.static', filename='img/Flask-BigApp-Logo-white-bg.png')</strong></p>
+    <img src="{{ url_for('root_theme.static', filename='img/Flask-BigApp-Logo-white-bg.png') }}" alt="Flask-BigApp Logo" />
+
+{% endblock %}

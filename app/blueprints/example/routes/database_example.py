@@ -10,7 +10,8 @@ def create_all_models():
     Creates database based on the models file
     """
     db.create_all()
-    return """If you didn't see an error, this probably worked..."""
+    render = bp.tmpl("create-models.html")
+    return render_template(render, **page_needs)
 
 
 @bp.route("/database-example", methods=["GET"])
