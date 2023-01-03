@@ -9,9 +9,9 @@ db = SQLAlchemy()
 
 
 def create_app():
-    main = Flask(__name__)
-    bigapp.init_app(main)
-    db.init_app(main)
+    app = Flask(__name__)
+    bigapp.init_app(app)
+    db.init_app(app)
 
     bigapp.import_builtins("flask/routes")
     bigapp.import_builtins("flask/template_filters")
@@ -24,15 +24,15 @@ def create_app():
 
     bigapp.import_models(folder="models")
 
-    @main.before_request
+    @app.before_request
     def before_request():
         bigapp.init_session()
 
-    @main.after_request
+    @app.after_request
     def after_request(response):
         return response
 
-    with main.app_context():
+    with app.app_context():
         """
         The following creates all tables from the model files and populates the database
         with test data.
@@ -71,4 +71,4 @@ def create_app():
     #
     # print(bigapp.models)
 
-    return main
+    return app

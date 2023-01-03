@@ -5,12 +5,23 @@ from pathlib import Path
 from typing import Union
 
 
-def deprecated(message: str):
-    logging.critical(f"Function deprecated: {message}")
+class Sprinkles:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
 
+
+def deprecated(message: str):
     def func_wrapper(func):
         @functools.wraps(func)
         def proc_function(*args, **kwargs):
+            logging.critical(f"{Sprinkles.FAIL}Function deprecated: {message}{Sprinkles.END}")
             return func(*args, **kwargs)
 
         return proc_function
