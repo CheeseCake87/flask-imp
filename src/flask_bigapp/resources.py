@@ -3,7 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Resources:
-    default_config = """
+    # Format to: secret_key
+    default_config = """\
 # Updates the Flask app config with the variables below.
 # If any variable below does not exist in the standard Flask env vars it is created and will be accessible using
 # app.config["YOUR_VAR_NAME"]. All variables defined below will be capitalised when imported.
@@ -33,4 +34,10 @@ EXPLAIN_TEMPLATE_LOADING = false
     username = "user"
     password = "password"
 
+"""
+    # Format to: static_url_path
+    default_theme_config = """\
+enabled = "yes"
+static_folder = "static"
+static_url_path = "{static_url_path}"
 """

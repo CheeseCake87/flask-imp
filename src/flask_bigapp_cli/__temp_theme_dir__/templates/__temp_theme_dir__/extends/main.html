@@ -1,0 +1,21 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %} {% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('__temp_theme_dir__.static', filename='css/custom.css') }}">
+    <script src="{{ url_for('__temp_theme_dir__.static', filename='js/main.js') }}"></script>
+</head>
+
+<body>
+    <img src="{{ url_for('__temp_theme_dir__.static', filename='img/Flask-BigApp-Logo.png') }}" alt="logo">
+    {% include "__temp_theme_dir__/includes/menu.html" %}
+    {% block global %}
+    
+    {% endblock %}
+    {% include "__temp_theme_dir__/includes/footer.html" %}
+</body>
+
+</html>

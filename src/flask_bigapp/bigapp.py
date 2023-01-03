@@ -16,7 +16,7 @@ from toml import load as toml_load
 
 from .blueprint import BigAppBlueprint
 from .resources import Resources
-from .utilities import cast_to_import_str, deprecated
+from .utilities import cast_to_bool, cast_to_import_str, deprecated
 
 
 class _ModelRegistry:
@@ -242,29 +242,45 @@ class BigApp(object):
             static_folder = Path(theme / "static")
             template_folder = Path(theme / "templates")
             nested_template_folder = Path(theme / "templates" / theme.name)
+            builtins_folder = Path(theme / "builtins")
+
+            config = Path(theme / "config.toml")
 
             if not static_folder.exists():
-                logging.critical(f"Static folder for {theme.name} was not found, creating one now")
-                static_folder.mkdir(exist_ok=True)
+                logging.debug(f"Static folder for {theme.name} was not found, skipping")
 
             if not template_folder.exists():
-                logging.critical(f"Template folder for {theme.name} was not found, creating one now")
-                template_folder.mkdir(exist_ok=True)
+                raise NotADirectoryError(f"Template folder for {theme.name} was not found")
 
             if not nested_template_folder.exists():
-                logging.critical(f"Nested template folder for {theme.name} was not found, creating one now")
-                nested_template_folder.mkdir(exist_ok=True)
+                raise NotADirectoryError(f"Nested template folder for {theme.name} was not found")
+
+            if not config.exists():
+                logging.debug(f"Config file for {theme.name} was not found, creating default")
+                config.write_text(Resources.default_theme_config.format(static_url_path=f"/{theme.name}/static"))
+
+            loaded_config = toml_load(config)
 
             theme_bp = Blueprint(
                 name=theme.name,
                 import_name=f"{theme.name}",
                 static_folder=f"{theme.absolute()}/static",
                 template_folder=f"{theme.absolute()}/templates",
-                static_url_path=f"/{theme.name}/static"
+                static_url_path=f"{loaded_config.get('static_url_path', f'/{theme.name}/static')}",
             )
 
-            self._app.register_blueprint(theme_bp)
-            self.themes.update({theme.name: theme.absolute()})
+            if cast_to_bool(loaded_config.get("enabled")):
+
+                if builtins_folder.exists():
+                    with self._app.app_context():
+                        for py_file in builtins_folder.glob("*.py"):
+                            module = import_module(
+                                f"{cast_to_import_str(self._app_name, builtins_folder)}.{py_file.stem}")
+                            if hasattr(module, "loader"):
+                                module.loader(self._app)
+
+                self._app.register_blueprint(theme_bp)
+                self.themes.update({theme.name: theme.absolute()})
 
     def import_models(
             self,
