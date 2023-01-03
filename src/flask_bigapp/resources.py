@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 
+
 @dataclass
 class Resources:
     default_config = """
@@ -11,9 +12,9 @@ class Resources:
 [flask]
 APP_NAME = "app"
 VERSION = "0.0.1"
-SECRET_KEY = "changeme"
-DEBUG = true
-TESTING = true
+SECRET_KEY = "{secret_key}"
+DEBUG = false
+TESTING = false
 SESSION_TIME = 480
 ERROR_404_HELP = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false

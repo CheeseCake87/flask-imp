@@ -1,7 +1,7 @@
-from .Auth import Auth as Auth
-from .Auth import PasswordGeneration as PasswordGeneration
-from .BigApp import BigApp as BigApp
-from .Blueprint import BigAppBlueprint as Blueprint
-from .Security import BigAppSecurity as Security
+from .auth import Auth as Auth
+from .auth import PasswordGeneration as PasswordGeneration
+from .bigapp import BigApp as BigApp
+from .blueprint import BigAppBlueprint as Blueprint
+from .security import BigAppSecurity as Security
 
 __all__ = ["Auth", "PasswordGeneration", "BigApp", "Blueprint", "Security"]
