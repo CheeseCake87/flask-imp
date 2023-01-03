@@ -1,10 +1,10 @@
 import logging
 import os
-from pathlib import Path, PurePath
 import re
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
+from pathlib import Path
 from types import ModuleType
 from typing import Dict, TextIO, Union, Optional, Any
 
@@ -269,7 +269,7 @@ class BigApp(object):
                     model_processor(model_file)
 
         if file is not None:
-            file_path = Path(PurePath(self._app_path) / file)
+            file_path = Path(self._app_path / file)
             if file_path.is_file() and file_path.suffix == ".py":
                 model_processor(file_path)
 

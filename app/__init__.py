@@ -1,7 +1,8 @@
 from flask import Flask
-from flask_bigapp import BigApp
 from flask_sqlalchemy import SQLAlchemy
+
 from flask_bigapp import Auth
+from flask_bigapp import BigApp
 
 bigapp = BigApp()
 db = SQLAlchemy()
@@ -25,9 +26,6 @@ def create_app():
     @main.after_request
     def after_request(response):
         return response
-
-    print(main.config)
-
 
     with main.app_context():
         """
@@ -65,5 +63,7 @@ def create_app():
     """
     for _ in main.url_map.iter_rules():
         print(_)
+
+    print(bigapp.model_classes)
 
     return main

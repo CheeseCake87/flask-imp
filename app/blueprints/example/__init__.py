@@ -7,7 +7,10 @@ page_needs = {
 bp = Blueprint(__name__)
 
 bp.import_routes("routes")
+
 bp.import_nested_blueprint("example_nested")
+
+bp.import_blueprint_models(folder="models")
 
 
 @bp.before_app_request
