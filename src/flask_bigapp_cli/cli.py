@@ -243,7 +243,7 @@ def add_theme(folder, name, static_url_path):
 
     shutil.copytree(cli_theme_dir, temp_them_folder, dirs_exist_ok=True)
 
-    theme_config = temp_them_folder / "config.ini"
+    theme_config = temp_them_folder / "config.toml"
     theme_main = new_theme_nested_template_folder / "extends" / "main.html"
 
     if not theme_config.exists():
@@ -294,7 +294,7 @@ def rename_theme(theme, new_name):
             f"{Sprinkles.FAIL}The Theme [{theme}] does not exist in the {theme_path.parent} directory.{Sprinkles.END}")
         return
 
-    blueprint_nested_template_path = theme_path / "templates" / theme_path.name
+    theme_nested_template_path = theme_path / "templates" / theme_path.name
 
     new_name = to_snake_case(new_name)
     new_path = theme_path.parent / new_name
@@ -303,15 +303,15 @@ def rename_theme(theme, new_name):
         click.echo(f"{Sprinkles.FAIL}The new name you have given already exists.{Sprinkles.END}")
         return
 
-    blueprint_config = theme_path / "config.ini"
+    theme_config = theme_path / "config.toml"
 
-    with open(blueprint_config, "r") as f:
+    with open(theme_config, "r") as f:
         config = f.read()
 
     config = config.replace(theme_path.name, new_name)
 
-    with open(blueprint_config, "w") as f:
+    with open(theme_config, "w") as f:
         f.write(config)
 
-    blueprint_nested_template_path.rename(theme_path / "templates" / new_name)
+    theme_nested_template_path.rename(theme_path / "templates" / new_name)
     theme_path.rename(theme_path.parent / new_name)

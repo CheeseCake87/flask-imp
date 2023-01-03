@@ -1,12 +1,13 @@
 {% extends extend %}
 
 {% block _title %}
-Flask-BigApp - Index
+    Flask-BigApp - Index
 {% endblock %}
 
 {% block _container %}
     Example1
 
-    {{ format_price(100.33) }}
-    {{ "hello" | example }}
+    <p>{{ format_price(100.33) }} <- this is a filter that was created by the cli_created theme in the themes folder</p>
+    <p>{{ "hello" | example }} <- this is a context processor that was created by the cli_created theme in the themes
+        folder</p>
 {% endblock %}

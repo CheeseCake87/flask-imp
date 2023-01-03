@@ -21,7 +21,6 @@ def create_app():
 
     bigapp.import_themes("themes")
     bigapp.import_theme("root_theme")
-    bigapp.import_theme("my")
 
     bigapp.import_models(folder="models")
 
