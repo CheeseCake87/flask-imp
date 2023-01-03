@@ -6,7 +6,7 @@
 
 ![Tests](https://github.com/CheeseCake87/Flask-BigApp/actions/workflows/tests.yml/badge.svg)
 
-`NOTE:` This version; Being 1.4.* and above includes some breaking changes from anything on version 1.3.* and below.
+`NOTE:` This version; Being 1.5.* and above includes some breaking changes from anything on version 1.4.* and below.
 
 **What is Flask-BigApp?**
 
