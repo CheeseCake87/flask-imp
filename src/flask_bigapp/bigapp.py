@@ -11,6 +11,7 @@ from typing import Dict, TextIO, Union, Optional, Any
 from flask import Blueprint
 from flask import Flask
 from flask import session
+from flask_sqlalchemy.model import DefaultMeta
 from toml import load as toml_load
 
 from .blueprint import BigAppBlueprint
@@ -35,7 +36,7 @@ class _ModelRegistry:
         self.assert_exists(ref)
         return self.registry[ref]
 
-    def class_(self, ref: str) -> ModuleType:
+    def class_(self, ref: str) -> DefaultMeta:
         self.assert_exists(ref)
         return self.registry[ref]['class']
 
@@ -313,7 +314,7 @@ class BigApp(object):
     def model_class(self, class_name: str) -> Any:
         return self.model(class_name)
 
-    def model(self, class_: str) -> ModuleType:
+    def model(self, class_: str) -> DefaultMeta:
         """
         Returns the model class for the given class name
         """
