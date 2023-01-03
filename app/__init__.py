@@ -26,6 +26,8 @@ def create_app():
     def after_request(response):
         return response
 
+    print(main.config)
+
 
     with main.app_context():
         """

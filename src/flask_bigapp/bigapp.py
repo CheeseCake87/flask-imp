@@ -336,7 +336,10 @@ class BigApp(object):
                     if db_location.startswith("/"):
                         return f"sqlite:///{db_location}/{db_name}"
 
-                    return f"{db_type}:////{self._app_path}/{db_location}/{db_name}.db"
+                    complete_path = Path(self._app_path / db_location)
+                    complete_path.mkdir(parents=True, exist_ok=True)
+
+                    return f"{db_type}:////{complete_path}/{db_name}.db"
 
                 return f"{db_type}:////{self._app_path}/{db_name}.db"
 
