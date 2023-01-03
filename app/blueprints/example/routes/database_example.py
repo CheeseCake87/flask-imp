@@ -16,7 +16,9 @@ def create_all_models():
 @bp.route("/database-example", methods=["GET"])
 def database_example():
     # Load the ExampleUser class found in the import_models folder, this way saves having to import files
-    example_user = bigapp.model_class("ExampleUser")
+    example_user = bigapp.model("ExampleUser")
+
+    print(bigapp.model_meta("ExampleUser"))
 
     user_id = 1
     result = "NULL"

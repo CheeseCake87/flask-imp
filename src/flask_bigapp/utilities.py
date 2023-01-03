@@ -1,5 +1,6 @@
 import functools
 import logging
+import re
 from pathlib import Path
 from typing import Union
 
@@ -21,6 +22,19 @@ def cast_to_import_str(app_name: str, folder_path: Path) -> str:
     parts = folder_path.parts
     parts = parts[parts.index(app_name):]
     return ".".join(parts)
+
+
+def class_field(class_: str, field: str) -> str:
+    """
+    Switches name of the class CamelCase to snake_case and tacks on the field name
+
+    Used for SQLAlchemy foreign key assignments
+
+    INFO ::: This function will not work if you are changing the __tablename__ of your model class
+    """
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', class_)
+    snaked = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    return f"{snaked}.{field}"
 
 
 def cast_to_bool(value: Union[str, bool, None]) -> bool:

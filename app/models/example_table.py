@@ -1,17 +1,16 @@
 from sqlalchemy import ForeignKey
+from flask_bigapp.utilities import class_field
 
 from app import db
 
 
 class ExampleTable(db.Model):
-    __tablename__ = "fl_example_table"
     example_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, ForeignKey('fl_example_user.user_id'))
+    user_id = db.Column(db.Integer, ForeignKey(class_field("ExampleUser", "user_id")))
     thing = db.Column(db.String(256), nullable=False)
 
 
 class ExampleTableOne(db.Model):
-    __tablename__ = "fl_example_table_one"
     example_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, ForeignKey('fl_example_user.user_id'))
+    user_id = db.Column(db.Integer, ForeignKey(class_field("ExampleUser", "user_id")))
     thing = db.Column(db.String(256), nullable=False)

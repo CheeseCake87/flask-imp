@@ -8,7 +8,7 @@ def app_models():
     """
     Lists the model information loaded into bigapp.model_classes
     """
-    models = bigapp.model_classes
+    models = bigapp._model_registry
 
     render = bp.tmpl("app-models.html")
     return render_template(render, models=models, **page_needs)

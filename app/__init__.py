@@ -14,10 +14,11 @@ def create_app():
     db.init_app(main)
 
     bigapp.import_structures("structures")
-    bigapp.import_models(folder="models")
     bigapp.import_builtins("flask/routes")
     bigapp.import_builtins("flask/template_filters")
     bigapp.import_blueprints("blueprints")
+
+    bigapp.import_models(folder="models")
 
     @main.before_request
     def before_request():
@@ -34,8 +35,8 @@ def create_app():
         """
         db.create_all()
 
-        m_example_user = bigapp.model_class("ExampleUser")
-        m_example_table = bigapp.model_class("ExampleTable")
+        m_example_user = bigapp.model("ExampleUser")
+        m_example_table = bigapp.model("ExampleTable")
 
         if not m_example_user.get_by_id(1):
             salt = Auth.generate_salt()
@@ -61,9 +62,9 @@ def create_app():
     """
     This prints all the available routes in the app
     """
-    for _ in main.url_map.iter_rules():
-        print(_)
-
-    print(bigapp.model_classes)
+    # for _ in main.url_map.iter_rules():
+    #     print(_)
+    #
+    # print(bigapp.models)
 
     return main

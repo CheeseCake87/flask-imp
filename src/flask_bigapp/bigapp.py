@@ -18,11 +18,43 @@ from .resources import Resources
 from .utilities import cast_to_import_str, deprecated
 
 
+class _ModelRegistry:
+    registry: Dict[str, Any]
+
+    def __init__(self):
+        self.registry = dict()
+
+    def assert_exists(self, ref: str):
+        if ref not in self.registry:
+            raise KeyError(
+                f"Model {ref} not found in model registry \n"
+                f"Available models: {', '.join(self.registry.keys())}"
+            )
+
+    def get(self, ref: str) -> dict:
+        self.assert_exists(ref)
+        return self.registry[ref]
+
+    def class_(self, ref: str) -> ModuleType:
+        self.assert_exists(ref)
+        return self.registry[ref]['class']
+
+    def add(self, ref, model: Optional[ModuleType] = None):
+        self.registry[ref] = {
+            'ref': ref,
+            'class': model
+        }
+
+    def __repr__(self):
+        return f"ModelRegistry({self.registry})"
+
+
 class BigApp(object):
     session: Dict
     themes: Dict[str, Path]
-    blueprints: Dict[str, Optional[ModuleType]]
-    model_classes: Dict
+
+    _blueprint_registry: Dict[str, Optional[ModuleType]]
+    _model_registry: _ModelRegistry
 
     _app: Flask
     _app_name: str
@@ -66,7 +98,7 @@ class BigApp(object):
 
         self.session = dict()
         self.themes = dict()
-        self.model_classes = dict()
+        self._model_registry = _ModelRegistry()
 
         self._app = app
         self._app_name = app.name
@@ -78,7 +110,7 @@ class BigApp(object):
 
         self._init_config(self._app_path / app_config_file)
 
-        self.blueprints = dict()
+        self._blueprint_registry = dict()
 
     def init_session(self) -> None:
         """
@@ -126,7 +158,7 @@ class BigApp(object):
             potential_bp = blueprint
 
         if potential_bp.is_dir():
-            if potential_bp.name in self.blueprints:
+            if potential_bp.name in self._blueprint_registry:
                 raise ImportError(
                     f"Blueprint {potential_bp.name} is already registered, blueprint folders must be unique\n"
                     f"Importing from {potential_bp}"
@@ -137,7 +169,7 @@ class BigApp(object):
                     _ = getattr(module, dir_item)
                     if isinstance(_, BigAppBlueprint):
                         if _.enabled:
-                            self.blueprints.update(
+                            self._blueprint_registry.update(
                                 {potential_bp.name: module}
                             )
                             self._app.register_blueprint(_)
@@ -253,9 +285,13 @@ class BigApp(object):
                 model_module = import_module(import_string)
                 for model_object_members in getmembers(model_module, isclass):
                     if import_string in model_object_members[1].__module__:
-                        self.model_classes.update({
-                            model_object_members[0]: model_object_members[1]
-                        })
+                        name = model_object_members[0]
+                        model = model_object_members[1]
+                        if not hasattr(model, "__tablename__"):
+                            raise AttributeError(f"{name} is not a valid model")
+
+                        self._model_registry.add(name, model)
+
             except ImportError as e:
                 logging.critical("Error importing model: ", e, f" {import_string}")
 
@@ -277,16 +313,27 @@ class BigApp(object):
     def model_class(self, class_name: str) -> Any:
         return self.model(class_name)
 
-    def model(self, class_name: str) -> Any:
+    def model(self, class_: str) -> ModuleType:
         """
         Returns the model class for the given class name
-
-        table_class = bigapp.model_class("ExampleTable")
-        table_query = table_class.query.all()
         """
-        if class_name in self.model_classes:
-            return self.model_classes[class_name]
-        raise ValueError(f"{class_name} was not found in the list of model_classes")
+        return self._model_registry.class_(class_)
+
+    def model_meta(self, class_: Union[str, ModuleType]) -> dict:
+        """
+        Returns the model class for the given class name
+        """
+        if isinstance(class_, str):
+            model = self._model_registry.get(class_)
+            return {
+                "ref": model['ref'],
+                "location": model['class'].__module__,
+            }
+        if isinstance(class_, ModuleType):
+            return {
+                "ref": class_.__name__,
+                "location": class_.__module__,
+            }
 
     def _init_config(self, config_file_path: Path):
         """

@@ -129,7 +129,7 @@ class BigAppBlueprint(Blueprint):
     def import_blueprint_models(
             self,
             file: Optional[str] = None,
-            folder: Optional[str] = None,
+            folder: Optional[str] = None
     ) -> None:
         """
         Imports model files from a single file or a folder. Both are allowed to be set.
@@ -144,6 +144,7 @@ class BigAppBlueprint(Blueprint):
                 _ = getattr(app_module, dir_item)
                 if isinstance(_, BigApp):
                     return _
+            raise ImportError(f"Cannot find BigApp instance in {self.app_name}")
 
         def model_processor(path: Path):
             """
@@ -154,9 +155,14 @@ class BigAppBlueprint(Blueprint):
                 model_module = import_module(import_string)
                 for model_object_members in getmembers(model_module, isclass):
                     if import_string in model_object_members[1].__module__:
-                        get_bigapp_instance().model_classes.update({
-                            f"{self.bp_name}.{model_object_members[0]}": model_object_members[1]
-                        })
+                        name = model_object_members[0]
+                        model = model_object_members[1]
+
+                        if not hasattr(model, "__tablename__"):
+                            raise AttributeError(f"{name} is not a valid model")
+
+                        get_bigapp_instance()._model_registry.add(name, model)
+
             except ImportError as e:
                 logging.critical("Error importing model: ", e, f" {import_string}")
 
@@ -165,10 +171,8 @@ class BigAppBlueprint(Blueprint):
 
         if folder is not None:
             folder_path = Path(self.location / folder)
-            print(folder_path)
             if folder_path.is_dir():
                 for model_file in folder_path.glob("*.py"):
-                    print(model_file)
                     model_processor(model_file)
 
         if file is not None:
