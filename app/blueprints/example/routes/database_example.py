@@ -18,7 +18,9 @@ def database_example():
     # Load the ExampleUser class found in the import_models folder, this way saves having to import files
     example_user = bigapp.model("ExampleUser")
 
+    # the model_meta is used to return data about the model
     print(bigapp.model_meta("ExampleUser"))
+    print(bigapp.model_meta(example_user))
 
     user_id = 1
     result = "NULL"

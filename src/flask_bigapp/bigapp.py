@@ -319,21 +319,30 @@ class BigApp(object):
         """
         return self._model_registry.class_(class_)
 
-    def model_meta(self, class_: Union[str, ModuleType]) -> dict:
+    def model_meta(self, class_: Union[str, Any]) -> dict:
         """
         Returns the model class for the given class name
         """
+
+        def check_for_table_name(model_):
+            if not hasattr(model_, "__tablename__"):
+                raise AttributeError(f"{model_} is not a valid model")
+
         if isinstance(class_, str):
             model = self._model_registry.get(class_)
+            check_for_table_name(model['class'])
             return {
                 "ref": model['ref'],
                 "location": model['class'].__module__,
+                "table_name": model['class'].__tablename__,
             }
-        if isinstance(class_, ModuleType):
-            return {
-                "ref": class_.__name__,
-                "location": class_.__module__,
-            }
+
+        check_for_table_name(class_)
+        return {
+            "ref": class_.__name__,
+            "location": class_.__module__,
+            "table_name": class_.__tablename__,
+        }
 
     def _init_config(self, config_file_path: Path):
         """
