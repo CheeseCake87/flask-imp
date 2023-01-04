@@ -1,9 +1,0 @@
-enabled = "yes"
-url_prefix = "/"
-
-
-[session]
-var_in_session = "this can be loaded using bp.init_session()"
-permissions = ["this", "that"]
-logged_in = true
-not_logged_in = false

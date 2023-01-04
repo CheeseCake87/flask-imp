@@ -20,8 +20,10 @@ enabled = "yes"
 
 [settings]
 url_prefix = "{url_prefix}"
-template_folder = "templates"
+subdomain = ""
+url_defaults = {{}}
 static_folder = "static"
+template_folder = "templates"
 static_url_path = "{static_url_path}"
 
 [session]

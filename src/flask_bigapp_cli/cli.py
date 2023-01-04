@@ -1,8 +1,9 @@
-from pathlib import Path
 import re
-from .resources import Resources
+from pathlib import Path
 
 import click
+
+from .resources import Resources
 
 
 def to_snake_case(string):
@@ -42,7 +43,7 @@ def cli():
     default="Current Working Directory",
     prompt=(f'\n{Sprinkles.WARNING}(Creation is relative to the current working directory){Sprinkles.END}\n'
             f'Folder to create blueprint in'),
-    help='The folder to create the blueprint in, defaults to the current working directory'
+    help='The from_folder to create the blueprint in, defaults to the current working directory'
 )
 @click.option(
     '-n', '--name',
@@ -124,7 +125,7 @@ def add_blueprint(folder, name, url_prefix, static_url_path):
         click.echo(f"{Sprinkles.WARNING}Route already exists: {bp_route}, skipping{Sprinkles.END}")
 
     if not bp_template.exists():
-        bp_template.write_text(Resources.blueprint_index_template)
+        bp_template.write_text(Resources.blueprint_index_template.format(name=name))
     else:
         click.echo(f"{Sprinkles.WARNING}Template already exists: {bp_template}, skipping{Sprinkles.END}")
 
@@ -137,7 +138,7 @@ def add_blueprint(folder, name, url_prefix, static_url_path):
     nargs=1,
     prompt=(
             f'\n{Sprinkles.WARNING}(Search of the blueprint is relative to the current working directory){Sprinkles.END}\n'
-            f'\nMust be the blueprint folder (that contains the __init__.py file)\n'
+            f'\nMust be the blueprint from_folder (that contains the __init__.py file)\n'
             f'Blueprint to rename'
     ),
     help='Location of the blueprint to rename'
@@ -182,12 +183,12 @@ def rename_blueprint(blueprint, new_name):
 
 @cli.command("add-theme", help="Create a flask-bigapp theme")
 @click.option(
-    '-f', '--folder',
+    '-f', '--from_folder',
     nargs=1,
     default="Current Working Directory",
     prompt=(f'\n{Sprinkles.WARNING}(Creation is relative to the current working directory){Sprinkles.END}\n'
             f'Folder to create theme in'),
-    help='The folder to create the theme in, defaults to the current working directory'
+    help='The from_folder to create the theme in, defaults to the current working directory'
 )
 @click.option(
     '-n', '--name',

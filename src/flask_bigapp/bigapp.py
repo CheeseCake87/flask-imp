@@ -6,17 +6,18 @@ from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
 from types import ModuleType
-from typing import Dict, TextIO, Union, Optional, Any
+from typing import Dict, TextIO, Union, Optional, Any, TypeVar, List
 
 from flask import Blueprint
 from flask import Flask
 from flask import session
-from flask_sqlalchemy.model import DefaultMeta
 from toml import load as toml_load
 
 from .blueprint import BigAppBlueprint
 from .resources import Resources
 from .utilities import cast_to_bool, cast_to_import_str, deprecated
+
+DefaultMeta = TypeVar('DefaultMeta')
 
 
 class _ModelRegistry:
@@ -54,8 +55,8 @@ class BigApp(object):
     session: Dict
     themes: Dict[str, Path]
 
-    _blueprint_registry: Dict[str, Optional[ModuleType]]
-    _model_registry: _ModelRegistry
+    __blueprint_registry__: Dict[str, Optional[ModuleType]]
+    __model_registry__: _ModelRegistry
 
     _app: Flask
     _app_name: str
@@ -86,9 +87,9 @@ class BigApp(object):
 
         Can be passed an SQLAlchemy object, doing this will enable the use of the model_class.
 
-        Optional config file passed in. If no config file is given an
+        Optional config from_file passed in. If no config from_file is given an
         attempt will be made to read from the environment for the variable BA_CONFIG
-        If the environment variable is not found it will create a new config file
+        If the environment variable is not found it will create a new config from_file
         called default.config.toml and proceed to load the values from there.
         """
 
@@ -99,7 +100,7 @@ class BigApp(object):
 
         self.session = dict()
         self.themes = dict()
-        self._model_registry = _ModelRegistry()
+        self.__model_registry__ = _ModelRegistry()
 
         self._app = app
         self._app_name = app.name
@@ -111,11 +112,11 @@ class BigApp(object):
 
         self._init_config(self._app_path / app_config_file)
 
-        self._blueprint_registry = dict()
+        self.__blueprint_registry__ = dict()
 
     def init_session(self) -> None:
         """
-        Initialize the session variables found in the config file.
+        Initialize the session variables found in the config from_file.
         Use this method in the before_request route.
         """
         for key in self.session:
@@ -123,23 +124,28 @@ class BigApp(object):
                 session.update(self.session)
                 break
 
-    def import_builtins(self, folder: str = "routes") -> None:
+    def import_builtins(self, folder: Union[str, Path] = "builtins") -> None:
         """
-        Imports all the routes in the given folder.
+        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
+        """
+        if isinstance(folder, str):
+            builtins_folder = Path(self._app_path / folder)
+        else:
+            builtins_folder = folder
 
-        Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
-        """
-        folder_path = Path(self._app_path / folder)
-        if folder_path.is_dir():
+        if builtins_folder.is_dir():
             with self._app.app_context():
-                for py_file in folder_path.glob("*.py"):
-                    import_module(f"{cast_to_import_str(self._app_name, folder_path)}.{py_file.stem}")
+                for py_file in builtins_folder.glob("*.py"):
+                    module = import_module(
+                        f"{cast_to_import_str(self._app_name, builtins_folder)}.{py_file.stem}")
+                    if hasattr(module, "loader"):
+                        module.loader(self._app)
 
     def import_blueprints(self, folder: str) -> None:
         """
-        Imports all the blueprints in the given folder.
+        Imports all the blueprints in the given from_folder.
 
-        Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
+        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
 
         folder_path = Path(self._app_path / folder)
@@ -151,7 +157,7 @@ class BigApp(object):
         """
         Imports a single blueprint from the given path.
 
-        Path must be relative ( path="here" not path="/home/user/app/folder" )
+        Path must be relative ( path="here" not path="/home/user/app/from_folder" )
         """
         if isinstance(blueprint, str):
             potential_bp = Path(self._app_path / blueprint)
@@ -159,7 +165,7 @@ class BigApp(object):
             potential_bp = blueprint
 
         if potential_bp.is_dir():
-            if potential_bp.name in self._blueprint_registry:
+            if potential_bp.name in self.__blueprint_registry__:
                 raise ImportError(
                     f"Blueprint {potential_bp.name} is already registered, blueprint folders must be unique\n"
                     f"Importing from {potential_bp}"
@@ -170,13 +176,13 @@ class BigApp(object):
                     _ = getattr(module, dir_item)
                     if isinstance(_, BigAppBlueprint):
                         if _.enabled:
-                            self._blueprint_registry.update(
+                            self.__blueprint_registry__.update(
                                 {potential_bp.name: module}
                             )
                             self._app.register_blueprint(_)
                         break
             except Exception as e:
-                logging.critical(f"{e}\n", f"Error importing blueprint: from {potential_bp}")
+                logging.critical(f"{e}", f"Error importing blueprint: from {potential_bp}")
 
     @deprecated("import_structures() will be removed, Use import_themes() instead")
     def import_structures(self, structures_folder: str) -> None:
@@ -184,38 +190,7 @@ class BigApp(object):
 
     def import_themes(self, themes_folder: str) -> None:
         """
-        Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
-
-        Imports all the themes in the given folder, this works the
-        same as import_blueprints but does not require a config file. The
-        settings are pulled from the environment of the folder.
-
-        Folder structure should look like this:
-
-        themes
-        ├── theme1
-        │   ├── static
-        │   │   ├── style.css
-        │   │   └── script.js
-        │   └── templates
-        │   │   └── theme1
-        │   │       └── main.html
-        └── theme2
-            ├── static
-            │   ├── style.css
-            │   ├── script.js
-            │   └── logo.png
-            └── templates
-                ├── theme2
-                └── main.html
-
-        You can use the themes like this:
-
-        {% extends "theme1/main.html" %}
-
-        {{ url_for('theme1.static', filename='style.css') }}
-
-
+        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
         folder_path = Path(self._app_path / themes_folder)
         for theme in folder_path.iterdir():
@@ -223,9 +198,7 @@ class BigApp(object):
 
     def import_theme(self, theme_folder: Union[str, Path]):
         """
-        Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
-
-        Works the same as import_themes but only imports one theme.
+        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
         if isinstance(theme_folder, str):
             theme = Path(self._app_path / theme_folder)
@@ -247,16 +220,16 @@ class BigApp(object):
             config = Path(theme / "config.toml")
 
             if not static_folder.exists():
-                logging.debug(f"Static folder for {theme.name} was not found, skipping")
+                logging.debug(f"Static from_folder for {theme.name} was not found, skipping")
 
             if not template_folder.exists():
-                raise NotADirectoryError(f"Template folder for {theme.name} was not found")
+                raise NotADirectoryError(f"Template from_folder for {theme.name} was not found")
 
             if not nested_template_folder.exists():
-                raise NotADirectoryError(f"Nested template folder for {theme.name} was not found")
+                raise NotADirectoryError(f"Nested template from_folder for {theme.name} was not found, \nshould look like: {nested_template_folder}")
 
             if not config.exists():
-                logging.debug(f"Config file for {theme.name} was not found, creating default")
+                logging.debug(f"Config from_file for {theme.name} was not found, creating default")
                 config.write_text(Resources.default_theme_config.format(static_url_path=f"/{theme.name}/static"))
 
             loaded_config = toml_load(config)
@@ -272,30 +245,25 @@ class BigApp(object):
             if cast_to_bool(loaded_config.get("enabled")):
 
                 if builtins_folder.exists():
-                    with self._app.app_context():
-                        for py_file in builtins_folder.glob("*.py"):
-                            module = import_module(
-                                f"{cast_to_import_str(self._app_name, builtins_folder)}.{py_file.stem}")
-                            if hasattr(module, "loader"):
-                                module.loader(self._app)
+                    self.import_builtins(builtins_folder)
 
                 self._app.register_blueprint(theme_bp)
                 self.themes.update({theme.name: theme.absolute()})
 
     def import_models(
             self,
-            file: Optional[str] = None,
-            folder: Optional[str] = None
+            from_file: Optional[str] = None,
+            from_folder: Optional[str] = None,
     ) -> None:
         """
-        Imports model files from a single file or a folder. Both are allowed to be set.
+        Imports model files from a single from_file or a from_folder. Both are allowed to be set.
 
-        File and Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
+        File and Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
 
         def model_processor(path: Path):
             """
-            Picks apart the model file and builds a registry of the models found.
+            Picks apart the model from_file and builds a registry of the models found.
             """
             import_string = cast_to_import_str(self._app_name, path).rstrip(".py")
             try:
@@ -307,22 +275,22 @@ class BigApp(object):
                         if not hasattr(model, "__tablename__"):
                             raise AttributeError(f"{name} is not a valid model")
 
-                        self._model_registry.add(name, model)
+                        self.__model_registry__.add(name, model)
 
             except ImportError as e:
                 logging.critical("Error importing model: ", e, f" {import_string}")
 
-        if file is None and folder is None:
-            raise ImportError("No model file or folder was passed in")
+        if from_file is None and from_folder is None:
+            raise ImportError("No model from_file or from_folder was passed in")
 
-        if folder is not None:
-            folder_path = Path(self._app_path / folder)
+        if from_folder is not None:
+            folder_path = Path(self._app_path / from_folder)
             if folder_path.is_dir():
                 for model_file in folder_path.glob("*.py"):
                     model_processor(model_file)
 
-        if file is not None:
-            file_path = Path(self._app_path / file)
+        if from_file is not None:
+            file_path = Path(self._app_path / from_file)
             if file_path.is_file() and file_path.suffix == ".py":
                 model_processor(file_path)
 
@@ -334,7 +302,7 @@ class BigApp(object):
         """
         Returns the model class for the given class name
         """
-        return self._model_registry.class_(class_)
+        return self.__model_registry__.class_(class_)
 
     def model_meta(self, class_: Union[str, Any]) -> dict:
         """
@@ -346,7 +314,7 @@ class BigApp(object):
                 raise AttributeError(f"{model_} is not a valid model")
 
         if isinstance(class_, str):
-            model = self._model_registry.get(class_)
+            model = self.__model_registry__.get(class_)
             check_for_table_name(model['class'])
             return {
                 "ref": model['ref'],
@@ -363,20 +331,20 @@ class BigApp(object):
 
     def _init_config(self, config_file_path: Path):
         """
-        Processes the values from the configuration file.
+        Processes the values from the configuration from_file.
         """
         if not config_file_path.exists():
-            logging.critical(f"Config file {config_file_path.name} was not found, creating default.config.toml to use")
+            logging.critical(f"Config from_file {config_file_path.name} was not found, creating default.config.toml to use")
             config_file_path.write_text(Resources.default_config.format(secret_key=os.urandom(24).hex()))
 
         config_suffix = ('.toml', '.tml')
 
         if config_file_path.suffix not in config_suffix:
-            raise TypeError(f"Config file must be one of the following types: {config_suffix}")
+            raise TypeError(f"Config from_file must be one of the following types: {config_suffix}")
 
         def if_env_replace(env_value: Optional[Any]) -> Any:
             """
-            Looks for the replacement pattern to swap out values in the config file with environment variables.
+            Looks for the replacement pattern to swap out values in the config from_file with environment variables.
             """
             pattern = re.compile(r'<(.*?)>')
 

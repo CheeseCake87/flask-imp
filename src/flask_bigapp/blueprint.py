@@ -4,7 +4,7 @@ from importlib.util import find_spec
 from inspect import getmembers, isclass
 from pathlib import Path
 from types import ModuleType
-from typing import Dict, Optional, Union, TypeVar
+from typing import Dict, Optional, Union
 
 from flask import Blueprint
 from flask import session
@@ -12,12 +12,10 @@ from toml import load as toml_load
 
 from flask_bigapp.utilities import cast_to_bool, cast_to_import_str
 
-BigApp = TypeVar('BigApp')
-
 
 class BigAppBlueprint(Blueprint):
     """
-    Class that handles Blueprints from within the Blueprint __init__ file
+    Class that handles Blueprints from within the Blueprint __init__ from_file
     """
     enabled: bool = False
     location: Path
@@ -55,10 +53,10 @@ class BigAppBlueprint(Blueprint):
 
     def import_routes(self, folder: str = "routes") -> None:
         """
-        Imports all the routes in the given folder.
-        If no folder is specified defaults to a folder named 'routes'
+        Imports all the routes in the given from_folder.
+        If no from_folder is specified defaults to a from_folder named 'routes'
 
-        Folder must be relative ( folder="here" not folder="/home/user/app/folder/blueprint/folder" )
+        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder/blueprint/from_folder" )
         """
         path = self.location / folder
         if not path.exists():
@@ -74,9 +72,9 @@ class BigAppBlueprint(Blueprint):
 
     def import_nested_blueprints(self, folder: str) -> None:
         """
-        Imports all the blueprints in the given folder.
+        Imports all the blueprints in the given from_folder.
 
-        Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
+        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
 
         folder_path = Path(self.location / folder)
@@ -88,7 +86,7 @@ class BigAppBlueprint(Blueprint):
         """
         Imports a single blueprint from the given path.
 
-        Path must be relative ( path="here" not path="/home/user/app/folder" )
+        Path must be relative ( path="here" not path="/home/user/app/from_folder" )
         """
         if isinstance(blueprint, str):
             potential_bp = Path(self.location / blueprint)
@@ -118,7 +116,7 @@ class BigAppBlueprint(Blueprint):
 
     def init_session(self) -> None:
         """
-        Initialize the session variables found in the config file.
+        Initialize the session variables found in the config from_file.
         Use this method in the before_request route.
         """
         for key in self.session:
@@ -128,13 +126,13 @@ class BigAppBlueprint(Blueprint):
 
     def import_blueprint_models(
             self,
-            file: Optional[str] = None,
-            folder: Optional[str] = None
+            from_file: Optional[str] = None,
+            from_folder: Optional[str] = None
     ) -> None:
         """
-        Imports model files from a single file or a folder. Both are allowed to be set.
+        Imports model files from a single from_file or a from_folder. Both are allowed to be set.
 
-        File and Folder must be relative ( folder="here" not folder="/home/user/app/folder" )
+        File and Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
         from flask_bigapp import BigApp
 
@@ -148,7 +146,7 @@ class BigAppBlueprint(Blueprint):
 
         def model_processor(path: Path):
             """
-            Picks apart the model file and builds a registry of the models found.
+            Picks apart the model from_file and builds a registry of the models found.
             """
             import_string = cast_to_import_str(self.app_name, path).rstrip(".py")
             try:
@@ -161,28 +159,28 @@ class BigAppBlueprint(Blueprint):
                         if not hasattr(model, "__tablename__"):
                             raise AttributeError(f"{name} is not a valid model")
 
-                        get_bigapp_instance()._model_registry.add(name, model)
+                        get_bigapp_instance().__model_registry__.add(name, model)
 
             except ImportError as e:
                 logging.critical("Error importing model: ", e, f" {import_string}")
 
-        if file is None and folder is None:
-            raise ImportError("No model file or folder was passed in")
+        if from_file is None and from_folder is None:
+            raise ImportError("No model from_file or from_folder was passed in")
 
-        if folder is not None:
-            folder_path = Path(self.location / folder)
+        if from_folder is not None:
+            folder_path = Path(self.location / from_folder)
             if folder_path.is_dir():
                 for model_file in folder_path.glob("*.py"):
                     model_processor(model_file)
 
-        if file is not None:
-            file_path = Path(self.location / file)
+        if from_file is not None:
+            file_path = Path(self.location / from_file)
             if file_path.is_file() and file_path.suffix == ".py":
                 model_processor(file_path)
 
     def tmpl(self, template) -> str:
         """
-        Pushes together the name of the blueprint and the template file to look for.
+        Pushes together the name of the blueprint and the template from_file to look for.
         This is a small-time saving method to allow you to only type
         bp.tmpl("index.html") when looking for template files.
         """
@@ -190,16 +188,16 @@ class BigAppBlueprint(Blueprint):
 
     def _init_bp_config(self, config_file_path) -> Optional[dict]:
         """
-        Attempts to load the and process the configuration file.
+        Attempts to load the and process the configuration from_file.
         """
 
         if not config_file_path.exists():
-            raise FileNotFoundError(f"{self.bp_name} Blueprint config file {config_file_path.name} was not found")
+            raise FileNotFoundError(f"{self.bp_name} Blueprint config from_file {config_file_path.name} was not found")
 
         config_suffix = ('.toml', '.tml')
 
         if config_file_path.suffix not in config_suffix:
-            raise TypeError(f"Config file must be one of the following types: {config_suffix}")
+            raise TypeError(f"Config from_file must be one of the following types: {config_suffix}")
 
         config = toml_load(config_file_path)
 
@@ -210,26 +208,16 @@ class BigAppBlueprint(Blueprint):
         kwargs = dict()
 
         """Pull values from settings"""
-        subdomain = settings.get('subdomain', False)
-        url_defaults = settings.get('url_defaults', False)
-        static_folder = settings.get('static_folder', False)
-        template_folder = settings.get('template_folder', False)
-        url_prefix = settings.get('url_prefix', False)
-        upper_url_prefix = config.get('url_prefix', False)
-        static_url_path = settings.get('static_url_path', False)
+        url_prefix = settings.get('url_prefix', "")
+        subdomain = settings.get('subdomain', "")
+        url_defaults = settings.get('url_defaults', dict())
+        static_folder = settings.get('static_folder', "")
+        template_folder = settings.get('template_folder', "")
+        static_url_path = settings.get('static_url_path', "")
+        root_path = settings.get('root_path', "")
 
-        """If values exist in the configuration file, set values"""
-        if static_folder:
-            kwargs.update({'static_folder': static_folder})
-
-        if template_folder:
-            kwargs.update({'template_folder': template_folder})
-
-        if url_prefix:
-            kwargs.update({'url_prefix': url_prefix})
-
-        if static_url_path:
-            kwargs.update({'static_url_path': static_url_path})
+        """If values exist in the configuration from_file, set values"""
+        kwargs.update({'url_prefix': url_prefix if url_prefix != "" else f"/{self.bp_name}"})
 
         if subdomain:
             kwargs.update({'subdomain': subdomain})
@@ -237,26 +225,16 @@ class BigAppBlueprint(Blueprint):
         if url_defaults:
             kwargs.update({'url_defaults': url_defaults})
 
-        """If values get set to False, set defaults"""
-        if static_folder is False:
-            kwargs.update({'static_folder': "static"})
-            default_static_folder = self.location / "static"
-            Path.mkdir(default_static_folder, exist_ok=True)
+        if static_folder:
+            kwargs.update({'static_folder': static_folder})
 
-        if template_folder is False:
-            kwargs.update({'template_folder': "templates"})
-            default_template_folder = self.location / "templates"
-            default_nested_template_folder = default_template_folder / self.location.name
-            Path.mkdir(default_template_folder, exist_ok=True)
-            Path.mkdir(default_nested_template_folder, exist_ok=True)
+        if template_folder:
+            kwargs.update({'template_folder': template_folder})
 
-        if not kwargs.get('url_prefix'):
-            if upper_url_prefix:
-                kwargs.update({'url_prefix': f"/{upper_url_prefix}"})
-            else:
-                kwargs.update({'url_prefix': f"/{self.location.name}"})
+        if static_url_path:
+            kwargs.update({'static_url_path': static_url_path})
 
-        if static_url_path is False:
-            kwargs.update({'static_url_path': f"/{self.location.name}/static"})
+        if root_path:
+            kwargs.update({'root_path': root_path})
 
         return kwargs

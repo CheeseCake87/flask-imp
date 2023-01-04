@@ -1,3 +1,6 @@
+import os
+import secrets
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -7,30 +10,24 @@ from flask_bigapp import BigApp
 bigapp = BigApp()
 db = SQLAlchemy()
 
+os.environ["CONFIG_SECRET_KEY"] = secrets.token_urlsafe(128)
+
 
 def create_app():
     app = Flask(__name__)
     bigapp.init_app(app)
     db.init_app(app)
 
-    bigapp.import_builtins("flask/routes")
-    bigapp.import_builtins("flask/template_filters")
+    bigapp.import_builtins()
+    bigapp.import_blueprint("www")
+    bigapp.import_blueprint("tests")
+    bigapp.import_theme("theme")
 
-    bigapp.import_blueprints("blueprints")
-    bigapp.import_blueprint("root_blueprint")
-
-    bigapp.import_themes("themes")
-    bigapp.import_theme("root_theme")
-
-    bigapp.import_models(folder="models")
+    bigapp.import_models(from_folder="models")
 
     @app.before_request
     def before_request():
         bigapp.init_session()
-
-    @app.after_request
-    def after_request(response):
-        return response
 
     with app.app_context():
         """
@@ -62,13 +59,5 @@ def create_app():
             )
             db.session.add(new_example_user_rel)
             db.session.commit()
-
-    """
-    This prints all the available routes in the app
-    """
-    # for _ in main.url_map.iter_rules():
-    #     print(_)
-    #
-    # print(bigapp.models)
 
     return app
