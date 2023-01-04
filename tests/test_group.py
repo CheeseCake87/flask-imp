@@ -5,4 +5,4 @@ def test_import_builtins(client):
 
 def test_import_structures(client):
     response = client.get('/tests/static')
-    assert b"/theme/static/img/Flask-BigApp-Logo.png" in response.data
+    assert b"/img/Flask-BigApp-Logo.png" in response.data
