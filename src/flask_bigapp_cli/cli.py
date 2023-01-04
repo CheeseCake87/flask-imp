@@ -31,7 +31,6 @@ class Sprinkles:
 
 
 @click.group()
-@click.version_option()
 def cli():
     pass  # Entry Point
 
@@ -91,7 +90,7 @@ def add_blueprint(folder, name, url_prefix, static_url_path):
     bp_static_folder = bp_folder / "static"
 
     bp_init = bp_folder / "__init__.py"
-    bp_config = bp_folder / "config.ini"
+    bp_config = bp_folder / "config.toml"
     bp_route = bp_routes_folder / "index.py"
     bp_template = bp_templates_folder / "index.html"
 
@@ -167,7 +166,7 @@ def rename_blueprint(blueprint, new_name):
         click.echo(f"{Sprinkles.FAIL}The new name you have given already exists.{Sprinkles.END}")
         return
 
-    blueprint_config = blueprint_path / "config.ini"
+    blueprint_config = blueprint_path / "config.toml"
 
     with open(blueprint_config, "r") as f:
         config = f.read()

@@ -1,0 +1,1 @@
+recursive-include src/flask_bigapp_cli/__temp_theme_dir__ *
