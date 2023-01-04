@@ -9,7 +9,7 @@ def read(file_name):
 
 setup(
     name='flask-bigapp',
-    version='1.6.2',
+    version='1.6.3',
     url='https://github.com/CheeseCake87/Flask-BigApp',
     license='GNU General Public License v2 or later (GPLv2+)',
     author='David Carmichael',
@@ -30,6 +30,7 @@ setup(
     ],
     install_requires=[
         'Flask',
+        'Flask-SQLAlchemy',
         'toml',
     ],
     zip_safe=False,

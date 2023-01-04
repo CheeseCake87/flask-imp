@@ -6,18 +6,17 @@ from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
 from types import ModuleType
-from typing import Dict, TextIO, Union, Optional, Any, TypeVar, List
+from typing import Dict, TextIO, Union, Optional, Any
 
 from flask import Blueprint
 from flask import Flask
 from flask import session
+from flask_sqlalchemy.model import DefaultMeta
 from toml import load as toml_load
 
 from .blueprint import BigAppBlueprint
 from .resources import Resources
 from .utilities import cast_to_bool, cast_to_import_str, deprecated
-
-DefaultMeta = TypeVar('DefaultMeta')
 
 
 class _ModelRegistry:
@@ -94,9 +93,11 @@ class BigApp(object):
         """
 
         if app is None:
-            raise ImportError("No app was passed in, do ba = BigApp(flaskapp) or app.init_app(flaskapp)")
+            raise ImportError(
+                "No app was passed in, do ba = BigApp(flaskapp) or app.init_app(flaskapp)")
         if not isinstance(app, Flask):
-            raise TypeError("The app that was passed in is not an instance of Flask")
+            raise TypeError(
+                "The app that was passed in is not an instance of Flask")
 
         self.session = dict()
         self.themes = dict()
@@ -171,7 +172,8 @@ class BigApp(object):
                     f"Importing from {potential_bp}"
                 )
             try:
-                module = import_module(cast_to_import_str(self._app_name, potential_bp))
+                module = import_module(
+                    cast_to_import_str(self._app_name, potential_bp))
                 for dir_item in dir(module):
                     _ = getattr(module, dir_item)
                     if isinstance(_, BigAppBlueprint):
@@ -182,9 +184,11 @@ class BigApp(object):
                             self._app.register_blueprint(_)
                         break
             except Exception as e:
-                logging.critical(f"{e}", f"Error importing blueprint: from {potential_bp}")
+                logging.critical(f"{e}",
+                                 f"Error importing blueprint: from {potential_bp}")
 
-    @deprecated("import_structures() will be removed, Use import_themes() instead")
+    @deprecated(
+        "import_structures() will be removed, Use import_themes() instead")
     def import_structures(self, structures_folder: str) -> None:
         self.import_themes(structures_folder)
 
@@ -220,17 +224,22 @@ class BigApp(object):
             config = Path(theme / "config.toml")
 
             if not static_folder.exists():
-                logging.debug(f"Static from_folder for {theme.name} was not found, skipping")
+                logging.debug(
+                    f"Static from_folder for {theme.name} was not found, skipping")
 
             if not template_folder.exists():
-                raise NotADirectoryError(f"Template from_folder for {theme.name} was not found")
+                raise NotADirectoryError(
+                    f"Template from_folder for {theme.name} was not found")
 
             if not nested_template_folder.exists():
-                raise NotADirectoryError(f"Nested template from_folder for {theme.name} was not found, \nshould look like: {nested_template_folder}")
+                raise NotADirectoryError(
+                    f"Nested template from_folder for {theme.name} was not found, \nshould look like: {nested_template_folder}")
 
             if not config.exists():
-                logging.debug(f"Config from_file for {theme.name} was not found, creating default")
-                config.write_text(Resources.default_theme_config.format(static_url_path=f"/{theme.name}/static"))
+                logging.debug(
+                    f"Config from_file for {theme.name} was not found, creating default")
+                config.write_text(Resources.default_theme_config.format(
+                    static_url_path=f"/{theme.name}/static"))
 
             loaded_config = toml_load(config)
 
@@ -265,7 +274,8 @@ class BigApp(object):
             """
             Picks apart the model from_file and builds a registry of the models found.
             """
-            import_string = cast_to_import_str(self._app_name, path).rstrip(".py")
+            import_string = cast_to_import_str(self._app_name, path).rstrip(
+                ".py")
             try:
                 model_module = import_module(import_string)
                 for model_object_members in getmembers(model_module, isclass):
@@ -273,15 +283,18 @@ class BigApp(object):
                         name = model_object_members[0]
                         model = model_object_members[1]
                         if not hasattr(model, "__tablename__"):
-                            raise AttributeError(f"{name} is not a valid model")
+                            raise AttributeError(
+                                f"{name} is not a valid model")
 
                         self.__model_registry__.add(name, model)
 
             except ImportError as e:
-                logging.critical("Error importing model: ", e, f" {import_string}")
+                logging.critical("Error importing model: ", e,
+                                 f" {import_string}")
 
         if from_file is None and from_folder is None:
-            raise ImportError("No model from_file or from_folder was passed in")
+            raise ImportError(
+                "No model from_file or from_folder was passed in")
 
         if from_folder is not None:
             folder_path = Path(self._app_path / from_folder)
@@ -334,13 +347,16 @@ class BigApp(object):
         Processes the values from the configuration from_file.
         """
         if not config_file_path.exists():
-            logging.critical(f"Config from_file {config_file_path.name} was not found, creating default.config.toml to use")
-            config_file_path.write_text(Resources.default_config.format(secret_key=os.urandom(24).hex()))
+            logging.critical(
+                f"Config from_file {config_file_path.name} was not found, creating default.config.toml to use")
+            config_file_path.write_text(Resources.default_config.format(
+                secret_key=os.urandom(24).hex()))
 
         config_suffix = ('.toml', '.tml')
 
         if config_file_path.suffix not in config_suffix:
-            raise TypeError(f"Config from_file must be one of the following types: {config_suffix}")
+            raise TypeError(
+                f"Config from_file must be one of the following types: {config_suffix}")
 
         def if_env_replace(env_value: Optional[Any]) -> Any:
             """
@@ -387,7 +403,8 @@ class BigApp(object):
             if db_type in db_allowed:
                 return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
 
-            raise ValueError(f"Unknown database type: {db_type}, must be: postgresql / mysql / oracle / sqlite")
+            raise ValueError(
+                f"Unknown database type: {db_type}, must be: postgresql / mysql / oracle / sqlite")
 
         config = toml_load(config_file_path)
 
@@ -397,15 +414,19 @@ class BigApp(object):
 
         if flask_config is not None and isinstance(flask_config, dict):
             if flask_config.get("static_folder", False):
-                self._app.static_folder = if_env_replace(flask_config.get("static_folder"))
+                self._app.static_folder = if_env_replace(
+                    flask_config.get("static_folder"))
                 del flask_config['static_folder']
 
             if flask_config.get("template_folder", False):
-                self._app.template_folder = if_env_replace(flask_config.get("template_folder"))
+                self._app.template_folder = if_env_replace(
+                    flask_config.get("template_folder"))
                 del flask_config['template_folder']
 
             for flask_config_key, flask_config_value in flask_config.items():
-                self._app.config.update({str(flask_config_key).upper(): if_env_replace(flask_config_value)})
+                self._app.config.update({
+                    str(flask_config_key).upper(): if_env_replace(
+                        flask_config_value)})
 
         if session_config is not None and isinstance(session_config, dict):
             self.session = session_config
@@ -415,11 +436,13 @@ class BigApp(object):
             for database_config_key, database_config_value in database_config.items():
                 if database_config_value.get("enabled", False):
                     if database_config_key == "main":
-                        self._app.config['SQLALCHEMY_DATABASE_URI'] = f"{build_database_uri(database_config_value)}"
+                        self._app.config[
+                            'SQLALCHEMY_DATABASE_URI'] = f"{build_database_uri(database_config_value)}"
                         continue
 
                     self._app.config['SQLALCHEMY_BINDS'].update(
-                        {database_config_key: f"{build_database_uri(database_config_value)}"}
+                        {
+                            database_config_key: f"{build_database_uri(database_config_value)}"}
                     )
 
     @staticmethod
