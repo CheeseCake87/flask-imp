@@ -35,17 +35,23 @@ def cast_to_import_str(app_name: str, folder_path: Path) -> str:
     return ".".join(parts)
 
 
+def snake(value: str) -> str:
+    """
+    Switches name of the class CamelCase to snake_case
+    """
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', value)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
 def class_field(class_: str, field: str) -> str:
     """
     Switches name of the class CamelCase to snake_case and tacks on the field name
 
     Used for SQLAlchemy foreign key assignments
 
-    INFO ::: This function will not work if you are changing the __tablename__ of your model class
+    INFO ::: This function may not produce the correct information if you are using __tablename__ in your class
     """
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', class_)
-    snaked = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
-    return f"{snaked}.{field}"
+    return f"{snake(class_)}.{field}"
 
 
 def cast_to_bool(value: Union[str, bool, None]) -> bool:
