@@ -274,8 +274,7 @@ class BigApp(object):
             """
             Picks apart the model from_file and builds a registry of the models found.
             """
-            import_string = cast_to_import_str(self._app_name, path).rstrip(
-                ".py")
+            import_string = cast_to_import_str(self._app_name, path)
             try:
                 model_module = import_module(import_string)
                 for model_object_members in getmembers(model_module, isclass):

@@ -32,7 +32,7 @@ def deprecated(message: str):
 def cast_to_import_str(app_name: str, folder_path: Path) -> str:
     parts = folder_path.parts
     parts = parts[parts.index(app_name):]
-    return ".".join(parts)
+    return ".".join(parts).removesuffix('.py')
 
 
 def snake(value: str) -> str:

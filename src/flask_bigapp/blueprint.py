@@ -10,7 +10,7 @@ from flask import Blueprint
 from flask import session
 from toml import load as toml_load
 
-from flask_bigapp.utilities import cast_to_bool, cast_to_import_str
+from flask_bigapp.utilities import cast_to_bool, cast_to_import_str, deprecated
 
 
 class BigAppBlueprint(Blueprint):
@@ -124,7 +124,15 @@ class BigAppBlueprint(Blueprint):
                 session.update(self.session)
                 break
 
+    @deprecated("import_blueprint_models() is deprecated Use import_models instead")
     def import_blueprint_models(
+            self,
+            from_file: Optional[str] = None,
+            from_folder: Optional[str] = None
+    ) -> None:
+        self.import_models(from_file=from_file, from_folder=from_folder)
+
+    def import_models(
             self,
             from_file: Optional[str] = None,
             from_folder: Optional[str] = None
@@ -148,7 +156,7 @@ class BigAppBlueprint(Blueprint):
             """
             Picks apart the model from_file and builds a registry of the models found.
             """
-            import_string = cast_to_import_str(self.app_name, path).rstrip(".py")
+            import_string = cast_to_import_str(self.app_name, path)
             try:
                 model_module = import_module(import_string)
                 for model_object_members in getmembers(model_module, isclass):
