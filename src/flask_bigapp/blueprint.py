@@ -147,44 +147,20 @@ class BigAppBlueprint(Blueprint):
         def get_bigapp_instance() -> BigApp:
             app_module = import_module(self.app_name)
             for dir_item in dir(app_module):
-                _ = getattr(app_module, dir_item)
-                if isinstance(_, BigApp):
-                    return _
+                potential_instance = getattr(app_module, dir_item)
+                if isinstance(potential_instance, BigApp):
+                    return potential_instance
             raise ImportError(f"Cannot find BigApp instance in {self.app_name}")
 
-        def model_processor(path: Path):
-            """
-            Picks apart the model from_file and builds a registry of the models found.
-            """
-            import_string = cast_to_import_str(self.app_name, path)
-            try:
-                model_module = import_module(import_string)
-                for model_object_members in getmembers(model_module, isclass):
-                    if import_string in model_object_members[1].__module__:
-                        name = model_object_members[0]
-                        model = model_object_members[1]
+        bigapp_instance = get_bigapp_instance()
 
-                        if not hasattr(model, "__tablename__"):
-                            raise AttributeError(f"{name} is not a valid model")
+        if isinstance(from_file, str):
+            from_file = Path(self.location / from_file)
 
-                        get_bigapp_instance().__model_registry__.add(name, model)
+        if isinstance(from_folder, str):
+            from_folder = Path(self.location / from_folder)
 
-            except ImportError as e:
-                logging.critical("Error importing model: ", e, f" {import_string}")
-
-        if from_file is None and from_folder is None:
-            raise ImportError("No model from_file or from_folder was passed in")
-
-        if from_folder is not None:
-            folder_path = Path(self.location / from_folder)
-            if folder_path.is_dir():
-                for model_file in folder_path.glob("*.py"):
-                    model_processor(model_file)
-
-        if from_file is not None:
-            file_path = Path(self.location / from_file)
-            if file_path.is_file() and file_path.suffix == ".py":
-                model_processor(file_path)
+        bigapp_instance.import_models(from_file, from_folder)
 
     def tmpl(self, template) -> str:
         """

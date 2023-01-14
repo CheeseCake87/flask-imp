@@ -261,8 +261,8 @@ class BigApp(object):
 
     def import_models(
             self,
-            from_file: Optional[str] = None,
-            from_folder: Optional[str] = None,
+            from_file: Optional[Union[str, Path]] = None,
+            from_folder: Optional[Union[str, Path]] = None,
     ) -> None:
         """
         Imports model files from a single from_file or a from_folder. Both are allowed to be set.
@@ -295,16 +295,26 @@ class BigApp(object):
             raise ImportError(
                 "No model from_file or from_folder was passed in")
 
+        if from_file is not None:
+            if isinstance(from_file, Path):
+                file_path = from_file
+            else:
+                file_path = Path(self._app_path / from_file)
+
+            if file_path.is_file() and file_path.suffix == ".py":
+                model_processor(file_path)
+            else:
+                from_folder = from_file
+
         if from_folder is not None:
-            folder_path = Path(self._app_path / from_folder)
+            if isinstance(from_folder, Path):
+                folder_path = from_folder
+            else:
+                folder_path = Path(self._app_path / from_folder)
+
             if folder_path.is_dir():
                 for model_file in folder_path.glob("*.py"):
                     model_processor(model_file)
-
-        if from_file is not None:
-            file_path = Path(self._app_path / from_file)
-            if file_path.is_file() and file_path.suffix == ".py":
-                model_processor(file_path)
 
     @deprecated("model_class() will be removed, Use model() instead")
     def model_class(self, class_name: str) -> Any:
