@@ -1,7 +1,6 @@
 import logging
 from importlib import import_module
 from importlib.util import find_spec
-from inspect import getmembers, isclass
 from pathlib import Path
 from types import ModuleType
 from typing import Dict, Optional, Union
@@ -134,8 +133,8 @@ class BigAppBlueprint(Blueprint):
 
     def import_models(
             self,
-            from_file: Optional[str] = None,
-            from_folder: Optional[str] = None
+            from_file: Optional[Union[str, Path]] = None,
+            from_folder: Optional[Union[str, Path]] = None,
     ) -> None:
         """
         Imports model files from a single from_file or a from_folder. Both are allowed to be set.

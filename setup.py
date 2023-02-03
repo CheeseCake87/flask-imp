@@ -5,9 +5,9 @@ readme = pathlib.Path(pathlib.Path.cwd() / "README.md").read_text()
 
 setup(
     name='Flask-BigApp',
-    version=f'2023.1.3',
+    version=f'2023.1.4',
     url='https://github.com/CheeseCake87/Flask-BigApp',
-    license='GNU General Public License v2 or later (GPLv2+)',
+    license='GNU Lesser General Public License v2.1',
     author='David Carmichael',
     author_email='carmichaelits@gmail.com',
     description='A Flask auto importer that allows your Flask apps to grow big.',

@@ -314,6 +314,8 @@ class BigApp(object):
 
             if folder_path.is_dir():
                 for model_file in folder_path.glob("*.py"):
+                    if "__" in model_file.name:
+                        continue
                     model_processor(model_file)
 
     @deprecated("model_class() will be removed, Use model() instead")
