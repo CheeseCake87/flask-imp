@@ -4,10 +4,5 @@ from .. import bp
 
 
 @bp.route("/", methods=["GET"])
-def index():
+def index_test():
     return render_template(bp.tmpl("index.html"))
-
-
-@bp.route("/static", methods=["GET"])
-def static_test():
-    return render_template(bp.tmpl("static.html"))
