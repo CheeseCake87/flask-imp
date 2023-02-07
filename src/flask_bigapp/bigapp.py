@@ -400,16 +400,17 @@ class BigApp(object):
 
             if db_type == "sqlite":
                 if db_location is not None:
+                    if Path(db_location).exists():
+                        database = Path(db_location / f"{db_name}.db")
+                        return f"sqlite:///{database}"
 
-                    if db_location.startswith("/"):
-                        return f"sqlite:///{db_location}/{db_name}"
+                    db_location_path = Path(self._app_path / db_location)
+                    db_location_path.mkdir(parents=True, exist_ok=True)
+                    db_location_file_path = db_location_path / f"{db_name}.db"
+                    return f"sqlite:///{db_location_file_path}"
 
-                    complete_path = Path(self._app_path / db_location)
-                    complete_path.mkdir(parents=True, exist_ok=True)
-
-                    return f"{db_type}:////{complete_path}/{db_name}.db"
-
-                return f"{db_type}:////{self._app_path}/{db_name}.db"
+                db_at_root = Path(self._app_path / f"{db_name}.db")
+                return f"{db_type}:///{db_at_root}"
 
             if db_type in db_allowed:
                 return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
@@ -418,7 +419,6 @@ class BigApp(object):
                 f"Unknown database type: {db_type}, must be: postgresql / mysql / oracle / sqlite")
 
         config = toml_load(config_file_path)
-
         flask_config = config.get("flask")
         session_config = config.get("session")
         database_config = config.get("database")
