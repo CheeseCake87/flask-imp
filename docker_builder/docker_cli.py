@@ -20,7 +20,7 @@ class DockerCli:
 
         self.process.stdin.close()
 
-        return self.process.stdout.read().decode()
+        return f"{self.process.stdout.read().decode()} {self.process.stderr.read().decode()}"
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.process.terminate()

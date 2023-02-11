@@ -7,5 +7,4 @@ RUN pip install -r requirements.txt
 RUN pip install -r requirements_dev.txt
 COPY . .
 RUN python3 setup.py install
-RUN python3 -m pytest
-ENTRYPOINT ["flask", "run", "--host", "0.0.0.0", "--port", "5000"]
+ENTRYPOINT ["pytest"]
