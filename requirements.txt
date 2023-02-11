@@ -1,3 +1,4 @@
 Flask
 toml
 Flask-SQLAlchemy
+typing-extensions
