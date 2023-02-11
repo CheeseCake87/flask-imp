@@ -1,11 +1,15 @@
 import re
-from typing import Literal
 from dataclasses import dataclass
 from datetime import datetime
 from hashlib import sha1, sha256, sha512
 from random import choice
 from random import randrange
 from string import punctuation, ascii_letters
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 
 class Auth:
