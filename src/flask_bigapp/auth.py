@@ -6,11 +6,6 @@ from random import choice
 from random import randrange
 from string import punctuation, ascii_letters
 
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
 
 class Auth:
 
@@ -28,8 +23,9 @@ class Auth:
         return bool(pattern.match(email_address))
 
     @classmethod
-    def is_username_valid(cls, username: str, allowed: Literal["all", "dot", "dash", "under"] = "all") -> bool:
+    def is_username_valid(cls, username: str, allowed: str = "all") -> bool:
         """
+        Allowed options: "all", "dot", "dash", "under"
         Checks if a username is valid. Valid usernames can only include
         letters, numbers, ., -, and _ but can not begin or end with the last three mentioned
         :param allowed:
@@ -137,8 +133,10 @@ class Auth:
         return False
 
     @classmethod
-    def generate_password(cls, style: Literal["animals"], length: int = 3) -> str:
+    def generate_password(cls, style: str = "animals", length: int = 3) -> str:
         """
+        style options: "animals"
+
         Will return a plain text password based on choice of style and length.
 
         Combinations available:
