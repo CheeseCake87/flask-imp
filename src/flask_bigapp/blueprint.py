@@ -7,9 +7,9 @@ from typing import Dict, Optional, Union
 
 from flask import Blueprint
 from flask import session
-from toml import load as toml_load
 
-from flask_bigapp.utilities import cast_to_bool, cast_to_import_str, deprecated
+from flask_bigapp.helpers import init_bp_config
+from flask_bigapp.utilities import cast_to_import_str, deprecated
 
 
 class BigAppBlueprint(Blueprint):
@@ -21,6 +21,7 @@ class BigAppBlueprint(Blueprint):
     bp_name: str
     package: str
     session: dict
+    settings: dict
 
     nested_blueprints: Dict[str, Optional[ModuleType]]
 
@@ -42,13 +43,14 @@ class BigAppBlueprint(Blueprint):
 
         self.nested_blueprints = {}
 
-        bp_args = self._init_bp_config(Path(self.location / config_file)) or {}
+        self.enabled, self.session, self.settings = init_bp_config(self.bp_name, self.location / config_file)
 
-        super().__init__(
-            self.bp_name,
-            self.package,
-            **bp_args
-        )
+        if self.enabled:
+            super().__init__(
+                self.bp_name,
+                self.package,
+                **self.settings
+            )
 
     def import_routes(self, folder: str = "routes") -> None:
         """
@@ -57,11 +59,14 @@ class BigAppBlueprint(Blueprint):
 
         Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder/blueprint/from_folder" )
         """
-        path = self.location / folder
-        if not path.exists():
-            raise NotADirectoryError(f"{path} is not a directory")
+        if not self.enabled:
+            return
 
-        routes = path.glob("*.py")
+        route_path = self.location / folder
+        if not route_path.exists():
+            raise NotADirectoryError(f"{route_path} is not a directory")
+
+        routes = route_path.glob("*.py")
         for route in routes:
             try:
                 import_module(f"{self.package}.{folder}.{route.stem}")
@@ -75,6 +80,8 @@ class BigAppBlueprint(Blueprint):
 
         Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
+        if not self.enabled:
+            return
 
         folder_path = Path(self.location / folder)
 
@@ -87,6 +94,9 @@ class BigAppBlueprint(Blueprint):
 
         Path must be relative ( path="here" not path="/home/user/app/from_folder" )
         """
+        if not self.enabled:
+            return
+
         if isinstance(blueprint, str):
             potential_bp = Path(self.location / blueprint)
         else:
@@ -118,18 +128,13 @@ class BigAppBlueprint(Blueprint):
         Initialize the session variables found in the config from_file.
         Use this method in the before_request route.
         """
+        if not self.enabled:
+            return
+
         for key in self.session:
             if key not in session:
                 session.update(self.session)
                 break
-
-    @deprecated("import_blueprint_models() is deprecated Use import_models instead")
-    def import_blueprint_models(
-            self,
-            from_file: Optional[str] = None,
-            from_folder: Optional[str] = None
-    ) -> None:
-        self.import_models(from_file=from_file, from_folder=from_folder)
 
     def import_models(
             self,
@@ -141,6 +146,9 @@ class BigAppBlueprint(Blueprint):
 
         File and Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
+        if not self.enabled:
+            return
+
         from flask_bigapp import BigApp
 
         def get_bigapp_instance() -> BigApp:
@@ -169,55 +177,10 @@ class BigAppBlueprint(Blueprint):
         """
         return f"{self.name}/{template}"
 
-    def _init_bp_config(self, config_file_path) -> Optional[dict]:
-        """
-        Attempts to load the and process the configuration from_file.
-        """
-
-        if not config_file_path.exists():
-            raise FileNotFoundError(f"{self.bp_name} Blueprint config from_file {config_file_path.name} was not found")
-
-        config_suffix = ('.toml', '.tml')
-
-        if config_file_path.suffix not in config_suffix:
-            raise TypeError(f"Config from_file must be one of the following types: {config_suffix}")
-
-        config = toml_load(config_file_path)
-
-        self.enabled = cast_to_bool(config.get('enabled', False))
-        self.session = config.get('session', {})
-        settings = config.get('settings', {})
-
-        kwargs = dict()
-
-        """Pull values from settings"""
-        url_prefix = settings.get('url_prefix', "")
-        subdomain = settings.get('subdomain', "")
-        url_defaults = settings.get('url_defaults', dict())
-        static_folder = settings.get('static_folder', "")
-        template_folder = settings.get('template_folder', "")
-        static_url_path = settings.get('static_url_path', "")
-        root_path = settings.get('root_path', "")
-
-        """If values exist in the configuration from_file, set values"""
-        kwargs.update({'url_prefix': url_prefix if url_prefix != "" else f"/{self.bp_name}"})
-
-        if subdomain:
-            kwargs.update({'subdomain': subdomain})
-
-        if url_defaults:
-            kwargs.update({'url_defaults': url_defaults})
-
-        if static_folder:
-            kwargs.update({'static_folder': static_folder})
-
-        if template_folder:
-            kwargs.update({'template_folder': template_folder})
-
-        if static_url_path:
-            kwargs.update({'static_url_path': static_url_path})
-
-        if root_path:
-            kwargs.update({'root_path': root_path})
-
-        return kwargs
+    @deprecated("import_blueprint_models() is deprecated Use import_models instead")
+    def import_blueprint_models(
+            self,
+            from_file: Optional[str] = None,
+            from_folder: Optional[str] = None
+    ) -> None:
+        self.import_models(from_file=from_file, from_folder=from_folder)
