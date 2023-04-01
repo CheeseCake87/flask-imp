@@ -6,11 +6,11 @@ class Resources:
     # Format to: secret_key
     default_config = """\
 # Flask-BigApp Config File
-# 
+#
 # Updates the Flask app config with the variables below.
 # If any variable below does not exist in the standard Flask env vars it is created and will be accessible using
 # app.config["YOUR_VAR_NAME"]. All key names defined below will be capitalised when imported.
-# 
+#
 [FLASK]
 APP_NAME = "app"
 VERSION = "0.0.1"
