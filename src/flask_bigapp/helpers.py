@@ -71,25 +71,8 @@ def init_app_config(config_file_path: Path, app) -> dict:
     session_config = config.get("SESSION")
     database_config = capitalize_dict_keys(config.get("DATABASE"))
 
-    static_folder = flask_config.get("STATIC_FOLDER", False)
-    template_folder = flask_config.get("TEMPLATE_FOLDER", False)
-    static_url_path = flask_config.get("STATIC_URL_PATH", False)
-
     if flask_config is not None and isinstance(flask_config, dict):
-        if static_folder:
-            app.static_folder = if_env_replace(static_folder)
-
-        if template_folder:
-            app.template_folder = if_env_replace(template_folder)
-
-        if static_url_path:
-            app.static_url_path = if_env_replace(static_url_path)
-
-        ignore = ("STATIC_FOLDER", "TEMPLATE_FOLDER", "STATIC_URL_PATH")
         for flask_config_key, flask_config_value in flask_config.items():
-            if flask_config_key in ignore:
-                continue
-
             app.config.update({str(flask_config_key): if_env_replace(flask_config_value)})
 
     if database_config is not None and isinstance(database_config, dict):
