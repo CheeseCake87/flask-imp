@@ -9,10 +9,10 @@ class Resources:
 # If any variable below does not exist in the standard Flask env vars it is created and will be accessible using
 # app.config["YOUR_VAR_NAME"]. All variables defined below will be capitalised when imported.
 
-[flask]
+[FLASK]
 APP_NAME = "app"
 VERSION = "0.0.1"
-SECRET_KEY = "{secret_key}"
+SECRET_KEY = "<CONFIG_SECRET_KEY>"
 DEBUG = false
 TESTING = false
 SESSION_TIME = 480
@@ -23,16 +23,15 @@ EXPLAIN_TEMPLATE_LOADING = false
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
 # type = mysql / postgresql / sqlite
 # if type = sqlite, config parser will ignore username and password
-[database]
-
-    [database.main]
-    enabled = true
-    type = "sqlite"
-    database_name = "database"
-    location = "db"
-    port = ""
-    username = "user"
-    password = "password"
+[DATABASE]
+[DATABASE.MAIN]
+ENABLED = true
+TYPE = "sqlite"
+DATABASE_NAME = "database"
+LOCATION = "db"
+PORT = ""
+USERNAME = "user"
+PASSWORD = "password"
 
 """
     # Format to: static_url_path
