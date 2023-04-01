@@ -1,6 +1,5 @@
 import logging
 import os
-import typing as t
 from pathlib import Path
 
 from toml import load as toml_load
@@ -109,9 +108,7 @@ def init_app_config(config_file_path: Path, app) -> dict:
     return {"FLASK": flask_config, "SESSION": session_config, "DATABASE": database_config}
 
 
-def init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple[
-    bool, t.Dict[t.Any, t.Any], t.Dict[t.Any, t.Any]
-]:
+def init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:
     """
     Attempts to load the and process the configuration from_file.
     """
