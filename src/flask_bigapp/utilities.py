@@ -1,9 +1,10 @@
 import functools
 import logging
+import os
 import re
 import sys
+import typing as t
 from pathlib import Path
-from typing import Union
 
 
 class Sprinkles:
@@ -28,6 +29,39 @@ def deprecated(message: str):
         return proc_function
 
     return func_wrapper
+
+
+def if_env_replace(env_value: t.Optional[t.Any]) -> t.Any:
+    """
+    Looks for the replacement pattern to swap out values in the config from_file with environment variables.
+    """
+    pattern = re.compile(r'<(.*?)>')
+
+    if isinstance(env_value, str):
+        if re.match(pattern, env_value):
+            env_var = re.findall(pattern, env_value)[0]
+            return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
+    return env_value
+
+
+def capitalize_dict_keys(dictionary: t.Optional[dict]) -> dict:
+    """
+    Capitalizes the keys in a dictionary.
+    """
+    if dictionary is None:
+        return {}
+
+    return {key.upper(): value for key, value in dictionary.items()}
+
+
+def lower_dict_keys(dictionary: t.Optional[dict]) -> dict:
+    """
+    Lowercases the keys in a dictionary.
+    """
+    if dictionary is None:
+        return {}
+
+    return {key.lower(): value for key, value in dictionary.items()}
 
 
 def cast_to_import_str(app_name: str, folder_path: Path) -> str:
@@ -59,7 +93,7 @@ def class_field(class_: str, field: str) -> str:
     return f"{snake(class_)}.{field}"
 
 
-def cast_to_bool(value: Union[str, bool, None]) -> bool:
+def cast_to_bool(value: t.Union[str, bool, None]) -> bool:
     if value is None:
         return False
     if isinstance(value, bool):
