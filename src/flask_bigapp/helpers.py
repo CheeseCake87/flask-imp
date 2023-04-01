@@ -47,7 +47,7 @@ def build_database_uri(database_config_value: dict, app) -> str:
         return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
 
     raise ValueError(
-        f"Unknown database type, must be: postgresql / mysql / oracle / sqlite")
+        "Unknown database type, must be: postgresql / mysql / oracle / sqlite")
 
 
 def init_app_config(config_file_path: Path, app) -> dict:
@@ -55,7 +55,7 @@ def init_app_config(config_file_path: Path, app) -> dict:
     Processes the values from the configuration from_file.
     """
     if not config_file_path.exists():
-        logging.critical(f"Config file was not found, creating default.config.toml to use")
+        logging.critical("Config file was not found, creating default.config.toml to use")
 
         config_file_path.write_text(
             Resources.default_config.format(
@@ -110,7 +110,7 @@ def init_app_config(config_file_path: Path, app) -> dict:
 
 
 def init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple[
-    bool, t.Optional[dict[t.Any, t.Any]] | t.Any, t.Optional[dict]
+    bool, t.Dict[t.Any, t.Any], t.Dict[t.Any, t.Any]
 ]:
     """
     Attempts to load the and process the configuration from_file.
@@ -122,14 +122,14 @@ def init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple[
     config_suffix = ('.toml', '.tml')
 
     if config_file_path.suffix not in config_suffix:
-        raise TypeError(f"Config from_file must be one of the following types: .toml / .tml")
+        raise TypeError("Config from_file must be one of the following types: .toml / .tml")
 
     config = capitalize_dict_keys(toml_load(config_file_path))
 
     enabled = cast_to_bool(config.get('ENABLED', False))
 
     if not enabled:
-        return enabled, None, None
+        return enabled, {}, {}
 
     session = config.get('SESSION', {})
     settings = lower_dict_keys(config.get('SETTINGS', {}))
