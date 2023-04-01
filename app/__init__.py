@@ -24,6 +24,9 @@ def create_app():
 
     bigapp.import_models(from_folder="models")
 
+    with app.app_context():
+        db.create_all()
+
     @app.before_request
     def before_request():
         bigapp.init_session()
