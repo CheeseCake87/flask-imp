@@ -1,12 +1,11 @@
 import logging
 import os
-import re
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
 from types import ModuleType
-from typing import Dict, TextIO, Union, Optional, Any
+from typing import Dict, Union, Optional, Any
 
 from flask import Blueprint
 from flask import Flask
@@ -15,54 +14,24 @@ from flask_sqlalchemy.model import DefaultMeta
 from toml import load as toml_load
 
 from .blueprint import BigAppBlueprint
+from .helpers import init_app_config
+from .objects import ModelRegistry
 from .resources import Resources
 from .utilities import cast_to_bool, cast_to_import_str, deprecated
 
 
-class _ModelRegistry:
-    registry: Dict[str, Any]
-
-    def __init__(self):
-        self.registry = dict()
-
-    def assert_exists(self, ref: str):
-        if ref not in self.registry:
-            raise KeyError(
-                f"Model {ref} not found in model registry \n"
-                f"Available models: {', '.join(self.registry.keys())}"
-            )
-
-    def get(self, ref: str) -> dict:
-        self.assert_exists(ref)
-        return self.registry[ref]
-
-    def class_(self, ref: str) -> DefaultMeta:
-        self.assert_exists(ref)
-        return self.registry[ref]['class']
-
-    def add(self, ref, model: Optional[ModuleType] = None):
-        self.registry[ref] = {
-            'ref': ref,
-            'class': model
-        }
-
-    def __repr__(self):
-        return f"ModelRegistry({self.registry})"
-
-
 class BigApp(object):
-    session: Dict
-    themes: Dict[str, Path]
-
-    __blueprint_registry__: Dict[str, Optional[ModuleType]]
-    __model_registry__: _ModelRegistry
-
     _app: Flask
     _app_name: str
     _app_path: Path
     _app_folder: Path
 
-    _default_config: Optional[str]
+    __blueprint_registry__: Dict[str, Optional[ModuleType]]
+    __model_registry__: ModelRegistry
+
+    config_path: Path
+    config: Dict
+    themes: Dict[str, Path]
 
     def __init__(
             self,
@@ -98,32 +67,30 @@ class BigApp(object):
         if not isinstance(app, Flask):
             raise TypeError(
                 "The app that was passed in is not an instance of Flask")
-
-        self.session = dict()
-        self.themes = dict()
-        self.__model_registry__ = _ModelRegistry()
+        if app_config_file is None:
+            app_config_file = "default.config.toml"
 
         self._app = app
         self._app_name = app.name
         self._app_path = Path(self._app.root_path)
         self._app_folder = self._app_path.parent
 
-        if app_config_file is None:
-            app_config_file = "default.config.toml"
-
-        self._init_config(self._app_path / app_config_file)
-
+        self.__model_registry__ = ModelRegistry()
         self.__blueprint_registry__ = dict()
+
+        self.config_path = self._app_path / app_config_file
+        self.config = init_app_config(self.config_path, self._app)
+        self.themes = dict()
 
     def init_session(self) -> None:
         """
         Initialize the session variables found in the config from_file.
         Use this method in the before_request route.
         """
-        for key in self.session:
-            if key not in session:
-                session.update(self.session)
-                break
+        if self.config.get("session"):
+            for key, value in self.config["session"].items():
+                if key not in session:
+                    session[key] = value
 
     def import_builtins(self, folder: Union[str, Path] = "builtins") -> None:
         """
@@ -186,11 +153,6 @@ class BigApp(object):
             except Exception as e:
                 logging.critical(f"{e}",
                                  f"Error importing blueprint: from {potential_bp}")
-
-    @deprecated(
-        "import_structures() will be removed, Use import_themes() instead")
-    def import_structures(self, structures_folder: str) -> None:
-        self.import_themes(structures_folder)
 
     def import_themes(self, themes_folder: str) -> None:
         """
@@ -288,8 +250,7 @@ class BigApp(object):
                         self.__model_registry__.add(name, model)
 
             except ImportError as e:
-                logging.critical("Error importing model: ", e,
-                                 f" {import_string}")
+                logging.critical("Error importing model: ", e, f" {import_string}")
 
         if from_file is None and from_folder is None:
             raise ImportError(
@@ -318,19 +279,15 @@ class BigApp(object):
                         continue
                     model_processor(model_file)
 
-    @deprecated("model_class() will be removed, Use model() instead")
-    def model_class(self, class_name: str) -> Any:
-        return self.model(class_name)
-
     def model(self, class_: str) -> DefaultMeta:
         """
-        Returns the model class for the given class name
+        Returns the model class for the given ORM class name
         """
         return self.__model_registry__.class_(class_)
 
     def model_meta(self, class_: Union[str, Any]) -> dict:
         """
-        Returns the model class for the given class name
+        Returns meta information for the given ORM class name
         """
 
         def check_for_table_name(model_):
@@ -353,112 +310,10 @@ class BigApp(object):
             "table_name": class_.__tablename__,
         }
 
-    def _init_config(self, config_file_path: Path):
-        """
-        Processes the values from the configuration from_file.
-        """
-        if not config_file_path.exists():
-            logging.critical(
-                f"Config from_file {config_file_path.name} was not found, creating default.config.toml to use")
-            config_file_path.write_text(Resources.default_config.format(
-                secret_key=os.urandom(24).hex()))
+    @deprecated("import_structures() will be removed, Use import_themes() instead")
+    def import_structures(self, structures_folder: str) -> None:
+        self.import_themes(structures_folder)
 
-        config_suffix = ('.toml', '.tml')
-
-        if config_file_path.suffix not in config_suffix:
-            raise TypeError(
-                f"Config from_file must be one of the following types: {config_suffix}")
-
-        def if_env_replace(env_value: Optional[Any]) -> Any:
-            """
-            Looks for the replacement pattern to swap out values in the config from_file with environment variables.
-            """
-            pattern = re.compile(r'<(.*?)>')
-
-            if isinstance(env_value, str):
-                if re.match(pattern, env_value):
-                    env_var = re.findall(pattern, env_value)[0]
-                    return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
-            return env_value
-
-        def build_database_uri(block: dict) -> str:
-            """
-            Puts together the correct database URI depending on the type specified.
-
-            Fails if type is not supported.
-            """
-            db_type = if_env_replace(block.get("type", "None"))
-            db_name = if_env_replace(block.get('database_name', 'database'))
-
-            db_location = if_env_replace(block.get("location", "db"))
-            db_port = if_env_replace(str(block.get('port', 'None')))
-
-            db_username = if_env_replace(block.get('username', 'None'))
-            db_password = if_env_replace(block.get('password', 'None'))
-
-            db_allowed = ('postgresql', 'mysql', 'oracle')
-
-            if db_type == "sqlite":
-                if db_location is not None:
-                    if Path(db_location).exists():
-                        database = Path(db_location / f"{db_name}.db")
-                        return f"sqlite:///{database}"
-
-                    db_location_path = Path(self._app_path / db_location)
-                    db_location_path.mkdir(parents=True, exist_ok=True)
-                    db_location_file_path = db_location_path / f"{db_name}.db"
-                    return f"sqlite:///{db_location_file_path}"
-
-                db_at_root = Path(self._app_path / f"{db_name}.db")
-                return f"{db_type}:///{db_at_root}"
-
-            if db_type in db_allowed:
-                return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
-
-            raise ValueError(
-                f"Unknown database type: {db_type}, must be: postgresql / mysql / oracle / sqlite")
-
-        config = toml_load(config_file_path)
-        flask_config = config.get("flask")
-        session_config = config.get("session")
-        database_config = config.get("database")
-
-        if flask_config is not None and isinstance(flask_config, dict):
-            if flask_config.get("static_folder", False):
-                self._app.static_folder = if_env_replace(
-                    flask_config.get("static_folder"))
-                del flask_config['static_folder']
-
-            if flask_config.get("template_folder", False):
-                self._app.template_folder = if_env_replace(
-                    flask_config.get("template_folder"))
-                del flask_config['template_folder']
-
-            for flask_config_key, flask_config_value in flask_config.items():
-                self._app.config.update({
-                    str(flask_config_key).upper(): if_env_replace(
-                        flask_config_value)})
-
-        if session_config is not None and isinstance(session_config, dict):
-            self.session = session_config
-
-        if database_config is not None and isinstance(database_config, dict):
-            self._app.config['SQLALCHEMY_BINDS'] = dict()
-            for database_config_key, database_config_value in database_config.items():
-                if database_config_value.get("enabled", False):
-                    if database_config_key == "main":
-                        self._app.config[
-                            'SQLALCHEMY_DATABASE_URI'] = f"{build_database_uri(database_config_value)}"
-                        continue
-
-                    self._app.config['SQLALCHEMY_BINDS'].update(
-                        {
-                            database_config_key: f"{build_database_uri(database_config_value)}"}
-                    )
-
-    @staticmethod
-    def structure_tmpl(structure: str, template: Union[str, TextIO]) -> str:
-        """
-        pushes together a structure name to a template location.
-        """
-        return f"{structure}/{template}"
+    @deprecated("model_class() will be removed, Use model() instead")
+    def model_class(self, class_name: str) -> Any:
+        return self.model(class_name)
