@@ -183,7 +183,7 @@ def rename_blueprint(blueprint, new_name):
 
 @cli.command("add-theme", help="Create a flask-bigapp theme")
 @click.option(
-    '-f', '--from_folder',
+    '-f', '--folder',
     nargs=1,
     default="Current Working Directory",
     prompt=(f'\n{Sprinkles.WARNING}(Creation is relative to the current working directory){Sprinkles.END}\n'
