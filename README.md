@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/CheeseCake87/Flask-BigApp/master/app/theme/static/img/Flask-BigApp-Logo.svg)
+![](https://raw.githubusercontent.com/CheeseCake87/Flask-BigApp/master/app/theme/static/img/![Flask-BigApp-Logo-White-BG.png](app%2Ftheme%2Fstatic%2Fimg%2FFlask-BigApp-Logo-White-BG.png)Flask-BigApp-Logo.svg)
 
 # Flask-BigApp
 
