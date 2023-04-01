@@ -13,6 +13,7 @@ def database_creation_test():
 @bp.route("/database-population", methods=["GET"])
 def database_population_test():
     m_example_user = bigapp.model("ExampleUser")
+    m_example_user_bind = bigapp.model("ExampleUserBind")
     m_example_table = bigapp.model("ExampleTable")
 
     if not m_example_user.get_by_id(1):
@@ -28,6 +29,14 @@ def database_population_test():
             disabled=False
         )
         db.session.add(new_example_user)
+        new_example_user_bind = m_example_user_bind(
+            username="David",
+            password=password,
+            salt=salt,
+            private_key=Auth.generate_private_key(salt),
+            disabled=False
+        )
+        db.session.add(new_example_user_bind)
         db.session.flush()
         new_example_user_rel = m_example_table(
             user_id=new_example_user.user_id,
@@ -40,6 +49,7 @@ def database_population_test():
         user_in_example_table = bigapp.model("ExampleTable").get_by_user_id(new_example_user.user_id)
 
         if user_in_example_table:
-            return f"{new_example_user.username} created and {user_in_example_table.thing} in ExampleTable"
+            return (f"{new_example_user.username} created and {user_in_example_table.thing}"
+                    f"in ExampleTable, and {new_example_user_bind.username} created in ExampleUserBind.")
 
     return "Failed Auto Test, User already exists."
