@@ -8,4 +8,3 @@ bp.import_routes("routes")
 @bp.before_app_request
 def before_app_request():
     bp.init_session()
-
