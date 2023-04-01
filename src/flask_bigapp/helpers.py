@@ -102,7 +102,7 @@ def init_app_config(config_file_path: Path, app) -> dict:
                     continue
 
                 app.config['SQLALCHEMY_BINDS'].update({
-                    database_config_key: f"{build_database_uri(values, app)}"
+                    str(database_config_key).lower(): f"{build_database_uri(values, app)}"
                 })
 
     return {"FLASK": flask_config, "SESSION": session_config, "DATABASE": database_config}
