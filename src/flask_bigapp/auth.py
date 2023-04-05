@@ -80,12 +80,22 @@ class Auth:
         return sha.hexdigest()
 
     @classmethod
+    def generate_numeric_validator(cls, length: int) -> int:
+        """
+        Generates (length) of random numbers.
+        :return str:
+        """
+        start = int("1" * length)
+        end = int("9" * length)
+        return randrange(start, end)
+
+    @classmethod
     def generate_email_validator(cls) -> str:
         """
         Generates a string of 8 random numbers, for use in MFA email
         :return str:
         """
-        return str(randrange(11111111, 99999999))
+        return str(cls.generate_numeric_validator(length=8))
 
     @classmethod
     def generate_pepper(cls, password: str):
