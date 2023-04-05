@@ -5,7 +5,7 @@ readme = pathlib.Path(pathlib.Path.cwd() / "README.md").read_text()
 
 setup(
     name='Flask-BigApp',
-    version=f'2023.1.8.2',
+    version=f'2023.1.8.3',
     url='https://github.com/CheeseCake87/Flask-BigApp',
     license='GNU Lesser General Public License v2.1',
     author='David Carmichael',
