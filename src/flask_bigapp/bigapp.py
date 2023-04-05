@@ -87,8 +87,8 @@ class BigApp(object):
         Initialize the session variables found in the config from_file.
         Use this method in the before_request route.
         """
-        if self.config.get("session"):
-            for key, value in self.config["session"].items():
+        if self.config.get("SESSION"):
+            for key, value in self.config.get("SESSION", {}).items():
                 if key not in session:
                     session[key] = value
 
