@@ -1,3 +1,4 @@
+import typing as t
 from functools import wraps
 
 from flask import flash
@@ -10,8 +11,8 @@ def login_check(
         bool_session_key: str,
         endpoint_redirect: str,
         redirect_on_value: bool = False,
-        endpoint_kwargs: dict = None,
-        message: str = None,
+        endpoint_kwargs: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        message: t.Optional[str] = None,
         message_category: str = "message"
 ):
     """
@@ -69,9 +70,9 @@ def login_check(
 def permission_check(
         iter_session_key: str,
         endpoint_redirect: str,
-        redirect_if_no_match: list = None,
-        endpoint_kwargs: dict = None,
-        message: str = None,
+        redirect_if_no_match: t.Optional[list] = None,
+        endpoint_kwargs: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        message: t.Optional[str] = None,
         message_category: str = "message"
 ):
     """
