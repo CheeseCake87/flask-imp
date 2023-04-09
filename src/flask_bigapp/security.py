@@ -11,7 +11,7 @@ def login_check(
         bool_session_key: str,
         endpoint_redirect: str,
         redirect_on_value: bool = False,
-        endpoint_kwargs: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
         message: t.Optional[str] = None,
         message_category: str = "message"
 ):
@@ -71,7 +71,7 @@ def permission_check(
         iter_session_key: str,
         endpoint_redirect: str,
         redirect_if_no_match: t.Optional[list] = None,
-        endpoint_kwargs: t.Optional[t.Dict[t.Any, t.Any]] = None,
+        endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
         message: t.Optional[str] = None,
         message_category: str = "message"
 ):
@@ -88,13 +88,12 @@ def permission_check(
     def admin_page():
         ...
 
-
     IF redirect_if_no_match is None, the default value of ['admin'] is set.
 
     :param iter_session_key: The session key to check for.
     :param endpoint_redirect: The endpoint to redirect to if the
-                                session key does not exist or does not contain the
-                                specified values.
+                              session key does not exist or does not contain the
+                              specified values.
     :param redirect_if_no_match: A list of values that the session key must contain.
     :param endpoint_kwargs: A dictionary of keyword arguments to pass to the redirect endpoint.
     :param message: If a message is specified, a flash message is shown.
