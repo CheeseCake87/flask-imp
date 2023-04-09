@@ -49,3 +49,7 @@ USERNAME = "user"
 PASSWORD = "password"
 #
 # You can add as many databases as you want.
+
+
+[SESSION]
+logged_in = false
