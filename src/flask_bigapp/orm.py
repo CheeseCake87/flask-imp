@@ -64,9 +64,9 @@ class CrudMixin:
             if order_by is not None:
                 column = getattr(cls, order_by)
                 if order_desc:
-                    base_query = select(cls).order_by(desc(column))
+                    base_query = select(cls).order_by(desc(column))  # type: ignore
                 else:
-                    base_query = select(cls).order_by(asc(column))
+                    base_query = select(cls).order_by(asc(column))  # type: ignore
             else:
                 base_query = select(cls)  # type: ignore
 
