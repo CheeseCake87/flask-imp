@@ -1,4 +1,5 @@
 from app import bigapp, db
+from app.models.example_mixin import ExampleMixin
 from flask_bigapp import Auth
 from .. import bp
 
@@ -53,3 +54,9 @@ def database_population_test():
                     f"in ExampleTable, and {new_example_user_bind.username} created in ExampleUserBind.")
 
     return "Failed Auto Test, User already exists."
+
+
+@bp.route("/mixin-add", methods=["GET"])
+def mixin_add_test():
+    new_mixin = ExampleMixin.create({"thing": "MixinTest"})
+    return f"{new_mixin.thing}"

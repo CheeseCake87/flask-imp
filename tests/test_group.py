@@ -46,6 +46,14 @@ def test_database_creation(client):
     assert b"Database created." in response.data
 
 
+def test_mixin_create(client):
+    """
+    If this test is successful, the mixin is working correctly.
+    """
+    response = client.get('/tests/mixin-add')
+    assert b"MixinTest" in response.data
+
+
 def test_database_population(client):
     """
     If this test is successful, the database has been populated correctly.
