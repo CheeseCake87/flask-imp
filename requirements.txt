@@ -1,4 +1,5 @@
-Flask
+Flask>=2.2.3
 toml
-Flask-SQLAlchemy
-typing-extensions
+Flask-SQLAlchemy>=3.0.3
+typing-extensions>=4.5.0
+sqlalchemy>=2.0.9
