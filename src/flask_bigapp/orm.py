@@ -38,7 +38,7 @@ class CrudMixin:
                     del values[key]
 
         result = cls.__session__.scalar(
-            insert(cls).returning(cls).values(**values)
+            insert(cls).returning(cls).values(**values)  # type: ignore
         )
         cls.__session__.commit()
         return result
@@ -57,9 +57,9 @@ class CrudMixin:
             _auto_output: bool = True
     ):
         if _updating:
-            base_query = update(cls)
+            base_query = update(cls)  # type: ignore
         elif _deleting:
-            base_query = delete(cls)
+            base_query = delete(cls)  # type: ignore
         else:
             if order_by is not None:
                 column = getattr(cls, order_by)
@@ -68,7 +68,7 @@ class CrudMixin:
                 else:
                     base_query = select(cls).order_by(asc(column))
             else:
-                base_query = select(cls)
+                base_query = select(cls)  # type: ignore
 
         if all_rows:
             return cls.__session__.scalars(base_query).all()
