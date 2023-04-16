@@ -46,7 +46,7 @@ class CrudMixin:
     @classmethod
     def read(
             cls,
-            id_: t.Optional[int],
+            id_: t.Optional[int] = None,
             field: t.Optional[tuple] = None,
             fields: t.Optional[t.Dict[str, t.Any]] = None,
             all_rows: bool = False,
