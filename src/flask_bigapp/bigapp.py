@@ -195,7 +195,8 @@ class BigApp(object):
 
             if not nested_template_folder.exists():
                 raise NotADirectoryError(
-                    f"Nested template from_folder for {theme.name} was not found, \nshould look like: {nested_template_folder}")
+                    f"Nested template from_folder for {theme.name} was not found, "
+                    f"\nshould look like: {nested_template_folder}")
 
             if not config.exists():
                 logging.debug(

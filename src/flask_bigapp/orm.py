@@ -14,15 +14,21 @@ class CrudMixin:
             values: t.Optional[t.Dict[str, t.Any]] = None,
             batch: t.Optional[t.List[t.Dict[str, t.Any]]] = None,
             wash_attributes: bool = False,
+            ignore_attributes: t.Optional[t.List[str]] = None,
     ):
         if batch is not None:
             new_batch = []
             if wash_attributes:
                 for item in batch:
+                    temp_item = {**item}
                     for key, value in item.items():
+                        if ignore_attributes:
+                            if key in ignore_attributes:
+                                del temp_item[key]
+                                continue
                         if not hasattr(cls, key):
-                            del item[key]
-                    new_batch.append(item)
+                            del temp_item[key]
+                    new_batch.append(temp_item)
 
             process_batch = batch if not wash_attributes else new_batch
             result = cls.__session__.scalars(
@@ -32,13 +38,23 @@ class CrudMixin:
             cls.__session__.commit()
             return result.all()
 
+        if values:
+            temp_values = {**values}
+        else:
+            temp_values = {}
+
         if wash_attributes and values is not None:
             for key, value in values.items():
                 if not hasattr(cls, key):
-                    del values[key]
+                    del temp_values[key]
+
+        if ignore_attributes is not None and values is not None:
+            for key in ignore_attributes:
+                if key in values:
+                    del temp_values[key]
 
         result = cls.__session__.scalar(
-            insert(cls).returning(cls).values(**values)  # type: ignore
+            insert(cls).returning(cls).values(**temp_values)  # type: ignore
         )
         cls.__session__.commit()
         return result
@@ -106,13 +122,25 @@ class CrudMixin:
             field: t.Optional[tuple] = None,
             fields: t.Optional[t.Dict[str, t.Any]] = None,
             return_updated: bool = False,
-            wash_attributes: bool = False
+            wash_attributes: bool = False,
+            ignore_attributes: t.Optional[t.List[str]] = None,
     ):
+        if values:
+            temp_values = {**values}
+        else:
+            temp_values = {}
+
         if wash_attributes:
             for key, value in values.items():
                 if not hasattr(cls, key):
-                    del values[key]
-        query = cls.read(id_=id_, field=field, fields=fields, _updating=True).values(values)
+                    del temp_values[key]
+
+        if ignore_attributes is not None and values is not None:
+            for key in ignore_attributes:
+                if key in values:
+                    del temp_values[key]
+
+        query = cls.read(id_=id_, field=field, fields=fields, _updating=True).values(temp_values)
         if return_updated:
             result = cls.__session__.execute(query.returning(cls)).scalars().all()
             cls.__session__.commit()
