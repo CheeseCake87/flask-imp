@@ -104,6 +104,7 @@ class BigApp(object):
         if builtins_folder.is_dir():
             with self._app.app_context():
                 for py_file in builtins_folder.glob("*.py"):
+                    print(f"{cast_to_import_str(self._app_name, builtins_folder)}.{py_file.stem}")
                     module = import_module(
                         f"{cast_to_import_str(self._app_name, builtins_folder)}.{py_file.stem}")
                     if hasattr(module, "loader"):
@@ -141,6 +142,7 @@ class BigApp(object):
             try:
                 module = import_module(
                     cast_to_import_str(self._app_name, potential_bp))
+                print(cast_to_import_str(self._app_name, potential_bp))
                 for dir_item in dir(module):
                     _ = getattr(module, dir_item)
                     if isinstance(_, BigAppBlueprint):

@@ -8,8 +8,8 @@ from typing import Dict, Optional, Union
 from flask import Blueprint
 from flask import session
 
-from flask_bigapp.helpers import init_bp_config
-from flask_bigapp.utilities import cast_to_import_str, deprecated
+from .helpers import init_bp_config
+from .utilities import cast_to_import_str, deprecated
 
 
 class BigAppBlueprint(Blueprint):
