@@ -13,6 +13,9 @@ def database_creation_test():
 
 @bp.route("/database-population", methods=["GET"])
 def database_population_test():
+    db.drop_all()
+    db.create_all()
+
     m_example_user = bigapp.model("ExampleUser")
     m_example_user_bind = bigapp.model("ExampleUserBind")
     m_example_table = bigapp.model("ExampleTable")

@@ -2,14 +2,22 @@ import logging
 from importlib import import_module
 from importlib.util import find_spec
 from pathlib import Path
-from types import ModuleType
-from typing import Dict, Optional, Union
+from typing import Optional, Union, Protocol
 
 from flask import Blueprint
 from flask import session
 
 from .helpers import init_bp_config
 from .utilities import cast_to_import_str, deprecated
+
+
+class BigApp(Protocol):
+    def import_models(
+            self,
+            from_file: Optional[Union[str, Path]] = None,
+            from_folder: Optional[Union[str, Path]] = None,
+    ) -> None:
+        ...
 
 
 class BigAppBlueprint(Blueprint):
@@ -23,7 +31,7 @@ class BigAppBlueprint(Blueprint):
     session: dict
     settings: dict
 
-    nested_blueprints: Dict[str, Optional[ModuleType]]
+    _bigapp_instance: BigApp
 
     def __init__(self, dunder_name, config_file: str = "config.toml"):
         """
@@ -41,8 +49,6 @@ class BigAppBlueprint(Blueprint):
         self.location = Path(f"{spec.origin}").parent
         self.bp_name = self.location.name
 
-        self.nested_blueprints = {}
-
         self.enabled, self.session, self.settings = init_bp_config(self.bp_name, self.location / config_file)
 
         if self.enabled:
@@ -51,6 +57,20 @@ class BigAppBlueprint(Blueprint):
                 self.package,
                 **self.settings
             )
+            self._bigapp_instance = self.set_bigapp_instance()
+
+    def set_bigapp_instance(self):
+        def get_bigapp_instance() -> BigApp:
+            from flask_bigapp import BigApp
+
+            app_module = import_module(self.app_name)
+            for dir_item in dir(app_module):
+                potential_instance = getattr(app_module, dir_item)
+                if isinstance(potential_instance, BigApp):
+                    return potential_instance
+            raise ImportError(f"Cannot find BigApp instance in {self.app_name}")
+
+        return get_bigapp_instance()
 
     def import_routes(self, folder: str = "routes") -> None:
         """
@@ -103,11 +123,6 @@ class BigAppBlueprint(Blueprint):
             potential_bp = blueprint
 
         if potential_bp.is_dir():
-            if potential_bp.name in self.nested_blueprints:
-                raise ImportError(
-                    f"Nested blueprint {potential_bp.name} is already registered, blueprint folders must be unique\n"
-                    f"Importing from {potential_bp}"
-                )
             app_name = self.package.split(".")[0]
             try:
                 module = import_module(cast_to_import_str(app_name, potential_bp))
@@ -115,9 +130,6 @@ class BigAppBlueprint(Blueprint):
                     _ = getattr(module, dir_item)
                     if isinstance(_, BigAppBlueprint):
                         if _.enabled:
-                            self.nested_blueprints.update(
-                                {potential_bp.name: module}
-                            )
                             self.register_blueprint(_)
                         break
             except Exception as e:
@@ -149,25 +161,13 @@ class BigAppBlueprint(Blueprint):
         if not self.enabled:
             return
 
-        from flask_bigapp import BigApp
-
-        def get_bigapp_instance() -> BigApp:
-            app_module = import_module(self.app_name)
-            for dir_item in dir(app_module):
-                potential_instance = getattr(app_module, dir_item)
-                if isinstance(potential_instance, BigApp):
-                    return potential_instance
-            raise ImportError(f"Cannot find BigApp instance in {self.app_name}")
-
-        bigapp_instance = get_bigapp_instance()
-
         if isinstance(from_file, str):
             from_file = Path(self.location / from_file)
 
         if isinstance(from_folder, str):
             from_folder = Path(self.location / from_folder)
 
-        bigapp_instance.import_models(from_file, from_folder)
+        self._bigapp_instance.import_models(from_file, from_folder)
 
     def tmpl(self, template) -> str:
         """

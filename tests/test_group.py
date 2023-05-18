@@ -6,6 +6,30 @@ def test_general_setup(client):
     assert response.status_code == 200
 
 
+def test_nested_blueprint(client):
+    """
+    If this test is successful, the app is set up and running correctly.
+    """
+    response = client.get('/tests/nested_test/')
+    assert response.status_code == 200
+
+
+def test_group_nested_blueprint_one(client):
+    """
+    If this test is successful, the app is set up and running correctly.
+    """
+    response = client.get('/tests/nested_test_one/')
+    assert response.status_code == 200
+
+
+def test_group_nested_blueprint_two(client):
+    """
+    If this test is successful, the app is set up and running correctly.
+    """
+    response = client.get('/tests/nested_test_two/')
+    assert response.status_code == 200
+
+
 def test_error_404(client):
     """
     If this test is successful, the app is set up and running correctly.

@@ -4,7 +4,6 @@ from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
-from types import ModuleType
 from typing import Dict, Union, Optional, Any
 
 from flask import Blueprint
@@ -15,7 +14,7 @@ from toml import load as toml_load
 
 from .blueprint import BigAppBlueprint
 from .helpers import init_app_config
-from .objects import ModelRegistry
+from .registeries import ModelRegistry
 from .resources import Resources
 from .utilities import cast_to_bool, cast_to_import_str, deprecated
 
@@ -26,7 +25,6 @@ class BigApp(object):
     _app_path: Path
     _app_folder: Path
 
-    __blueprint_registry__: Dict[str, Optional[ModuleType]]
     __model_registry__: ModelRegistry
 
     config_path: Path
@@ -76,7 +74,6 @@ class BigApp(object):
         self._app_folder = self._app_path.parent
 
         self.__model_registry__ = ModelRegistry()
-        self.__blueprint_registry__ = dict()
 
         self.config_path = self._app_path / app_config_file
         self.config = init_app_config(self.config_path, self._app)
@@ -134,22 +131,12 @@ class BigApp(object):
             potential_bp = blueprint
 
         if potential_bp.is_dir():
-            if potential_bp.name in self.__blueprint_registry__:
-                raise ImportError(
-                    f"Blueprint {potential_bp.name} is already registered, blueprint folders must be unique\n"
-                    f"Importing from {potential_bp}"
-                )
             try:
-                module = import_module(
-                    cast_to_import_str(self._app_name, potential_bp))
-                print(cast_to_import_str(self._app_name, potential_bp))
+                module = import_module(cast_to_import_str(self._app_name, potential_bp))
                 for dir_item in dir(module):
                     _ = getattr(module, dir_item)
                     if isinstance(_, BigAppBlueprint):
                         if _.enabled:
-                            self.__blueprint_registry__.update(
-                                {potential_bp.name: module}
-                            )
                             self._app.register_blueprint(_)
                         break
             except Exception as e:
@@ -288,7 +275,7 @@ class BigApp(object):
         """
         return self.__model_registry__.class_(class_)
 
-    def model_meta(self, class_: Union[str, Any]) -> dict:
+    def model_meta(self, class_: Union[str, DefaultMeta]) -> dict:
         """
         Returns meta information for the given ORM class name
         """
@@ -298,17 +285,14 @@ class BigApp(object):
                 raise AttributeError(f"{model_} is not a valid model")
 
         if isinstance(class_, str):
-            model = self.__model_registry__.get(class_)
-            check_for_table_name(model['class'])
+            model = self.__model_registry__.class_(class_)
+            check_for_table_name(model)
             return {
-                "ref": model['ref'],
-                "location": model['class'].__module__,
-                "table_name": model['class'].__tablename__,
+                "location": model.__module__,
+                "table_name": model.__tablename__,
             }
 
-        check_for_table_name(class_)
         return {
-            "ref": class_.__name__,
             "location": class_.__module__,
             "table_name": class_.__tablename__,
         }

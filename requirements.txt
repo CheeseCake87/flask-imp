@@ -1,5 +1,5 @@
-Flask>=2.2.3
+Flask==2.3.2
 toml
 Flask-SQLAlchemy>=3.0.3
 typing-extensions>=4.5.0
-sqlalchemy>=2.0.9
+sqlalchemy==2.0.13

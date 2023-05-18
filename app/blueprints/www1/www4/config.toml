@@ -1,0 +1,12 @@
+enabled = "yes"
+
+[settings]
+url_prefix = "/www4"
+#subdomain = ""
+#url_defaults = { }
+static_folder = "static"
+template_folder = "templates"
+static_url_path = "/www2/static"
+
+#[session]
+#www_session = "yes"
