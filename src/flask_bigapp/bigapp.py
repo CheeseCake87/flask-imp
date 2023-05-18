@@ -101,7 +101,6 @@ class BigApp(object):
         if builtins_folder.is_dir():
             with self._app.app_context():
                 for py_file in builtins_folder.glob("*.py"):
-                    print(f"{cast_to_import_str(self._app_name, builtins_folder)}.{py_file.stem}")
                     module = import_module(
                         f"{cast_to_import_str(self._app_name, builtins_folder)}.{py_file.stem}")
                     if hasattr(module, "loader"):
