@@ -6,7 +6,6 @@ from docker_builder.docker_cli import DockerCli
 cwd = Path.cwd()
 
 tags = {
-    "flask-bigapp-python-3-7": "docker_tests/Dockerfile_Python_3_7",
     "flask-bigapp-python-3-8": "docker_tests/Dockerfile_Python_3_8",
     "flask-bigapp-python-3-9": "docker_tests/Dockerfile_Python_3_9",
     "flask-bigapp-python-3-10": "docker_tests/Dockerfile_Python_3_10",
@@ -15,7 +14,6 @@ tags = {
 }
 
 enabled_tags = [
-    "flask-bigapp-python-3-7",
     "flask-bigapp-python-3-8",
     "flask-bigapp-python-3-9",
     "flask-bigapp-python-3-10",
