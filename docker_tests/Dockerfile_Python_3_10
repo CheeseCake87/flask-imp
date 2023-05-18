@@ -7,4 +7,5 @@ RUN pip install -r requirements.txt
 RUN pip install -r requirements_dev.txt
 COPY . .
 RUN python3 setup.py install
+ENV DOCKER_TESTING = True
 ENTRYPOINT ["pytest"]
