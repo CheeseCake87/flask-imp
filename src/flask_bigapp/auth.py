@@ -108,7 +108,7 @@ class Auth:
         return "".join(choice(ascii_letters) for _ in range(1)) + password
 
     @classmethod
-    def sha_password(cls, password: str, salt: str, encrypt: int = 512) -> str:
+    def hash_password(cls, password: str, salt: str, encrypt: int = 512) -> str:
         """
         Takes user's password, peppers in, salts it, then converts it to sha
         Can set encryption to 256/512 - 256 is system
@@ -120,6 +120,11 @@ class Auth:
         sha = sha512() if encrypt == 512 else sha256()
         sha.update((cls.generate_pepper(password) + salt).encode("utf-8"))
         return sha.hexdigest()
+
+    @classmethod
+    def sha_password(cls, password: str, salt: str, encrypt: int = 512) -> str:
+        """ Legacy method, use hash_password instead """
+        return cls.hash_password(password, salt, encrypt)
 
     @classmethod
     def auth_password(cls, input_password: str, database_password: str, database_salt: str,
