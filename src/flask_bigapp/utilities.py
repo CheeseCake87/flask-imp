@@ -40,18 +40,43 @@ def if_env_replace(env_value: t.Optional[t.Any]) -> t.Any:
     if isinstance(env_value, str):
         if re.match(pattern, env_value):
             env_var = re.findall(pattern, env_value)[0]
+            print(env_var)
             return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
     return env_value
 
 
-def capitalize_dict_keys(dictionary: t.Optional[dict]) -> dict:
+def prep_config_dict(config_dict: t.Optional[dict]) -> dict:
     """
     Capitalizes the keys in a dictionary.
     """
-    if dictionary is None:
+    if config_dict is None:
         return {}
 
-    return {key.upper(): value for key, value in dictionary.items()}
+    return_dictionary = {}
+
+    def process_inner_dict(inner_dict: dict) -> dict:
+        return {key.upper(): if_env_replace(value) for key, value in inner_dict.items()}
+
+    for config_key, config_value in config_dict.items():
+        if isinstance(config_value, dict):
+            return_dictionary[config_key.upper()] = {}
+
+            for i_config_key, i_config_value in config_value.items():
+
+                if isinstance(i_config_value, dict):
+                    return_dictionary[config_key.upper()][i_config_key.upper()] = process_inner_dict(i_config_value)
+                    continue
+
+                return_dictionary[config_key.upper()].update(
+                    {
+                        i_config_key.upper(): if_env_replace(i_config_value)
+                    }
+                )
+
+        else:
+            return_dictionary[config_key.upper()] = if_env_replace(config_value)
+
+    return return_dictionary
 
 
 def lower_dict_keys(dictionary: t.Optional[dict]) -> dict:

@@ -15,7 +15,7 @@ ERROR_404_HELP = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false
 EXPLAIN_TEMPLATE_LOADING = false
 
-[DATABASE]
+[database]
 #
 # [database.main] is loaded as SQLALCHEMY_DATABASE_URI
 # type = mysql / postgresql / sqlite

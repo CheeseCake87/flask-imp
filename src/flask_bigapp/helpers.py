@@ -5,10 +5,10 @@ from pathlib import Path
 from toml import load as toml_load
 
 from .resources import Resources
-from .utilities import if_env_replace, capitalize_dict_keys, cast_to_bool, lower_dict_keys
+from .utilities import prep_config_dict, cast_to_bool, lower_dict_keys
 
 
-def build_database_uri(database_config_value: dict, app) -> tuple:
+def build_database_uri(database_config_value: dict, app) -> str:
     """
     Puts together the correct database URI depending on the type specified.
 
@@ -16,23 +16,12 @@ def build_database_uri(database_config_value: dict, app) -> tuple:
     """
     app_root = Path(app.root_path)
 
-    db_type = if_env_replace(database_config_value.get("TYPE", "None"))
-    db_name = if_env_replace(database_config_value.get('DATABASE_NAME', 'database'))
-
-    db_location = if_env_replace(database_config_value.get("LOCATION", "db"))
-    db_port = if_env_replace(str(database_config_value.get('PORT', 'None')))
-
-    db_username = if_env_replace(database_config_value.get('USERNAME', 'None'))
-    db_password = if_env_replace(database_config_value.get('PASSWORD', 'None'))
-
-    settings_dict = {
-        "TYPE": db_type,
-        "DATABASE_NAME": db_name,
-        "LOCATION": db_location,
-        "PORT": db_port,
-        "USERNAME": db_username,
-        "PASSWORD": db_password,
-    }
+    db_type = database_config_value.get("TYPE", "None")
+    db_name = database_config_value.get('DATABASE_NAME', 'database')
+    db_location = database_config_value.get("LOCATION", "db")
+    db_port = str(database_config_value.get('PORT', 'None'))
+    db_username = database_config_value.get('USERNAME', 'None')
+    db_password = database_config_value.get('PASSWORD', 'None')
 
     db_allowed = ('postgresql', 'mysql', 'oracle')
 
@@ -40,19 +29,19 @@ def build_database_uri(database_config_value: dict, app) -> tuple:
         if db_location is not None:
 
             if Path(db_location).exists():
-                database = Path(db_location / f"{db_name}.db")
-                return f"sqlite:///{database}", settings_dict
+                database = Path(Path(db_location) / f"{db_name}.db")
+                return f"sqlite:///{database}"
 
             db_location_path = Path(app_root / db_location)
             db_location_path.mkdir(parents=True, exist_ok=True)
             db_location_file_path = db_location_path / f"{db_name}.db"
-            return f"sqlite:///{db_location_file_path}", settings_dict
+            return f"sqlite:///{db_location_file_path}"
 
         db_at_root = Path(app_root / f"{db_name}.db")
-        return f"{db_type}:///{db_at_root}", settings_dict
+        return f"sqlite:///{db_at_root}"
 
     if db_type in db_allowed:
-        return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}", settings_dict
+        return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
 
     raise ValueError(
         "Unknown database type, must be: postgresql / mysql / oracle / sqlite")
@@ -75,24 +64,21 @@ def init_app_config(config_file_path: Path, app) -> dict:
     if config_file_path.suffix not in config_suffix:
         raise TypeError("Config from_file must be one of the following types: .toml / .tml")
 
-    config = capitalize_dict_keys(toml_load(config_file_path))
-    flask_config = capitalize_dict_keys(config.get("FLASK"))
-    session_config = config.get("SESSION")
-    database_config = capitalize_dict_keys(config.get("DATABASE"))
+    config = prep_config_dict(toml_load(config_file_path))
 
-    flask_config_env_loaded = {}
+    flask_config = config.get("FLASK")
+    session_config = config.get("SESSION")
+    database_config = config.get("DATABASE")
 
     if flask_config is not None and isinstance(flask_config, dict):
         for flask_config_key, flask_config_value in flask_config.items():
-            app.config.update({str(flask_config_key): if_env_replace(flask_config_value)})
-            flask_config_env_loaded[flask_config_key] = if_env_replace(flask_config_value)
+            app.config.update({flask_config_key: flask_config_value})
 
     if database_config is not None and isinstance(database_config, dict):
         app.config['SQLALCHEMY_BINDS'] = dict()
         for database_config_key, database_config_values in database_config.items():
-            values = capitalize_dict_keys(database_config_values)
-            if values.get("ENABLED", False):
-                database_uri, settings_dict = build_database_uri(values, app)
+            if database_config_values.get("ENABLED", False):
+                database_uri = build_database_uri(database_config_values, app)
                 if database_config_key == "MAIN":
                     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
                     continue
@@ -100,11 +86,6 @@ def init_app_config(config_file_path: Path, app) -> dict:
                 app.config['SQLALCHEMY_BINDS'].update({
                     str(database_config_key).lower(): database_uri
                 })
-                for key in settings_dict:
-                    values[key] = settings_dict[key]
-            database_config[database_config_key] = values
-
-    print(database_config)
 
     return {"FLASK": flask_config, "SESSION": session_config, "DATABASE": database_config}
 
@@ -122,7 +103,7 @@ def init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:
     if config_file_path.suffix not in config_suffix:
         raise TypeError("Config from_file must be one of the following types: .toml / .tml")
 
-    config = capitalize_dict_keys(toml_load(config_file_path))
+    config = prep_config_dict(toml_load(config_file_path))
 
     enabled = cast_to_bool(config.get('ENABLED', False))
 
