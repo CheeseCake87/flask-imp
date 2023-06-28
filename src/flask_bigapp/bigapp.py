@@ -19,7 +19,7 @@ from .resources import Resources
 from .utilities import cast_to_bool, cast_to_import_str, deprecated
 
 
-class BigApp(object):
+class BigApp:
     _app: Flask
     _app_name: str
     _app_path: Path
