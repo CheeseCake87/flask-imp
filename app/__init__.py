@@ -10,6 +10,7 @@ bigapp = BigApp()
 db = SQLAlchemy()
 
 os.environ["CONFIG_SECRET_KEY"] = secrets.token_urlsafe(128)
+os.environ["DB_USERNAME"] = "database_username"
 
 
 def create_app():

@@ -27,7 +27,7 @@ TYPE = "sqlite"
 DATABASE_NAME = "database"
 LOCATION = "db"
 PORT = ""
-USERNAME = "user"
+USERNAME = "<DB_USERNAME>"
 PASSWORD = "password"
 
 # Adding another database is as simple as adding a new section

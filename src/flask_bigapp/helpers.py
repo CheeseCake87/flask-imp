@@ -8,7 +8,7 @@ from .resources import Resources
 from .utilities import if_env_replace, capitalize_dict_keys, cast_to_bool, lower_dict_keys
 
 
-def build_database_uri(database_config_value: dict, app) -> str:
+def build_database_uri(database_config_value: dict, app) -> tuple:
     """
     Puts together the correct database URI depending on the type specified.
 
@@ -25,6 +25,15 @@ def build_database_uri(database_config_value: dict, app) -> str:
     db_username = if_env_replace(database_config_value.get('USERNAME', 'None'))
     db_password = if_env_replace(database_config_value.get('PASSWORD', 'None'))
 
+    settings_dict = {
+        "TYPE": db_type,
+        "DATABASE_NAME": db_name,
+        "LOCATION": db_location,
+        "PORT": db_port,
+        "USERNAME": db_username,
+        "PASSWORD": db_password,
+    }
+
     db_allowed = ('postgresql', 'mysql', 'oracle')
 
     if db_type == "sqlite":
@@ -32,18 +41,18 @@ def build_database_uri(database_config_value: dict, app) -> str:
 
             if Path(db_location).exists():
                 database = Path(db_location / f"{db_name}.db")
-                return f"sqlite:///{database}"
+                return f"sqlite:///{database}", settings_dict
 
             db_location_path = Path(app_root / db_location)
             db_location_path.mkdir(parents=True, exist_ok=True)
             db_location_file_path = db_location_path / f"{db_name}.db"
-            return f"sqlite:///{db_location_file_path}"
+            return f"sqlite:///{db_location_file_path}", settings_dict
 
         db_at_root = Path(app_root / f"{db_name}.db")
-        return f"{db_type}:///{db_at_root}"
+        return f"{db_type}:///{db_at_root}", settings_dict
 
     if db_type in db_allowed:
-        return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
+        return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}", settings_dict
 
     raise ValueError(
         "Unknown database type, must be: postgresql / mysql / oracle / sqlite")
@@ -71,22 +80,31 @@ def init_app_config(config_file_path: Path, app) -> dict:
     session_config = config.get("SESSION")
     database_config = capitalize_dict_keys(config.get("DATABASE"))
 
+    flask_config_env_loaded = {}
+
     if flask_config is not None and isinstance(flask_config, dict):
         for flask_config_key, flask_config_value in flask_config.items():
             app.config.update({str(flask_config_key): if_env_replace(flask_config_value)})
+            flask_config_env_loaded[flask_config_key] = if_env_replace(flask_config_value)
 
     if database_config is not None and isinstance(database_config, dict):
         app.config['SQLALCHEMY_BINDS'] = dict()
         for database_config_key, database_config_values in database_config.items():
             values = capitalize_dict_keys(database_config_values)
             if values.get("ENABLED", False):
+                database_uri, settings_dict = build_database_uri(values, app)
                 if database_config_key == "MAIN":
-                    app.config['SQLALCHEMY_DATABASE_URI'] = f"{build_database_uri(values, app)}"
+                    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
                     continue
 
                 app.config['SQLALCHEMY_BINDS'].update({
-                    str(database_config_key).lower(): f"{build_database_uri(values, app)}"
+                    str(database_config_key).lower(): database_uri
                 })
+                for key in settings_dict:
+                    values[key] = settings_dict[key]
+            database_config[database_config_key] = values
+
+    print(database_config)
 
     return {"FLASK": flask_config, "SESSION": session_config, "DATABASE": database_config}
 
