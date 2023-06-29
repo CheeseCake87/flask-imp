@@ -34,16 +34,22 @@ class BigApp:
     def __init__(
             self,
             app: Optional[Flask] = None,
-            app_config_file: Optional[str] = None
+            app_config_file: Optional[str] = None,
+            ignore_missing_env_variables: bool = False
     ) -> None:
 
         if app is not None:
-            self.init_app(app, app_config_file)
+            self.init_app(
+                app,
+                app_config_file,
+                ignore_missing_env_variables
+            )
 
     def init_app(
             self,
             app: Flask,
-            app_config_file: Optional[str] = os.environ.get("BA_CONFIG")
+            app_config_file: Optional[str] = os.environ.get("BA_CONFIG"),
+            ignore_missing_env_variables: bool = False
     ) -> None:
 
         """
@@ -76,7 +82,7 @@ class BigApp:
         self.__model_registry__ = ModelRegistry()
 
         self.config_path = self._app_path / app_config_file
-        self.config = init_app_config(self.config_path, self._app)
+        self.config = init_app_config(self.config_path, ignore_missing_env_variables, self._app)
         self.themes = dict()
 
     def init_session(self) -> None:

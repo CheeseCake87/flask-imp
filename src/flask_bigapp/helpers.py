@@ -47,7 +47,7 @@ def build_database_uri(database_config_value: dict, app) -> str:
         "Unknown database type, must be: postgresql / mysql / oracle / sqlite")
 
 
-def init_app_config(config_file_path: Path, app) -> dict:
+def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, app) -> dict:
     """
     Processes the values from the configuration from_file.
     """
@@ -64,11 +64,24 @@ def init_app_config(config_file_path: Path, app) -> dict:
     if config_file_path.suffix not in config_suffix:
         raise TypeError("Config from_file must be one of the following types: .toml / .tml")
 
-    config = process_dict(toml_load(config_file_path), key_case_switch="upper")
+    config = process_dict(toml_load(config_file_path))
 
-    flask_config = config.get("FLASK")
-    session_config = config.get("SESSION")
-    database_config = config.get("DATABASE")
+    flask_config = process_dict(
+        config.get("FLASK"),
+        key_case_switch="upper",
+        ignore_missing_env_variables=ignore_missing_env_variables
+    )
+    session_config = process_dict(
+        config.get("SESSION"),
+        key_case_switch="ignore",
+        ignore_missing_env_variables=ignore_missing_env_variables
+    )
+    database_config = process_dict(
+        config.get("DATABASE"),
+        key_case_switch="upper",
+        ignore_missing_env_variables=ignore_missing_env_variables,
+        crawl=True
+    )
 
     if flask_config is not None and isinstance(flask_config, dict):
         for flask_config_key, flask_config_value in flask_config.items():

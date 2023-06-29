@@ -31,7 +31,10 @@ def deprecated(message: str):
     return func_wrapper
 
 
-def if_env_replace(env_value: t.Optional[t.Any]) -> t.Any:
+def if_env_replace(
+        env_value: t.Optional[t.Any],
+        ignore_missing_env_variables: bool = False
+) -> t.Any:
     """
     Looks for the replacement pattern to swap out values in the config from_file with environment variables.
     """
@@ -40,20 +43,37 @@ def if_env_replace(env_value: t.Optional[t.Any]) -> t.Any:
     if isinstance(env_value, str):
         if re.match(pattern, env_value):
             env_var = re.findall(pattern, env_value)[0]
-            return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
+            if ignore_missing_env_variables:
+                return os.environ.get(env_var)
+            return os.environ.get(env_var, f"{env_value} not found in environment variables")
     return env_value
 
 
-def process_dict(this_dict: t.Optional[dict], key_case_switch: str = "upper") -> dict:
+def process_dict(
+        this_dict: t.Optional[dict],
+        key_case_switch: str = "upper",
+        ignore_missing_env_variables: bool = False,
+        crawl: bool = False
+) -> dict:
     if this_dict is None:
         return {}
 
     return_dict = {}
     for key, value in this_dict.items():
-        cs_key = key.upper() if key_case_switch == "upper" else key.lower()
-        if isinstance(value, dict):
-            return_dict[cs_key] = process_dict(value, key_case_switch)
-            continue
+        if key_case_switch == "ignore":
+            cs_key = key
+        else:
+            cs_key = key.upper() if key_case_switch == "upper" else key.lower()
+
+        if crawl:
+            if isinstance(value, dict):
+                return_dict[cs_key] = process_dict(
+                    value,
+                    key_case_switch,
+                    ignore_missing_env_variables,
+                    crawl
+                )
+                continue
 
         return_dict[cs_key] = if_env_replace(value)
 

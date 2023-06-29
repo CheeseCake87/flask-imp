@@ -26,7 +26,7 @@ ENABLED = true
 TYPE = "sqlite"
 DATABASE_NAME = "database"
 LOCATION = "db"
-PORT = ""
+PORT = "<DB_PORT>"
 USERNAME = "<DB_USERNAME>"
 PASSWORD = "password"
 

@@ -15,7 +15,7 @@ os.environ["DB_USERNAME"] = "database_username"
 
 def create_app():
     app = Flask(__name__)
-    bigapp.init_app(app)
+    bigapp.init_app(app, ignore_missing_env_variables=True)
     db.init_app(app)
 
     bigapp.import_builtins()
