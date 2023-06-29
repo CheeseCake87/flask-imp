@@ -40,7 +40,6 @@ def if_env_replace(env_value: t.Optional[t.Any]) -> t.Any:
     if isinstance(env_value, str):
         if re.match(pattern, env_value):
             env_var = re.findall(pattern, env_value)[0]
-            print(env_var)
             return os.environ.get(env_var, "ENV_KEY_NOT_FOUND")
     return env_value
 
