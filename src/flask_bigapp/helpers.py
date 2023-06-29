@@ -5,7 +5,7 @@ from pathlib import Path
 from toml import load as toml_load
 
 from .resources import Resources
-from .utilities import prep_config_dict, cast_to_bool, lower_dict_keys
+from .utilities import cast_to_bool, process_dict
 
 
 def build_database_uri(database_config_value: dict, app) -> str:
@@ -64,7 +64,7 @@ def init_app_config(config_file_path: Path, app) -> dict:
     if config_file_path.suffix not in config_suffix:
         raise TypeError("Config from_file must be one of the following types: .toml / .tml")
 
-    config = prep_config_dict(toml_load(config_file_path))
+    config = process_dict(toml_load(config_file_path), key_case_switch="upper")
 
     flask_config = config.get("FLASK")
     session_config = config.get("SESSION")
@@ -103,15 +103,15 @@ def init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:
     if config_file_path.suffix not in config_suffix:
         raise TypeError("Config from_file must be one of the following types: .toml / .tml")
 
-    config = prep_config_dict(toml_load(config_file_path))
+    config = process_dict(toml_load(config_file_path), key_case_switch="lower")
 
-    enabled = cast_to_bool(config.get('ENABLED', False))
+    enabled = cast_to_bool(config.get('enabled', False))
 
     if not enabled:
         return enabled, {}, {}
 
-    session = config.get('SESSION', {})
-    settings = lower_dict_keys(config.get('SETTINGS', {}))
+    session = config.get('session', {})
+    settings = config.get('settings', {})
 
     kwargs = dict()
 

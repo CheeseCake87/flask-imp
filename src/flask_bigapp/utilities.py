@@ -45,48 +45,20 @@ def if_env_replace(env_value: t.Optional[t.Any]) -> t.Any:
     return env_value
 
 
-def prep_config_dict(config_dict: t.Optional[dict]) -> dict:
-    """
-    Capitalizes the keys in a dictionary.
-    """
-    if config_dict is None:
+def process_dict(this_dict: t.Optional[dict], key_case_switch: str = "upper") -> dict:
+    if this_dict is None:
         return {}
 
-    return_dictionary = {}
+    return_dict = {}
+    for key, value in this_dict.items():
+        cs_key = key.upper() if key_case_switch == "upper" else key.lower()
+        if isinstance(value, dict):
+            return_dict[cs_key] = process_dict(value, key_case_switch)
+            continue
 
-    def process_inner_dict(inner_dict: dict) -> dict:
-        return {key.upper(): if_env_replace(value) for key, value in inner_dict.items()}
+        return_dict[cs_key] = if_env_replace(value)
 
-    for config_key, config_value in config_dict.items():
-        if isinstance(config_value, dict):
-            return_dictionary[config_key.upper()] = {}
-
-            for i_config_key, i_config_value in config_value.items():
-
-                if isinstance(i_config_value, dict):
-                    return_dictionary[config_key.upper()][i_config_key.upper()] = process_inner_dict(i_config_value)
-                    continue
-
-                return_dictionary[config_key.upper()].update(
-                    {
-                        i_config_key.upper(): if_env_replace(i_config_value)
-                    }
-                )
-
-        else:
-            return_dictionary[config_key.upper()] = if_env_replace(config_value)
-
-    return return_dictionary
-
-
-def lower_dict_keys(dictionary: t.Optional[dict]) -> dict:
-    """
-    Lowercases the keys in a dictionary.
-    """
-    if dictionary is None:
-        return {}
-
-    return {key.lower(): value for key, value in dictionary.items()}
+    return return_dict
 
 
 def cast_to_import_str(app_name: str, folder_path: Path) -> str:
