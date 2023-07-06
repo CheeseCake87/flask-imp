@@ -67,6 +67,51 @@ def login_check(
     return login_check_wrapper
 
 
+def api_login_check(
+        bool_session_key: str,
+        fail_if_session_value_is: bool = False,
+        json_to_return: t.Optional[t.Dict[str, t.Any]] = None,
+):
+    """
+    A decorator that checks if the specified session key exists, shows a 401 error if it does not
+
+    Example of a route that requires a user to be logged in:
+
+    @bp.route("/api/resource", methods=["GET"])
+    @api_login_check('logged_in')
+    def api_page():
+        ...
+
+    Can also supply your own failed return JSON:
+
+    @bp.route("/api/resource", methods=["GET"])
+    @api_login_check('logged_in', json_to_return={"error": "You are not logged in."})
+    def api_page():
+        ...
+
+    Default json_to_return is {"error": "You are not logged in."}
+
+    :param bool_session_key: The session key to check for.
+    :param fail_if_session_value_is: The boolean value to check the session key against.
+    :param json_to_return: the json that will be returned if login has failed.
+    """
+
+    def login_check_wrapper(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            if bool_session_key not in session:
+                return json_to_return or {"error": "You are not logged in."}, 401
+
+            if session[bool_session_key] == fail_if_session_value_is:
+                return json_to_return or {"error": "You are not logged in."}, 401
+
+            return func(*args, **kwargs)
+
+        return inner
+
+    return login_check_wrapper
+
+
 def permission_check(
         iter_session_key: str,
         endpoint_redirect: str,
