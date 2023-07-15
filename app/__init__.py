@@ -18,24 +18,15 @@ def create_app():
     bigapp.init_app(app, ignore_missing_env_variables=True)
     db.init_app(app)
 
+    bigapp.import_global_collection()
     # bigapp.import_builtins()
     # bigapp.import_blueprint("www")
     # bigapp.import_blueprint("tests")
     # bigapp.import_blueprints("blueprints")
     # bigapp.import_theme("theme")
-
-    @app.route("/")
-    def index():
-        return "Hello World"
-
-    #
     # bigapp.import_models(from_folder="models")
 
-    with app.app_context():
-        db.create_all()
-
-    @app.before_request
-    def before_request():
-        bigapp.init_session()
+    # with app.app_context():
+    #     db.create_all()
 
     return app

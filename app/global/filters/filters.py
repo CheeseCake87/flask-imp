@@ -1,7 +1,4 @@
-from flask import Flask
-
-
-def loader(app: Flask):
+def collection(app: object):
     from markupsafe import Markup
 
     @app.template_filter('example__hello_world')

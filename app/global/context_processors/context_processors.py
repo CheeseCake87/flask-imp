@@ -1,7 +1,4 @@
-from flask import Flask
-
-
-def loader(app: Flask):
+def collection(app: object):
     @app.context_processor
     def example__utility_processor():
         """

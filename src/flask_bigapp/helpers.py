@@ -16,35 +16,35 @@ def build_database_uri(database_config_value: dict, app) -> str:
     """
     app_root = Path(app.root_path)
 
-    db_type = database_config_value.get("TYPE", "None")
+    db_dialect = database_config_value.get("DIALECT", "None")
     db_name = database_config_value.get('DATABASE_NAME', 'database')
     db_location = database_config_value.get("LOCATION", "db")
     db_port = str(database_config_value.get('PORT', 'None'))
     db_username = database_config_value.get('USERNAME', 'None')
     db_password = database_config_value.get('PASSWORD', 'None')
 
-    db_allowed = ('postgresql', 'mysql', 'oracle')
+    allowed_dialects = ('postgresql', 'mysql', 'oracle', 'sqlite', 'mssql')
 
-    if db_type == "sqlite":
+    if "sqlite" in db_dialect:
         if db_location is not None:
 
             if Path(db_location).exists():
                 database = Path(Path(db_location) / f"{db_name}.db")
-                return f"sqlite:///{database}"
+                return f"{db_dialect}:///{database}"
 
             db_location_path = Path(app_root / db_location)
             db_location_path.mkdir(parents=True, exist_ok=True)
             db_location_file_path = db_location_path / f"{db_name}.db"
-            return f"sqlite:///{db_location_file_path}"
+            return f"{db_dialect}:///{db_location_file_path}"
 
         db_at_root = Path(app_root / f"{db_name}.db")
-        return f"sqlite:///{db_at_root}"
+        return f"{db_dialect}:///{db_at_root}"
 
-    if db_type in db_allowed:
-        return f"{db_type}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
+    for dialect in allowed_dialects:
+        if dialect in db_dialect:
+            return f"{db_dialect}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
 
-    raise ValueError(
-        "Unknown database type, must be: postgresql / mysql / oracle / sqlite")
+    logging.critical("Unknown database dialect, must be: postgresql / mysql / oracle / sqlite / mssql")
 
 
 def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, app) -> dict:
@@ -76,6 +76,11 @@ def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, 
         key_case_switch="ignore",
         ignore_missing_env_variables=ignore_missing_env_variables
     )
+    sqlalchemy_config = process_dict(
+        config.get("SQLALCHEMY"),
+        key_case_switch="upper",
+        ignore_missing_env_variables=ignore_missing_env_variables,
+    )
     database_config = process_dict(
         config.get("DATABASE"),
         key_case_switch="upper",
@@ -100,7 +105,11 @@ def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, 
                     str(database_config_key).lower(): database_uri
                 })
 
-    return {"FLASK": flask_config, "SESSION": session_config, "DATABASE": database_config}
+    return {
+        "FLASK": {**flask_config, **sqlalchemy_config},
+        "SESSION": session_config,
+        "DATABASE": database_config
+    }
 
 
 def init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:

@@ -16,7 +16,7 @@ from .blueprint import BigAppBlueprint
 from .helpers import init_app_config
 from .registeries import ModelRegistry
 from .resources import Resources
-from .utilities import cast_to_bool, cast_to_import_str, deprecated
+from .utilities import cast_to_bool, cast_to_import_str
 
 
 class BigApp:
@@ -24,12 +24,12 @@ class BigApp:
     _app_name: str
     _app_path: Path
     _app_folder: Path
+    _global_collection_imported: bool = False
 
     __model_registry__: ModelRegistry
 
     config_path: Path
     config: Dict
-    themes: Dict[str, Path]
 
     def __init__(
             self,
@@ -78,12 +78,41 @@ class BigApp:
         self._app_name = app.name
         self._app_path = Path(self._app.root_path)
         self._app_folder = self._app_path.parent
+        self.config_path = self._app_path / app_config_file
 
         self.__model_registry__ = ModelRegistry()
 
-        self.config_path = self._app_path / app_config_file
-        self.config = init_app_config(self.config_path, ignore_missing_env_variables, self._app)
-        self.themes = dict()
+        self.config = init_app_config(
+            self.config_path,
+            ignore_missing_env_variables,
+            self._app
+        )
+
+    def import_global_collection(self) -> None:
+        """
+        Will look in the root of the app for a folder called global.
+        """
+        if self._global_collection_imported:
+            logging.warning(
+                "The global collection has already been imported, skipping")
+            return
+
+        self._global_collection_imported = True
+
+        skip_folders = ("static", "templates",)
+        global_collection_folder = self._app_path / "global"
+        if global_collection_folder.is_dir():
+            self._app.template_folder = global_collection_folder / "templates"
+            self._app.static_folder = global_collection_folder / "static"
+            with self._app.app_context():
+                for folder in global_collection_folder.iterdir():
+                    if folder.is_dir() and folder.name not in skip_folders:
+                        for py_file in folder.glob("*.py"):
+                            module_file = import_module(
+                                f"{cast_to_import_str(self._app_name, folder)}.{py_file.stem}"
+                            )
+                            if hasattr(module_file, "collection"):
+                                module_file.collection(self._app)
 
     def init_session(self) -> None:
         """
@@ -94,35 +123,6 @@ class BigApp:
             for key, value in self.config.get("SESSION", {}).items():
                 if key not in session:
                     session[key] = value
-
-    def import_builtins(self, folder: Union[str, Path] = "builtins") -> None:
-        """
-        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
-        """
-        if isinstance(folder, str):
-            builtins_folder = Path(self._app_path / folder)
-        else:
-            builtins_folder = folder
-
-        if builtins_folder.is_dir():
-            with self._app.app_context():
-                for py_file in builtins_folder.glob("*.py"):
-                    module = import_module(
-                        f"{cast_to_import_str(self._app_name, builtins_folder)}.{py_file.stem}")
-                    if hasattr(module, "loader"):
-                        module.loader(self._app)
-
-    def import_blueprints(self, folder: str) -> None:
-        """
-        Imports all the blueprints in the given from_folder.
-
-        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
-        """
-
-        folder_path = Path(self._app_path / folder)
-
-        for potential_bp in folder_path.iterdir():
-            self.import_blueprint(potential_bp)
 
     def import_blueprint(self, blueprint: Union[str, Path]):
         """
@@ -148,73 +148,17 @@ class BigApp:
                 logging.critical(f"{e}",
                                  f"Error importing blueprint: from {potential_bp}")
 
-    def import_themes(self, themes_folder: str) -> None:
+    def import_blueprints(self, folder: str) -> None:
         """
+        Imports all the blueprints in the given from_folder.
+
         Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
-        folder_path = Path(self._app_path / themes_folder)
-        for theme in folder_path.iterdir():
-            self.import_theme(theme)
 
-    def import_theme(self, theme_folder: Union[str, Path]):
-        """
-        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
-        """
-        if isinstance(theme_folder, str):
-            theme = Path(self._app_path / theme_folder)
-        else:
-            theme = theme_folder
+        folder_path = Path(self._app_path / folder)
 
-        if theme.is_dir():
-            if theme.name in self.themes:
-                raise ImportError(
-                    f"Theme {theme.name} is already registered, theme folders must be unique\n"
-                    f"Importing from {theme}"
-                )
-
-            static_folder = Path(theme / "static")
-            template_folder = Path(theme / "templates")
-            nested_template_folder = Path(theme / "templates" / theme.name)
-            builtins_folder = Path(theme / "builtins")
-
-            config = Path(theme / "config.toml")
-
-            if not static_folder.exists():
-                logging.debug(
-                    f"Static from_folder for {theme.name} was not found, skipping")
-
-            if not template_folder.exists():
-                raise NotADirectoryError(
-                    f"Template from_folder for {theme.name} was not found")
-
-            if not nested_template_folder.exists():
-                raise NotADirectoryError(
-                    f"Nested template from_folder for {theme.name} was not found, "
-                    f"\nshould look like: {nested_template_folder}")
-
-            if not config.exists():
-                logging.debug(
-                    f"Config from_file for {theme.name} was not found, creating default")
-                config.write_text(Resources.default_theme_config.format(
-                    static_url_path=f"/{theme.name}/static"))
-
-            loaded_config = toml_load(config)
-
-            theme_bp = Blueprint(
-                name=theme.name,
-                import_name=f"{theme.name}",
-                static_folder=f"{theme.absolute()}/static",
-                template_folder=f"{theme.absolute()}/templates",
-                static_url_path=f"{loaded_config.get('static_url_path', f'/{theme.name}/static')}",
-            )
-
-            if cast_to_bool(loaded_config.get("enabled")):
-
-                if builtins_folder.exists():
-                    self.import_builtins(builtins_folder)
-
-                self._app.register_blueprint(theme_bp)
-                self.themes.update({theme.name: theme.absolute()})
+        for potential_bp in folder_path.iterdir():
+            self.import_blueprint(potential_bp)
 
     def import_models(
             self,
@@ -222,9 +166,11 @@ class BigApp:
             from_folder: Optional[Union[str, Path]] = None,
     ) -> None:
         """
-        Imports model files from a single from_file or a from_folder. Both are allowed to be set.
+        Imports model files from a single from_file or a from_folder.
+        Both are allowed to be set.
 
-        File and Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
+        File and Folder must be relative
+        ( from_folder="here" not from_folder="/home/user/app/from_folder" )
         """
 
         def model_processor(path: Path):
@@ -301,11 +247,3 @@ class BigApp:
             "location": class_.__module__,
             "table_name": class_.__tablename__,
         }
-
-    @deprecated("import_structures() will be removed, Use import_themes() instead")
-    def import_structures(self, structures_folder: str) -> None:
-        self.import_themes(structures_folder)
-
-    @deprecated("model_class() will be removed, Use model() instead")
-    def model_class(self, class_name: str) -> Any:
-        return self.model(class_name)
