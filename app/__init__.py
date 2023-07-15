@@ -20,7 +20,7 @@ def create_app():
 
     bigapp.import_global_collection()
     # bigapp.import_builtins()
-    # bigapp.import_blueprint("www")
+    bigapp.import_blueprint("www")
     # bigapp.import_blueprint("tests")
     # bigapp.import_blueprints("blueprints")
     # bigapp.import_theme("theme")

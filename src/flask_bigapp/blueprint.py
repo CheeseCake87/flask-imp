@@ -72,26 +72,27 @@ class BigAppBlueprint(Blueprint):
 
         return get_bigapp_instance()
 
-    def import_routes(self, folder: str = "routes") -> None:
+    def import_resource(self, folder: str = "routes") -> None:
         """
-        Imports all the routes in the given from_folder.
+        Imports all the resources in the given from_folder.
         If no from_folder is specified defaults to a from_folder named 'routes'
 
-        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder/blueprint/from_folder" )
+        Folder must be relative
+        ( from_folder="here" not from_folder="/home/user/app/from_folder/blueprint/from_folder" )
         """
         if not self.enabled:
             return
 
-        route_path = self.location / folder
-        if not route_path.exists():
-            raise NotADirectoryError(f"{route_path} is not a directory")
+        resource_path = self.location / folder
+        if not resource_path.exists():
+            raise NotADirectoryError(f"{resource_path} is not a directory")
 
-        routes = route_path.glob("*.py")
-        for route in routes:
+        resources = resource_path.glob("*.py")
+        for resource in resources:
             try:
-                import_module(f"{self.package}.{folder}.{route.stem}")
+                import_module(f"{self.package}.{folder}.{resource.stem}")
             except ImportError as e:
-                logging.warning(f"Error when importing {self.package}.{route}: {e}")
+                logging.warning(f"Error when importing {self.package}.{resource}: {e}")
                 continue
 
     def import_nested_blueprints(self, folder: str) -> None:

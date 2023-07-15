@@ -47,20 +47,22 @@ logged_in = false
 # These settings are spcific to the Flask-SQLAlchemy extension.
 # Anything here will be accessible using app.config
 [SQLALCHEMY]
-SQLALCHEMY_ECHO = true
+SQLALCHEMY_ECHO = false
 SQLALCHEMY_TRACK_MODIFICATIONS = false
 SQLALCHEMY_RECORD_QUERIES = false
 
 # [DATABASE.MAIN] is loaded as SQLALCHEMY_DATABASE_URI
 # Dialets = mysql / postgresql / sqlite / oracle / mssql
-[DATABASE.MAIN]
-ENABLED = true
-DIALECT = "sqlite"
-DATABASE_NAME = "database"
-LOCATION = "db"
-PORT = ""
-USERNAME = "database"
-PASSWORD = "password"
+
+# Uncomment below to generate the SQLALCHEMY_DATABASE_URI.
+#[DATABASE.MAIN]
+#ENABLED = true
+#DIALECT = "sqlite"
+#DATABASE_NAME = "database"
+#LOCATION = "db"
+#PORT = ""
+#USERNAME = "database"
+#PASSWORD = "password"
 
 # Adding another database is as simple as adding a new section.
 # [DATABASE.ANOTHER] will then be accessible using SQLALCHEMY_BINDS
@@ -70,9 +72,8 @@ PASSWORD = "password"
 # class MyModel(db.Model):
 #     __bind_key__ = "another"
 #     ...
-#
-# Below is an example of a second database.
 
+# Uncomment below to generate and add to SQLALCHEMY_BINDS.
 #[DATABASE.ANOTHER]
 #ENABLED = true
 #DIALECT = "sqlite"
@@ -81,10 +82,4 @@ PASSWORD = "password"
 #PORT = ""
 #USERNAME = "user"
 #PASSWORD = "password"
-"""
-    # Format to: static_url_path
-    default_theme_config = """\
-enabled = "yes"
-static_folder = "static"
-static_url_path = "{static_url_path}"\
 """
