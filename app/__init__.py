@@ -1,15 +1,10 @@
 import os
-import secrets
 
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from app.extensions import bigapp
+from app.extensions import db
 
-from flask_bigapp import BigApp
-
-bigapp = BigApp()
-db = SQLAlchemy()
-
-os.environ["CONFIG_SECRET_KEY"] = secrets.token_urlsafe(128)
+os.environ["CONFIG_SECRET_KEY"] = "inserted_from_environment"
 os.environ["DB_USERNAME"] = "database_username"
 
 
@@ -19,14 +14,12 @@ def create_app():
     db.init_app(app)
 
     bigapp.import_global_collection()
-    # bigapp.import_builtins()
-    bigapp.import_blueprint("www")
-    # bigapp.import_blueprint("tests")
-    # bigapp.import_blueprints("blueprints")
-    # bigapp.import_theme("theme")
-    # bigapp.import_models(from_folder="models")
+    bigapp.import_blueprint("root_blueprint")
+    bigapp.import_blueprints("blueprints")
 
-    # with app.app_context():
-    #     db.create_all()
+    bigapp.import_models(from_folder="models")
+
+    with app.app_context():
+        db.create_all()
 
     return app

@@ -57,9 +57,9 @@ def test_context_processors(client):
     assert b"$100.00" in response.data
 
 
-def test_import_theme(client):
+def test_static(client):
     """
-    If this test is successful, the import of the theme is working correctly.
+    If this test is successful, the static folder is working correctly.
     """
     response = client.get('/tests/static')
     assert b"/img/Flask-BigApp-Logo.png" in response.data

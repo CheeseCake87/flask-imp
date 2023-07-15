@@ -2,10 +2,8 @@ def collection(app: object):
     @app.context_processor
     def example__utility_processor():
         """
-        Usage
-
-        {{ format_price(100) }}
-        {{ format_price(100.33) }}
+        Usage:
+        {{ format_price(100.33) }} -> $100.33
         """
 
         def example__format_price(amount, currency='$'):
