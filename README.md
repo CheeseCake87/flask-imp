@@ -15,10 +15,7 @@ It has a few extra features built in to help with securing pages and password au
 
 ### Setup
 
-(This assumes you have Python installed)
-
-1. Download or Clone this repository.
-2. Open terminal (Linux) / powershell (Windows) and cd to the directory of the project.
+Create a new project folder and navigate to it.
 
 ```text
 # Linux
@@ -60,10 +57,4 @@ pip install flask-bigapp
 
 ```bash
 flask-bigapp init
-```
-
-### Run the project
-
-```bash
-flask run --debug
 ```
