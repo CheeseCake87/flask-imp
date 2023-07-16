@@ -2,7 +2,7 @@ from flask_bigapp import Blueprint
 
 bp = Blueprint(__name__)
 
-bp.import_resource("routes")
+bp.import_resources("routes")
 
 
 @bp.before_app_request

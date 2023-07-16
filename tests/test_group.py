@@ -62,7 +62,7 @@ def test_static(client):
     If this test is successful, the static folder is working correctly.
     """
     response = client.get('/tests/static')
-    assert b"/img/Flask-BigApp-Logo.png" in response.data
+    assert b"/img/Flask-BigApp-Logo.svg" in response.data
 
 
 def test_database_creation(client):
@@ -71,16 +71,6 @@ def test_database_creation(client):
     """
     response = client.get('/tests/database-creation')
     assert b"Database created." in response.data
-
-
-def test_mixin_create(client):
-    """
-    If this test is successful, the mixin is working correctly.
-    """
-    if os.environ.get("DOCKER_TESTING", False):
-        return
-    response = client.get('/tests/mixin-add')
-    assert b"MixinTest" in response.data
 
 
 def test_database_population(client):

@@ -72,7 +72,7 @@ class BigAppBlueprint(Blueprint):
 
         return get_bigapp_instance()
 
-    def import_resource(self, folder: str = "routes") -> None:
+    def import_resources(self, folder: str = "routes") -> None:
         """
         Imports all the resources in the given from_folder.
         If no from_folder is specified defaults to a from_folder named 'routes'
