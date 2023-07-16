@@ -6,39 +6,65 @@ class Resources:
     # Format to: secret_key
     default_config = """\
 # Flask-BigApp Config File
-#
+# ------------------------
 # Updates the Flask app config with the variables below.
-# If any variable below does not exist in the standard Flask env vars it is created and will be accessible using
-# app.config["YOUR_VAR_NAME"]. All key names defined below will be capitalised when imported.
-#
+# If any variable below does not exist in the standard Flask env
+# vars it is created and will be accessible using
+# app.config. All key names defined below will be
+# capitalised when imported.
 [FLASK]
-APP_NAME = "app"
-VERSION = "0.0.1"
-SECRET_KEY = "change_me"
 DEBUG = false
-TESTING = false
-SESSION_TIME = 480
+#PROPAGATE_EXCEPTIONS = true
+TRAP_HTTP_EXCEPTIONS = false
+#TRAP_BAD_REQUEST_ERRORS = true
+SECRET_KEY = "super_secret_key"
+SESSION_COOKIE_NAME = "session"
+#SESSION_COOKIE_DOMAIN = "domain-here.com"
+#SESSION_COOKIE_PATH = "/"
+SESSION_COOKIE_HTTPONLY = true
+SESSION_COOKIE_SECURE = false
+SESSION_COOKIE_SAMESITE = "Lax"
+PERMANENT_SESSION_LIFETIME = 3600  # 1 hour
+SESSION_REFRESH_EACH_REQUEST = true
+USE_X_SENDFILE = false
+#SEND_FILE_MAX_AGE_DEFAULT = 43200
 ERROR_404_HELP = true
-SQLALCHEMY_TRACK_MODIFICATIONS = false
+#SERVER_NAME = "localhost:5000"
+APPLICATION_ROOT = "/"
+PREFERRED_URL_SCHEME = "http"
+#MAX_CONTENT_LENGTH = 0
+#TEMPLATES_AUTO_RELOAD = true
 EXPLAIN_TEMPLATE_LOADING = false
+MAX_COOKIE_SIZE = 4093
 
 
-[DATABASE]
-#
-# [database.main] is loaded as SQLALCHEMY_DATABASE_URI
-# type = mysql / postgresql / sqlite
-# if type = sqlite, config parser will ignore username and password
-#
-[DATABASE.MAIN]
-ENABLED = true
-TYPE = "sqlite"
-DATABASE_NAME = "database"
-LOCATION = "db"
-PORT = ""
-USERNAME = "user"
-PASSWORD = "password"
+# This will set the default session variables for the app.
+# Anything here will be accessible using session["your_var_name"]
+# or session.get("your_var_name")
+[SESSION]
+logged_in = false
 
-# Adding another database is as simple as adding a new section
+# These settings are spcific to the Flask-SQLAlchemy extension.
+# Anything here will be accessible using app.config
+[SQLALCHEMY]
+SQLALCHEMY_ECHO = false
+SQLALCHEMY_TRACK_MODIFICATIONS = false
+SQLALCHEMY_RECORD_QUERIES = false
+
+# [DATABASE.MAIN] is loaded as SQLALCHEMY_DATABASE_URI
+# Dialets = mysql / postgresql / sqlite / oracle / mssql
+
+# Uncomment below to generate the SQLALCHEMY_DATABASE_URI.
+#[DATABASE.MAIN]
+#ENABLED = true
+#DIALECT = "sqlite"
+#DATABASE_NAME = "database"
+#LOCATION = "db"
+#PORT = ""
+#USERNAME = "database"
+#PASSWORD = "password"
+
+# Adding another database is as simple as adding a new section.
 # [DATABASE.ANOTHER] will then be accessible using SQLALCHEMY_BINDS
 # The bind key will be stored as a lowercase value, so "ANOTHER" will
 # be accessible as "another"
@@ -46,21 +72,14 @@ PASSWORD = "password"
 # class MyModel(db.Model):
 #     __bind_key__ = "another"
 #     ...
-#
+
+# Uncomment below to generate and add to SQLALCHEMY_BINDS.
 #[DATABASE.ANOTHER]
 #ENABLED = true
-#TYPE = "sqlite"
+#DIALECT = "sqlite"
 #DATABASE_NAME = "database_another"
 #LOCATION = "db"
 #PORT = ""
 #USERNAME = "user"
 #PASSWORD = "password"
-#
-# You can add as many databases as you want.\
-"""
-    # Format to: static_url_path
-    default_theme_config = """\
-enabled = "yes"
-static_folder = "static"
-static_url_path = "{static_url_path}"\
 """

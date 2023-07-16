@@ -1,34 +1,11 @@
-import re
 from pathlib import Path
 
 import click
 
-from .resources import Resources
+from .resources import Resources as CLIResources
+from flask_bigapp.resources import Resources
 
-
-def to_snake_case(string):
-    """
-    Thank you openai
-    """
-    # Replace any non-alphanumeric characters with underscores
-    string = re.sub(r'[^a-zA-Z0-9]', '_', string)
-    # Remove any consecutive underscores
-    string = re.sub(r'_{2,}', '_', string)
-    # Convert the string to lowercase
-    string = string.lower()
-    return string
-
-
-class Sprinkles:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END = '\033[0m'
+from .helpers import Sprinkles, _add_blueprint
 
 
 @click.group()
@@ -36,7 +13,7 @@ def cli():
     pass  # Entry Point
 
 
-@cli.command("add-bp", help="Create a flask-bigapp blueprint")
+@cli.command("blueprint", help="Create a flask-bigapp blueprint")
 @click.option(
     '-f', '--folder',
     nargs=1,
@@ -52,266 +29,253 @@ def cli():
     prompt='Name of the blueprint to create',
     help='The name of the blueprint to create'
 )
-@click.option(
-    '-urlp', '--url-prefix',
-    nargs=1,
-    default="/",
-    prompt='URL prefix',
-    help='The URL Prefix to set for the blueprint'
-)
-@click.option(
-    '-surlp', '--static-url-path',
-    nargs=1,
-    default="/<blueprint_name>/static",
-    prompt='Static URL path',
-    help='The URL Prefix to set for the blueprint'
-)
-def add_blueprint(folder, name, url_prefix, static_url_path):
-    cwd = Path.cwd()
-    if folder != "Current Working Directory":
-        cwd = Path(cwd / folder)
-    if not cwd.exists():
-        click.echo(
-            f"{Sprinkles.FAIL}{folder} does not exist.{Sprinkles.END}")
-        return
-
-    name = to_snake_case(name)
-
-    url_prefix = url_prefix if url_prefix != "/" else "/"
-    url_prefix = url_prefix if url_prefix.startswith("/") else f"/{url_prefix}"
-
-    if static_url_path == "/<blueprint_name>/static":
-        static_url_path = f"/{name}/static"
-    else:
-        static_url_path = static_url_path if static_url_path.startswith("/") else f"/{static_url_path}"
-
-    bp_folder = cwd / name
-    bp_routes_folder = bp_folder / "routes"
-    bp_templates_folder = bp_folder / "templates" / name
-    bp_static_folder = bp_folder / "static"
-
-    bp_init = bp_folder / "__init__.py"
-    bp_config = bp_folder / "config.toml"
-    bp_route = bp_routes_folder / "index.py"
-    bp_template = bp_templates_folder / "index.html"
-
-    folders = [bp_folder, bp_routes_folder, bp_templates_folder, bp_static_folder]
-
-    for folder in folders:
-        if not folder.exists():
-            folder.mkdir(parents=True)
-        else:
-            click.echo(f"{Sprinkles.WARNING}Folder already exists: {folder}, skipping{Sprinkles.END}")
-
-    if not bp_init.exists():
-        bp_init.write_text(Resources.blueprint_init)
-    else:
-        click.echo(f"{Sprinkles.WARNING}__init__ already exists: {bp_init}, skipping{Sprinkles.END}")
-
-    if not bp_config.exists():
-        bp_config.write_text(
-            Resources.blueprint_config.format(
-                name=name,
-                url_prefix=url_prefix,
-                static_url_path=static_url_path
-            )
-        )
-    else:
-        click.echo(f"{Sprinkles.WARNING}Config already exists: {bp_config}, skipping{Sprinkles.END}")
-
-    if not bp_route.exists():
-        bp_route.write_text(Resources.blueprint_index_route)
-    else:
-        click.echo(f"{Sprinkles.WARNING}Route already exists: {bp_route}, skipping{Sprinkles.END}")
-
-    if not bp_template.exists():
-        bp_template.write_text(Resources.blueprint_index_template.format(name=name))
-    else:
-        click.echo(f"{Sprinkles.WARNING}Template already exists: {bp_template}, skipping{Sprinkles.END}")
-
-    click.echo(f"{Sprinkles.OKGREEN}Blueprint created: {bp_folder}{Sprinkles.END}")
+def add_blueprint(folder, name):
+    _add_blueprint(folder, name)
 
 
-@cli.command("rename-bp", help="Rename a flask-bigapp blueprint")
-@click.option(
-    '-bp', '--blueprint',
-    nargs=1,
-    prompt=(
-            f'\n{Sprinkles.WARNING}(Search of the blueprint is relative to the current working directory){Sprinkles.END}\n'
-            f'\nMust be the blueprint from_folder (that contains the __init__.py file)\n'
-            f'Blueprint to rename'
-    ),
-    help='Location of the blueprint to rename'
-)
-@click.option(
-    '-n', '--new-name',
-    nargs=1,
-    prompt='New name',
-    help='The new name to give to the blueprint'
-)
-def rename_blueprint(blueprint, new_name):
-    cwd = Path.cwd()
-    blueprint_path = Path(cwd / blueprint)
-    if not blueprint_path.exists():
-        click.echo(
-            f"{Sprinkles.FAIL}The Blueprint [{blueprint}] does not exist in the {blueprint_path.parent} directory.{Sprinkles.END}")
-        return
-
-    blueprint_nested_template_path = blueprint_path / "templates" / blueprint_path.name
-
-    new_name = to_snake_case(new_name)
-
-    new_path = blueprint_path.parent / new_name
-
-    if new_path.exists():
-        click.echo(f"{Sprinkles.FAIL}The new name you have given already exists.{Sprinkles.END}")
-        return
-
-    blueprint_config = blueprint_path / "config.toml"
-
-    with open(blueprint_config, "r") as f:
-        config = f.read()
-
-    config = config.replace(blueprint_path.name, new_name)
-
-    with open(blueprint_config, "w") as f:
-        f.write(config)
-
-    blueprint_nested_template_path.rename(blueprint_path / "templates" / new_name)
-    blueprint_path.rename(blueprint_path.parent / new_name)
-
-
-@cli.command("add-theme", help="Create a flask-bigapp theme")
-@click.option(
-    '-f', '--folder',
-    nargs=1,
-    default="Current Working Directory",
-    prompt=(f'\n{Sprinkles.WARNING}(Creation is relative to the current working directory){Sprinkles.END}\n'
-            f'Folder to create theme in'),
-    help='The from_folder to create the theme in, defaults to the current working directory'
-)
+@cli.command("init", help="Create a new flask-bigapp app")
 @click.option(
     '-n', '--name',
     nargs=1,
-    default="my_new_theme",
-    prompt='Name of the theme to create',
-    help='The name of the theme to create'
+    default="app",
+    prompt='What would you like to call your app?',
+    help='The name of the app folder that will be created'
 )
-@click.option(
-    '-surlp', '--static-url-path',
-    nargs=1,
-    default="/<theme_name>/static",
-    prompt='Static URL path',
-    help='The URL Prefix to set for the theme'
-)
-def add_theme(folder, name, static_url_path):
-    import shutil
-
+def init_new_app(name):
     cwd = Path.cwd()
 
-    if folder != "Current Working Directory":
-        cwd = Path(cwd / folder)
-    if not cwd.exists():
-        click.echo(
-            f"{Sprinkles.FAIL}{folder} does not exist.{Sprinkles.END}")
-        return
+    app_folder = cwd / name
 
-    name = to_snake_case(name)
+    gc_folder = app_folder / "global"
+    models_folder = app_folder / "models"
+    blueprints_folder = app_folder / "blueprints"
+    extensions_folder = app_folder / "extensions"
 
-    theme_folder = cwd / name
+    app_folders = (
+        app_folder,
+        gc_folder,
+        models_folder,
+        blueprints_folder,
+        extensions_folder
+    )
 
-    if theme_folder.exists():
-        click.echo(f"{Sprinkles.WARNING}Theme already exists: {theme_folder}, skipping{Sprinkles.END}")
-        return
+    # Create app folders
+    for folder in app_folders:
+        if not folder.exists():
+            folder.mkdir(parents=True)
 
-    if static_url_path != "/<theme_name>/static":
-        static_url_path = static_url_path if static_url_path.startswith("/") else f"/{static_url_path}"
-    else:
-        static_url_path = f"/{name}/static"
+    app_files_lu = (
+        {
+            "default.config.toml": (
+                app_folder / "default.config.toml",
+                Resources.default_config
+            ),
+            "__init__.py": (
+                app_folder / "__init__.py",
+                CLIResources.app_init
+            ),
+        }
+    )
 
-    temp_them_folder = cwd / "__temp_theme_dir__"
-    temp_theme_nested_template_folder = temp_them_folder / "templates" / "__temp_theme_dir__"
+    # Create app files
+    for file_name, (file_path, file_content) in app_files_lu.items():
+        if not file_path.exists():
+            file_path.write_text(file_content)
+            click.echo(f"{Sprinkles.OKGREEN}App file: {file_name}, created{Sprinkles.END}")
+        else:
+            click.echo(f"{Sprinkles.WARNING}App file already exists: {file_path}, skipping{Sprinkles.END}")
 
-    rename_theme_folder = cwd / name
-    rename_theme_nested_template_folder = temp_them_folder / "templates" / name
-
-    new_theme_folder = rename_theme_folder
-    new_theme_nested_template_folder = new_theme_folder / "templates" / name
-
-    cli_dir = Path(__file__).parent
-    cli_theme_dir = cli_dir / "__temp_theme_dir__"
-
-    shutil.copytree(cli_theme_dir, temp_them_folder, dirs_exist_ok=True)
-
-    theme_config = temp_them_folder / "config.toml"
-    theme_main = new_theme_nested_template_folder / "extends" / "main.html"
-
-    if not theme_config.exists():
-        theme_config.write_text(
-            Resources.theme_config.format(
-                name=name,
-                static_url_path=static_url_path
+    # Model files lookup
+    model_files_lu = (
+        {
+            "__init__.py": (
+                models_folder / "__init__.py",
+                CLIResources.models_init
+            ),
+            "example__table.py": (
+                models_folder / "example__table.py",
+                CLIResources.models_example_table
             )
-        )
+        }
+    )
+
+    # Create model files
+    for file_name, (file_path, file_content) in model_files_lu.items():
+        if not file_path.exists():
+            file_path.write_text(file_content)
+            click.echo(f"{Sprinkles.OKGREEN}Model file: {file_name}, created{Sprinkles.END}")
+        else:
+            click.echo(f"{Sprinkles.WARNING}Model file already exists: {file_name}, skipping{Sprinkles.END}")
+
+    # Extensions files lookup
+    extensions_files_lu = (
+        {
+            "__init__.py": (
+                extensions_folder / "__init__.py",
+                CLIResources.extensions_init
+            ),
+        }
+    )
+
+    # Create extensions files
+    for file_name, (file_path, file_content) in extensions_files_lu.items():
+        if not file_path.exists():
+            file_path.write_text(file_content)
+            click.echo(f"{Sprinkles.OKGREEN}Extensions file: {file_name}, created{Sprinkles.END}")
+        else:
+            click.echo(f"{Sprinkles.WARNING}Extensions file already exists: {file_path}, skipping{Sprinkles.END}")
+
+    global_tlf = (
+        "cli",
+        "routes",
+        "templates",
+        "static",
+        "context_processors",
+        "error_handlers",
+        "filters",
+    )
+
+    global_static_folders = (
+        "css",
+        "js",
+        "img",
+    )
+
+    global_templates_folders = (
+        "errors",
+        "extends",
+        "includes",
+    )
+
+    global_tlf_lookup = dict()
+
+    # Prepare global folder structure
+    for folder in global_tlf:
+        global_tlf_lookup[folder] = gc_folder / folder
+        this_folder = gc_folder / folder
+        if not this_folder.exists():
+            click.echo(f"{Sprinkles.OKGREEN}Global collections folder: {this_folder.name}, created{Sprinkles.END}")
+            this_folder.mkdir(parents=True)
+
+    # Prepare global static folders
+    for folder in global_static_folders:
+        this_folder = gc_folder / "static" / folder
+        if not this_folder.exists():
+            click.echo(
+                f"{Sprinkles.OKGREEN}Global collections static folder: {this_folder.name}, created{Sprinkles.END}")
+            this_folder.mkdir(parents=True)
+
+    # Prepare global templates folders
+    for folder in global_templates_folders:
+        this_folder = gc_folder / "templates" / folder
+        if not this_folder.exists():
+            click.echo(
+                f"{Sprinkles.OKGREEN}Global collections templates folder: {this_folder.name}, created{Sprinkles.END}")
+            this_folder.mkdir(parents=True)
+
+    global_file_lu = {
+        "cli.py": (
+            global_tlf_lookup["cli"] / "cli.py",
+            CLIResources.global_cli_py
+        ),
+        "context_processors.py": (
+            global_tlf_lookup["context_processors"] / "context_processors.py",
+            CLIResources.global_context_processors_py
+        ),
+        "error_handlers.py": (
+            global_tlf_lookup["error_handlers"] / "error_handlers.py",
+            CLIResources.global_error_handlers_py
+        ),
+        "filters.py": (
+            global_tlf_lookup["filters"] / "filters.py",
+            CLIResources.global_filters_py
+        ),
+        "routes.py": (
+            global_tlf_lookup["routes"] / "routes.py",
+            CLIResources.global_routes_py
+        ),
+        "main.css": (
+            global_tlf_lookup["static"] / "css" / "main.css",
+            CLIResources.global_static_main_css
+        ),
+        "main.js": (
+            global_tlf_lookup["static"] / "js" / "main.js",
+            CLIResources.global_static_main_js
+        ),
+        "Flask-BigApp-Logo.svg": (
+            global_tlf_lookup["static"] / "img" / "Flask-BigApp-Logo.svg",
+            CLIResources.global_static_logo_svg
+        ),
+        "index.html": (
+            global_tlf_lookup["templates"] / "index.html",
+            CLIResources.index_html
+        ),
+        "400.html": (
+            global_tlf_lookup["templates"] / "errors" / "400.html",
+            CLIResources.page_400
+        ),
+        "401.html": (
+            global_tlf_lookup["templates"] / "errors" / "401.html",
+            CLIResources.page_401
+        ),
+        "403.html": (
+            global_tlf_lookup["templates"] / "errors" / "403.html",
+            CLIResources.page_403
+        ),
+        "404.html": (
+            global_tlf_lookup["templates"] / "errors" / "404.html",
+            CLIResources.page_404
+        ),
+        "405.html": (
+            global_tlf_lookup["templates"] / "errors" / "405.html",
+            CLIResources.page_405
+        ),
+        "500.html": (
+            global_tlf_lookup["templates"] / "errors" / "500.html",
+            CLIResources.page_500
+        ),
+        "main.html": (
+            global_tlf_lookup["templates"] / "extends" / "main.html",
+            CLIResources.extends_main
+        ),
+        "footer.html": (
+            global_tlf_lookup["templates"] / "includes" / "footer.html",
+            CLIResources.includes_footer
+        ),
+        "header.html": (
+            global_tlf_lookup["templates"] / "includes" / "header.html",
+            CLIResources.includes_header
+        ),
+    }
+
+    # Prepare global folder files
+    for file, (file_path, file_content) in global_file_lu.items():
+        if not file_path.exists():
+            file_path.write_text(file_content)
+            click.echo(f"{Sprinkles.OKGREEN}Global collections file: {file}, created{Sprinkles.END}")
+        else:
+            click.echo(
+                f"{Sprinkles.WARNING}Global collections file already exists: {file_path}, skipping{Sprinkles.END}")
+
+    _add_blueprint(f"{name}/blueprints", "www", _root=True)
+
+    click.echo(" ")
+    click.echo(f"{Sprinkles.OKBLUE}==================={Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKBLUE}Flask app deployed!{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKBLUE}==================={Sprinkles.END}")
+    click.echo(" ")
+    click.echo(f"{Sprinkles.OKGREEN}'/' route is set by the blueprint named www{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKGREEN}found in the blueprints folder. It is encouraged{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKGREEN}to use blueprints to set all app routes.{Sprinkles.END}")
+    click.echo(" ")
+    click.echo(f"{Sprinkles.OKGREEN}All app (non-blueprint) resources can be found{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKGREEN}in the global folder. Have a look through this{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKGREEN}folder to find out more.{Sprinkles.END}")
+    click.echo(" ")
+    if name == 'app':
+        click.echo(f"{Sprinkles.OKBLUE}Your app has the default name of 'app'{Sprinkles.END}")
+        click.echo(f"{Sprinkles.OKBLUE}Flask will automatically look for this!{Sprinkles.END}")
+        click.echo(f"{Sprinkles.OKBLUE}Run: Flask run --debug{Sprinkles.END}")
     else:
-        click.echo(f"{Sprinkles.WARNING}Config already exists: {theme_config}, skipping{Sprinkles.END}")
-
-    temp_theme_nested_template_folder.rename(rename_theme_nested_template_folder)
-    temp_them_folder.rename(rename_theme_folder)
-
-    with open(theme_main, "r") as f:
-        main = f.read()
-
-    main = main.replace("__temp_theme_dir__", name)
-
-    with open(theme_main, "w") as f:
-        f.write(main)
-
-    click.echo(f"{Sprinkles.OKGREEN}Theme created: {theme_folder}{Sprinkles.END}")
-
-
-@cli.command("rename-theme", help="Rename a flask-bigapp theme")
-@click.option(
-    '-t', '--theme',
-    nargs=1,
-    prompt=(
-            f'\n{Sprinkles.WARNING}(Search of the theme is relative to the current working directory){Sprinkles.END}\n'
-            f'Theme to rename'
-    ),
-    help='Location of the theme to rename'
-)
-@click.option(
-    '-n', '--new-name',
-    nargs=1,
-    prompt='New name',
-    help='The new name to give to the theme'
-)
-def rename_theme(theme, new_name):
-    cwd = Path.cwd()
-    theme_path = Path(cwd / theme)
-    if not theme_path.exists():
-        click.echo(
-            f"{Sprinkles.FAIL}The Theme [{theme}] does not exist in the {theme_path.parent} directory.{Sprinkles.END}")
-        return
-
-    theme_nested_template_path = theme_path / "templates" / theme_path.name
-
-    new_name = to_snake_case(new_name)
-    new_path = theme_path.parent / new_name
-
-    if new_path.exists():
-        click.echo(f"{Sprinkles.FAIL}The new name you have given already exists.{Sprinkles.END}")
-        return
-
-    theme_config = theme_path / "config.toml"
-
-    with open(theme_config, "r") as f:
-        config = f.read()
-
-    config = config.replace(theme_path.name, new_name)
-
-    with open(theme_config, "w") as f:
-        f.write(config)
-
-    theme_nested_template_path.rename(theme_path / "templates" / new_name)
-    theme_path.rename(theme_path.parent / new_name)
+        click.echo(f"{Sprinkles.OKBLUE}Your app has the name of '{name}'{Sprinkles.END}")
+        click.echo(f"{Sprinkles.OKBLUE}Run: Flask --app {name} run --debug{Sprinkles.END}")
