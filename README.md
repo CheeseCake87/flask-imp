@@ -13,7 +13,7 @@ It has a few extra features built in to help with securing pages and password au
 
 ## Getting Started
 
-### Setup
+### Setup.
 
 Create a new project folder and navigate to it.
 
@@ -53,7 +53,7 @@ python -m venv venv
 pip install flask-bigapp
 ```
 
-### Create a new project
+### Create a new project.
 
 ```bash
 flask-bigapp init
