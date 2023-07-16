@@ -46,6 +46,8 @@ def build_database_uri(database_config_value: dict, app) -> str:
 
     logging.critical("Unknown database dialect, must be: postgresql / mysql / oracle / sqlite / mssql")
 
+    return ""
+
 
 def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, app) -> dict:
     """
@@ -91,6 +93,10 @@ def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, 
     if flask_config is not None and isinstance(flask_config, dict):
         for flask_config_key, flask_config_value in flask_config.items():
             app.config.update({flask_config_key: flask_config_value})
+
+    if sqlalchemy_config is not None and isinstance(sqlalchemy_config, dict):
+        for sqlalchemy_config_key, sqlalchemy_config_value in sqlalchemy_config.items():
+            app.config.update({sqlalchemy_config_key: sqlalchemy_config_value})
 
     if database_config is not None and isinstance(database_config, dict):
         app.config['SQLALCHEMY_BINDS'] = dict()

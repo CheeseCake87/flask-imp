@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import click
@@ -6,30 +5,7 @@ import click
 from .resources import Resources as CLIResources
 from flask_bigapp.resources import Resources
 
-
-def to_snake_case(string):
-    """
-    Thank you openai
-    """
-    # Replace any non-alphanumeric characters with underscores
-    string = re.sub(r'[^a-zA-Z0-9]', '_', string)
-    # Remove any consecutive underscores
-    string = re.sub(r'_{2,}', '_', string)
-    # Convert the string to lowercase
-    string = string.lower()
-    return string
-
-
-class Sprinkles:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END = '\033[0m'
+from .helpers import Sprinkles, _add_blueprint
 
 
 @click.group()
@@ -37,7 +13,7 @@ def cli():
     pass  # Entry Point
 
 
-@cli.command("add-blueprint", help="Create a flask-bigapp blueprint")
+@cli.command("blueprint", help="Create a flask-bigapp blueprint")
 @click.option(
     '-f', '--folder',
     nargs=1,
@@ -54,78 +30,103 @@ def cli():
     help='The name of the blueprint to create'
 )
 def add_blueprint(folder, name):
-    cwd = Path.cwd()
-    if folder != "Current Working Directory":
-        cwd = Path(cwd / folder)
-    if not cwd.exists():
-        click.echo(
-            f"{Sprinkles.FAIL}{folder} does not exist.{Sprinkles.END}")
-        return
-
-    name = to_snake_case(name)
-
-    # Prepare blueprint folder structure
-    bp_folder = cwd / name
-    bp_routes_folder = bp_folder / "routes"
-    bp_templates_folder = bp_folder / "templates" / name
-    bp_static_folder = bp_folder / "static"
-
-    # Prepare blueprint files
-    bp_init = bp_folder / "__init__.py"
-    bp_config = bp_folder / "config.toml"
-    bp_route = bp_routes_folder / "index.py"
-    bp_template = bp_templates_folder / "index.html"
-
-    # Prepare blueprint folders for loop creation
-    folders = (bp_folder, bp_routes_folder, bp_templates_folder, bp_static_folder,)
-
-    # Loop create folders
-    for folder in folders:
-        if not folder.exists():
-            folder.mkdir(parents=True)
-        else:
-            click.echo(f"{Sprinkles.WARNING}Folder already exists: {folder}, skipping{Sprinkles.END}")
-
-    # Create __init__.py
-    if not bp_init.exists():
-        bp_init.write_text(CLIResources.blueprint_init)
-    else:
-        click.echo(f"{Sprinkles.WARNING}__init__ already exists: {bp_init}, skipping{Sprinkles.END}")
-
-    # Create config.toml
-    if not bp_config.exists():
-        bp_config.write_text(
-            CLIResources.blueprint_config.format(
-                name=name
-            )
-        )
-    else:
-        click.echo(f"{Sprinkles.WARNING}Config already exists: {bp_config}, skipping{Sprinkles.END}")
-
-    # Create blueprint index.py route
-    if not bp_route.exists():
-        bp_route.write_text(CLIResources.blueprint_index_route)
-    else:
-        click.echo(f"{Sprinkles.WARNING}Route already exists: {bp_route}, skipping{Sprinkles.END}")
-
-    # Create blueprint index.html template
-    if not bp_template.exists():
-        bp_template.write_text(CLIResources.blueprint_index_template.format(name=name))
-    else:
-        click.echo(f"{Sprinkles.WARNING}Template already exists: {bp_template}, skipping{Sprinkles.END}")
-
-    click.echo(f"{Sprinkles.OKGREEN}Blueprint created: {bp_folder}{Sprinkles.END}")
+    _add_blueprint(folder, name)
 
 
-@cli.command("init", help="Create a global collection folder")
-def create_global_collection():
+@cli.command("init", help="Create a new flask-bigapp app")
+@click.option(
+    '-n', '--name',
+    nargs=1,
+    default="app",
+    prompt='What would you like to call your app?',
+    help='The name of the app folder that will be created'
+)
+def init_new_app(name):
     cwd = Path.cwd()
 
-    app_folder = cwd / "app"
+    app_folder = cwd / name
 
     gc_folder = app_folder / "global"
+    models_folder = app_folder / "models"
+    blueprints_folder = app_folder / "blueprints"
+    extensions_folder = app_folder / "extensions"
 
-    tlf = (
+    app_folders = (
+        app_folder,
+        gc_folder,
+        models_folder,
+        blueprints_folder,
+        extensions_folder
+    )
+
+    # Create app folders
+    for folder in app_folders:
+        if not folder.exists():
+            folder.mkdir(parents=True)
+
+    app_files_lu = (
+        {
+            "default.config.toml": (
+                app_folder / "default.config.toml",
+                Resources.default_config
+            ),
+            "__init__.py": (
+                app_folder / "__init__.py",
+                CLIResources.app_init
+            ),
+        }
+    )
+
+    # Create app files
+    for file_name, (file_path, file_content) in app_files_lu.items():
+        if not file_path.exists():
+            file_path.write_text(file_content)
+            click.echo(f"{Sprinkles.OKGREEN}App file: {file_name}, created{Sprinkles.END}")
+        else:
+            click.echo(f"{Sprinkles.WARNING}App file already exists: {file_path}, skipping{Sprinkles.END}")
+
+    # Model files lookup
+    model_files_lu = (
+        {
+            "__init__.py": (
+                models_folder / "__init__.py",
+                CLIResources.models_init
+            ),
+            "example__table.py": (
+                models_folder / "example__table.py",
+                CLIResources.models_example_table
+            )
+        }
+    )
+
+    # Create model files
+    for file_name, (file_path, file_content) in model_files_lu.items():
+        if not file_path.exists():
+            file_path.write_text(file_content)
+            click.echo(f"{Sprinkles.OKGREEN}Model file: {file_name}, created{Sprinkles.END}")
+        else:
+            click.echo(f"{Sprinkles.WARNING}Model file already exists: {file_name}, skipping{Sprinkles.END}")
+
+    # Extensions files lookup
+    extensions_files_lu = (
+        {
+            "__init__.py": (
+                extensions_folder / "__init__.py",
+                CLIResources.extensions_init
+            ),
+        }
+    )
+
+    # Create extensions files
+    for file_name, (file_path, file_content) in extensions_files_lu.items():
+        if not file_path.exists():
+            file_path.write_text(file_content)
+            click.echo(f"{Sprinkles.OKGREEN}Extensions file: {file_name}, created{Sprinkles.END}")
+        else:
+            click.echo(f"{Sprinkles.WARNING}Extensions file already exists: {file_path}, skipping{Sprinkles.END}")
+
+    global_tlf = (
+        "cli",
         "routes",
         "templates",
         "static",
@@ -134,113 +135,147 @@ def create_global_collection():
         "filters",
     )
 
-    static_folders = (
+    global_static_folders = (
         "css",
         "js",
         "img",
     )
 
-    templates_folders = (
+    global_templates_folders = (
         "errors",
         "extends",
         "includes",
     )
 
-    tlf_lookup = dict()
+    global_tlf_lookup = dict()
 
     # Prepare global folder structure
-    for folder in tlf:
-        tlf_lookup[folder] = gc_folder / folder
+    for folder in global_tlf:
+        global_tlf_lookup[folder] = gc_folder / folder
         this_folder = gc_folder / folder
         if not this_folder.exists():
+            click.echo(f"{Sprinkles.OKGREEN}Global collections folder: {this_folder.name}, created{Sprinkles.END}")
             this_folder.mkdir(parents=True)
 
-    # Prepare static folders
-    for folder in static_folders:
+    # Prepare global static folders
+    for folder in global_static_folders:
         this_folder = gc_folder / "static" / folder
         if not this_folder.exists():
+            click.echo(
+                f"{Sprinkles.OKGREEN}Global collections static folder: {this_folder.name}, created{Sprinkles.END}")
             this_folder.mkdir(parents=True)
 
-    # Prepare templates folders
-    for folder in templates_folders:
+    # Prepare global templates folders
+    for folder in global_templates_folders:
         this_folder = gc_folder / "templates" / folder
         if not this_folder.exists():
+            click.echo(
+                f"{Sprinkles.OKGREEN}Global collections templates folder: {this_folder.name}, created{Sprinkles.END}")
             this_folder.mkdir(parents=True)
 
-    file_lu = {
+    global_file_lu = {
+        "cli.py": (
+            global_tlf_lookup["cli"] / "cli.py",
+            CLIResources.global_cli_py
+        ),
         "context_processors.py": (
-            tlf_lookup["context_processors"] / "context_processors.py",
+            global_tlf_lookup["context_processors"] / "context_processors.py",
             CLIResources.global_context_processors_py
         ),
         "error_handlers.py": (
-            tlf_lookup["error_handlers"] / "error_handlers.py",
+            global_tlf_lookup["error_handlers"] / "error_handlers.py",
             CLIResources.global_error_handlers_py
         ),
         "filters.py": (
-            tlf_lookup["filters"] / "filters.py",
+            global_tlf_lookup["filters"] / "filters.py",
             CLIResources.global_filters_py
         ),
         "routes.py": (
-            tlf_lookup["routes"] / "routes.py",
+            global_tlf_lookup["routes"] / "routes.py",
             CLIResources.global_routes_py
         ),
         "main.css": (
-            tlf_lookup["static"] / "css" / "main.css",
+            global_tlf_lookup["static"] / "css" / "main.css",
             CLIResources.global_static_main_css
         ),
         "main.js": (
-            tlf_lookup["static"] / "js" / "main.js",
+            global_tlf_lookup["static"] / "js" / "main.js",
             CLIResources.global_static_main_js
         ),
         "Flask-BigApp-Logo.svg": (
-            tlf_lookup["static"] / "img" / "Flask-BigApp-Logo.svg",
+            global_tlf_lookup["static"] / "img" / "Flask-BigApp-Logo.svg",
             CLIResources.global_static_logo_svg
         ),
         "index.html": (
-            tlf_lookup["templates"] / "index.html",
+            global_tlf_lookup["templates"] / "index.html",
             CLIResources.index_html
         ),
         "400.html": (
-            tlf_lookup["templates"] / "errors" / "400.html",
+            global_tlf_lookup["templates"] / "errors" / "400.html",
             CLIResources.page_400
         ),
         "401.html": (
-            tlf_lookup["templates"] / "errors" / "401.html",
+            global_tlf_lookup["templates"] / "errors" / "401.html",
             CLIResources.page_401
         ),
         "403.html": (
-            tlf_lookup["templates"] / "errors" / "403.html",
+            global_tlf_lookup["templates"] / "errors" / "403.html",
             CLIResources.page_403
         ),
         "404.html": (
-            tlf_lookup["templates"] / "errors" / "404.html",
+            global_tlf_lookup["templates"] / "errors" / "404.html",
             CLIResources.page_404
         ),
         "405.html": (
-            tlf_lookup["templates"] / "errors" / "405.html",
+            global_tlf_lookup["templates"] / "errors" / "405.html",
             CLIResources.page_405
         ),
         "500.html": (
-            tlf_lookup["templates"] / "errors" / "500.html",
+            global_tlf_lookup["templates"] / "errors" / "500.html",
             CLIResources.page_500
         ),
         "main.html": (
-            tlf_lookup["templates"] / "extends" / "main.html",
+            global_tlf_lookup["templates"] / "extends" / "main.html",
             CLIResources.extends_main
         ),
         "footer.html": (
-            tlf_lookup["templates"] / "includes" / "footer.html",
+            global_tlf_lookup["templates"] / "includes" / "footer.html",
             CLIResources.includes_footer
         ),
         "header.html": (
-            tlf_lookup["templates"] / "includes" / "header.html",
+            global_tlf_lookup["templates"] / "includes" / "header.html",
             CLIResources.includes_header
         ),
     }
 
-    # Prepare global files
-    for file, res in file_lu.items():
-        if not res(0).exists():
-            res(0).write_text(res(1))
+    # Prepare global folder files
+    for file, (file_path, file_content) in global_file_lu.items():
+        if not file_path.exists():
+            file_path.write_text(file_content)
+            click.echo(f"{Sprinkles.OKGREEN}Global collections file: {file}, created{Sprinkles.END}")
         else:
-            click.echo(f"{Sprinkles.WARNING}File already exists: {res(0)}, skipping{Sprinkles.END}")
+            click.echo(
+                f"{Sprinkles.WARNING}Global collections file already exists: {file_path}, skipping{Sprinkles.END}")
+
+    _add_blueprint(f"{name}/blueprints", "www", _root=True)
+
+    click.echo(" ")
+    click.echo(f"{Sprinkles.OKBLUE}==================={Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKBLUE}Flask app deployed!{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKBLUE}==================={Sprinkles.END}")
+    click.echo(" ")
+    click.echo(f"{Sprinkles.OKGREEN}'/' route is set by the blueprint named www{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKGREEN}found in the blueprints folder. It is encouraged{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKGREEN}to use blueprints to set all app routes.{Sprinkles.END}")
+    click.echo(" ")
+    click.echo(f"{Sprinkles.OKGREEN}All app (non-blueprint) resources can be found{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKGREEN}in the global folder. Have a look through this{Sprinkles.END}")
+    click.echo(f"{Sprinkles.OKGREEN}folder to find out more.{Sprinkles.END}")
+    click.echo(" ")
+    if name == 'app':
+        click.echo(f"{Sprinkles.OKBLUE}Your app has the default name of 'app'{Sprinkles.END}")
+        click.echo(f"{Sprinkles.OKBLUE}Flask will automatically look for this!{Sprinkles.END}")
+        click.echo(f"{Sprinkles.OKBLUE}Run: Flask run --debug{Sprinkles.END}")
+    else:
+        click.echo(f"{Sprinkles.OKBLUE}Your app has the name of '{name}'{Sprinkles.END}")
+        click.echo(f"{Sprinkles.OKBLUE}Run: Flask --app {name} run --debug{Sprinkles.END}")

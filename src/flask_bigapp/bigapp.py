@@ -4,19 +4,16 @@ from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
-from typing import Dict, Union, Optional, Any
+from typing import Dict, Union, Optional
 
-from flask import Blueprint
 from flask import Flask
 from flask import session
 from flask_sqlalchemy.model import DefaultMeta
-from toml import load as toml_load
 
 from .blueprint import BigAppBlueprint
 from .helpers import init_app_config
 from .registeries import ModelRegistry
-from .resources import Resources
-from .utilities import cast_to_bool, cast_to_import_str
+from .utilities import cast_to_import_str
 
 
 class BigApp:
@@ -103,7 +100,7 @@ class BigApp:
         global_collection_folder = self._app_path / "global"
         if global_collection_folder.is_dir():
             self._app.template_folder = global_collection_folder / "templates"
-            self._app.static_folder = global_collection_folder / "static"
+            self._app.static_folder = "static"
             with self._app.app_context():
                 for folder in global_collection_folder.iterdir():
                     if folder.is_dir() and folder.name not in skip_folders:
