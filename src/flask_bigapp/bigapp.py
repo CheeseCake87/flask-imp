@@ -100,7 +100,7 @@ class BigApp:
         global_collection_folder = self._app_path / "global"
         if global_collection_folder.is_dir():
             self._app.template_folder = global_collection_folder / "templates"
-            self._app.static_folder = "static"
+            self._app.static_folder = "global/static"
             with self._app.app_context():
                 for folder in global_collection_folder.iterdir():
                     if folder.is_dir() and folder.name not in skip_folders:

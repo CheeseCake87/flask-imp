@@ -1,6 +1,7 @@
 import logging
 import os
 from pathlib import Path
+import typing as t
 
 from toml import load as toml_load
 
@@ -8,7 +9,7 @@ from .resources import Resources
 from .utilities import cast_to_bool, process_dict
 
 
-def build_database_uri(database_config_value: dict, app) -> str:
+def build_database_uri(database_config_value: dict, app) -> t.Optional[str]:
     """
     Puts together the correct database URI depending on the type specified.
 
@@ -24,6 +25,23 @@ def build_database_uri(database_config_value: dict, app) -> str:
     db_password = database_config_value.get('PASSWORD', 'None')
 
     allowed_dialects = ('postgresql', 'mysql', 'oracle', 'sqlite', 'mssql')
+
+    if db_dialect == "None":
+        raise ValueError("""\
+Database dialect was not specified, must be: postgresql / mysql / oracle / sqlite / mssql
+Example:
+
+[DATABASE.MAIN]
+ENABLED = true
+DIALECT = "sqlite"
+DATABASE_NAME = "database"
+LOCATION = "db"
+PORT = ""
+USERNAME = "database"
+PASSWORD = "password"
+
+This will create a sqlite file called
+database.db in a folder called db.""")
 
     if "sqlite" in db_dialect:
         if db_location is not None:
@@ -44,9 +62,22 @@ def build_database_uri(database_config_value: dict, app) -> str:
         if dialect in db_dialect:
             return f"{db_dialect}://{db_username}:{db_password}@{db_location}:{db_port}/{db_name}"
 
-    logging.critical("Unknown database dialect, must be: postgresql / mysql / oracle / sqlite / mssql")
+    raise ValueError("""\
+Database dialect is unknown, must be: postgresql / mysql / oracle / sqlite / mssql
 
-    return ""
+Example:
+
+[DATABASE.MAIN]
+ENABLED = true
+DIALECT = "sqlite"
+DATABASE_NAME = "database"
+LOCATION = "db"
+PORT = ""
+USERNAME = "database"
+PASSWORD = "password"
+
+This will create a sqlite file called
+database.db in a folder called db.""")
 
 
 def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, app) -> dict:
@@ -103,13 +134,14 @@ def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, 
         for database_config_key, database_config_values in database_config.items():
             if database_config_values.get("ENABLED", False):
                 database_uri = build_database_uri(database_config_values, app)
-                if database_config_key == "MAIN":
-                    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-                    continue
+                if database_uri:
+                    if database_config_key == "MAIN":
+                        app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+                        continue
 
-                app.config['SQLALCHEMY_BINDS'].update({
-                    str(database_config_key).lower(): database_uri
-                })
+                    app.config['SQLALCHEMY_BINDS'].update({
+                        str(database_config_key).lower(): database_uri
+                    })
 
     return {
         "FLASK": {**flask_config, **sqlalchemy_config},
