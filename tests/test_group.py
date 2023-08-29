@@ -1,6 +1,3 @@
-import os
-
-
 def test_general_setup(client):
     """
     If this test is successful, the app is set up and running correctly.
@@ -79,3 +76,65 @@ def test_database_population(client):
     """
     response = client.get('/tests/database-population')
     assert b"David created" in response.data
+
+
+def test_security_login_bool(client):
+    """
+    If this test is successful, session login set to bool.
+    """
+    client.get('/tests/login/bool')
+    response = client.get('/tests/must-be-logged-in/bool')
+    assert b"Security" in response.data
+
+
+def test_security_login_int(client):
+    """
+    If this test is successful, session login set to int.
+    """
+    client.get('/tests/login/int')
+    response = client.get('/tests/must-be-logged-in/int')
+    assert b"Security" in response.data
+
+
+def test_security_login_str(client):
+    """
+    If this test is successful, session login set to str.
+    """
+    client.get('/tests/login/str')
+    response = client.get('/tests/must-be-logged-in/str')
+    assert b"Security" in response.data
+
+
+def test_security_login_fail(client):
+    """
+    If this test is successful, the redirect if login fails is working correctly.
+    """
+    client.get('/tests/logout')
+    response = client.get('/tests/must-be-logged-in/bool', follow_redirects=True)
+    assert b"Login failed" in response.data
+
+
+def test_permission_list(client):
+    """
+    If this test is successful, session permission set to list ["admin"].
+    """
+    client.get('/tests/set-permission/list')
+    response = client.get('/tests/must-have-permissions/std')
+    assert b"Security" in response.data
+
+
+def test_permission_value(client):
+    """
+    If this test is successful, session permission set to value "admin".
+    """
+    client.get('/tests/set-permission/value')
+    response = client.get('/tests/must-have-permissions/std')
+    assert b"Security" in response.data
+
+
+def test_permission_fail(client):
+    """
+    If this test is successful, the redirect if login fails is working correctly.
+    """
+    response = client.get('/tests/must-have-permissions/adv', follow_redirects=True)
+    assert b"Permission failed" in response.data
