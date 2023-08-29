@@ -69,6 +69,7 @@ def login_check(
         @wraps(func)
         def inner(*args, **kwargs):
             skey = session.get(session_key)
+
             if skey:
                 if _check_against_values_allowed(skey, values_allowed):
                     if pass_endpoint:
@@ -82,16 +83,18 @@ def login_check(
 
                     return func(*args, **kwargs)
 
-            if message:
-                flash(message, message_category)
+                if message:
+                    flash(message, message_category)
 
-            if fail_endpoint:
-                if endpoint_kwargs:
-                    return redirect(url_for(fail_endpoint, **endpoint_kwargs))
+                if fail_endpoint:
+                    if endpoint_kwargs:
+                        return redirect(url_for(fail_endpoint, **endpoint_kwargs))
 
-                return redirect(url_for(fail_endpoint))
+                    return redirect(url_for(fail_endpoint))
 
-            return abort(403)
+                return abort(403)
+
+            return func(*args, **kwargs)
 
         return inner
 
