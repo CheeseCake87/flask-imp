@@ -1,7 +1,7 @@
 import typing as t
 from functools import wraps
 
-from flask import flash
+from flask import flash, abort
 from flask import redirect
 from flask import session
 from flask import url_for
@@ -31,7 +31,8 @@ def _check_against_values_allowed(
 def login_check(
         session_key: str,
         values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
-        fail_endpoint: str,
+        fail_endpoint: t.Optional[str] = None,
+        pass_endpoint: t.Optional[str] = None,
         endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
         message: t.Optional[str] = None,
         message_category: str = "message"
@@ -57,6 +58,8 @@ def login_check(
     :param values_allowed: A list of or singular value(s) that the session key must contain.
     :param fail_endpoint: The endpoint to redirect to if the session key does not exist or
                           match the pass_value.
+    :param pass_endpoint: The endpoint to redirect to if the session key passes.
+                          Used to redirect away from login pages, if already logged in.
     :param endpoint_kwargs: A dictionary of keyword arguments to pass to the redirect endpoint.
     :param message: If a message is specified, a flash message is shown.
     :param message_category: The category of the flash message.
@@ -68,15 +71,27 @@ def login_check(
             skey = session.get(session_key)
             if skey:
                 if _check_against_values_allowed(skey, values_allowed):
+                    if pass_endpoint:
+                        if message:
+                            flash(message, message_category)
+
+                        if endpoint_kwargs:
+                            return redirect(url_for(pass_endpoint, **endpoint_kwargs))
+
+                        return redirect(url_for(pass_endpoint))
+
                     return func(*args, **kwargs)
 
             if message:
                 flash(message, message_category)
 
-            if endpoint_kwargs:
-                return redirect(url_for(fail_endpoint, **endpoint_kwargs))
+            if fail_endpoint:
+                if endpoint_kwargs:
+                    return redirect(url_for(fail_endpoint, **endpoint_kwargs))
 
-            return redirect(url_for(fail_endpoint))
+                return redirect(url_for(fail_endpoint))
+
+            return abort(403)
 
         return inner
 
@@ -86,7 +101,7 @@ def login_check(
 def permission_check(
         session_key: str,
         values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
-        fail_endpoint: str,
+        fail_endpoint: t.Optional[str] = None,
         endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
         message: t.Optional[str] = None,
         message_category: str = "message"
@@ -124,10 +139,13 @@ def permission_check(
             if message:
                 flash(message, message_category)
 
-            if endpoint_kwargs:
-                return redirect(url_for(fail_endpoint, **endpoint_kwargs))
+            if fail_endpoint:
+                if endpoint_kwargs:
+                    return redirect(url_for(fail_endpoint, **endpoint_kwargs))
 
-            return redirect(url_for(fail_endpoint))
+                return redirect(url_for(fail_endpoint))
+
+            return abort(403)
 
         return inner
 
