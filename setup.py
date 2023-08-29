@@ -63,7 +63,7 @@ flask-bigapp init
 
 setup(
     name='Flask-BigApp',
-    version='2.2.1',
+    version='2.2.2',
     url='https://github.com/CheeseCake87/Flask-BigApp',
     license='GNU Lesser General Public License v2.1',
     author='David Carmichael',
