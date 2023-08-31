@@ -16,9 +16,9 @@ tags = {
 
 enabled_tags = [
     "flask-bigapp-python-3-8",
-    "flask-bigapp-python-3-9",
-    "flask-bigapp-python-3-10",
-    "flask-bigapp-python-3-11",
+    # "flask-bigapp-python-3-9",
+    # "flask-bigapp-python-3-10",
+    # "flask-bigapp-python-3-11",
     # "flask-bigapp-python-3-12",
 ]
 

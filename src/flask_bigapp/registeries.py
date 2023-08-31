@@ -1,7 +1,7 @@
 import typing as t
 from types import ModuleType
 
-from flask_sqlalchemy.model import DefaultMeta, Model
+from flask_sqlalchemy.model import DefaultMeta
 
 
 class ModelRegistry:

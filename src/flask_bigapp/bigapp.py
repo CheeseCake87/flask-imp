@@ -6,7 +6,7 @@ from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
 from types import ModuleType
-from typing import Dict, Union, Optional
+from typing import Dict, Union, Optional, List, Tuple
 
 from flask import Flask
 from flask import Blueprint
@@ -87,11 +87,11 @@ class BigApp:
     def import_app_resources(
             self,
             folder: str = "global",
-            app_factories: Optional[list] = None,
+            app_factories: Optional[List] = None,
             static_folder: str = "static",
             templates_folder: str = "templates",
-            scope_root_folders_to: Optional[list] = None,
-            scope_root_files_to: Optional[list] = None,
+            scope_root_folders_to: Optional[List] = None,
+            scope_root_files_to: Optional[List] = None,
     ) -> None:
         """
         Import standard app resources from a single folder.
@@ -122,7 +122,7 @@ class BigApp:
 
         self._app_resources_imported = True
 
-        def process_module(import_location: str) -> tuple[ModuleType, bool]:
+        def process_module(import_location: str) -> tuple:
             module_file = import_module(import_location)
             flask_instance = True if [
                 name for name, value in getmembers(module_file) if
