@@ -278,7 +278,7 @@ def init_new_app(name):
     if name == 'app':
         click.echo(f"{Sp.OKBLUE}Your app has the default name of 'app'{Sp.END}")
         click.echo(f"{Sp.OKBLUE}Flask will automatically look for this!{Sp.END}")
-        click.echo(f"{Sp.OKBLUE}Run: Flask run --debug{Sp.END}")
+        click.echo(f"{Sp.OKBLUE}Run: flask run --debug{Sp.END}")
     else:
         click.echo(f"{Sp.OKBLUE}Your app has the name of '{name}'{Sp.END}")
-        click.echo(f"{Sp.OKBLUE}Run: Flask --app {name} run --debug{Sp.END}")
+        click.echo(f"{Sp.OKBLUE}Run: flask --app {name} run --debug{Sp.END}")

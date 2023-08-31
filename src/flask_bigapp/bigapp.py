@@ -196,7 +196,6 @@ class BigApp:
 
         :param blueprint: The blueprint (Python Package) to import.
         Must be relative.
-        :param _from_folder: Used internally to import many blueprints.
         """
         if Path(blueprint).is_absolute():
             potential_bp = Path(blueprint)

@@ -14,8 +14,7 @@ def create_app():
     db.init_app(app)
 
     bigapp.import_app_resources(
-        app_factories=["collection"],
-        scope_root_files_to=["root_routes.py"]
+        app_factories=["collection"]
     )
 
     bigapp.import_blueprint("root_blueprint")
