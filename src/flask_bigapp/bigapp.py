@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from importlib import import_module
-from inspect import getmembers, getmembers_static
+from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
 from types import ModuleType
@@ -125,7 +125,7 @@ class BigApp:
         def process_module(import_location: str) -> tuple[ModuleType, bool]:
             module_file = import_module(import_location)
             flask_instance = True if [
-                name for name, value in getmembers_static(module_file) if
+                name for name, value in getmembers(module_file) if
                 isinstance(value, Flask)
             ] else False
 
