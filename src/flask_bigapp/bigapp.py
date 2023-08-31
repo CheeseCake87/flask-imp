@@ -87,11 +87,11 @@ class BigApp:
     def import_app_resources(
             self,
             folder: str = "global",
-            app_factories: Optional[list[str]] = None,
+            app_factories: Optional[list] = None,
             static_folder: str = "static",
             templates_folder: str = "templates",
-            scope_root_folders_to: Optional[list[str]] = None,
-            scope_root_files_to: Optional[list[str]] = None,
+            scope_root_folders_to: Optional[list] = None,
+            scope_root_files_to: Optional[list] = None,
     ) -> None:
         """
         Import standard app resources from a single folder.
