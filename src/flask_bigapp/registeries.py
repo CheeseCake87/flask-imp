@@ -17,7 +17,7 @@ class ModelRegistry:
                 f"Available models: {', '.join(self.registry.keys())}"
             )
 
-    def add(self, ref, model: t.Optional[ModuleType, Model] = None):
+    def add(self, ref, model: t.Optional[ModuleType] = None):
         self.registry[ref] = model
 
     def class_(self, class_name: str) -> DefaultMeta:
