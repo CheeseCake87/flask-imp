@@ -54,7 +54,7 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
 
     # Create __init__.py
     if not bp_init_py.exists():
-        bp_init_py.write_text(BlueprintFileLib.init_py)
+        bp_init_py.write_text(BlueprintFileLib.init_py, encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint __init__ created{Sp.END}")
     else:
         click.echo(f"{Sp.WARNING}Blueprint __init__ already exists, skipping{Sp.END}")
@@ -65,7 +65,7 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
             BlueprintFileLib.config_toml.format(
                 name=name,
                 url_prefix=name if not _root else "",
-            )
+            ), encoding="utf-8"
         )
         click.echo(f"{Sp.OKGREEN}Blueprint config, created{Sp.END}")
     else:
@@ -74,7 +74,7 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
     # Create blueprint index.py route
     if not bp_routes_index_py.exists():
         bp_routes_index_py.write_text(
-            BlueprintFileLib.routes_index_py)
+            BlueprintFileLib.routes_index_py, encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint route: {bp_routes_index_py.name}, created{Sp.END}")
     else:
         click.echo(f"{Sp.WARNING}Blueprint route already exists: {bp_routes_index_py.name}, skipping{Sp.END}")
@@ -82,7 +82,7 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
     # Create blueprint index.html template
     if not bp_templates_index_html.exists():
         bp_templates_index_html.write_text(
-            BlueprintFileLib.templates_index_html.format(name=name))
+            BlueprintFileLib.templates_index_html.format(name=name), encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint template file: {bp_templates_index_html.name}, created{Sp.END}")
     else:
         click.echo(
@@ -91,7 +91,7 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
     # Create blueprint main.html extend template
     if not bp_templates_extends_main_html.exists():
         bp_templates_extends_main_html.write_text(
-            BlueprintFileLib.templates_extends_main_html.format(name=name))
+            BlueprintFileLib.templates_extends_main_html.format(name=name), encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint template file: {bp_templates_extends_main_html.name}, created{Sp.END}")
     else:
         click.echo(
@@ -100,7 +100,7 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
     # Create logo
     if not bp_static_flask_bigapp_logo_svg.exists():
         bp_static_flask_bigapp_logo_svg.write_text(
-            flask_bigapp_logo_svg)
+            flask_bigapp_logo_svg, encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint static image: {bp_static_flask_bigapp_logo_svg.name}, created{Sp.END}")
     else:
         click.echo(
@@ -110,7 +110,7 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
     # Create water.css
     if not bp_static_water_css.exists():
         bp_static_water_css.write_text(
-            water_css)
+            water_css, encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint static image: {bp_static_water_css.name}, created{Sp.END}")
     else:
         click.echo(

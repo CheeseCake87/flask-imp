@@ -24,6 +24,8 @@ url_prefix = "/{url_prefix}"
 static_folder = "static"
 template_folder = "templates"
 static_url_path = "/static/{name}"
+#root_path = ""
+#cli_group = ""
 
 [session]
 #{name}_session = "yes"

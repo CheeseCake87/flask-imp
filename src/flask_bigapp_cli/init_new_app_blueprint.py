@@ -46,7 +46,7 @@ def init_new_app_blueprint(folder, name):
 
     # Create __init__.py
     if not bp_init_py.exists():
-        bp_init_py.write_text(BlueprintFileLib.init_py)
+        bp_init_py.write_text(BlueprintFileLib.init_py, encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint __init__ created{Sp.END}")
     else:
         click.echo(f"{Sp.WARNING}Blueprint __init__ already exists, skipping{Sp.END}")
@@ -57,7 +57,7 @@ def init_new_app_blueprint(folder, name):
             InitAppBlueprintFileLib.config_toml.format(
                 name=name,
                 url_prefix="",
-            )
+            ), encoding="utf-8"
         )
         click.echo(f"{Sp.OKGREEN}Blueprint config, created{Sp.END}")
     else:
@@ -65,14 +65,16 @@ def init_new_app_blueprint(folder, name):
 
     # Create blueprint index.py route
     if not bp_routes_index_py.exists():
-        bp_routes_index_py.write_text(BlueprintFileLib.routes_index_py)
+        bp_routes_index_py.write_text(
+            BlueprintFileLib.routes_index_py, encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint route: {bp_routes_index_py.name}, created{Sp.END}")
     else:
         click.echo(f"{Sp.WARNING}Blueprint route already exists: {bp_routes_index_py.name}, skipping{Sp.END}")
 
     # Create blueprint index.html template
     if not bp_templates_index_html.exists():
-        bp_templates_index_html.write_text(InitAppBlueprintFileLib.templates_index_html.format(name=name))
+        bp_templates_index_html.write_text(
+            InitAppBlueprintFileLib.templates_index_html.format(name=name), encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint template file: {bp_templates_index_html.name}, created{Sp.END}")
     else:
         click.echo(

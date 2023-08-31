@@ -219,9 +219,9 @@ def init_new_app(name):
     for file_name, (file_path, file_content, formatter) in app_files_lu.items():
         if not file_path.exists():
             if formatter:
-                file_path.write_text(file_content.format(**formatter))
+                file_path.write_text(file_content.format(**formatter), encoding="utf-8")
             else:
-                file_path.write_text(file_content)
+                file_path.write_text(file_content, encoding="utf-8")
             click.echo(f"{Sp.OKGREEN}App file: {file_name}, created{Sp.END}")
         else:
             click.echo(f"{Sp.WARNING}App file already exists: {file_path}, skipping{Sp.END}")
@@ -230,9 +230,9 @@ def init_new_app(name):
     for file_name, (file_path, file_content, formatter) in model_files_lu.items():
         if not file_path.exists():
             if formatter:
-                file_path.write_text(file_content.format(**formatter))
+                file_path.write_text(file_content.format(**formatter), encoding="utf-8")
             else:
-                file_path.write_text(file_content)
+                file_path.write_text(file_content, encoding="utf-8")
             click.echo(f"{Sp.OKGREEN}Model file: {file_name}, created{Sp.END}")
         else:
             click.echo(f"{Sp.WARNING}Model file already exists: {file_name}, skipping{Sp.END}")
@@ -241,9 +241,9 @@ def init_new_app(name):
     for file_name, (file_path, file_content, formatter) in extensions_files_lu.items():
         if not file_path.exists():
             if formatter:
-                file_path.write_text(file_content.format(**formatter))
+                file_path.write_text(file_content.format(**formatter), encoding="utf-8")
             else:
-                file_path.write_text(file_content)
+                file_path.write_text(file_content, encoding="utf-8")
             click.echo(f"{Sp.OKGREEN}Extensions file: {file_name}, created{Sp.END}")
         else:
             click.echo(f"{Sp.WARNING}Extensions file already exists: {file_path}, skipping{Sp.END}")
@@ -252,9 +252,9 @@ def init_new_app(name):
     for file_name, (file_path, file_content, formatter) in global_file_lu.items():
         if not file_path.exists():
             if formatter:
-                file_path.write_text(file_content.format(**formatter))
+                file_path.write_text(file_content.format(**formatter), encoding="utf-8")
             else:
-                file_path.write_text(file_content)
+                file_path.write_text(file_content, encoding="utf-8")
             click.echo(f"{Sp.OKGREEN}Global collections file: {file_name}, created{Sp.END}")
         else:
             click.echo(
