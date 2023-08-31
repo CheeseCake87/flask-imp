@@ -5,8 +5,7 @@ from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
-from types import ModuleType
-from typing import Dict, Union, Optional, List, Tuple
+from typing import Dict, Union, Optional, List
 
 from flask import Flask
 from flask import Blueprint
