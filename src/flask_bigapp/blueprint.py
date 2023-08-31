@@ -1,28 +1,28 @@
 import logging
 from importlib import import_module
 from importlib.util import find_spec
+from inspect import getmembers
 from pathlib import Path
-from typing import Optional, Union, Protocol
+from typing import Protocol
 
 from flask import Blueprint
 from flask import session
 
 from .helpers import init_bp_config
-from .utilities import cast_to_import_str, deprecated
+from .utilities import cast_to_import_str
 
 
 class BigApp(Protocol):
     def import_models(
             self,
-            from_file: Optional[Union[str, Path]] = None,
-            from_folder: Optional[Union[str, Path]] = None,
+            file_or_folder: str
     ) -> None:
         ...
 
 
 class BigAppBlueprint(Blueprint):
     """
-    Class that handles Blueprints from within the Blueprint __init__ from_file
+    Class that extends the capabilities of the Flask Blueprint class.
     """
     enabled: bool = False
     location: Path
@@ -33,10 +33,27 @@ class BigAppBlueprint(Blueprint):
 
     _bigapp_instance: BigApp
 
-    def __init__(self, dunder_name, config_file: str = "config.toml"):
-        """
-        dunder_name must be __name__
-        config_file must be relative to the location of the blueprint.
+    def __init__(self, dunder_name: str, config_file: str = "config.toml"):
+        r"""
+        :param dunder_name: Must be __name__
+        :param config_file: Must be in the same directory as the blueprint, defaults to "config.toml"
+
+        -- config.toml example:
+        ::
+            enabled = "yes"
+
+            [settings]
+            url_prefix = ""
+            subdomain = ""
+            url_defaults = { }
+            static_folder = ""
+            template_folder = ""
+            static_url_path = ""
+            #root_path = ""
+            #cli_group = ""
+
+            [session]
+            var = ""
         """
         self.package = dunder_name
         self.app_name = dunder_name.split(".")[0]
@@ -57,28 +74,29 @@ class BigAppBlueprint(Blueprint):
                 self.package,
                 **self.settings
             )
-            self._bigapp_instance = self.set_bigapp_instance()
+            self._bigapp_instance = self._set_bigapp_instance()
 
-    def set_bigapp_instance(self):
-        def get_bigapp_instance() -> BigApp:
-            from flask_bigapp import BigApp
+    def _set_bigapp_instance(self) -> BigApp:
+        """
+        Internal method.
+        Finds the BigApp instance in the app module.
+        """
+        from flask_bigapp import BigApp
 
-            app_module = import_module(self.app_name)
-            for dir_item in dir(app_module):
-                potential_instance = getattr(app_module, dir_item)
-                if isinstance(potential_instance, BigApp):
-                    return potential_instance
-            raise ImportError(f"Cannot find BigApp instance in {self.app_name}")
+        app_module = import_module(self.app_name)
+        for name, value in getmembers(app_module):
+            if isinstance(value, BigApp):
+                return value
 
-        return get_bigapp_instance()
+        raise ImportError(f"Cannot find BigApp instance in {self.app_name}")
 
     def import_resources(self, folder: str = "routes") -> None:
         """
-        Imports all the resources in the given from_folder.
-        If no from_folder is specified defaults to a from_folder named 'routes'
+        Imports all the resources (cli, routes, filters, context_processors...) in the given folder.
 
-        Folder must be relative
-        ( from_folder="here" not from_folder="/home/user/app/from_folder/blueprint/from_folder" )
+        :param folder: Folder to look for resources in.
+        Defaults to "routes".
+        Must be relative.
         """
         if not self.enabled:
             return
@@ -92,14 +110,16 @@ class BigAppBlueprint(Blueprint):
             try:
                 import_module(f"{self.package}.{folder}.{resource.stem}")
             except ImportError as e:
-                logging.warning(f"Error when importing {self.package}.{resource}: {e}")
-                continue
+                raise ImportError(f"Error when importing {self.package}.{resource}: {e}")
 
     def import_nested_blueprints(self, folder: str) -> None:
         """
-        Imports all the blueprints in the given from_folder.
+        Imports all blueprints in the given folder.
+        Nests them under the current blueprint.
+        url: /current_blueprint/nested_blueprint
 
-        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
+        :param folder: Folder to look for nested blueprints in.
+        Must be relative.
         """
         if not self.enabled:
             return
@@ -107,34 +127,34 @@ class BigAppBlueprint(Blueprint):
         folder_path = Path(self.location / folder)
 
         for potential_bp in folder_path.iterdir():
-            self.import_nested_blueprint(potential_bp)
+            self.import_nested_blueprint(potential_bp.as_posix())
 
-    def import_nested_blueprint(self, blueprint: Union[str, Path]):
+    def import_nested_blueprint(self, blueprint: str) -> None:
         """
-        Imports a single blueprint from the given path.
+        Imports a single nested blueprint from the given path.
 
-        Path must be relative ( path="here" not path="/home/user/app/from_folder" )
+        :param blueprint: Name of the blueprint (Python Package) to import.
+        Must be relative.
         """
         if not self.enabled:
             return
 
-        if isinstance(blueprint, str):
-            potential_bp = Path(self.location / blueprint)
+        if Path(blueprint).is_absolute():
+            potential_bp = Path(blueprint)
         else:
-            potential_bp = blueprint
+            potential_bp = Path(self.location / blueprint)
 
-        if potential_bp.is_dir():
-            app_name = self.package.split(".")[0]
-            try:
-                module = import_module(cast_to_import_str(app_name, potential_bp))
-                for dir_item in dir(module):
-                    _ = getattr(module, dir_item)
-                    if isinstance(_, BigAppBlueprint):
-                        if _.enabled:
-                            self.register_blueprint(_)
-                        break
-            except Exception as e:
-                logging.critical(f"{e}\n", f"Error importing blueprint: from {potential_bp}")
+        if potential_bp.exists() and potential_bp.is_dir():
+            module = import_module(
+                cast_to_import_str(self.package.split(".")[0], potential_bp)
+            )
+            for name, value in getmembers(module):
+                if isinstance(value, Blueprint):
+                    if hasattr(value, "enabled"):
+                        if value.enabled:
+                            self.register_blueprint(value)
+                        else:
+                            logging.debug(f"Blueprint {name} is disabled")
 
     def init_session(self) -> None:
         """
@@ -151,24 +171,20 @@ class BigAppBlueprint(Blueprint):
 
     def import_models(
             self,
-            from_file: Optional[Union[str, Path]] = None,
-            from_folder: Optional[Union[str, Path]] = None,
+            file_or_folder: str
     ) -> None:
         """
-        Imports model files from a single from_file or a from_folder. Both are allowed to be set.
+        Imports all the models in the given file or folder.
 
-        File and Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
+        :param file_or_folder: The file or folder to import from.
+        Must be relative.
         """
         if not self.enabled:
             return
 
-        if isinstance(from_file, str):
-            from_file = Path(self.location / from_file)
+        file_or_folder_path = Path(self.location / file_or_folder)
 
-        if isinstance(from_folder, str):
-            from_folder = Path(self.location / from_folder)
-
-        self._bigapp_instance.import_models(from_file, from_folder)
+        self._bigapp_instance.import_models(file_or_folder_path.as_posix())
 
     def tmpl(self, template) -> str:
         """
@@ -177,11 +193,3 @@ class BigAppBlueprint(Blueprint):
         bp.tmpl("index.html") when looking for template files.
         """
         return f"{self.name}/{template}"
-
-    @deprecated("import_blueprint_models() is deprecated Use import_models instead")
-    def import_blueprint_models(
-            self,
-            from_file: Optional[str] = None,
-            from_folder: Optional[str] = None
-    ) -> None:
-        self.import_models(from_file=from_file, from_folder=from_folder)

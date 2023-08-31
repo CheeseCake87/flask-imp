@@ -3,10 +3,12 @@ enabled = "yes"
 [settings]
 url_prefix = "/tests"
 subdomain = ""
-url_defaults = {}
+url_defaults = { }
 static_folder = "static"
 template_folder = "templates"
 static_url_path = "/tests/static"
+#root_path = ""
+#cli_group = ""
 
 [session]
 tests_session = "yes"

@@ -1,16 +1,18 @@
 import logging
 import os
+import sys
 from importlib import import_module
-from inspect import getmembers
+from inspect import getmembers, getmembers_static
 from inspect import isclass
 from pathlib import Path
+from types import ModuleType
 from typing import Dict, Union, Optional
 
 from flask import Flask
+from flask import Blueprint
 from flask import session
 from flask_sqlalchemy.model import DefaultMeta
 
-from .blueprint import BigAppBlueprint
 from .helpers import init_app_config
 from .registeries import ModelRegistry
 from .utilities import cast_to_import_str
@@ -21,7 +23,7 @@ class BigApp:
     _app_name: str
     _app_path: Path
     _app_folder: Path
-    _global_collection_imported: bool = False
+    _app_resources_imported: bool = False
 
     __model_registry__: ModelRegistry
 
@@ -50,16 +52,13 @@ class BigApp:
     ) -> None:
 
         """
-        Initializes the application.
+        Initializes the flask app to work with flask-bigapp.
 
-        -> Expects a Flask application
-
-        Can be passed an SQLAlchemy object, doing this will enable the use of the model_class.
-
-        Optional config from_file passed in. If no config from_file is given an
-        attempt will be made to read from the environment for the variable BA_CONFIG
-        If the environment variable is not found it will create a new config from_file
-        called default.config.toml and proceed to load the values from there.
+        :param app: The flask app to initialize.
+        :param app_config_file: The config file to use.
+        If not given will attempt to read from the environment.
+        If no environment variable is found will use default.config.toml, which will be created if not found.
+        :param ignore_missing_env_variables: If set to True will ignore missing environment variables.
         """
 
         if app is None:
@@ -85,35 +84,106 @@ class BigApp:
             self._app
         )
 
-    def import_global_collection(self) -> None:
+    def import_app_resources(
+            self,
+            folder: str = "global",
+            app_factories: Optional[list[str]] = None,
+            static_folder: str = "static",
+            templates_folder: str = "templates",
+            scope_root_folders_to: Optional[list[str]] = None,
+            scope_root_files_to: Optional[list[str]] = None,
+    ) -> None:
         """
-        Will look in the root of the app for a folder called global.
-        """
-        if self._global_collection_imported:
-            logging.warning(
-                "The global collection has already been imported, skipping")
-            return
+        Import standard app resources from a single folder.
 
-        self._global_collection_imported = True
+        :param folder: The folder to import from.
+        Must be relative.
+        :param app_factories: A list of function names to call with the app instance.
+        ["collection"] => collection(app) will be called
+        :param static_folder: The name of the static folder (if not found will be set to None)
+        :param templates_folder: The name of the templates folder (if not found will be set to None)
+        :param scope_root_folders_to: A list of folders to scope the import to
+        ["cli", "routes"] => will only import from folder/cli/*.py and folder/routes/*.py
+        :param scope_root_files_to: A list of files to scope the import to
+        ["cli.py", "routes.py"] => will only import from folder/cli.py and folder/routes.py
+        """
+
+        if app_factories is None:
+            app_factories = []
+
+        if scope_root_folders_to is None:
+            scope_root_folders_to = []
+
+        if scope_root_files_to is None:
+            scope_root_files_to = []
+
+        if self._app_resources_imported:
+            raise ImportError("The app resources can only be imported once.")
+
+        self._app_resources_imported = True
+
+        def process_module(import_location: str) -> tuple[ModuleType, bool]:
+            module_file = import_module(import_location)
+            flask_instance = True if [
+                name for name, value in getmembers_static(module_file) if
+                isinstance(value, Flask)
+            ] else False
+
+            return module_file, flask_instance
 
         skip_folders = ("static", "templates",)
-        global_collection_folder = self._app_path / "global"
-        if global_collection_folder.is_dir():
-            self._app.template_folder = global_collection_folder / "templates"
-            self._app.static_folder = "global/static"
-            with self._app.app_context():
-                for folder in global_collection_folder.iterdir():
-                    if folder.is_dir() and folder.name not in skip_folders:
-                        for py_file in folder.glob("*.py"):
-                            module_file = import_module(
-                                f"{cast_to_import_str(self._app_name, folder)}.{py_file.stem}"
-                            )
-                            if hasattr(module_file, "collection"):
-                                module_file.collection(self._app)
+        global_collection_folder = self._app_path / folder
+        app_static_folder = global_collection_folder / static_folder
+        app_templates_folder = global_collection_folder / templates_folder
+
+        if not global_collection_folder.exists():
+            raise ImportError(
+                f"Cannot find global collection folder at {global_collection_folder}")
+
+        if not global_collection_folder.is_dir():
+            raise ImportError(
+                f"Global collection must be a folder {global_collection_folder}")
+
+        self._app.static_folder = app_static_folder.as_posix() if app_static_folder.exists() else None
+        self._app.template_folder = app_templates_folder.as_posix() if app_templates_folder.exists() else None
+
+        with self._app.app_context():
+            for item in global_collection_folder.iterdir():
+
+                if item.is_dir() and item.name not in skip_folders:
+                    if scope_root_folders_to:
+                        if item.name not in scope_root_folders_to:
+                            continue
+
+                    for py_file in item.glob("*.py"):
+                        module, flask_instance_found = process_module(
+                            f"{cast_to_import_str(self._app_name, item)}.{py_file.stem}")
+
+                        for instance_factory in app_factories:
+                            if hasattr(module, instance_factory):
+                                getattr(module, instance_factory)(self._app)
+
+                        if not flask_instance_found and not app_factories:
+                            del sys.modules[module.__name__]
+
+                if item.is_file() and item.suffix == ".py":
+                    if scope_root_files_to:
+                        if item.name not in scope_root_files_to:
+                            continue
+
+                    module, flask_instance_found = process_module(
+                        cast_to_import_str(self._app_name, item))
+
+                    for instance_factory in app_factories:
+                        if hasattr(module, instance_factory):
+                            getattr(module, instance_factory)(self._app)
+
+                    if not flask_instance_found and not app_factories:
+                        del sys.modules[module.__name__]
 
     def init_session(self) -> None:
         """
-        Initialize the session variables found in the config from_file.
+        Initialize the session variables found in the config.
         Use this method in the before_request route.
         """
         if self.config.get("SESSION"):
@@ -121,53 +191,56 @@ class BigApp:
                 if key not in session:
                     session[key] = value
 
-    def import_blueprint(self, blueprint: Union[str, Path]):
+    def import_blueprint(self, blueprint: str) -> None:
         """
         Imports a single blueprint from the given path.
 
-        Path must be relative ( path="here" not path="/home/user/app/from_folder" )
+        :param blueprint: The blueprint (Python Package) to import.
+        Must be relative.
+        :param _from_folder: Used internally to import many blueprints.
         """
-        if isinstance(blueprint, str):
-            potential_bp = Path(self._app_path / blueprint)
+        if Path(blueprint).is_absolute():
+            potential_bp = Path(blueprint)
         else:
-            potential_bp = blueprint
+            potential_bp = Path(self._app_path / blueprint)
 
-        if potential_bp.is_dir():
+        if potential_bp.exists() and potential_bp.is_dir():
             try:
                 module = import_module(cast_to_import_str(self._app_name, potential_bp))
-                for dir_item in dir(module):
-                    _ = getattr(module, dir_item)
-                    if isinstance(_, BigAppBlueprint):
-                        if _.enabled:
-                            self._app.register_blueprint(_)
-                        break
+                for name, value in getmembers(module):
+                    if isinstance(value, Blueprint):
+                        if hasattr(value, "enabled"):
+                            if value.enabled:
+                                self._app.register_blueprint(value)
+                            else:
+                                logging.debug(f"Blueprint {name} is disabled")
+                        else:
+                            self._app.register_blueprint(value)
             except Exception as e:
-                logging.critical(f"{e}",
-                                 f"Error importing blueprint: from {potential_bp}")
+                raise ImportError(f"Error when importing {potential_bp.name}: {e}")
 
     def import_blueprints(self, folder: str) -> None:
         """
-        Imports all the blueprints in the given from_folder.
+        Imports all the blueprints in the given folder.
 
-        Folder must be relative ( from_folder="here" not from_folder="/home/user/app/from_folder" )
+        :param folder: The folder to import from.
+        Must be relative.
         """
 
         folder_path = Path(self._app_path / folder)
 
         for potential_bp in folder_path.iterdir():
-            self.import_blueprint(potential_bp)
+            self.import_blueprint(potential_bp.as_posix())
 
     def import_models(
             self,
-            from_file: Optional[Union[str, Path]] = None,
-            from_folder: Optional[Union[str, Path]] = None,
+            file_or_folder: str
     ) -> None:
         """
-        Imports model files from a single from_file or a from_folder.
-        Both are allowed to be set.
+        Imports all the models in the given file or folder.
 
-        File and Folder must be relative
-        ( from_folder="here" not from_folder="/home/user/app/from_folder" )
+        :param file_or_folder: The file or folder to import from.
+        Must be relative.
         """
 
         def model_processor(path: Path):
@@ -177,49 +250,30 @@ class BigApp:
             import_string = cast_to_import_str(self._app_name, path)
             try:
                 model_module = import_module(import_string)
-                for model_object_members in getmembers(model_module, isclass):
-                    if import_string in model_object_members[1].__module__:
-                        name = model_object_members[0]
-                        model = model_object_members[1]
-                        if not hasattr(model, "__tablename__"):
-                            raise AttributeError(
-                                f"{name} is not a valid model")
-
-                        self.__model_registry__.add(name, model)
+                for name, value in getmembers(model_module, isclass):
+                    if hasattr(value, "__tablename__"):
+                        self.__model_registry__.add(name, value)
 
             except ImportError as e:
-                logging.critical("Error importing model: ", e, f" {import_string}")
+                raise ImportError(f"Error when importing {import_string}: {e}")
 
-        if from_file is None and from_folder is None:
-            raise ImportError(
-                "No model from_file or from_folder was passed in")
+        if Path(file_or_folder).is_absolute():
+            file_or_folder_path = Path(file_or_folder)
+        else:
+            file_or_folder_path = Path(self._app_path / file_or_folder)
 
-        if from_file is not None:
-            if isinstance(from_file, Path):
-                file_path = from_file
-            else:
-                file_path = Path(self._app_path / from_file)
+        if file_or_folder_path.is_file() and file_or_folder_path.suffix == ".py":
+            model_processor(file_or_folder_path)
 
-            if file_path.is_file() and file_path.suffix == ".py":
-                model_processor(file_path)
-            else:
-                from_folder = from_file
-
-        if from_folder is not None:
-            if isinstance(from_folder, Path):
-                folder_path = from_folder
-            else:
-                folder_path = Path(self._app_path / from_folder)
-
-            if folder_path.is_dir():
-                for model_file in folder_path.glob("*.py"):
-                    if "__" in model_file.name:
-                        continue
-                    model_processor(model_file)
+        elif file_or_folder_path.is_dir():
+            for model_file in [_ for _ in file_or_folder_path.iterdir() if "__" not in _.name]:
+                model_processor(model_file)
 
     def model(self, class_: str) -> DefaultMeta:
         """
         Returns the model class for the given ORM class name
+
+        bigapp.model("User") => <class 'app.models.User'>
         """
         return self.__model_registry__.class_(class_)
 
