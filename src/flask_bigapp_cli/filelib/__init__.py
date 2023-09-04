@@ -1,4 +1,4 @@
-from ._global import GlobalFileLib
+from .all_files import GlobalFileLib
 from .app import AppFileLib
 from .blueprint import BlueprintFileLib, InitAppBlueprintFileLib
 

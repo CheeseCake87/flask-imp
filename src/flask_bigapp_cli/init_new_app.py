@@ -5,7 +5,7 @@ import click
 from .helpers import Sprinkles as Sp
 from .init_new_app_blueprint import init_new_app_blueprint as _init_new_app_blueprint
 
-from .filelib._global import GlobalFileLib
+from .filelib.all_files import GlobalFileLib
 from .filelib.app import AppFileLib
 from .filelib.flask_bigapp_logo_svg import flask_bigapp_logo_svg
 from .filelib.water_css import water_css
@@ -106,9 +106,9 @@ def init_new_app(name):
             AppFileLib.models_init_py,
             {"app_name": name}
         ),
-        "example__table.py": (
-            models_folder / "example__table.py",
-            AppFileLib.models_example_table_py,
+        "example_user_table.py": (
+            models_folder / "example_user_table.py",
+            AppFileLib.models_example_user_table_py,
             {}
         )
     }

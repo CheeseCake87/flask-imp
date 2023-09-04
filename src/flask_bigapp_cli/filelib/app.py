@@ -90,9 +90,7 @@ def create_app():
     bigapp.init_app(app)
     #db.init_app(app)
 
-    bigapp.import_app_resources(
-        app_factories=["collection"]
-    )
+    bigapp.import_app_resources()
 
     bigapp.import_blueprints("blueprints")
 
@@ -127,7 +125,7 @@ __all__ = [
 """
 
     # Format to: None
-    models_example_table_py = """\
+    models_example_user_table_py = """\
 from . import *
 
 
