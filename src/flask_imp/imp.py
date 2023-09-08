@@ -46,7 +46,7 @@ class Imp:
     def init_app(
             self,
             app: Flask,
-            app_config_file: Optional[str] = os.environ.get("BA_CONFIG"),
+            app_config_file: Optional[str] = os.environ.get("IMP_CONFIG"),
             ignore_missing_env_variables: bool = False
     ) -> None:
 
