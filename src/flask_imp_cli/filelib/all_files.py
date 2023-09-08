@@ -181,7 +181,7 @@ console.log('This log is from the file global/static/js/main.js')
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Flask-BigApp</title>
+    <title>Flask-Imp</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/water.css') }}">
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </head>
@@ -201,13 +201,13 @@ console.log('This log is from the file global/static/js/main.js')
 <p>It is being imported in the <code>global/templates/extends/main.html</code> template.</p>
 """
 
-    # Format to: None
+    # Format to: flask_imp_logo
     templates_includes_header_html = """\
 <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
     <img style="border-radius: 50%"
-         src="{{ url_for('static', filename='img/Flask-BigApp-Logo.svg') }}" alt="logo">
+         src="{flask_imp_logo}" alt="logo">
     <div>
-        <h1 style="margin: 0;">Flask-BigApp</h1>
+        <h1 style="margin: 0;">Flask-Imp</h1>
         <p>This is the header, this is located here: <code>global/templates/includes/header.html</code></p>
         <p>It is being imported in the <code>global/templates/extends/main.html</code> template.</p>
     </div>

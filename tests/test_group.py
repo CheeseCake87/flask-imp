@@ -55,7 +55,7 @@ def test_context_processors(client):
 
 def test_static(client):
     response = client.get('/tests/static')
-    assert b"/img/Flask-BigApp-Logo.svg" in response.data
+    assert b"/img/Flask-Imp-Small.png" in response.data
 
 
 def test_database_creation(client):

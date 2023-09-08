@@ -5,7 +5,7 @@ from dataclasses import dataclass
 class Resources:
     # Format to: secret_key
     default_config = """\
-# Flask-BigApp Config File
+# Flask-Imp Config File
 # ------------------------
 # Updates the Flask app config with the variables below.
 # If any variable below does not exist in the standard Flask env

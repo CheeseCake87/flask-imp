@@ -12,7 +12,7 @@ from .helpers import init_bp_config
 from .utilities import cast_to_import_str
 
 
-class BigApp(Protocol):
+class Imp(Protocol):
     def import_models(
             self,
             file_or_folder: str
@@ -20,7 +20,7 @@ class BigApp(Protocol):
         ...
 
 
-class BigAppBlueprint(Blueprint):
+class ImpBlueprint(Blueprint):
     """
     Class that extends the capabilities of the Flask Blueprint class.
     """
@@ -31,7 +31,7 @@ class BigAppBlueprint(Blueprint):
     session: dict
     settings: dict
 
-    _bigapp_instance: BigApp
+    _imp_instance: Imp
 
     def __init__(self, dunder_name: str, config_file: str = "config.toml"):
         r"""
@@ -74,21 +74,21 @@ class BigAppBlueprint(Blueprint):
                 self.package,
                 **self.settings
             )
-            self._bigapp_instance = self._set_bigapp_instance()
+            self._imp_instance = self._set_imp_instance()
 
-    def _set_bigapp_instance(self) -> BigApp:
+    def _set_imp_instance(self) -> Imp:
         """
         Internal method.
-        Finds the BigApp instance in the app module.
+        Finds the Imp instance in the app module.
         """
-        from flask_bigapp import BigApp
+        from flask_imp import Imp
 
         app_module = import_module(self.app_name)
         for name, value in getmembers(app_module):
-            if isinstance(value, BigApp):
+            if isinstance(value, Imp):
                 return value
 
-        raise ImportError(f"Cannot find BigApp instance in {self.app_name}")
+        raise ImportError(f"Cannot find Imp instance in {self.app_name}")
 
     def import_resources(self, folder: str = "routes") -> None:
         """
@@ -184,7 +184,7 @@ class BigAppBlueprint(Blueprint):
 
         file_or_folder_path = Path(self.location / file_or_folder)
 
-        self._bigapp_instance.import_models(file_or_folder_path.as_posix())
+        self._imp_instance.import_models(file_or_folder_path.as_posix())
 
     def tmpl(self, template) -> str:
         """

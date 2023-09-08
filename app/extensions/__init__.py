@@ -1,5 +1,5 @@
-from flask_bigapp import BigApp
+from flask_imp import Imp
 from flask_sqlalchemy import SQLAlchemy
 
-bigapp = BigApp()
+imp = Imp()
 db = SQLAlchemy()

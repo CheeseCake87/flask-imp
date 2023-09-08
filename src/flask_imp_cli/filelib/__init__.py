@@ -2,7 +2,7 @@ from .all_files import GlobalFileLib
 from .app import AppFileLib
 from .blueprint import BlueprintFileLib, InitAppBlueprintFileLib
 
-from .flask_bigapp_logo_svg import flask_bigapp_logo_svg
+from .flask_imp_logo import flask_imp_logo
 from .water_css import water_css
 
 __all__ = [
@@ -10,6 +10,6 @@ __all__ = [
     "AppFileLib",
     "BlueprintFileLib",
     "InitAppBlueprintFileLib",
-    "flask_bigapp_logo_svg",
+    "flask_imp_logo",
     "water_css",
 ]

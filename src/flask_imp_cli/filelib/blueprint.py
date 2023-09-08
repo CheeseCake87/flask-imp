@@ -1,7 +1,7 @@
 class BlueprintFileLib:
     # Format to: NONE
     init_py = """\
-from flask_bigapp import Blueprint
+from flask_imp import Blueprint
 
 bp = Blueprint(__name__)
 
@@ -43,19 +43,20 @@ def index():
     return render_template(bp.tmpl("index.html"))
 """
 
-    # Format to: name, location
+    # Format to: name, flask_imp_logo
     templates_index_html = """\
 {{% extends '{name}/extends/main.html' %}}
 
 {{% block content %}}
     <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
         <img style="border-radius: 50%"
-             src="{{{{ url_for('{name}.static', filename='Flask-BigApp-Logo.svg') }}}}" alt="logo">
+             src="{flask_imp_logo}" alt="logo">
         <div>
             <h1 style="margin: 0;">{name} blueprint</h1>
             <cite>
                 <h3>Here's your new blueprint.</h3>
-                <p>Remember to double-check the config.toml file.
+                <p>
+                    Remember to double-check the config.toml file.
                 <p/>
             </cite>
         </div>

@@ -7,7 +7,7 @@ from .init_new_app_blueprint import init_new_app_blueprint as _init_new_app_blue
 
 from .filelib.all_files import GlobalFileLib
 from .filelib.app import AppFileLib
-from .filelib.flask_bigapp_logo_svg import flask_bigapp_logo_svg
+from .filelib.flask_imp_logo import flask_imp_logo
 from .filelib.water_css import water_css
 
 
@@ -51,7 +51,6 @@ def init_new_app(name):
     global_static_folders = (
         "css",
         "js",
-        "img",
     )
 
     global_templates_folders = (
@@ -158,11 +157,6 @@ def init_new_app(name):
             GlobalFileLib.static_main_js,
             {}
         ),
-        "Flask-BigApp-Logo.svg": (
-            global_tlf_lookup["static"] / "img" / "Flask-BigApp-Logo.svg",
-            flask_bigapp_logo_svg,
-            {}
-        ),
         "index.html": (
             global_tlf_lookup["templates"] / "index.html",
             GlobalFileLib.templates_index_html,
@@ -211,7 +205,7 @@ def init_new_app(name):
         "header.html": (
             global_tlf_lookup["templates"] / "includes" / "header.html",
             GlobalFileLib.templates_includes_header_html,
-            {}
+            {"flask_imp_logo": flask_imp_logo}
         ),
     }
 

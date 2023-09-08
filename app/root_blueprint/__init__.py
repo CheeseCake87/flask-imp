@@ -1,4 +1,4 @@
-from flask_bigapp import Blueprint
+from flask_imp import Blueprint
 
 bp = Blueprint(__name__)
 

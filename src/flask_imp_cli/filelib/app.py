@@ -1,7 +1,7 @@
 class AppFileLib:
     # Format to: app_name
     default_config_toml = """\
-# Flask-BigApp Config File
+# Flask-Imp Config File
 # ------------------------
 # Updates the Flask app config with the variables below.
 # If any variable below does not exist in the standard Flask env
@@ -82,28 +82,28 @@ SQLALCHEMY_RECORD_QUERIES = false
 
     init_py = """\
 from flask import Flask
-from {app_name}.extensions import bigapp, db
+from {app_name}.extensions import imp, db
 
 
 def create_app():
     app = Flask(__name__)
-    bigapp.init_app(app)
+    imp.init_app(app)
     #db.init_app(app)
 
-    bigapp.import_app_resources()
+    imp.import_app_resources()
 
-    bigapp.import_blueprints("blueprints")
+    imp.import_blueprints("blueprints")
 
-    #bigapp.import_models("models")
+    #imp.import_models("models")
 
     return app
 """
 
     extensions_init_py = """\
-from flask_bigapp import BigApp
+from flask_imp import Imp
 from flask_sqlalchemy import SQLAlchemy
 
-bigapp = BigApp()
+imp = Imp()
 db = SQLAlchemy()
 """
 
@@ -145,7 +145,7 @@ class ExampleUserTable(db.Model):
 
     @classmethod
     def create(cls, username, password, disabled):
-        from flask_bigapp.auth import Auth
+        from flask_imp.auth import Auth
 
         salt = Auth.generate_salt()
         salt_pepper_password = Auth.hash_password(password, salt)

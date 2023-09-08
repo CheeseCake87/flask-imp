@@ -17,7 +17,7 @@ from .registeries import ModelRegistry
 from .utilities import cast_to_import_str
 
 
-class BigApp:
+class Imp:
     _app: Flask
     _app_name: str
     _app_path: Path
@@ -51,7 +51,7 @@ class BigApp:
     ) -> None:
 
         """
-        Initializes the flask app to work with flask-bigapp.
+        Initializes the flask app to work with flask-imp.
 
         :param app: The flask app to initialize.
         :param app_config_file: The config file to use.
@@ -62,7 +62,7 @@ class BigApp:
 
         if app is None:
             raise ImportError(
-                "No app was passed in, do ba = BigApp(flaskapp) or app.init_app(flaskapp)")
+                "No app was passed in, do ba = Imp(flaskapp) or app.init_app(flaskapp)")
         if not isinstance(app, Flask):
             raise TypeError(
                 "The app that was passed in is not an instance of Flask")
@@ -271,7 +271,7 @@ class BigApp:
         """
         Returns the model class for the given ORM class name
 
-        bigapp.model("User") => <class 'app.models.User'>
+        imp.model("User") => <class 'app.models.User'>
         """
         return self.__model_registry__.class_(class_)
 

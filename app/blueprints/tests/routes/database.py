@@ -1,5 +1,5 @@
-from app import bigapp, db
-from flask_bigapp import Auth
+from app import imp, db
+from flask_imp import Auth
 from .. import bp
 
 
@@ -15,9 +15,9 @@ def database_population_test():
     db.drop_all()
     db.create_all()
 
-    m_example_user = bigapp.model("ExampleUser")
-    m_example_user_bind = bigapp.model("ExampleUserBind")
-    m_example_table = bigapp.model("ExampleTable")
+    m_example_user = imp.model("ExampleUser")
+    m_example_user_bind = imp.model("ExampleUserBind")
+    m_example_table = imp.model("ExampleTable")
 
     if not m_example_user.get_by_id(1):
         salt = Auth.generate_salt()
@@ -49,7 +49,7 @@ def database_population_test():
         db.session.flush()
         db.session.commit()
 
-        user_in_example_table = bigapp.model("ExampleTable").get_by_user_id(new_example_user.user_id)
+        user_in_example_table = imp.model("ExampleTable").get_by_user_id(new_example_user.user_id)
 
         if user_in_example_table:
             return (f"{new_example_user.username} created and {user_in_example_table.thing}"

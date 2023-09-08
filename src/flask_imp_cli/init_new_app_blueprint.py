@@ -3,7 +3,7 @@ import click
 
 from .helpers import to_snake_case
 from .helpers import Sprinkles as Sp
-from .filelib import BlueprintFileLib
+from .filelib import BlueprintFileLib, flask_imp_logo
 from .filelib import InitAppBlueprintFileLib
 
 
@@ -74,7 +74,7 @@ def init_new_app_blueprint(folder, name):
     # Create blueprint index.html template
     if not bp_templates_index_html.exists():
         bp_templates_index_html.write_text(
-            InitAppBlueprintFileLib.templates_index_html.format(name=name), encoding="utf-8")
+            InitAppBlueprintFileLib.templates_index_html.format(name=name, flask_imp_logo=flask_imp_logo), encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint template file: {bp_templates_index_html.name}, created{Sp.END}")
     else:
         click.echo(

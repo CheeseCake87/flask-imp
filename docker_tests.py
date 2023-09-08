@@ -7,19 +7,19 @@ from docker_builder.docker_cli import DockerCli
 cwd = Path.cwd()
 
 tags = {
-    "flask-bigapp-python-3-8": "docker_tests/Dockerfile_Python_3_8",
-    "flask-bigapp-python-3-9": "docker_tests/Dockerfile_Python_3_9",
-    "flask-bigapp-python-3-10": "docker_tests/Dockerfile_Python_3_10",
-    "flask-bigapp-python-3-11": "docker_tests/Dockerfile_Python_3_11",
-    "flask-bigapp-python-3-12": "docker_tests/Dockerfile_Python_3_12",
+    "flask-imp-python-3-8": "docker_tests/Dockerfile_Python_3_8",
+    "flask-imp-python-3-9": "docker_tests/Dockerfile_Python_3_9",
+    "flask-imp-python-3-10": "docker_tests/Dockerfile_Python_3_10",
+    "flask-imp-python-3-11": "docker_tests/Dockerfile_Python_3_11",
+    "flask-imp-python-3-12": "docker_tests/Dockerfile_Python_3_12",
 }
 
 enabled_tags = [
-    "flask-bigapp-python-3-8",
-    # "flask-bigapp-python-3-9",
-    # "flask-bigapp-python-3-10",
-    # "flask-bigapp-python-3-11",
-    # "flask-bigapp-python-3-12",
+    "flask-imp-python-3-8",
+    # "flask-imp-python-3-9",
+    # "flask-imp-python-3-10",
+    # "flask-imp-python-3-11",
+    # "flask-imp-python-3-12",
 ]
 
 if __name__ == "__main__":

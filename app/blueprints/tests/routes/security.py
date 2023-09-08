@@ -1,5 +1,5 @@
 from flask import render_template, session
-from flask_bigapp.security import login_check, permission_check
+from flask_imp.security import login_check, permission_check
 
 from .. import bp
 

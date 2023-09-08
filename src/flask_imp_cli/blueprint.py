@@ -4,7 +4,7 @@ import click
 from .helpers import to_snake_case
 from .helpers import Sprinkles as Sp
 from .filelib import BlueprintFileLib
-from .filelib import flask_bigapp_logo_svg
+from .filelib import flask_imp_logo
 from .filelib import water_css
 
 
@@ -33,7 +33,6 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
     bp_templates_index_html = bp_templates_folder / "index.html"
     bp_templates_extends_main_html = bp_templates_extends_folder / "main.html"
     bp_static_water_css = bp_static_folder / "water.css"
-    bp_static_flask_bigapp_logo_svg = bp_static_folder / "Flask-BigApp-Logo.svg"
 
     # Prepare blueprint folders for loop creation
     folders = (
@@ -82,7 +81,7 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
     # Create blueprint index.html template
     if not bp_templates_index_html.exists():
         bp_templates_index_html.write_text(
-            BlueprintFileLib.templates_index_html.format(name=name), encoding="utf-8")
+            BlueprintFileLib.templates_index_html.format(name=name, flask_imp_logo=flask_imp_logo), encoding="utf-8")
         click.echo(f"{Sp.OKGREEN}Blueprint template file: {bp_templates_index_html.name}, created{Sp.END}")
     else:
         click.echo(
@@ -96,16 +95,6 @@ def add_blueprint(folder, name, _root=False, _from_init=False):
     else:
         click.echo(
             f"{Sp.WARNING}Blueprint template file already exists: {bp_templates_extends_main_html.name}, skipping{Sp.END}")
-
-    # Create logo
-    if not bp_static_flask_bigapp_logo_svg.exists():
-        bp_static_flask_bigapp_logo_svg.write_text(
-            flask_bigapp_logo_svg, encoding="utf-8")
-        click.echo(f"{Sp.OKGREEN}Blueprint static image: {bp_static_flask_bigapp_logo_svg.name}, created{Sp.END}")
-    else:
-        click.echo(
-            f"{Sp.WARNING}Blueprint static image already \
-            exists: {bp_static_flask_bigapp_logo_svg.name}, skipping{Sp.END}")
 
     # Create water.css
     if not bp_static_water_css.exists():

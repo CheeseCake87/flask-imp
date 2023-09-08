@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey
 
 from app import db
-from flask_bigapp.utilities import class_field
+from flask_imp.utilities import class_field
 
 
 class ExampleTable(db.Model):

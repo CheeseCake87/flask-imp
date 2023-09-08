@@ -10,7 +10,7 @@ def cli():
     pass  # Entry Point
 
 
-@cli.command("blueprint", help="Create a flask-bigapp blueprint")
+@cli.command("blueprint", help="Create a flask-imp blueprint")
 @click.option(
     '-f', '--folder',
     nargs=1,
@@ -30,7 +30,7 @@ def add_blueprint(folder, name):
     _add_blueprint(folder, name)
 
 
-@cli.command("init", help="Create a new flask-bigapp app")
+@cli.command("init", help="Create a new flask-imp app")
 @click.option(
     '-n', '--name',
     nargs=1,

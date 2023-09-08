@@ -1,12 +1,16 @@
-![](https://raw.githubusercontent.com/CheeseCake87/Flask-BigApp/master/_assets/Flask-BigApp-v2-Small.png)
 
-# Flask-BigApp
 
-![Tests](https://github.com/CheeseCake87/Flask-BigApp/actions/workflows/tests.yml/badge.svg)
+![](https://raw.githubusercontent.com/CheeseCake87/Flask-Imp/master/_assets/Flask-Imp-Small.png)
 
-## What is Flask-BigApp?
+# Flask-Imp
 
-Flask-BigApp's main purpose is to help simplify the importing of blueprints, resources and models.
+![Tests](https://github.com/CheeseCake87/Flask-Imp/actions/workflows/tests.yml/badge.svg)
+
+(Previously known as Flask-BigApp)
+
+## What is Flask-Imp?
+
+Flask-Imp's main purpose is to help simplify the importing of blueprints, resources, and models.
 It has a few extra features built in to help with securing pages and password authentication.
 
 ## Getting Started
@@ -45,14 +49,14 @@ python -m venv venv
 .\venv\Scripts\activate
 ```
 
-### Install Flask-BigApp
+### Install Flask-Imp
 
 ```bash
-pip install flask-bigapp
+pip install flask-imp
 ```
 
 ### Create a new project.
 
 ```bash
-flask-bigapp init
+flask-imp init
 ```
