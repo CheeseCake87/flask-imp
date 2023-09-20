@@ -148,9 +148,9 @@ class Auth:
         return False
 
     @classmethod
-    def generate_password(cls, style: str = "animals", length: int = 3) -> str:
+    def generate_password(cls, style: str = "mixed", length: int = 3) -> str:
         """
-        style options: "animals"
+        style options: "animals", "colors", "mixed"
 
         Will return a plain text password based on choice of style and length.
 
@@ -165,9 +165,33 @@ class Auth:
         if style == "animals":
             final = []
             for i in range(length):
-                random_index = randrange(0, len(PasswordGeneration.animals))
-                final.append(PasswordGeneration.animals[random_index])
-            return '-'.join(final)
+                final.append(
+                    choice(
+                        PasswordGeneration.animals
+                    )
+                )
+            return '-'.join(final) + str(cls.generate_numeric_validator(length=2))
+
+        if style == "colors":
+            final = []
+            for i in range(length):
+                final.append(
+                    choice(
+                        PasswordGeneration.colors
+                    )
+                )
+            return '-'.join(final) + str(cls.generate_numeric_validator(length=2))
+
+        if style == "mixed":
+            final = []
+            for i in range(length):
+                final.append(
+                    choice(
+                        [*PasswordGeneration.animals, *PasswordGeneration.colors]
+                    )
+                )
+            return '-'.join(final) + str(cls.generate_numeric_validator(length=2))
+
         raise ValueError(f"Invalid style passed in {style}")
 
 
@@ -220,3 +244,48 @@ class PasswordGeneration:
                'Wildebeest', 'Wildfowl', 'Wolf', 'Wolverine', 'Wombat', 'Woodpecker', 'Worm', 'Wren',
                'Xerinae', 'Yak', 'Zebra', 'Alpaca', 'Cat', 'Cattle', 'Chicken', 'Dog', 'Donkey', 'Ferret',
                'Gayal', 'Goldfish', 'Guppy', 'Horse', 'Koi', 'Llama', 'Sheep', 'Yak']
+
+    colors = ['DarkViolet', 'MediumVioletRed', 'Rose', 'Avocado', 'Greenish', 'Blood', 'Sangria', 'Pastel',
+              'Night', 'Celeste', 'Ocean', 'Cloudy', 'Battleship', 'Oak', 'BlanchedAlmond', 'Gold', 'Slate',
+              'DarkGray', 'MidnightBlue', 'PeachPuff', 'Dark', 'Chartreuse', 'Bashful', 'PaleVioletRed',
+              'DarkTurquoise', 'Grapefruit', 'Sun', 'Eggplant', 'Golden', 'Cyan', 'Sand', 'LightYellow', 'Cobalt',
+              'Tron', 'Ruby', 'Mustard', 'AntiqueWhite', 'Western', 'Deep-Sea', 'Iron', 'LimeGreen', 'Orange',
+              'DarkCyan', 'Velvet', 'Clover', 'Butterfly', 'Jasmine', 'Fire', 'DarkSlateGray', 'Heliotrope',
+              'Scarlet', 'Medium', 'Unbleached', 'Dimorphotheca', 'Cornsilk', 'GoldenRod', 'Beer', 'Canary',
+              'DeepPink', 'Sunrise', 'SlateGray', 'Burnt', 'Algae', 'Granite', 'Baby', 'Cream', 'LightBlue', 'Tan',
+              'Yellow', 'Burgundy', 'Cherry', 'Papaya', 'Lapis', 'Robin', 'Mango', 'Blush', 'Blueberry', 'Roman',
+              'Bisque', 'Iceberg', 'Rosy', 'Teal', 'SeaShell', 'Copper', 'Pea', 'Jeans', 'Watermelon', 'Grayish',
+              'Flamingo', 'Rich', 'Navy', 'Raspberry', 'Lime', 'Halloween', 'RosyBrown', 'Tangerine', 'Sea',
+              'Wood', 'MediumOrchid', 'Shamrock', 'Chameleon', 'Glacial', 'BlueViolet', 'Deep', 'FloralWhite',
+              'Fall', 'Black', 'Marble', 'Hazel', 'Hot', 'DarkSalmon', 'LavenderBlush', 'Organic', 'Violet',
+              'MintCream', 'Slime', 'DarkSlateBlue', 'DodgerBlue', 'MediumSpringGreen', 'Bee', 'Jade', 'Sage',
+              'Egg', 'Neon', 'WhiteSmoke', 'Grape', 'LightCyan', 'Acid', 'Day', 'Earth', 'Olive', 'Balloon',
+              'Pine', 'Rice', 'OliveDrab', 'Tulip', 'Corn', 'Rosy-Finch', 'Dirty', 'Coffee', 'Vampire', 'Pig',
+              'Jellyfish', 'Salmon', 'Vermilion', 'Camouflage', 'IndianRed', 'Mint', 'Viola', 'Venom', 'Cookie',
+              'HoneyDew', 'MediumSeaGreen', 'DarkMagenta', 'Magic', 'DarkGoldenRod', 'Lipstick', 'Tomato',
+              'Lavender', 'LightSkyBlue', 'Midday', 'Seafoam', 'CornflowerBlue', 'GhostWhite', 'Carbon',
+              'PapayaWhip', 'Wheat', 'Harvest', 'SteelBlue', 'Gulf', 'Mauve', 'Champagne', 'DarkOliveGreen',
+              'PaleGoldenRod', 'Oil', 'Clematis', 'Deer', 'Purple', 'LightGray', 'Parchment', 'PaleTurquoise',
+              'Northern', 'MistyRose', 'Tea', 'Ginger', 'New', 'AliceBlue', 'Jungle', 'SlateBlue', 'Khaki',
+              'RebeccaPurple', 'Pale', 'Water', 'School', 'Sepia', 'Wisteria', 'LightPink', 'Stoplight', 'Seaweed',
+              'DimGray', 'Mocha', 'LightGoldenRodYellow', 'Donut', 'Basket', 'Dusty', 'Construction', 'Metallic',
+              'Chestnut', 'Light', 'Fuchsia', 'SeaGreen', 'Plum', 'RoyalBlue', 'BurlyWood', 'Azure', 'Very',
+              'Aztech', 'Gray', 'DarkSeaGreen', 'LemonChiffon', 'FireBrick', 'Dull', 'Brown', 'Ash', 'Denim',
+              'Dull-Sea', 'Sapphire', 'Carnation', 'Antique', 'Dragon', 'PaleGreen', 'LightSteelBlue', 'Cinnamon',
+              'Heavenly', 'Sonic', 'Coral', 'SkyBlue', 'Jet', 'Thistle', 'Beetle', 'Blonde', 'Red',
+              'MediumSlateBlue', 'HotPink', 'MediumBlue', 'DarkKhaki', 'Carrot', 'DeepSkyBlue', 'Taupe',
+              'Aquamarine', 'Pistachio', 'DarkOrange', 'Camel', 'Gainsboro', 'DarkRed', 'Linen', 'Kelly', 'Off',
+              'Macaw', 'Bullet', 'MediumPurple', 'Brass', 'Cardboard', 'Sienna', 'Midnight', 'Electric',
+              'CadetBlue', 'Chilli', 'Columbia', 'Vanilla', 'Puce', 'Snow', 'Bean', 'Cadillac', 'LightCoral',
+              'Soft', 'MediumTurquoise', 'Bold', 'NavajoWhite', 'Cantaloupe', 'Blue', 'Maroon', 'LightSlateGray',
+              'Cotton', 'Iguana', 'Chrome', 'DarkOrchid', 'Indigo', 'Moccasin', 'Orchid', 'Nebula', 'Milk', 'Fern',
+              'GreenYellow', 'Ferrari', 'Pearl', 'Bakers', 'Bright', 'Emerald', 'Beige', 'Army', 'Alien',
+              'Periwinkle', 'SpringGreen', 'Rubber', 'Chocolate', 'Charcoal', 'Tiger', 'Nardo', 'Rogue', 'Aqua',
+              'Lilac', 'PowderBlue', 'OrangeRed', 'SaddleBrown', 'DarkBlue', 'Hummingbird', 'White', 'Saffron',
+              'Old', 'LightSalmon', 'LightSeaGreen', 'OldLace', 'Cranberry', 'Zombie', 'Crocus', 'Windows', 'Frog',
+              'Peru', 'DarkGreen', 'Ivory', 'Love', 'Pink', 'Sky', 'Mahogany', 'French', 'SandyBrown', 'Dollar',
+              'Dinosaur', 'Sedona', 'ForestGreen', 'Mist', 'Smokey', 'Crystal', 'Iridium', 'Banana', 'Desert',
+              'LightGreen', 'Sandstone', 'Silver', 'Valentine', 'Silk', 'Green', 'Parrot', 'Macaroni', 'Caramel',
+              'Pumpkin', 'Indian', 'Crimson', 'Tiffany', 'Gunmetal', 'Salad', 'Platinum', 'MediumAquaMarine',
+              'Bronze', 'Lava', 'Peach', 'Tyrian', 'Rust', 'Petra', 'Lovely', 'Aloe', 'Blossom', 'Rat', 'Shocking',
+              'LawnGreen', 'YellowGreen', 'Turquoise']
