@@ -53,12 +53,10 @@ def index():
              src="{flask_imp_logo}" alt="logo">
         <div>
             <h1 style="margin: 0;">{name} blueprint</h1>
-            <cite>
-                <h3>Here's your new blueprint.</h3>
-                <p>
-                    Remember to double-check the config.toml file.
-                <p/>
-            </cite>
+            <h3>Here's your new blueprint.</h3>
+            <p>
+                Remember to double-check the config.toml file.
+            <p/>
         </div>
     </div>
 {{% endblock %}}
@@ -98,6 +96,8 @@ url_prefix = "/{url_prefix}"
 #static_folder = "static"
 template_folder = "templates"
 #static_url_path = "/static/{name}"
+#root_path = ""
+#cli_group = ""
 
 [session]
 #{name}_session = "yes"
