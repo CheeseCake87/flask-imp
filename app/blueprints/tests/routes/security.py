@@ -40,9 +40,21 @@ def set_permissions_value():
     return render_template(bp.tmpl("security.html"), permission="admin")
 
 
+@bp.route("/already-logged-in/bool/with-flash", methods=["GET"])
+@login_check("logged_in", True, pass_endpoint="tests.already_logged_in", message="Already logged in")
+def already_logged_in_bool():
+    return render_template(bp.tmpl("security.html"), logged_in_on=session.get("logged_in"))
+
+
 @bp.route("/must-be-logged-in/bool", methods=["GET"])
 @login_check("logged_in", True, "tests.login_failed")
 def must_be_logged_in_bool():
+    return render_template(bp.tmpl("security.html"), logged_in_on=True)
+
+
+@bp.route("/must-be-logged-in/bool/with-flash", methods=["GET"])
+@login_check("logged_in", True, "tests.login_failed", message="Login needed")
+def must_be_logged_in_bool_with_flash():
     return render_template(bp.tmpl("security.html"), logged_in_on=True)
 
 
@@ -78,7 +90,12 @@ def permission_check_adv():
 
 @bp.route("/login-failed", methods=["GET"])
 def login_failed():
-    return "Login failed"
+    return render_template(bp.tmpl("login_failed.html"))
+
+
+@bp.route("/already-logged-in", methods=["GET"])
+def already_logged_in():
+    return render_template(bp.tmpl("already_logged_in.html"))
 
 
 @bp.route("/permission-failed", methods=["GET"])

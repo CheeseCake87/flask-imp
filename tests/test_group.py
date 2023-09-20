@@ -92,6 +92,18 @@ def test_security_login_fail(client):
     assert b"Login failed" in response.data
 
 
+def test_security_login_fail_with_message(client):
+    client.get('/tests/logout')
+    response = client.get('/tests/must-be-logged-in/bool/with-flash', follow_redirects=True)
+    assert b"message:Login needed" in response.data
+
+
+def test_security_already_logged_in_pass_with_message(client):
+    client.get('/tests/login/bool')
+    response = client.get('/tests/must-be-logged-in/bool/with-flash', follow_redirects=True)
+    assert b"message:Already logged in" in response.data
+
+
 def test_permission_list(client):
     client.get('/tests/set-permission/list')
     response = client.get('/tests/must-have-permissions/std')

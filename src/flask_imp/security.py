@@ -1,5 +1,6 @@
 import typing as t
 from functools import wraps
+from functools import partial
 
 from flask import flash, abort
 from flask import redirect
@@ -66,12 +67,23 @@ def login_check(
     """
 
     def login_check_wrapper(func):
+
         @wraps(func)
         def inner(*args, **kwargs):
             skey = session.get(session_key)
 
+            def setup_flash(_message, _message_category):
+                if _message:
+                    partial_flash = partial(flash, _message)
+                    if _message_category:
+                        partial_flash(_message_category)
+                    else:
+                        partial_flash()
+
             if skey is None:
                 if fail_endpoint:
+                    setup_flash(message, message_category)
+
                     if endpoint_kwargs:
                         return redirect(url_for(fail_endpoint, **endpoint_kwargs))
 
@@ -82,8 +94,7 @@ def login_check(
             if skey is not None:
                 if _check_against_values_allowed(skey, values_allowed):
                     if pass_endpoint:
-                        if message:
-                            flash(message, message_category)
+                        setup_flash(message, message_category)
 
                         if endpoint_kwargs:
                             return redirect(url_for(pass_endpoint, **endpoint_kwargs))
@@ -93,6 +104,8 @@ def login_check(
                     return func(*args, **kwargs)
 
                 if fail_endpoint:
+                    setup_flash(message, message_category)
+
                     if endpoint_kwargs:
                         return redirect(url_for(fail_endpoint, **endpoint_kwargs))
 
@@ -141,14 +154,22 @@ def permission_check(
         def inner(*args, **kwargs):
             skey = session.get(session_key)
 
+            def setup_flash(_message, _message_category):
+                if _message:
+                    partial_flash = partial(flash, _message)
+                    if _message_category:
+                        partial_flash(_message_category)
+                    else:
+                        partial_flash()
+
             if skey:
                 if _check_against_values_allowed(skey, values_allowed):
                     return func(*args, **kwargs)
 
-            if message:
-                flash(message, message_category)
+            setup_flash(message, message_category)
 
             if fail_endpoint:
+
                 if endpoint_kwargs:
                     return redirect(url_for(fail_endpoint, **endpoint_kwargs))
 
