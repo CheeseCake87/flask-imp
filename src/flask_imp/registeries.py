@@ -1,5 +1,4 @@
 import typing as t
-from types import ModuleType
 
 from flask_sqlalchemy.model import DefaultMeta
 
@@ -17,7 +16,7 @@ class ModelRegistry:
                 f"Available models: {', '.join(self.registry.keys())}"
             )
 
-    def add(self, ref, model: t.Optional[ModuleType] = None):
+    def add(self, ref: str, model: t.Any):
         self.registry[ref] = model
 
     def class_(self, class_name: str) -> DefaultMeta:
