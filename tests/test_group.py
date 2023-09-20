@@ -100,7 +100,7 @@ def test_security_login_fail_with_message(client):
 
 def test_security_already_logged_in_pass_with_message(client):
     client.get('/tests/login/bool')
-    response = client.get('/tests/must-be-logged-in/bool/with-flash', follow_redirects=True)
+    response = client.get('/tests/already-logged-in/bool/with-flash', follow_redirects=True)
     assert b"message:Already logged in" in response.data
 
 
