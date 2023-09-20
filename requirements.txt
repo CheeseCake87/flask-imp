@@ -1,8 +1,8 @@
 Flask==2.3.3
 toml~=0.10.2
-Flask-SQLAlchemy==3.0.5
-typing-extensions==4.7.1
-sqlalchemy==2.0.20
+Flask-SQLAlchemy==3.1.1
+typing-extensions==4.8.0
+sqlalchemy==2.0.21
 click~=8.1.7
 pytest==7.4.2
-setuptools==68.2.0
+setuptools==68.2.2
