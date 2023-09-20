@@ -24,7 +24,8 @@ def login_int():
 
 @bp.route("/logout", methods=["GET"])
 def logout():
-    del session["logged_in"]
+    if session.get("logged_in"):
+        del session["logged_in"]
     return render_template(bp.tmpl("security.html"), logged_in=False)
 
 
