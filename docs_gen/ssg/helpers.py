@@ -11,6 +11,10 @@ def pytz_dt_now() -> datetime:
     return datetime.now(local_tz)
 
 
+def pytz_dt_epoch() -> float:
+    return pytz_dt_now().timestamp()
+
+
 def pytz_dt_now_str(mask: str = "%Y-%m-%d %H:%M:%S %z") -> str:
     return datetime.now(local_tz).strftime(mask)
 

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Initialising A Flask-Imp Project | Flask-Imp</title>
+    <link rel="stylesheet" href="static/water.css">
+    <link rel="stylesheet" href="static/pygments.emacs-dull.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+    <link rel="manifest" href="static/site.webmanifest">
+    <link rel="mask-icon" href="static/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+
+<aside>
+    <img width="50%" src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo">
+    <h1>Flask-Imp</h1>
+    <div><small>Last Updated:</small></div>
+    <div><small>Thu, 21 Sep 2023</small></div>
+    <h2>Menu</h2>
+    <ul>
+        <li><a href="index.html"><strong>Index</strong></a></li>
+    </ul>
+    <ul>
+
+        
+            
+                <li><strong>Getting Started</strong></li>
+            
+            
+                <ul style="padding-top: 5px; padding-left: 10px;">
+                    
+                        
+                            <li><a href="getting_started-installing_and_setup.html">Installing and Setup</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>CLI Commands</strong></li>
+            
+            
+                <ul style="padding-top: 5px; padding-left: 10px;">
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_init.html">flask-imp init</a></li>
+                        
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_blueprint.html">flask-imp blueprint</a></li>
+                        
+                    
+                </ul>
+            
+        
+    </ul>
+</aside>
+
+<section>
+    <h1 style="font-size: 2.6rem; margin: 0;">Initialising a Flask-Imp Project</h1>
+    <p>Flask-Imp has a cli command that deploys a new ready-to-go project.
+This project is structured in a way to give you the best idea of
+how to use Flask-Imp.</p>
+<h2>Create a new project</h2>
+<p>Make sure you are in the virtual environment, and at the root of your project folder, then run the following command:</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init
+</pre></div>
+<p>After running this command, you will be prompted to enter a name for your app:</p>
+<div class="highlight"><pre><span></span>~ $ flask-imp init
+What would you like to call your app? [app]:
+</pre></div>
+<p>'app' is the default name, so if you just press enter, your app will be called 'app'. You will then see this output:</p>
+<div class="highlight"><pre><span></span>===================
+Flask app deployed!
+===================
+ 
+&#39;/&#39; route is set by the blueprint named www
+found in the blueprints folder. It is encouraged
+to use blueprints to set all app routes.
+ 
+All app (non-blueprint) resources can be found
+in the global folder. Have a look through this
+folder to find out more.
+ 
+Your app has the default name of &#39;app&#39;
+Flask will automatically look for this!
+Run: flask run --debug
+</pre></div>
+<p>If you called your app something other than 'app', like 'new' for example, you will see:</p>
+<div class="highlight"><pre><span></span>===================
+Flask app deployed!
+===================
+ 
+&#39;/&#39; route is set by the blueprint named www
+found in the blueprints folder. It is encouraged
+to use blueprints to set all app routes.
+ 
+All app (non-blueprint) resources can be found
+in the global folder. Have a look through this
+folder to find out more.
+ 
+Your app has the name of &#39;new&#39;
+Run: flask --app new run --debug
+</pre></div>
+<p>As you can see from the output, it gives you instructions on how to start your app, depending on the name you gave it.</p>
+<h2>init Folder structure</h2>
+<p>You should see a new folder that has been given the name you specified in
+the <code>flask-imp init</code> command.</p>
+<p>This folder contains the following files and folders:</p>
+<div class="highlight"><pre><span></span>app/
+├── blueprints
+│   └── www
+│       ├── config.toml
+│       ├── __init__.py
+│       ├── routes
+│       │   └── index.py
+│       └── templates
+│           └── www
+│               └── index.html
+│
+├── extensions
+│   └── __init__.py
+│
+├── global
+│   ├── cli
+│   │   └── cli.py
+│   │
+│   ├── context_processors
+│   │   └── context_processors.py
+│   │
+│   ├── error_handlers
+│   │   └── error_handlers.py
+│   │
+│   ├── filters
+│   │   └── filters.py
+│   │
+│   ├── routes
+│   │   └── routes.py
+│   │
+│   ├── static
+│   │   ├── css
+│   │   │   └── water.css
+│   │   └── js
+│   │       └── main.js
+│   │
+│   └── templates
+│       ├── errors
+│       │   ├── 400.html
+│       │   ├── 401.html
+│       │   ├── 403.html
+│       │   ├── 404.html
+│       │   ├── 405.html
+│       │   └── 500.html
+│       │
+│       ├── extends
+│       │   └── main.html
+│       │
+│       ├── includes
+│       │   ├── footer.html
+│       │   └── header.html
+│       │
+│       └── index.html
+│
+├── models
+│   ├── example_user_table.py
+│   └── __init__.py
+│    
+├── __init__.py
+└── default.config.toml
+</pre></div>
+
+</section>
+
+</body>
+</html>

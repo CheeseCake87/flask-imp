@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generate A Flask-Imp Blueprint | Flask-Imp</title>
+    <link rel="stylesheet" href="static/water.css">
+    <link rel="stylesheet" href="static/pygments.emacs-dull.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+    <link rel="manifest" href="static/site.webmanifest">
+    <link rel="mask-icon" href="static/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+
+<aside>
+    <img width="50%" src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo">
+    <h1>Flask-Imp</h1>
+    <div><small>Last Updated:</small></div>
+    <div><small>Thu, 21 Sep 2023</small></div>
+    <h2>Menu</h2>
+    <ul>
+        <li><a href="index.html"><strong>Index</strong></a></li>
+    </ul>
+    <ul>
+
+        
+            
+                <li><strong>Getting Started</strong></li>
+            
+            
+                <ul style="padding-top: 5px; padding-left: 10px;">
+                    
+                        
+                            <li><a href="getting_started-installing_and_setup.html">Installing and Setup</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>CLI Commands</strong></li>
+            
+            
+                <ul style="padding-top: 5px; padding-left: 10px;">
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_init.html">flask-imp init</a></li>
+                        
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_blueprint.html">flask-imp blueprint</a></li>
+                        
+                    
+                </ul>
+            
+        
+    </ul>
+</aside>
+
+<section>
+    <h1 style="font-size: 2.6rem; margin: 0;">Generate a Flask-Imp Blueprint</h1>
+    <p>Flask-Imp has its own type of blueprint. It can read some configuration from a toml file and has some extra methods for
+auto importing. To generate a Flask-Imp blueprint, run the following command:</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>blueprint
+</pre></div>
+<p>After running this command, you will be prompted to enter the location of where you want to create your blueprint:</p>
+<div class="highlight"><pre><span></span>~ $ flask-imp blueprint
+(Creation is relative to the current working directory)
+Folder to create blueprint in [Current Working Directory]:
+</pre></div>
+<p>As detailed in the prompt, the creation of the blueprint is relative to the current working directory. So to create a
+blueprint in the folder <code>app/blueprints</code>, you would enter <code>app/blueprints</code> in the prompt.</p>
+<div class="highlight"><pre><span></span>(Creation is relative to the current working directory)
+Folder to create blueprint in [Current Working Directory]: app/blueprints
+</pre></div>
+<p>You will then be prompted to enter a name for your blueprint:</p>
+<div class="highlight"><pre><span></span>(Creation is relative to the current working directory)
+Folder to create blueprint in [Current Working Directory]: app/blueprints 
+Name of the blueprint to create [my_new_blueprint]:
+</pre></div>
+<p>The default name is 'my_new_blueprint', we will change this to 'admin'</p>
+<div class="highlight"><pre><span></span>(Creation is relative to the current working directory)
+Folder to create blueprint in [Current Working Directory]: app/blueprints 
+Name of the blueprint to create [my_new_blueprint]: admin
+</pre></div>
+<p>After creating your blueprint, the folder structure will look like this:</p>
+<div class="highlight"><pre><span></span>app/
+├── blueprints
+│   └── admin
+│       ├── routes
+│       │   └── index.py
+│       ├── static
+│       │   └── water.css
+│       ├── templates
+│       │   └── admin
+│       │       ├── extends
+│       │       │   └── main.html
+│       │       └── index.html
+│       ├── config.toml
+│       └── __init__.py
+...
+</pre></div>
+<p>This is a self-contained blueprint, so it has its own static, templates and routes folders. You can now navigate '
+/admin'</p>
+
+</section>
+
+</body>
+</html>
