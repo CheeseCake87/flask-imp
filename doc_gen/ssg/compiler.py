@@ -55,7 +55,7 @@ def replace_post_date(content: str, new_date: str) -> str:
     )
 
 
-def compiler(docs_dir: Path, markdown_dir: Path, recompile: bool = False):
+def compiler(docs_dir: Path, markdown_dir: Path):
     docs_dir.mkdir(exist_ok=True)
     markdown_dir.mkdir(exist_ok=True)
 
