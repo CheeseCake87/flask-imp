@@ -1,0 +1,29 @@
+<aside>
+    <img width="50%" src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo">
+    <h1>Flask-Imp</h1>
+    <div><small>Last Updated:</small></div>
+    <div><small>{{ date }}</small></div>
+    <h2>Menu</h2>
+    <ul>
+        <li><a href="index.html"><strong>Index</strong></a></li>
+    </ul>
+    <ul>
+
+        {% for title, values in menu.items() %}
+            {% if values["page"] %}
+                <li><a href="{{ values["page"] }}"><strong>{{ title }}</strong></a></li>
+            {% else %}
+                <li><strong>{{ title }}</strong></li>
+            {% endif %}
+            {% if values["pages"] %}
+                <ul style="padding-top: 5px; padding-left: 10px;">
+                    {% for page in values["pages"] %}
+                        {% if page[page.keys()|list|first] %}
+                            <li><a href="{{ page[page.keys()|list|first] }}">{{ page.keys()|list|first }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</aside>
