@@ -1,0 +1,10 @@
+<form method="post" action="{{ url_for('post_to_me_pass') }}">
+    <input type="hidden" value="{{ crsf }}" name="csrf">
+    <input type="submit" value="submit">
+</form>
+
+
+<form method="post" action="{{ url_for('post_to_me_fail') }}">
+    <input type="hidden" value="asdasd" name="csrf">
+    <input type="submit" value="submit">
+</form>

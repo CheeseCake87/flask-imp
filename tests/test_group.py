@@ -119,3 +119,19 @@ def test_permission_value(client):
 def test_permission_fail(client):
     response = client.get('/tests/must-have-permissions/adv', follow_redirects=True)
     assert b"Permission failed" in response.data
+
+
+def test_csrf_pass(client):
+    session = client.get('/tests/csrf-session')
+    response = client.post(
+        '/tests/csrf-post-pass', data={'csrf': session.data.decode('utf-8')}
+    )
+    assert response.status_code == 200
+
+
+def test_csrf_fail(client):
+    client.get('/tests/csrf-session')
+    response = client.post(
+        '/tests/csrf-post-fail', data={'csrf': '000'}
+    )
+    assert response.status_code == 401

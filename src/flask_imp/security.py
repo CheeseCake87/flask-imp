@@ -2,10 +2,14 @@ import typing as t
 from functools import wraps
 from functools import partial
 
-from flask import flash, abort
+from flask import flash
+from flask import abort
 from flask import redirect
 from flask import session
 from flask import url_for
+from flask import request
+
+from flask_imp import Auth
 
 
 def _check_against_values_allowed(
@@ -227,3 +231,35 @@ def api_login_check(
         return inner
 
     return api_login_check_wrapper
+
+
+def include_csrf(session_key: str = "csrf", form_key: str = "csrf"):
+    """
+    A decorator that handles CSRF protection.
+    """
+    def include_csrf_wrapper(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            if request.method == "GET":
+                session[session_key] = Auth.generate_form_token()
+
+                return func(*args, **kwargs)
+
+            if request.method == "POST":
+                _session_key = session.get(session_key)
+                _form_key = request.form.get(form_key)
+
+                if _form_key is None:
+                    return abort(401)
+
+                if _session_key is None:
+                    return abort(401)
+
+                if _session_key != _form_key:
+                    return abort(401)
+
+            return func(*args, **kwargs)
+
+        return inner
+
+    return include_csrf_wrapper
