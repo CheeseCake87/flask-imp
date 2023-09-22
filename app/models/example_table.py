@@ -4,6 +4,10 @@ from app import db
 from flask_imp.utilities import class_field
 
 
+def example_function():
+    print("example_function printed this message")
+
+
 class ExampleTable(db.Model):
     example_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey(class_field("ExampleUser", "user_id")))
