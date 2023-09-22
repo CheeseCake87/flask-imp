@@ -1,4 +1,5 @@
 import re
+import itertools
 from dataclasses import dataclass
 from datetime import datetime
 from hashlib import sha1, sha256, sha512
@@ -13,8 +14,13 @@ class Auth:
     def is_email_address_valid(cls, email_address: str) -> bool:
         """
         Checks if email_address is a valid email address.
-        :param email_address:
-        :return bool:
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param email_address: str
+        :return: bool
         """
         pattern = re.compile(
             r"[a-z\d!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?",
@@ -25,11 +31,27 @@ class Auth:
     @classmethod
     def is_username_valid(cls, username: str, allowed: str = "all") -> bool:
         """
-        Allowed options: "all", "dot", "dash", "under"
-        Checks if a username is valid. Valid usernames can only include
-        letters, numbers, ., -, and _ but can not begin or end with the last three mentioned
-        :param allowed:
-        :param username:
+        Checks if a username is valid.
+
+        :raw-html:`<br />`
+
+        Valid usernames can only include letters, numbers, ., -, and _ but cannot begin or end with
+        the last three mentioned.
+
+        :raw-html:`<br />`
+
+        -----
+
+        .. note::
+
+            This method is unstable and needs to be reworked.
+        
+        :raw-html:`<br />`
+
+        -----
+
+        :param username: str
+        :param allowed: str - "all", "dot", "dash", "under" - defaults to "all"
         :return bool:
         """
         matches = list()
@@ -52,28 +74,63 @@ class Auth:
         return False
 
     @classmethod
-    def generate_form_token(cls) -> str:
+    def generate_csrf_token(cls) -> str:
         """
-        Generates a SHA1 using today's date and time.
-        :return str: hash:
+        Generates a SHA1 using the current date and time.
+
+        :raw-html:`<br />`
+
+        For use in Cross-Site Request Forgery.
+
+        :raw-html:`<br />`
+
+        -----
+
+        :return: str - sha1
         """
         sha = sha1()
         sha.update(str(datetime.now()).encode("utf-8"))
         return sha.hexdigest()
 
     @classmethod
+    def generate_form_token(cls) -> str:
+        """
+        Been renamed to generate_csrf_token
+        """
+        return cls.generate_csrf_token()
+
+    @classmethod
     def generate_salt(cls) -> str:
         """
-        Generates a string of 4 special characters, for use in password salting
-        :return str:
+        Generates a string of 4 special characters (punctuation).
+
+        :raw-html:`<br />`
+
+        For use in password salting
+
+        :raw-html:`<br />`
+
+        -----
+
+        :return: str - salt of length 4
         """
         return "".join(choice(punctuation) for _ in range(4))
 
     @classmethod
     def generate_private_key(cls, hook: str) -> str:
         """
-        Generates a private key for api access from a passed in hook value.
-        :return str: hash:
+        Generates a sha256 private key from a passed in hook value.
+        
+        :raw-html:`<br />`
+        
+        For use in any private key generation.
+        
+        :raw-html:`<br />`
+
+        -----
+
+        :param hook: str - hook value to generate private key from
+        :return: str - sha256
         """
         sha = sha256()
         sha.update(hook.encode("utf-8"))
@@ -83,7 +140,16 @@ class Auth:
     def generate_numeric_validator(cls, length: int) -> int:
         """
         Generates (length) of random numbers.
-        :return str:
+        
+        :raw-html:`<br />`
+        
+        For use in MFA email, or unique filename generation.
+
+        :raw-html:`<br />`
+
+        -----
+        :param length: int - length of number to generate
+        :return: int - number between 1111 and 9999 if length is 4
         """
         start = int("1" * length)
         end = int("9" * length)
@@ -92,110 +158,194 @@ class Auth:
     @classmethod
     def generate_email_validator(cls) -> str:
         """
-        Generates a string of 8 random numbers, for use in MFA email
-        :return str:
+        Uses generate_numeric_validator with a length of 8 to 
+        generate a random number for the specific use of
+        validating accounts via email.
+        
+        :raw-html:`<br />`
+        
+        See `generate_numeric_validator` for more information.
+        
+        :raw-html:`<br />`
+
+        -----
+        
+        :return: str - number between 11111111 and 99999999
         """
         return str(cls.generate_numeric_validator(length=8))
 
     @classmethod
-    def generate_pepper(cls, password: str):
+    def generate_pepper(cls, password: str, length: int = 1) -> str:
         """
         Chooses a random letter from ascii_letters and joins it onto the user's password,
         this is used to pepper the password
-        :param password:
-        :return str:
+
+        :raw-html:`<br />`
+
+        For use in password hashing.
+
+        :raw-html:`<br />`
+
+        .. Note::
+
+            length is capped at 3.
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param password: str - user's password
+        :param length: int - length of pepper - defaults to 1, capped at 3
+        :return: str - peppered password
         """
-        return "".join(choice(ascii_letters) for _ in range(1)) + password
+        if length > 3:
+            length = 3
+
+        return "".join(choice(ascii_letters) for _ in range(length)) + password
 
     @classmethod
-    def hash_password(cls, password: str, salt: str, encrypt: int = 512) -> str:
+    def hash_password(cls, password: str, salt: str, encrypt: int = 512, pepper_length: int = 1) -> str:
         """
-        Takes user's password, peppers in, salts it, then converts it to sha
-        Can set encryption to 256/512 - 256 is system
-        :param password:
-        :param salt:
-        :param encrypt:
+        Takes the plain password, applies a pepper, salts it, then converts it to sha
+
+        :raw-html:`<br />`
+
+        Can set encryption to 256 or 512.
+
+        :raw-html:`<br />`
+
+        For use in password hashing.
+
+        :raw-html:`<br />`
+
+        .. Note::
+
+            pepper_length is capped at 3.
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param password: str - plain password
+        :param salt: str - salt
+        :param encrypt: int - 256 or 512 - defaults to 512
+        :param pepper_length: int - length of pepper
         :return str: hash:
         """
+        if pepper_length > 3:
+            pepper_length = 3
+
         sha = sha512() if encrypt == 512 else sha256()
-        sha.update((cls.generate_pepper(password) + salt).encode("utf-8"))
+        sha.update((cls.generate_pepper(password, pepper_length) + salt).encode("utf-8"))
         return sha.hexdigest()
 
     @classmethod
-    def sha_password(cls, password: str, salt: str, encrypt: int = 512) -> str:
+    def sha_password(cls, password: str, salt: str, encrypt: int = 512, pepper_length: int = 1) -> str:
         """ Legacy method, use hash_password instead """
-        return cls.hash_password(password, salt, encrypt)
+        return cls.hash_password(password, salt, encrypt, pepper_length)
 
     @classmethod
-    def auth_password(cls, input_password: str, database_password: str, database_salt: str,
-                      encrypt: int = 512) -> bool:
+    def auth_password(
+            cls,
+            input_password: str,
+            database_password: str,
+            database_salt: str,
+            encrypt: int = 512,
+            pepper_length: int = 1
+    ) -> bool:
         """
-        Takes user's password (input_password), loops over all possible ascii_letters joining
-        to the password as a pepper, then salts using salt value in the database, then converts it
-        to sha, then compares that loop result to the database password to find a match
-        Can set encryption to 256/512 - 256 is system
-        :param input_password: str
-        :param database_password: str
-        :param database_salt: str
-        :param encrypt: int
-        :return bool:
+        Takes plain password, the stored hashed password along with the stored salt
+        and tries every possible combination of pepper values to find a match.
+
+        :raw-html:`<br />`
+
+        For use in password authentication.
+
+        :raw-html:`<br />`
+
+        .. Note::
+
+            pepper_length is capped at 3.
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param input_password: str - plain password
+        :param database_password: str - hashed password from database
+        :param database_salt: str - salt from database
+        :param encrypt: int - encryption used to generate database password
+        :param pepper_length: int - length of pepper used to generate database password
+        :return: bool - True if match, False if not
         """
-        for letter in list(ascii_letters):
+
+        if pepper_length > 3:
+            pepper_length = 3
+
+        guesses = [''.join(i) for i in itertools.product(ascii_letters, repeat=pepper_length)]
+
+        for index, guess in enumerate(guesses):
             sha = sha512() if encrypt == 512 else sha256()
-            sha.update((letter + input_password + database_salt).encode("utf-8"))
+            sha.update((guess + input_password + database_salt).encode("utf-8"))
             if sha.hexdigest() == database_password:
                 return True
+
         return False
 
     @classmethod
     def generate_password(cls, style: str = "mixed", length: int = 3) -> str:
         """
-        style options: "animals", "colors", "mixed"
+        Generates a plain text password based on choice of style and length.
+        2 random numbers are appended to the end of every generated password.
 
-        Will return a plain text password based on choice of style and length.
+        :raw-html:`<br />`
 
-        Combinations available:
+        style options: "animals", "colors", "mixed" - defaults to "mixed"
 
-        style: str "animals", length: int <number of animals returned>
+        :raw-html:`<br />`
 
-        :param style: str
-        :param length: int
-        :return: str:
+        **Example use:**
+
+        .. code-block::
+
+            Auth.generate_password(style="animals", length=3)
+
+        :raw-html:`<br />`
+
+        **Output:**
+
+        Cat-Goat-Pig12
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param style: str - "animals", "colors", "mixed" - defaults to "mixed"
+        :param length: int - how many words are chosen - defaults to 3
+        :return: str - a generated plain text password
         """
         if style == "animals":
-            final = []
-            for i in range(length):
-                final.append(
-                    choice(
-                        PasswordGeneration.animals
-                    )
-                )
-            return '-'.join(final) + str(cls.generate_numeric_validator(length=2))
+            return '-'.join(
+                [choice(PasswordGeneration.animals) for _ in range(length)]
+            ) + str(cls.generate_numeric_validator(length=2))
 
         if style == "colors":
-            final = []
-            for i in range(length):
-                final.append(
-                    choice(
-                        PasswordGeneration.colors
-                    )
-                )
-            return '-'.join(final) + str(cls.generate_numeric_validator(length=2))
+            return '-'.join(
+                [choice(PasswordGeneration.colors) for _ in range(length)]
+            ) + str(cls.generate_numeric_validator(length=2))
 
         if style == "mixed":
-            final = []
-            for i in range(length):
-                final.append(
-                    choice(
-                        [*PasswordGeneration.animals, *PasswordGeneration.colors]
-                    )
-                )
-            return '-'.join(final) + str(cls.generate_numeric_validator(length=2))
+            return '-'.join(
+                [choice([
+                    *PasswordGeneration.animals,
+                    *PasswordGeneration.colors
+                ]) for _ in range(length)]
+            ) + str(cls.generate_numeric_validator(length=2))
 
         raise ValueError(f"Invalid style passed in {style}")
 
 
-@dataclass
+@dataclass(frozen=True)
 class PasswordGeneration:
     """
     This is a bank of words used to generate random passwords.
@@ -289,3 +439,89 @@ class PasswordGeneration:
               'Pumpkin', 'Indian', 'Crimson', 'Tiffany', 'Gunmetal', 'Salad', 'Platinum', 'MediumAquaMarine',
               'Bronze', 'Lava', 'Peach', 'Tyrian', 'Rust', 'Petra', 'Lovely', 'Aloe', 'Blossom', 'Rat', 'Shocking',
               'LawnGreen', 'YellowGreen', 'Turquoise']
+
+
+if __name__ == '__main__':
+    import timeit
+    import statistics
+    import functools
+
+    # on page testing:
+
+    pepper_lengths = [1, 2, 3]
+    runs = 100
+    results: list[str] = []
+
+    print("Testing password hashing and guessing speed, please wait...")
+
+
+    def auth_password(pl: int, cor_pass: bool):
+        incorrect_pass = Auth.generate_password()
+        correct_pass = Auth.generate_password()
+        db_salt = Auth.generate_salt()
+        db_pass = Auth.hash_password(correct_pass, db_salt, pepper_length=pl)
+
+        if cor_pass:
+            Auth.auth_password(correct_pass, db_pass, db_salt, pepper_length=pl)
+        else:
+            Auth.auth_password(incorrect_pass, db_pass, db_salt, pepper_length=pl)
+
+
+    for _pepper_length in pepper_lengths:
+        times = []
+        for i in range(runs):
+            times.append(
+                timeit.timeit(
+                    functools.partial(auth_password, _pepper_length, True),
+                    number=1
+                )
+            )
+        results.append(
+            f"# Avr time: {statistics.mean(times):.4f} seconds, for "
+            f"pepper length of {_pepper_length} ({runs} runs, correct password given)"
+        )
+
+    for _pepper_length in pepper_lengths:
+        times = []
+        for i in range(runs):
+            times.append(
+                timeit.timeit(
+                    functools.partial(auth_password, _pepper_length, False),
+                    number=1
+                )
+            )
+        results.append(
+            f"# Avr time: {statistics.mean(times):.4f} seconds, for "
+            f"pepper length of {_pepper_length} ({runs} runs, incorrect password given)"
+        )
+
+    for result in results:
+        print(result)
+
+# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, correct password given)
+# Avr time: 0.0020 seconds, for pepper length of 2 (100 runs, correct password given)
+# Avr time: 0.1132 seconds, for pepper length of 3 (100 runs, correct password given)
+# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, incorrect password given)
+# Avr time: 0.0040 seconds, for pepper length of 2 (100 runs, incorrect password given)
+# Avr time: 0.1944 seconds, for pepper length of 3 (100 runs, incorrect password given)
+
+# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, correct password given)
+# Avr time: 0.0020 seconds, for pepper length of 2 (100 runs, correct password given)
+# Avr time: 0.1026 seconds, for pepper length of 3 (100 runs, correct password given)
+# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, incorrect password given)
+# Avr time: 0.0037 seconds, for pepper length of 2 (100 runs, incorrect password given)
+# Avr time: 0.2049 seconds, for pepper length of 3 (100 runs, incorrect password given)
+
+# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, correct password given)
+# Avr time: 0.0024 seconds, for pepper length of 2 (100 runs, correct password given)
+# Avr time: 0.1066 seconds, for pepper length of 3 (100 runs, correct password given)
+# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, incorrect password given)
+# Avr time: 0.0035 seconds, for pepper length of 2 (100 runs, incorrect password given)
+# Avr time: 0.1947 seconds, for pepper length of 3 (100 runs, incorrect password given)
+
+# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, correct password given)
+# Avr time: 0.0020 seconds, for pepper length of 2 (100 runs, correct password given)
+# Avr time: 0.1036 seconds, for pepper length of 3 (100 runs, correct password given)
+# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, incorrect password given)
+# Avr time: 0.0037 seconds, for pepper length of 2 (100 runs, incorrect password given)
+# Avr time: 0.1989 seconds, for pepper length of 3 (100 runs, incorrect password given)
