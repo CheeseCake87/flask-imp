@@ -36,7 +36,7 @@ def if_env_replace(
         ignore_missing_env_variables: bool = False
 ) -> t.Any:
     """
-    Looks for the replacement pattern to swap out values in the config from_file with environment variables.
+    Looks for the replacement pattern to swap out values in the config file with environment variables.
     """
     pattern = re.compile(r'<(.*?)>')
 
@@ -55,6 +55,10 @@ def process_dict(
         ignore_missing_env_variables: bool = False,
         crawl: bool = False
 ) -> dict:
+    """
+    Used to process the config from_file dictionary and replace environment variables. Turns all keys to upper case.
+    """
+
     if this_dict is None:
         return {}
 
@@ -81,6 +85,9 @@ def process_dict(
 
 
 def cast_to_import_str(app_name: str, folder_path: Path) -> str:
+    """
+    Takes the folder path and converts it to a string that can be imported
+    """
     folder_parts = folder_path.parts
     parts = folder_parts[folder_parts.index(app_name):]
     if sys.version_info.major == 3:
@@ -110,6 +117,9 @@ def class_field(class_: str, field: str) -> str:
 
 
 def cast_to_bool(value: t.Union[str, bool, None]) -> bool:
+    """
+    Casts an array of truly string values to a boolean. Used for config files.
+    """
     if value is None:
         return False
     if isinstance(value, bool):
