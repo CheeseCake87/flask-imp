@@ -45,7 +45,6 @@ class Auth:
         .. note::
 
             This method is unstable and needs to be reworked.
-        
         :raw-html:`<br />`
 
         -----
@@ -120,11 +119,10 @@ class Auth:
     def generate_private_key(cls, hook: str) -> str:
         """
         Generates a sha256 private key from a passed in hook value.
-        
+
         :raw-html:`<br />`
-        
         For use in any private key generation.
-        
+
         :raw-html:`<br />`
 
         -----
@@ -158,7 +156,7 @@ class Auth:
     @classmethod
     def generate_email_validator(cls) -> str:
         """
-        Uses generate_numeric_validator with a length of 8 to 
+        Uses generate_numeric_validator with a length of 8 to
         generate a random number for the specific use of
         validating accounts via email.
         
@@ -439,89 +437,3 @@ class PasswordGeneration:
               'Pumpkin', 'Indian', 'Crimson', 'Tiffany', 'Gunmetal', 'Salad', 'Platinum', 'MediumAquaMarine',
               'Bronze', 'Lava', 'Peach', 'Tyrian', 'Rust', 'Petra', 'Lovely', 'Aloe', 'Blossom', 'Rat', 'Shocking',
               'LawnGreen', 'YellowGreen', 'Turquoise']
-
-
-if __name__ == '__main__':
-    import timeit
-    import statistics
-    import functools
-
-    # on page testing:
-
-    pepper_lengths = [1, 2, 3]
-    runs = 100
-    results: list[str] = []
-
-    print("Testing password hashing and guessing speed, please wait...")
-
-
-    def auth_password(pl: int, cor_pass: bool):
-        incorrect_pass = Auth.generate_password()
-        correct_pass = Auth.generate_password()
-        db_salt = Auth.generate_salt()
-        db_pass = Auth.hash_password(correct_pass, db_salt, pepper_length=pl)
-
-        if cor_pass:
-            Auth.auth_password(correct_pass, db_pass, db_salt, pepper_length=pl)
-        else:
-            Auth.auth_password(incorrect_pass, db_pass, db_salt, pepper_length=pl)
-
-
-    for _pepper_length in pepper_lengths:
-        times = []
-        for i in range(runs):
-            times.append(
-                timeit.timeit(
-                    functools.partial(auth_password, _pepper_length, True),
-                    number=1
-                )
-            )
-        results.append(
-            f"# Avr time: {statistics.mean(times):.4f} seconds, for "
-            f"pepper length of {_pepper_length} ({runs} runs, correct password given)"
-        )
-
-    for _pepper_length in pepper_lengths:
-        times = []
-        for i in range(runs):
-            times.append(
-                timeit.timeit(
-                    functools.partial(auth_password, _pepper_length, False),
-                    number=1
-                )
-            )
-        results.append(
-            f"# Avr time: {statistics.mean(times):.4f} seconds, for "
-            f"pepper length of {_pepper_length} ({runs} runs, incorrect password given)"
-        )
-
-    for result in results:
-        print(result)
-
-# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, correct password given)
-# Avr time: 0.0020 seconds, for pepper length of 2 (100 runs, correct password given)
-# Avr time: 0.1132 seconds, for pepper length of 3 (100 runs, correct password given)
-# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, incorrect password given)
-# Avr time: 0.0040 seconds, for pepper length of 2 (100 runs, incorrect password given)
-# Avr time: 0.1944 seconds, for pepper length of 3 (100 runs, incorrect password given)
-
-# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, correct password given)
-# Avr time: 0.0020 seconds, for pepper length of 2 (100 runs, correct password given)
-# Avr time: 0.1026 seconds, for pepper length of 3 (100 runs, correct password given)
-# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, incorrect password given)
-# Avr time: 0.0037 seconds, for pepper length of 2 (100 runs, incorrect password given)
-# Avr time: 0.2049 seconds, for pepper length of 3 (100 runs, incorrect password given)
-
-# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, correct password given)
-# Avr time: 0.0024 seconds, for pepper length of 2 (100 runs, correct password given)
-# Avr time: 0.1066 seconds, for pepper length of 3 (100 runs, correct password given)
-# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, incorrect password given)
-# Avr time: 0.0035 seconds, for pepper length of 2 (100 runs, incorrect password given)
-# Avr time: 0.1947 seconds, for pepper length of 3 (100 runs, incorrect password given)
-
-# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, correct password given)
-# Avr time: 0.0020 seconds, for pepper length of 2 (100 runs, correct password given)
-# Avr time: 0.1036 seconds, for pepper length of 3 (100 runs, correct password given)
-# Avr time: 0.0001 seconds, for pepper length of 1 (100 runs, incorrect password given)
-# Avr time: 0.0037 seconds, for pepper length of 2 (100 runs, incorrect password given)
-# Avr time: 0.1989 seconds, for pepper length of 3 (100 runs, incorrect password given)

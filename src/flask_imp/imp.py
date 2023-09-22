@@ -202,11 +202,13 @@ class Imp:
 
         :raw-html:`<br />`
 
-        scope_root_folders_to=["cli", "routes"] => will only import files from `<folder>/cli/\*.py` and `<folder>/routes/*.py`
+        scope_root_folders_to=["cli", "routes"] => will only import files from `<folder>/cli/*.py`
+        and `<folder>/routes/*.py`
 
         :raw-html:`<br />`
 
-        scope_root_files_to=["cli.py", "routes.py"] => will only import the files `<folder>/cli.py` and `<folder>/routes.py`
+        scope_root_files_to=["cli.py", "routes.py"] => will only import the files `<folder>/cli.py`
+        and `<folder>/routes.py`
 
         :raw-html:`<br />`
 
