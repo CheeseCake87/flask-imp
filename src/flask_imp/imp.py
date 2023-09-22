@@ -12,7 +12,7 @@ from flask import Blueprint
 from flask import session
 from flask_sqlalchemy.model import DefaultMeta
 
-from .helpers import init_app_config
+from .helpers import _init_app_config
 from .registeries import ModelRegistry
 from .utilities import cast_to_import_str
 
@@ -52,12 +52,27 @@ class Imp:
 
         """
         Initializes the flask app to work with flask-imp.
+        
+        :raw-html:`<br />`
+        
+        If no `app_config_file` specified, an attempt to read `IMP_CONFIG` from the environment will be made.
+
+        :raw-html:`<br />`
+
+        If `IMP_CONFIG` is not in the environment variables, an attempt to load `default.config.toml` will be made.
+
+        :raw-html:`<br />`
+
+        `default.config.toml` will be created, and used if not found.
+
+        :raw-html:`<br />`
+
+        -----
 
         :param app: The flask app to initialize.
         :param app_config_file: The config file to use.
-        If not given will attempt to read from the environment.
-        If no environment variable is found will use default.config.toml, which will be created if not found.
-        :param ignore_missing_env_variables: If set to True will ignore missing environment variables.
+        :param ignore_missing_env_variables: Will ignore missing environment variables in the config if set to True.
+        :return: None
         """
 
         if app is None:
@@ -77,7 +92,7 @@ class Imp:
 
         self.__model_registry__ = ModelRegistry()
 
-        self.config = init_app_config(
+        self.config = _init_app_config(
             self.config_path,
             ignore_missing_env_variables,
             self._app
@@ -93,18 +108,117 @@ class Imp:
             scope_root_files_to: Optional[List] = None,
     ) -> None:
         """
-        Import standard app resources from a single folder.
+        Import standard app resources from the specified folder.
 
-        :param folder: The folder to import from.
-        Must be relative.
+        :raw-html:`<br />`
+
+        This will import any resources that have been set to the Flask app. Routes, context processors, cli, etc.
+
+        :raw-html:`<br />`
+
+        **Can only be called once.**
+
+        :raw-html:`<br />`
+
+        If no static folder is found, the static folder will be set to None in the Flask app config.
+
+        :raw-html:`<br />`
+
+        **Small example of usage:**
+
+        :raw-html:`<br />`
+
+        .. code-block:: text
+
+            imp.import_app_resources(folder="global")
+
+        ...
+        :raw-html:`<br />`
+
+        ---
+        `global` folder structure
+        ---
+
+        .. code-block:: text
+
+            app
+            ├── global
+            │   ├── routes.py
+            │   ├── app_fac.py
+            │   ├── static
+            │   │   └── css
+            │   │       └── style.css
+            │   └── templates
+            │       └── index.html
+            └── ...
+        ...
+        :raw-html:`<br />`
+
+        ---
+        `routes.py` file
+        ---
+
+        .. code-block::
+
+            from flask import current_app as app
+            from flask import render_template
+
+            @app.route("/")
+            def index():
+                return render_template("index.html")
+
+        :raw-html:`<br />`
+
+        **How app app_factories work**
+
+        :raw-html:`<br />`
+
+        app_factories are functions that are called when importing the app resources. Here's an example:
+
+        :raw-html:`<br />`
+
+        .. code-block::
+
+            imp.import_app_resources(folder="global", app_factories=["development_cli"])
+
+        :raw-html:`<br />`
+
+        ["development_cli"] => development_cli(app) function will be called, and the current app will be passed in.
+
+        :raw-html:`<br />`
+
+        --- `app_fac.py` file ---
+
+        .. code-block::
+
+            def development_cli(app):
+                @app.cli.command("dev")
+                def dev():
+                    print("dev cli command")
+
+        :raw-html:`<br />`
+
+        **How to scope the import**
+
+        :raw-html:`<br />`
+
+        scope_root_folders_to=["cli", "routes"] => will only import files from `<folder>/cli/\*.py` and `<folder>/routes/*.py`
+
+        :raw-html:`<br />`
+
+        scope_root_files_to=["cli.py", "routes.py"] => will only import the files `<folder>/cli.py` and `<folder>/routes.py`
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param folder: The folder to import from, must be relative.
         :param app_factories: A list of function names to call with the app instance.
-        ["collection"] => collection(app) will be called
         :param static_folder: The name of the static folder (if not found will be set to None)
         :param templates_folder: The name of the templates folder (if not found will be set to None)
         :param scope_root_folders_to: A list of folders to scope the import to
-        ["cli", "routes"] => will only import from folder/cli/*.py and folder/routes/*.py
         :param scope_root_files_to: A list of files to scope the import to
-        ["cli.py", "routes.py"] => will only import from folder/cli.py and folder/routes.py
+        :return: None
         """
 
         if app_factories is None:
@@ -182,8 +296,21 @@ class Imp:
 
     def init_session(self) -> None:
         """
-        Initialize the session variables found in the config.
-        Use this method in the before_request route.
+        Initialize the session variables found in the config. Commonly used in `app.before_request`.
+
+        :raw-html:`<br />`
+
+        .. code-block::
+
+            @app.before_request
+            def before_request():
+                imp.init_session()
+
+        :raw-html:`<br />`
+
+        -----
+
+        :return: None
         """
         if self.config.get("SESSION"):
             for key, value in self.config.get("SESSION", {}).items():
@@ -192,10 +319,115 @@ class Imp:
 
     def import_blueprint(self, blueprint: str) -> None:
         """
-        Imports a single blueprint from the given path.
+        Imports the specified Flask-Imp Blueprint or a standard Flask Blueprint.
 
-        :param blueprint: The blueprint (Python Package) to import.
-        Must be relative.
+        :raw-html:`<br />`
+
+        **Must be setup in a Python package**
+
+        :raw-html:`<br />`
+
+        **Example of a Flask-Imp Blueprint:**
+
+        :raw-html:`<br />`
+
+        Will look for a config.toml file in the blueprint folder.
+
+        :raw-html:`<br />`
+
+        --- Folder structure ---
+        .. code-block:: text
+
+            app
+            ├── my_blueprint
+            │   ├── routes
+            │   │   └── index.py
+            │   ├── static
+            │   │   └── css
+            │   │       └── style.css
+            │   ├── templates
+            │   │   └── my_blueprint
+            │   │       └── index.html
+            │   ├── __init__.py
+            │   └── config.toml
+            └── ...
+
+        :raw-html:`<br />`
+
+        --- __init__.py ---
+
+        .. code-block::
+
+            from flask_imp import Blueprint
+
+            bp = Blueprint(__name__)
+
+            bp.import_resources("routes")
+
+
+            @bp.before_app_request
+            def before_app_request():
+                bp.init_session()
+
+
+        :raw-html:`<br />`
+
+        --- config.toml ---
+
+        .. code-block::
+
+            enabled = "yes"
+
+            [settings]
+            url_prefix = "/my-blueprint"
+            #subdomain = ""
+            #url_defaults = { }
+            #static_folder = "static"
+            #template_folder = "templates"
+            #static_url_path = "/my-blueprint/static"
+            #root_path = ""
+            #cli_group = ""
+
+            [session]
+            session_values_used_by_blueprint = "will be set by bp.init_session()"
+
+        :raw-html:`<br />`
+
+        **Example of a standard Flask Blueprint:**
+
+        :raw-html:`<br />`
+
+        --- Folder structure ---
+
+        .. code-block:: text
+
+            app
+            ├── my_blueprint
+            │   ├── ...
+            │   └── __init__.py
+            └── ...
+
+        :raw-html:`<br />`
+
+        --- __init__.py ---
+
+        .. code-block::
+
+            from flask import Blueprint
+
+            bp = Blueprint("my_blueprint", __name__, url_prefix="/my-blueprint")
+
+
+            @bp.route("/")
+            def index():
+                return "regular_blueprint"
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param blueprint: The blueprint (folder name) to import. Must be relative.
+        :return: None
         """
         if Path(blueprint).is_absolute():
             potential_bp = Path(blueprint)
@@ -221,8 +453,34 @@ class Imp:
         """
         Imports all the blueprints in the given folder.
 
-        :param folder: The folder to import from.
-        Must be relative.
+        :raw-html:`<br />`
+
+        **Example folder structure:**
+
+        :raw-html:`<br />`
+
+        .. code-block:: text
+
+            app
+            ├── blueprints
+            │   ├── regular_blueprint
+            │   │   ├── ...
+            │   │   └── __init__.py
+            │   └── flask_imp_blueprint
+            │       ├── ...
+            │       ├── config.toml
+            │       └── __init__.py
+            └── ...
+            
+        :raw-html:`<br />`
+        
+        See: `import_blueprint` for more information.
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param folder: The folder to import from. Must be relative.
         """
 
         folder_path = Path(self._app_path / folder)
@@ -235,10 +493,85 @@ class Imp:
             file_or_folder: str
     ) -> None:
         """
-        Imports all the models in the given file or folder.
+        Imports all the models from the given file or folder.
 
-        :param file_or_folder: The file or folder to import from.
-        Must be relative.
+
+        :raw-html:`<br />`
+
+        **Each model found will be added to the model registry.**
+
+        See: `Imp.model()` for more information.
+
+        :raw-html:`<br />`
+
+        **Example usage from files:**
+
+        :raw-html:`<br />`
+
+        .. code-block::
+
+            imp.import_models("users.py")
+            imp.import_models("cars.py")
+
+
+        :raw-html:`<br />`
+
+        -- Folder structure --
+
+        .. code-block::
+
+            app
+            ├── ...
+            ├── users.py
+            ├── cars.py
+            ├── default.config.toml
+            └── __init__.py
+
+        :raw-html:`<br />`
+
+        **Example usage from folders:**
+
+        :raw-html:`<br />`
+
+        .. code-block::
+
+            imp.import_models("models")
+
+        :raw-html:`<br />`
+
+        -- Folder structure --
+
+        .. code-block::
+
+            app
+            ├── ...
+            ├── models
+            │   ├── users.py
+            │   └── cars.py
+            ├── default.config.toml
+            └── __init__.py
+
+        :raw-html:`<br />`
+
+        **Example of model file:**
+
+        :raw-html:`<br />`
+
+        -- users.py --
+
+        .. code-block::
+
+            from app.extensions import db
+
+            class User(db.Model):
+                attribute = db.Column(db.String(255))
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param file_or_folder: The file or folder to import from. Must be relative.
+        :return: None
         """
 
         def model_processor(path: Path):
@@ -269,15 +602,110 @@ class Imp:
 
     def model(self, class_: str) -> DefaultMeta:
         """
-        Returns the model class for the given ORM class name
+        Returns the model class for the given ORM class name.
 
-        imp.model("User") => <class 'app.models.User'>
+        :raw-html:`<br />`
+
+        This is used to omit the need to import the models from their locations.
+
+        :raw-html:`<br />`
+
+        **For example, this:**
+
+        :raw-html:`<br />`
+
+        .. code-block::
+
+            from app.models.user import User
+            from app.models.cars import Cars
+
+        :raw-html:`<br />`
+
+        **Can be replaced with:**
+
+        :raw-html:`<br />`
+
+        .. code-block::
+
+            from app.extensions import imp
+
+            User = imp.model("User")
+            Cars = imp.model("Cars")
+
+        :raw-html:`<br />`
+
+        imp.model("User") -> <class 'app.models.User'>
+
+        :raw-html:`<br />`
+
+        Although this method is convenient, you lose out on an IDE's ability of attribute and method
+        suggestions due to the type being unknown.
+
+        :raw-html:`<br />`
+
+        -----
+        :param class_: The class name of the model to return.
+        :return: The model class [DefaultMeta].
         """
         return self.__model_registry__.class_(class_)
 
     def model_meta(self, class_: Union[str, DefaultMeta]) -> dict:
         """
         Returns meta information for the given ORM class name
+
+        :raw-html:`<br />`
+
+        **Example:**
+
+        :raw-html:`<br />`
+
+        .. code-block::
+
+            from app.extensions import imp
+
+            User = imp.model("User")
+
+            print(imp.model_meta(User))
+            # or
+            print(imp.model_meta("User"))
+
+        :raw-html:`<br />`
+        Will output:
+
+        {"location": "app.models.user", "table_name": "user"}
+
+        :raw-html:`<br />`
+
+        **Advanced use case:**
+
+        `location` can be used to import a function from the model file using Pythons importlib.
+
+        :raw-html:`<br />`
+
+        Here's an example:
+
+        :raw-html:`<br />`
+
+        .. code-block::
+
+            from app.extensions import imp
+
+
+            users_meta = imp.model_meta("User")
+            users_module = import_module(users_meta["location"])
+            users_module.some_function()
+
+        :raw-html:`<br />`
+
+        `table_name` is the snake_case version of the class name, pulled from `__table_name__`, which can be useful
+        if you'd like to use the table name in a raw query in a route.
+
+        :raw-html:`<br />`
+
+        -----
+
+        :param class_: The class name of the model to return [Class Instance | Name of class as String].
+        :return: dict of meta-information.
         """
 
         def check_for_table_name(model_):
