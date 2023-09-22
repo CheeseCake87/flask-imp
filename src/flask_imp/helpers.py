@@ -9,7 +9,7 @@ from .resources import Resources
 from .utilities import cast_to_bool, process_dict
 
 
-def build_database_uri(database_config_value: dict, app) -> t.Optional[str]:
+def _build_database_uri(database_config_value: dict, app) -> t.Optional[str]:
     """
     Puts together the correct database URI depending on the type specified.
 
@@ -80,7 +80,7 @@ This will create a sqlite file called
 database.db in a folder called db.""")
 
 
-def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, app) -> dict:
+def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, app) -> dict:
     """
     Processes the values from the configuration from_file.
     """
@@ -133,7 +133,7 @@ def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, 
         app.config['SQLALCHEMY_BINDS'] = dict()
         for database_config_key, database_config_values in database_config.items():
             if database_config_values.get("ENABLED", False):
-                database_uri = build_database_uri(database_config_values, app)
+                database_uri = _build_database_uri(database_config_values, app)
                 if database_uri:
                     if database_config_key == "MAIN":
                         app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
@@ -150,7 +150,7 @@ def init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, 
     }
 
 
-def init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:
+def _init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:
     """
     Attempts to load the and process the configuration from_file.
     """
