@@ -1,9 +1,12 @@
+from importlib import import_module
+
+
 def collection(app: object):
     @app.cli.command("add-example-user")
     def add_example_user():
-        from app.models.example__table import ExampleUserTable
+        from app.models.example_table import ExampleTable
 
-        ExampleUserTable.add(
+        ExampleTable.add(
             username="admin",
             password="password",
             disabled=False,
@@ -11,9 +14,9 @@ def collection(app: object):
 
     @app.cli.command("update-example-user")
     def update_example_user():
-        from app.models.example__table import ExampleUserTable
+        from app.models.example_table import ExampleTable
 
-        ExampleUserTable.update(
+        ExampleTable.update(
             user_id=1,
             username="admin-updated",
             private_key="private_key",
@@ -22,8 +25,18 @@ def collection(app: object):
 
     @app.cli.command("delete-example-user")
     def delete_example_user():
-        from app.models.example__table import ExampleUserTable
+        from app.models.example_table import ExampleTable
 
-        ExampleUserTable.delete(
+        ExampleTable.delete(
             user_id=1,
         )
+
+    @app.cli.command("example-model-function")
+    def example_model_function():
+        from app.extensions import imp
+
+        imp.import_models("models")
+
+        example_table_meta = imp.model_meta("ExampleTable")
+        users_module = import_module(example_table_meta["location"])
+        users_module.example_function()
