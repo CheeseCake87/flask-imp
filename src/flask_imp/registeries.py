@@ -4,6 +4,13 @@ from flask_sqlalchemy.model import DefaultMeta
 
 
 class ModelRegistry:
+    """
+    A registry for SQLAlchemy models.
+    
+    This is used to store all imported SQLAlchemy models in a central location.
+    
+    Accessible via Imp.__model_registry__
+    """
     registry: t.Dict[str, t.Any]
 
     def __init__(self):
