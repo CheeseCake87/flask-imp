@@ -16,9 +16,9 @@ tags = {
 
 enabled_tags = [
     "flask-imp-python-3-8",
-    # "flask-imp-python-3-9",
-    # "flask-imp-python-3-10",
-    # "flask-imp-python-3-11",
+    "flask-imp-python-3-9",
+    "flask-imp-python-3-10",
+    "flask-imp-python-3-11",
     # "flask-imp-python-3-12",
 ]
 
