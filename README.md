@@ -1,12 +1,8 @@
-
-
 ![](https://raw.githubusercontent.com/CheeseCake87/Flask-Imp/master/_assets/Flask-Imp-Small.png)
 
 # Flask-Imp
 
 ![Tests](https://github.com/CheeseCake87/Flask-Imp/actions/workflows/tests.yml/badge.svg)
-
-(Previously known as Flask-BigApp)
 
 ## What is Flask-Imp?
 
