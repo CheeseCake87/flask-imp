@@ -1,13 +1,13 @@
 import typing as t
-from functools import wraps
 from functools import partial
+from functools import wraps
 
-from flask import flash
 from flask import abort
+from flask import flash
 from flask import redirect
+from flask import request
 from flask import session
 from flask import url_for
-from flask import request
 
 from flask_imp import Auth
 
@@ -215,6 +215,96 @@ def permission_check(
         return inner
 
     return permission_check_wrapper
+
+
+def pass_function_check(
+        function: t.Callable,
+        fail_endpoint: t.Optional[str] = None,
+        endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
+        message: t.Optional[str] = None,
+        message_category: str = "message",
+        fail_on_missing_function_kwargs: bool = False,
+):
+    """
+    A decorator that takes the result of a function and checks if it is True or False.
+
+    :raw-html:`<br />`
+
+    **Example:**
+
+    :raw-html:`<br />`
+
+    .. code-block::
+
+        def check_if_number(value):
+            if isinstance(value, int):
+                return True
+            return False
+
+        @bp.route("/admin-page/<int:value>", methods=["GET"])
+        @login_check('logged_in', True, 'blueprint.login_page')  # can be mixed with login_check
+        @function_pass_check(check_if_number, fail_endpoint='www.index', message="Failed message")
+        def admin_page():
+            ...
+
+    :raw-html:`<br />`
+
+    The url variable name must match the name of the argument in the function.
+
+    -----
+
+    :param function: The function to call (this will be passed the url variables of the route.
+    :param fail_endpoint: The endpoint to redirect to if the
+                          session key does not exist or does not contain the
+                          specified values.
+    :param endpoint_kwargs: A dictionary of keyword arguments to pass to the redirect endpoint.
+    :param message: If a message is specified, a flash message is shown.
+    :param message_category: The category of the flash message.
+    :param fail_on_missing_function_kwargs: If any of the required arguments for the passed in function are missing
+                                            from the url variables, redirect to the fail endpoint.
+    :return: The decorated function, or abort(403).
+    """
+    import inspect
+
+    def pass_function_wrapper(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+
+            def setup_flash(_message, _message_category):
+                if _message:
+                    partial_flash = partial(flash, _message)
+                    if _message_category:
+                        partial_flash(_message_category)
+                    else:
+                        partial_flash()
+
+            function_args = dict(inspect.signature(function).parameters)
+            passed_in_kwargs = {k: v for k, v in kwargs.items() if k in function_args}
+
+            try:
+                if function(**passed_in_kwargs):
+                    return func(*args, **kwargs)
+
+            except TypeError:
+                if fail_on_missing_function_kwargs:
+                    return redirect(url_for(fail_endpoint))
+                else:
+                    return func(*args, **kwargs)
+
+            setup_flash(message, message_category)
+
+            if fail_endpoint:
+
+                if endpoint_kwargs:
+                    return redirect(url_for(fail_endpoint, **endpoint_kwargs))
+
+                return redirect(url_for(fail_endpoint))
+
+            return abort(403)
+
+        return inner
+
+    return pass_function_wrapper
 
 
 def api_login_check(

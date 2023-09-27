@@ -1,6 +1,6 @@
 from flask import render_template, session
-from flask_imp.security import login_check, permission_check
 
+from flask_imp.security import login_check, permission_check, pass_function_check
 from .. import bp
 
 
@@ -86,6 +86,34 @@ def permission_check_std():
 @bp.route("/must-have-permissions/adv", methods=["GET"])
 @permission_check("permissions", ["super-admin"], "tests.permission_failed")
 def permission_check_adv():
+    return render_template(bp.tmpl("security.html"))
+
+
+def check_if_number(number=1):
+    try:
+        int(number)
+        return True
+    except ValueError:
+        return False
+
+
+def blank_func(number):
+    try:
+        int(number)
+        return True
+    except ValueError:
+        return False
+
+
+@bp.route("/pass-func-check", methods=["GET"])
+@pass_function_check(check_if_number, "tests.permission_failed", fail_on_missing_function_kwargs=True)
+def pass_function_check_std():
+    return render_template(bp.tmpl("security.html"))
+
+
+@bp.route("/pass-func-check-with-url-var/<number>", methods=["GET"])
+@pass_function_check(check_if_number, "tests.permission_failed")
+def pass_function_check_with_url_value(number):
     return render_template(bp.tmpl("security.html"))
 
 
