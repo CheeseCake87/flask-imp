@@ -5,6 +5,25 @@ from flask_imp.security import login_check, permission_check, pass_function_chec
 from .. import bp
 
 
+def group_routes(rule, **options):
+    def decorator(func):
+        @functools.wraps(func)
+        @bp.route(rule, **options)
+        @login_check("logged_in", True, fail_endpoint="tests.login_failed")
+        @permission_check("permissions", ["admin"], fail_endpoint="tests.permission_failed")
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+@group_routes("/grouped-decorators", methods=["GET"])
+def grouped_decorators():
+    return f"{session.get('logged_in')}"
+
+
 @bp.route("/login/bool", methods=["GET"])
 def login_bool():
     session["logged_in"] = True
