@@ -1,3 +1,4 @@
+import functools
 from flask import render_template, session
 
 from flask_imp.security import login_check, permission_check, pass_function_check
@@ -89,7 +90,16 @@ def permission_check_adv():
     return render_template(bp.tmpl("security.html"))
 
 
-def check_if_number(number=1):
+def check_if_number(number, session_=None, session_key=None, tests_session=None):
+    if session_:
+        print(session_)
+
+    if session_key:
+        print(session_key)
+
+    if tests_session:
+        print(tests_session)
+
     try:
         int(number)
         return True
@@ -106,15 +116,61 @@ def blank_func(number):
 
 
 @bp.route("/pass-func-check", methods=["GET"])
-@pass_function_check(check_if_number, "tests.permission_failed", fail_on_missing_function_kwargs=True)
+@pass_function_check(
+    check_if_number,
+    None,
+    "tests.permission_failed"
+)
 def pass_function_check_std():
-    return render_template(bp.tmpl("security.html"))
+    # Expecting to pass as missing kwargs are ignored
+    return "Pass"
 
 
-@bp.route("/pass-func-check-with-url-var/<number>", methods=["GET"])
-@pass_function_check(check_if_number, "tests.permission_failed")
+@bp.route("/pass-func-check-fail-on-kwargs", methods=["GET"])
+@pass_function_check(
+    check_if_number,
+    None,
+    "tests.permission_failed",
+    fail_on_missing_kwargs=True
+)
+def pass_function_check_std_fail_on_kwargs():
+    # Expecting to fail with response: will redirect to tests.permission_failed
+    return f"Expecting to fail"
+
+
+@bp.route("/pass-func-check-with-url-var-replaced/<number>", methods=["GET"])
+@pass_function_check(
+    check_if_number,
+    {'number': 10},
+    "tests.permission_failed"
+)
 def pass_function_check_with_url_value(number):
-    return render_template(bp.tmpl("security.html"))
+    # Expecting to pass with response: URL value: <number>
+    return f"URL value: {number}"
+
+
+@bp.route("/pass-func-check-with-url-var-replaced-and-app-context/<number>", methods=["GET"])
+@pass_function_check(
+    check_if_number,
+    {'number': 10, 'session_': session},
+    "tests.permission_failed",
+    with_app_context=True
+)
+def pass_function_check_with_url_value_with_ac(number):
+    # Expecting to pass with response: URL value: <number>
+    return f"URL value: {number}"
+
+
+@bp.route("/pass-func-check-with-url-var-replaced-and-app-context-with-partial/<number>", methods=["GET"])
+@pass_function_check(
+    check_if_number,
+    {'number': 10, 'tests_session': session},
+    "tests.permission_failed",
+    with_app_context=True
+)
+def pass_function_check_with_url_value_with_ac_with_partial(number):
+    # Expecting to pass with response: URL value: <number>
+    return f"URL value: {number}"
 
 
 @bp.route("/login-failed", methods=["GET"])
