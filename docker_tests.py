@@ -7,19 +7,19 @@ from docker_builder.docker_cli import DockerCli
 cwd = Path.cwd()
 
 tags = {
-    "flask-imp-python-3-8": "docker_tests/Dockerfile_Python_3_8",
-    "flask-imp-python-3-9": "docker_tests/Dockerfile_Python_3_9",
-    "flask-imp-python-3-10": "docker_tests/Dockerfile_Python_3_10",
-    "flask-imp-python-3-11": "docker_tests/Dockerfile_Python_3_11",
-    "flask-imp-python-3-12": "docker_tests/Dockerfile_Python_3_12",
+    "flask-imp-python-3-8:latest": "docker_tests/Dockerfile_Python_3_8",
+    "flask-imp-python-3-9:latest": "docker_tests/Dockerfile_Python_3_9",
+    "flask-imp-python-3-10:latest": "docker_tests/Dockerfile_Python_3_10",
+    "flask-imp-python-3-11:latest": "docker_tests/Dockerfile_Python_3_11",
+    "flask-imp-python-3-12:latest": "docker_tests/Dockerfile_Python_3_12",
 }
 
 enabled_tags = [
-    "flask-imp-python-3-8",
-    "flask-imp-python-3-9",
-    "flask-imp-python-3-10",
-    "flask-imp-python-3-11",
-    # "flask-imp-python-3-12",
+    "flask-imp-python-3-8:latest",
+    "flask-imp-python-3-9:latest",
+    "flask-imp-python-3-10:latest",
+    "flask-imp-python-3-11:latest",
+    # "flask-imp-python-3-12:latest",
 ]
 
 if __name__ == "__main__":
@@ -37,16 +37,19 @@ if __name__ == "__main__":
 
     def build_docker(tag_, file_):
         with DockerCli(f"build -t {tag_} -f {file_} .") as output_:
+            print(f"build -t {tag_} -f {file_} .")
             _ = output_
 
 
     def create_docker(tag_):
         with DockerCli(f"create --name {tag_} {tag_}") as output_:
+            print(f"create --name {tag_} {tag_}")
             _ = output_
 
 
     def start_docker(tag_):
         with DockerCli(f"start {tag_}") as output_:
+            print(f"start {tag_}")
             _ = output_
 
 
