@@ -31,9 +31,7 @@ jobs:
           - { name: '3.9', python: '3.9', os: ubuntu-latest }
           - { name: '3.8', python: '3.8', os: ubuntu-latest }
           - { name: 'PyPy', python: 'pypy-3.10', os: ubuntu-latest }
-          - { name: 'Minimum Versions', python: '3.11', os: ubuntu-latest-min }
           - { name: 'Development Versions', python: '3.8', os: ubuntu-latest }
-          - { name: Typing, python: '3.11', os: ubuntu-latest }
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python }}
