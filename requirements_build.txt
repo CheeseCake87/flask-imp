@@ -1,3 +1,4 @@
+-r requirements.txt
 twine==4.0.2
 build==1.0.3
 sphinx==7.2.6

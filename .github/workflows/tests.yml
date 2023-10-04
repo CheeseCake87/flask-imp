@@ -43,8 +43,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install flake8 pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          python pip install -r requirements_dev.txt
       - name: Lint with flake8
         run: |
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
