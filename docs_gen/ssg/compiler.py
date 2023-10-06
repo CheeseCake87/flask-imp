@@ -8,8 +8,7 @@ from flask import render_template
 from .exceptions import NoPostDefinition
 from .helpers import (
     get_relative_files_in_the_docs_folder,
-    pytz_dt_now_str, pytz_dt_now,
-    pytz_dt_str_to_dt,
+    pytz_dt_now,
     post_date
 )
 from .render_engines import HighlightRenderer
@@ -66,13 +65,17 @@ def compiler(docs_dir: Path, markdown_dir: Path):
 
     with open(markdown_menu, mode="r") as menu_file:
         for line in menu_file.readlines():
-            if line.startswith("- "):
-                markdown_menu_dict[line.replace("- ", "").strip()] = {"page": "", "pages": []}
+            if line.startswith("-"):
+                line_strip = line.strip()
+                markdown_menu_dict[line_strip.replace("- ", "").strip()] = {"page": "", "pages": []}
+                continue
 
-            if line.startswith("    - "):
-                markdown_menu_dict[list(markdown_menu_dict.keys())[-1]]["pages"].append(
-                    {line.replace("    - ", "").strip(): ""}
-                )
+            if line.startswith(" ") or line.startswith("\t"):
+                line_strip = line.strip()
+                if line_strip.startswith("-"):
+                    markdown_menu_dict[list(markdown_menu_dict.keys())[-1]]["pages"].append(
+                        {line_strip.replace("- ", "").strip(): ""}
+                    )
 
     index_html = docs_dir / "index.html"
 

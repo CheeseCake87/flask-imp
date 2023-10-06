@@ -1,3 +1,27 @@
+```
+Menu = Configuration/x.config.toml
+Title = The Flask-Imp Config File
+```
+
+Flask-Imp loads configuration settings from a toml file found in the root of your app package.
+
+`app/default.config.toml` is the default config file, this will be created if no config file is found or set.
+
+Here's an example file structure:
+
+```text
+Project/
+├── app/
+│   ├── ...
+│   ├── __init__.py
+│   └── default.config.toml
+├── venv/...
+└── ...
+```
+
+Here's an example of the default config file that is created:
+
+```toml
 # Flask-Imp Config File
 # ------------------------
 # Updates the Flask app config with the variables below.
@@ -30,8 +54,6 @@ PREFERRED_URL_SCHEME = "http"
 EXPLAIN_TEMPLATE_LOADING = false
 MAX_COOKIE_SIZE = 4093
 
-TEST = "<TEST>"
-
 
 # This will set the default session variables for the app.
 # Anything here will be accessible using session["your_var_name"]
@@ -50,14 +72,14 @@ SQLALCHEMY_RECORD_QUERIES = false
 # Dialets = mysql / postgresql / sqlite / oracle / mssql
 
 # Uncomment below to generate the SQLALCHEMY_DATABASE_URI.
-[DATABASE.MAIN]
-ENABLED = true
-DIALECT = "sqlite"
-DATABASE_NAME = "<DB_USERNAME>"
-LOCATION = "db"
-PORT = ""
-USERNAME = "database"
-PASSWORD = "password"
+#[DATABASE.MAIN]
+#ENABLED = true
+#DIALECT = "sqlite"
+#DATABASE_NAME = "database"
+#LOCATION = "db"
+#PORT = ""
+#USERNAME = "database"
+#PASSWORD = "password"
 
 # Adding another database is as simple as adding a new section.
 # [DATABASE.ANOTHER] will then be accessible using SQLALCHEMY_BINDS
@@ -69,11 +91,41 @@ PASSWORD = "password"
 #     ...
 
 # Uncomment below to generate and add to SQLALCHEMY_BINDS.
-[DATABASE.ANOTHER]
-ENABLED = true
-DIALECT = "sqlite"
-DATABASE_NAME = "database_another"
-LOCATION = "db"
-PORT = ""
-USERNAME = "user"
-PASSWORD = "password"
+#[DATABASE.ANOTHER]
+#ENABLED = true
+#DIALECT = "sqlite"
+#DATABASE_NAME = "database_another"
+#LOCATION = "db"
+#PORT = ""
+#USERNAME = "user"
+#PASSWORD = "password"
+
+```
+
+To change what config file is loaded, you can set the `IMP_CONFIG` environment
+variable to the name of the config file you want to load.
+
+For example, given the following folder structure:
+
+```text
+Project/
+├── app/
+│   ├── ...
+│   ├── __init__.py
+│   ├── production.config.toml
+│   └── default.config.toml
+├── venv/...
+└── ...
+```
+
+You'd set the `IMP_CONFIG=production.config.toml`
+
+Or you can set the file in the `imp.init_app()` method:
+
+```python
+
+def create_app():
+    app = Flask(__name__)
+    imp.init_app(app, app_config_file="production.config.toml")
+
+```

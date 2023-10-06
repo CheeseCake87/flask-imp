@@ -50,8 +50,9 @@ body {
 }
 
 aside {
-    width: 250px;
-    border-right: 1px solid rgb(220, 220, 220);
+    width: 210px;
+    border-right: 1px solid rgba(220, 220, 220, 0.5);
+    margin-right: 30px;
 }
 
 aside ul {
@@ -63,7 +64,6 @@ aside ul {
 
 section {
     width: 650px;
-    padding-left: 20px;
 }
 
 .highlight {

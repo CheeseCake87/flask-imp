@@ -1,8 +1,9 @@
 import os
 
 from flask import Flask
-from app.extensions import imp
+
 from app.extensions import db
+from app.extensions import imp
 
 os.environ["CONFIG_SECRET_KEY"] = "inserted_from_environment"
 os.environ["DB_USERNAME"] = "database_username"
@@ -16,6 +17,8 @@ def create_app():
     imp.import_app_resources(
         app_factories=["collection"]
     )
+
+    print(app.config["TEST"])
 
     imp.import_blueprint("root_blueprint")
     imp.import_blueprints("blueprints")

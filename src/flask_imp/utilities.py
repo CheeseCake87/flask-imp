@@ -43,9 +43,12 @@ def if_env_replace(
     if isinstance(env_value, str):
         if re.match(pattern, env_value):
             env_var = re.findall(pattern, env_value)[0]
+            print(env_var)
+
             if ignore_missing_env_variables:
-                return os.environ.get(env_var)
-            return os.environ.get(env_var, f"{env_value} not found in environment variables")
+                return parse_config_env_var(os.environ.get(env_var))
+
+            return parse_config_env_var(os.environ.get(env_var, f"{env_value} not found in environment variables"))
     return env_value
 
 
@@ -136,3 +139,25 @@ def cast_to_bool(value: t.Union[str, bool, None]) -> bool:
             raise TypeError(f"Cannot cast {value} to bool")
     else:
         raise TypeError(f"Cannot cast {value} to bool")
+
+
+def parse_config_env_var(value: str) -> t.Optional[t.Union[bool, str, int]]:
+    """
+    Casts an array of truly string values to a boolean. Used for config files.
+    """
+    if value == "None":
+        return None
+
+    if isinstance(value, str):
+        true_str = ("true", "yes", "y", "1")
+        false_str = ("false", "no", "n", "0")
+
+        if value.lower() in true_str:
+            return True
+        elif value.lower() in false_str:
+            return False
+        else:
+            try:
+                return int(value)
+            except ValueError:
+                return value
