@@ -145,9 +145,9 @@ def cast_to_bool(value: t.Union[str, bool, None]) -> bool:
         raise TypeError(f"Cannot cast {value} to bool")
 
 
-def parse_config_env_var(value: str) -> t.Optional[t.Union[bool, str, int]]:
+def parse_config_env_var(value: t.Optional[str]) -> t.Optional[t.Union[bool, str, int]]:
     """
-    Casts an array of truly string values to a boolean. Used for config files.
+    Casts value to a boolean, string, or int if possible. If not, returns none.
     """
     if value == "None":
         return None
@@ -165,3 +165,5 @@ def parse_config_env_var(value: str) -> t.Optional[t.Union[bool, str, int]]:
                 return int(value)
             except ValueError:
                 return value
+
+    return None
