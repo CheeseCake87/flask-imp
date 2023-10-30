@@ -126,7 +126,8 @@ class Imp:
 
         :raw-html:`<br />`
 
-        If no static folder is found, the static folder will be set to None in the Flask app config.
+        If no static and or template folder is found, the static and or template folder will be set to None
+        in the Flask app config.
 
         :raw-html:`<br />`
 
