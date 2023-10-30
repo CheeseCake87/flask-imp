@@ -7,8 +7,8 @@ from inspect import isclass
 from pathlib import Path
 from typing import Dict, Union, Optional, List
 
-from flask import Flask
 from flask import Blueprint
+from flask import Flask
 from flask import session
 from flask_sqlalchemy.model import DefaultMeta
 
@@ -85,6 +85,10 @@ class Imp:
             app_config_file = "default.config.toml"
 
         self._app = app
+
+        if "imp" in self._app.extensions:
+            raise ImportError("The app has already been initialized with flask-imp.")
+
         self._app_name = app.name
         self._app_path = Path(self._app.root_path)
         self._app_folder = self._app_path.parent
@@ -97,6 +101,8 @@ class Imp:
             ignore_missing_env_variables,
             self._app
         )
+
+        self._app.extensions["imp"] = self
 
     def import_app_resources(
             self,
