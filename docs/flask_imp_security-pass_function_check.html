@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Load Enviroment Variables Into The Config File | Flask-Imp</title>
+    <title>Pass_function_check - Flask_imp.security | Flask-Imp</title>
     <link rel="stylesheet" href="static/water.css">
     <link rel="stylesheet" href="static/pygments.emacs-dull.css">
     <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
@@ -233,24 +233,8 @@
 </div>
 
 <section>
-    <h1 style="font-size: 2.6rem; margin: 0;">Load Enviroment Variables into the Config File</h1>
-    <p><code>&lt;&gt;</code> markers can be used to find variables set in the environment. For example:</p>
-<p><code>default.config.toml</code></p>
-<div class="highlight"><pre><span></span><span class="k">[FLASK]</span>
-<span class="c1"># ...</span>
-
-<span class="n">ERROR_404_HELP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-<span class="n">SERVER_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&lt;FLASK_SERVER_NAME&gt;&quot;</span>
-<span class="n">APPLICATION_ROOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/&quot;</span>
-
-<span class="c1"># ...</span>
-</pre></div>
-<p><code>&lt;FLASK_SERVER_NAME&gt;</code> will be replaced by the value of <code>FLASK_SERVER_NAME</code></p>
-<p>Development <code>.env</code></p>
-<div class="highlight"><pre><span></span>FLASK_SERVER_NAME=localhost:5000
-</pre></div>
-<p>Production <code>.env</code></p>
-<div class="highlight"><pre><span></span>FLASK_SERVER_NAME=mysite.com
+    <h1 style="font-size: 2.6rem; margin: 0;">pass_function_check - flask_imp.security</h1>
+    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.security</span> <span class="kn">import</span> <span class="n">pass_function_check</span>
 </pre></div>
 
 </section>
