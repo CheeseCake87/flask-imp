@@ -86,7 +86,7 @@ def process_dict(
                 )
                 continue
 
-        return_dict[cs_key] = if_env_replace(value)
+        return_dict[cs_key] = if_env_replace(value, ignore_missing_env_variables)
 
     return return_dict
 
