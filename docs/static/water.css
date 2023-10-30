@@ -35,7 +35,7 @@ html {
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
     line-height: 1.4;
-    max-width: 900px;
+    max-width: 1000px;
     margin: 20px auto;
     padding: 0 10px;
     word-wrap: break-word;
@@ -50,9 +50,9 @@ body {
 }
 
 aside {
-    width: 210px;
+    width: 250px;
     border-right: 1px solid rgba(220, 220, 220, 0.5);
-    margin-right: 30px;
+    padding: 10px;
 }
 
 aside ul {
@@ -63,7 +63,16 @@ aside ul {
 }
 
 section {
-    width: 650px;
+    width: 750px;
+    padding-left: 30px;
+}
+
+section > div:nth-child(2) {
+    margin-top: 20px;
+}
+
+hr {
+    margin: 40px 0;
 }
 
 .highlight {
