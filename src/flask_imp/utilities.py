@@ -43,12 +43,16 @@ def if_env_replace(
     if isinstance(env_value, str):
         if re.match(pattern, env_value):
             env_var = re.findall(pattern, env_value)[0]
-            print(env_var)
 
-            if ignore_missing_env_variables:
-                return parse_config_env_var(os.environ.get(env_var))
+            if env_var:
+                if os.environ.get(env_var):
+                    return parse_config_env_var(os.environ.get(env_var))
 
-            return parse_config_env_var(os.environ.get(env_var, f"{env_value} not found in environment variables"))
+                if ignore_missing_env_variables:
+                    return None
+
+                raise ValueError(f"Environment variable {env_value} not found")
+
     return env_value
 
 
