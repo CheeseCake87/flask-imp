@@ -42,8 +42,8 @@ if __name__ == "__main__":
 
 
     def create_docker(tag_):
-        with DockerCli(f"create --name {tag_} {tag_}") as output_:
-            print(f"create --name {tag_} {tag_}")
+        with DockerCli(f"create --name {tag_.replace(':latest', '')} {tag_}") as output_:
+            print(f"create --name {tag_.replace(':latest', '')} {tag_}")
             _ = output_
 
 
@@ -54,12 +54,8 @@ if __name__ == "__main__":
 
 
     build_pool = multiprocessing.Pool()
-    create_pool = multiprocessing.Pool()
-    start_pool = multiprocessing.Pool()
 
     running_builds = []
-    running_creates = []
-    running_starts = []
 
     print("Building test environments, please wait...")
 
@@ -75,26 +71,18 @@ if __name__ == "__main__":
 
     for tag, file in tags.items():
         if tag in enabled_tags:
-            p_create = create_pool.apply_async(create_docker, args=(tag,))
-            running_creates.append(p_create)
-
-    for pro in running_creates:
-        pro.wait()
+            create_docker(tag.replace(':latest', ''))
 
     print("Running test environments, please wait...")
 
     for tag, file in tags.items():
         if tag in enabled_tags:
-            p_starts = start_pool.apply_async(start_docker, args=(tag,))
-            running_starts.append(p_starts)
-
-    for pro in running_starts:
-        pro.wait()
+            start_docker(tag.replace(':latest', ''))
 
     print("Gathering logs, please wait...")
     for tag in tags:
         if tag in enabled_tags:
-            get_logs(tag)
+            get_logs(tag.replace(':latest', ''))
 
     cleanup_input = input("Do you want to cleanup? (Y/n): ")
 
@@ -102,7 +90,7 @@ if __name__ == "__main__":
         print("Cleaning up, please wait...")
         for tag in tags:
             if tag in enabled_tags:
-                with DockerCli(f"rm {tag}") as output:
+                with DockerCli(f"rm {tag.replace(':latest', '')}") as output:
                     _ = output
 
         for tag in tags:
