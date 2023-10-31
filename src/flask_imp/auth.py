@@ -55,7 +55,7 @@ class Auth:
     def is_username_valid(
             cls,
             username: str,
-            allowed: t.Optional[list[t.Literal["all", "dot", "dash", "under"]]] = None
+            allowed: t.Optional[t.List[t.Literal["all", "dot", "dash", "under"]]] = None
     ) -> bool:
         """
         Checks if a username is valid.
