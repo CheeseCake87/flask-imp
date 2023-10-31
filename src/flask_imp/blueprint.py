@@ -33,7 +33,7 @@ class ImpBlueprint(Blueprint):
 
     _imp_instance: Imp
 
-    def __init__(self, dunder_name: str, config_file: str = "config.toml"):
+    def __init__(self, dunder_name: str, config_file: str = "config.toml") -> None:
         """
         Creates a new ImpBlueprint instance.
 
