@@ -152,16 +152,16 @@ def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool,
 
 def _init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:
     """
-    Attempts to load the and process the configuration from_file.
+    Attempts to load and process the blueprint configuration file.
     """
 
     if not config_file_path.exists():
-        raise FileNotFoundError(f"{blueprint_name} Blueprint config from_file {config_file_path.name} was not found")
+        raise FileNotFoundError(f"{blueprint_name} Blueprint config {config_file_path.name} was not found")
 
     config_suffix = ('.toml', '.tml')
 
     if config_file_path.suffix not in config_suffix:
-        raise TypeError("Config from_file must be one of the following types: .toml / .tml")
+        raise TypeError("Blueprint Config must be one of the following types: .toml / .tml")
 
     config = process_dict(toml_load(config_file_path), key_case_switch="lower")
 
