@@ -328,7 +328,7 @@ class Imp:
 
     def import_blueprint(self, blueprint: str) -> None:
         """
-        Imports the specified Flask-Imp Blueprint or a standard Flask Blueprint.
+        Import a specified Flask-Imp or standard Flask Blueprint.
 
         :raw-html:`<br />`
 
