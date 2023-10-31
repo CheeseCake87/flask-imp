@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Include_csrf - Flask_imp.security | Flask-Imp</title>
+    <title>Imp.import_app_resources | Flask-Imp</title>
     <link rel="stylesheet" href="static/water.css">
     <link rel="stylesheet" href="static/pygments.emacs-dull.css">
     <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
@@ -244,9 +244,67 @@
 </aside>
 
 <section>
-    <h1 style="font-size: 2.6rem; margin: 0;">include_csrf - flask_imp.security</h1>
-    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.security</span> <span class="kn">import</span> <span class="n">include_csrf</span>
+    <h1 style="font-size: 2.6rem; margin: 0;">Imp.import_app_resources</h1>
+    <div class="highlight"><pre><span></span><span class="n">import_app_resources</span><span class="p">(</span>
+    <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;global&quot;</span><span class="p">,</span>
+    <span class="n">app_factories</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">static_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+    <span class="n">templates_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;templates&quot;</span><span class="p">,</span>
+    <span class="n">scope_root_folders_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">scope_root_files_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </pre></div>
+<hr />
+<p>Import standard app resources from the specified folder.</p>
+<p>This will import any resources that have been set to the Flask app.</p>
+<p>Routes, context processors, cli, etc.</p>
+<p><strong>Can only be called once.</strong></p>
+<p>If no static and or template folder is found, the static and or template folder will be set to None in the Flask app
+config.</p>
+<h4>Small example of usage:</h4>
+<div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="p">)</span>
+</pre></div>
+<p>Folder Structure: <code>global</code></p>
+<div class="highlight"><pre><span></span>app
+├── global
+│   ├── routes.py
+│   ├── app_fac.py
+│   ├── static
+│   │   └── css
+│   │       └── style.css
+│   └── templates
+│       └── index.html
+└── ...
+...
+</pre></div>
+<p>File: <code>routes.py</code></p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span> <span class="k">as</span> <span class="n">app</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">render_template</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;index.html&quot;</span><span class="p">)</span>
+</pre></div>
+<h4>app_factories</h4>
+<p><code>app_factories</code> are functions that are called when importing the app resources. Here's an example:</p>
+<div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span>
+    <span class="n">folder</span><span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="p">,</span>
+    <span class="n">app_factories</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;development_cli&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+<p><code>[&quot;development_cli&quot;]</code> =&gt; <code>development_cli(app)</code> function will be called, and the current app will be passed in.</p>
+<p>File: <code>app_fac.py</code></p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">development_cli</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;dev&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">dev</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dev cli command&quot;</span><span class="p">)</span>
+</pre></div>
+<h4>scope_root_folders_to &amp; scope_root_files_to</h4>
+<p><code>scope_root_folders_to=[&quot;cli&quot;, &quot;routes&quot;]</code> =&gt; will only import files from <code>&lt;folder&gt;/cli/*.py</code>
+and <code>&lt;folder&gt;/routes/*.py</code></p>
+<p><code>scope_root_files_to=[&quot;cli.py&quot;, &quot;routes.py&quot;]</code> =&gt; will only import the files <code>&lt;folder&gt;/cli.py</code>
+and <code>&lt;folder&gt;/routes.py</code></p>
 
 </section>
 

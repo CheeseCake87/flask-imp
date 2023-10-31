@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Include_csrf - Flask_imp.security | Flask-Imp</title>
+    <title>Flask-Imp Introduction | Flask-Imp</title>
     <link rel="stylesheet" href="static/water.css">
     <link rel="stylesheet" href="static/pygments.emacs-dull.css">
     <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
@@ -244,9 +244,79 @@
 </aside>
 
 <section>
-    <h1 style="font-size: 2.6rem; margin: 0;">include_csrf - flask_imp.security</h1>
-    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.security</span> <span class="kn">import</span> <span class="n">include_csrf</span>
+    <h1 style="font-size: 2.6rem; margin: 0;">Flask-Imp Introduction</h1>
+    <div class="highlight"><pre><span></span><span class="n">Imp</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Flask</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">app_config_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ignore_missing_env_variables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<span class="c1"># -or- </span>
+<span class="n">init_app</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">:</span> <span class="n">Flask</span><span class="p">,</span>
+    <span class="n">app_config_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ignore_missing_env_variables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </pre></div>
+<hr />
+<p>Flask-Imp is a Flask extension that provides auto import methods for various Flask resources. It will import models,
+blueprints, and other resources from a Flask application. It uses the importlib module to achieve this.</p>
+<p>Flask-Imp favors the application factory pattern as a project structure, and is opinionated towards using only
+Blueprints. However, you can use Flask-Imp without using Blueprints.</p>
+<p>Here's an example of a standard Flask-Imp project structure:</p>
+<div class="highlight"><pre><span></span>app/
+├── blueprints/
+│   ├── admin/...
+│   ├── api/...
+│   └── www/...
+├── global/
+│   ├── filters/...
+│   ├── context_processors/...
+│   ├── static/...
+│   └── templates/...
+├── models/...
+├── default.config.toml
+└── __init__.py
+</pre></div>
+<p>Here's an example of the <code>app/__init__.py</code> file:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span> <span class="nn">flask_sqlalchemy</span> <span class="kn">import</span> <span class="n">SQLAlchemy</span>
+<span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">Imp</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLAlchemy</span><span class="p">()</span>
+<span class="n">imp</span> <span class="o">=</span> <span class="n">Imp</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">create_app</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">imp</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+    <span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="s2">&quot;global&quot;</span><span class="p">)</span>
+    <span class="n">imp</span><span class="o">.</span><span class="n">import_models</span><span class="p">(</span><span class="s2">&quot;models&quot;</span><span class="p">)</span>
+    <span class="n">imp</span><span class="o">.</span><span class="n">import_blueprints</span><span class="p">(</span><span class="s2">&quot;blueprints&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">app</span>
+</pre></div>
+<p>During <code>imp.init_app</code> the <code>default.config.toml</code> file will load variables under <code>[FLASK]</code> into the Flask app config.
+It will also load variables under <code>[DATABASE]</code> into the Flask app config as <code>SQLALCHEMY_DATABASE_URI</code>.</p>
+<p>Values under <code>[SESSION]</code> can be loaded with:</p>
+<div class="highlight"><pre><span></span><span class="nd">@app</span><span class="o">.</span><span class="n">before_request</span>
+<span class="k">def</span> <span class="nf">before_request</span><span class="p">():</span>
+    <span class="n">imp</span><span class="o">.</span><span class="n">init_session</span><span class="p">()</span>
+</pre></div>
+<p>See more about the config file here: <a href="imp-x-config-toml.html">Imp / x.config.toml</a></p>
+<p><code>import_app_resources</code> will walk one level deep into the <code>global</code> folder, and import all <code>.py</code> files as modules. It will
+also check for the existence of a <code>static</code> and <code>templates</code> folder, and register them with the Flask app.</p>
+<p>There is a couple of options for <code>import_app_resources</code> to control what
+is imported, see: <a href="imp_x-import_app_resources.html">Imp.x / import_app_resources</a></p>
+<p><code>import_models</code> will import all Model classes from the specified file or folder. It will also place each model found
+into a lookup table that you can access via <code>imp.model</code></p>
+<p>See more about how import_models and the lookup
+here: <a href="imp_x-import_models.html">Imp.x / import_models</a> and <a href="imp_x-model.html">Imp.x / model</a></p>
+<p><code>import_blueprints</code> expects a folder that contains many Blueprint as Python packages.
+It will check each blueprint folder's <code>__init__.py</code> file for an instance of a Flask Blueprint or a
+Flask-Imp Blueprint. That instant will then be registered with the Flask app.</p>
+<p>See more about how importing blueprints work here: <a href="blueprint-introduction.html">Blueprint / Introduction</a></p>
 
 </section>
 

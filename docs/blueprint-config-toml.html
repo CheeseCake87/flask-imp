@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Include_csrf - Flask_imp.security | Flask-Imp</title>
+    <title>The Flask-Imp Blueprint Config File | Flask-Imp</title>
     <link rel="stylesheet" href="static/water.css">
     <link rel="stylesheet" href="static/pygments.emacs-dull.css">
     <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
@@ -244,9 +244,90 @@
 </aside>
 
 <section>
-    <h1 style="font-size: 2.6rem; margin: 0;">include_csrf - flask_imp.security</h1>
-    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.security</span> <span class="kn">import</span> <span class="n">include_csrf</span>
+    <h1 style="font-size: 2.6rem; margin: 0;">The Flask-Imp Blueprint Config File</h1>
+    <p>The Flask-Imp Blueprint will load configuration from a <code>config.toml</code> file, which is located in the same directory as the
+<code>__init__.py</code> file.</p>
+<p>File: <code>config.toml</code></p>
+<div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;yes&quot;</span>
+
+<span class="k">[settings]</span>
+<span class="n">url_prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">subdomain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">url_defaults</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<span class="n">static_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">template_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">static_url_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="c1">#root_path = &quot;&quot;</span>
+<span class="c1">#cli_group = &quot;&quot;</span>
+
+<span class="k">[session]</span>
+<span class="n">var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
 </pre></div>
+<p>This config reflects the args that are passed to a regular Flask Blueprint class, the addition of the ability to
+enable/disable the Blueprint, and set session variables.</p>
+<p>For more information about the args of a regular Flask Blueprint see:
+<a href="https://flask.palletsprojects.com/en/3.0.x/api/#flask.Blueprint">Flask docs (Blueprint)</a></p>
+<h4>Example of advance use case for blueprint config files:</h4>
+<div class="highlight"><pre><span></span>testing_blueprint/
+├── routes/
+│   └── index.py
+├── static/
+│   └── ...
+├── templates/
+│   └── www/
+│       └── index.html
+├── __init__.py
+├── pro_config.py
+└── dev_config.toml
+</pre></div>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">app</span> <span class="kn">import</span> <span class="n">app</span>
+<span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">Blueprint</span>
+
+<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span>
+    <span class="vm">__name__</span><span class="p">,</span> 
+    <span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;dev_config.toml&quot;</span> <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;pro_config.py&quot;</span>
+<span class="p">)</span>
+
+<span class="n">bp</span><span class="o">.</span><span class="n">import_resources</span><span class="p">(</span><span class="s2">&quot;routes&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@bp</span><span class="o">.</span><span class="n">before_app_request</span>
+<span class="k">def</span> <span class="nf">before_app_request</span><span class="p">():</span>
+    <span class="n">bp</span><span class="o">.</span><span class="n">init_session</span><span class="p">()</span>
+</pre></div>
+<p>File: <code>pro_config.py</code></p>
+<div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;no&quot;</span>
+
+<span class="k">[settings]</span>
+<span class="c1">#url_prefix = &quot;&quot;</span>
+<span class="c1">#subdomain = &quot;&quot;</span>
+<span class="c1">#url_defaults = { }</span>
+<span class="c1">#static_folder = &quot;&quot;</span>
+<span class="c1">#template_folder = &quot;&quot;</span>
+<span class="c1">#static_url_path = &quot;&quot;</span>
+<span class="c1">#root_path = &quot;&quot;</span>
+<span class="c1">#cli_group = &quot;&quot;</span>
+
+<span class="k">[session]</span>
+<span class="c1">#var = &quot;&quot;</span>
+</pre></div>
+<p>File: <code>dev_config.py</code></p>
+<div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;yes&quot;</span>
+
+<span class="k">[settings]</span>
+<span class="n">url_prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/testing&quot;</span>
+<span class="c1">#subdomain = &quot;&quot;</span>
+<span class="c1">#url_defaults = { }</span>
+<span class="n">static_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;static&quot;</span>
+<span class="n">template_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;templates&quot;</span>
+<span class="c1">#static_url_path = &quot;&quot;</span>
+<span class="c1">#root_path = &quot;&quot;</span>
+<span class="c1">#cli_group = &quot;&quot;</span>
+
+<span class="k">[session]</span>
+<span class="c1">#var = &quot;&quot;</span>
+</pre></div>
+<p>In the example above, the <code>testing_blueprint</code> will only be enabled if the Flask app is running in debug mode.</p>
 
 </section>
 

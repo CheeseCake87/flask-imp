@@ -1,10 +1,14 @@
 - CLI Commands
     - flask-imp init
     - flask-imp blueprint
-- Configuration
+- Imp
+    - Introduction
     - x.config.toml
-    - Find Env Variables
-- Imp.
+    - Load Env Variables
+- Blueprint
+    - Introduction
+    - config.toml
+- Imp.x
     - init_app
     - init_session
     - import_app_resources
@@ -13,7 +17,7 @@
     - import_models
     - model
     - model_meta
-- Blueprint.
+- Blueprint.x
     - init_session
     - import_resources
     - import_nested_blueprint
@@ -21,22 +25,20 @@
     - import_models
     - tmpl
 - flask_imp.security
-    - Introduction
     - login_check
     - permission_check
     - pass_function_check
     - api_login_check
     - include_csrf
 - flask_imp.auth
-    - Introduction
     - is_email_address_valid
     - is_username_valid
     - generate_csrf_token
     - generate_private_key
-    - generate_numeric_validator
     - generate_email_validator
-    - generate_salt
-    - generate_pepper
-    - hash_password
-    - auth_password
+    - generate_numeric_validator
+    - generate_alphanumeric_validator
     - generate_password
+    - generate_salt
+    - encrypt_password
+    - authenticate_password

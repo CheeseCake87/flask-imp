@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Include_csrf - Flask_imp.security | Flask-Imp</title>
+    <title>Flask-Imp Blueprint Introduction | Flask-Imp</title>
     <link rel="stylesheet" href="static/water.css">
     <link rel="stylesheet" href="static/pygments.emacs-dull.css">
     <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
@@ -244,9 +244,69 @@
 </aside>
 
 <section>
-    <h1 style="font-size: 2.6rem; margin: 0;">include_csrf - flask_imp.security</h1>
-    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.security</span> <span class="kn">import</span> <span class="n">include_csrf</span>
+    <h1 style="font-size: 2.6rem; margin: 0;">Flask-Imp Blueprint Introduction</h1>
+    <div class="highlight"><pre><span></span><span class="n">Blueprint</span><span class="p">(</span><span class="n">dunder_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;config.toml&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </pre></div>
+<hr />
+<p>The Flask-Imp Blueprint inherits from the Flask Blueprint class, then adds some additional methods to allow for auto
+importing of models, resources and other nested blueprints.</p>
+<p>The Flask-Imp Blueprint reads configuration from a config.toml file, which is located in the same directory as the
+<code>__init__.py</code> file.</p>
+<p>Here's an example of a Flask-Imp Blueprint structure:</p>
+<div class="highlight"><pre><span></span>www/
+├── nested_blueprints/
+│   ├── blueprint_one/
+│   │   ├── ...
+│   │   ├── __init__.py
+│   │   └── config.toml
+│   └── blueprint_two/
+│       ├── ...
+│       ├── __init__.py
+│       └── config.toml
+├── standalone_nested_blueprint/
+│   ├── ...
+│   ├── __init__.py
+│   └── config.toml
+├── models/
+│   └── ...
+├── routes/
+│   └── index.py
+├── static/
+│   └── ...
+├── templates/
+│   └── www/
+│       └── index.html
+├── __init__.py
+└── config.toml
+</pre></div>
+<p>File: <code>__init__.py</code></p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">Blueprint</span>
+
+<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">bp</span><span class="o">.</span><span class="n">import_resources</span><span class="p">(</span><span class="s2">&quot;routes&quot;</span><span class="p">)</span>
+<span class="n">bp</span><span class="o">.</span><span class="n">import_models</span><span class="p">(</span><span class="s2">&quot;models&quot;</span><span class="p">)</span>
+<span class="n">bp</span><span class="o">.</span><span class="n">import_nested_blueprints</span><span class="p">(</span><span class="s2">&quot;nested_blueprints&quot;</span><span class="p">)</span>
+<span class="n">bp</span><span class="o">.</span><span class="n">import_nested_blueprint</span><span class="p">(</span><span class="s2">&quot;standalone_nested_blueprint&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@bp</span><span class="o">.</span><span class="n">before_app_request</span>
+<span class="k">def</span> <span class="nf">before_app_request</span><span class="p">():</span>
+    <span class="n">bp</span><span class="o">.</span><span class="n">init_session</span><span class="p">()</span>
+</pre></div>
+<p>That <code>config.toml</code> file is loaded during the <code>__init__</code> method of the Blueprint class.
+To see more about the config file see: <a href="blueprint-config-toml.html">Blueprint / config.toml</a></p>
+<p><code>import_resources</code> method will walk one level deep into the <code>routes</code> folder, and import all <code>.py</code> files as modules.
+For more information see: <a href="blueprint_x-import_resources.html">Blueprint.x / import_resources</a></p>
+<p><code>import_models</code> works the same as <code>imp.import_models</code>, it will look for instances of <code>db.Model</code> and import them. These
+will also be available in the model lookup method <code>imp.model</code>.
+For more information see: <a href="imp_x-import_models.html">Imp.x / import_models</a></p>
+<p><code>import_nested_blueprints</code> will do the same as <code>imp.import_blueprints</code>, but will register the blueprints found as
+nested to the current blueprint. For example <code>www.blueprint_one.index</code></p>
+<p><code>import_nested_blueprint</code> behaves the same as <code>import_nested_blueprints</code>, but will only import a single blueprint.</p>
+<p><code>bp.init_session</code> will load the session variables from the config file into the session object. For more information
+see: <a href="blueprint_x-init_session.html">Blueprint.x / init_session</a> and
+<a href="blueprint-config-toml.html">Blueprint / config.toml</a></p>
 
 </section>
 

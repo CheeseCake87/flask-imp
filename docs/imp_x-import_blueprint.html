@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Include_csrf - Flask_imp.security | Flask-Imp</title>
+    <title>Imp.import_blueprint | Flask-Imp</title>
     <link rel="stylesheet" href="static/water.css">
     <link rel="stylesheet" href="static/pygments.emacs-dull.css">
     <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
@@ -244,8 +244,71 @@
 </aside>
 
 <section>
-    <h1 style="font-size: 2.6rem; margin: 0;">include_csrf - flask_imp.security</h1>
-    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.security</span> <span class="kn">import</span> <span class="n">include_csrf</span>
+    <h1 style="font-size: 2.6rem; margin: 0;">Imp.import_blueprint</h1>
+    <div class="highlight"><pre><span></span><span class="n">import_blueprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blueprint</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</pre></div>
+<hr />
+<p>Import a specified Flask-Imp or standard Flask Blueprint.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">Imp</span>
+
+<span class="n">imp</span> <span class="o">=</span> <span class="n">Imp</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">create_app</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">imp</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+    <span class="n">imp</span><span class="o">.</span><span class="n">import_blueprint</span><span class="p">(</span><span class="s2">&quot;my_blueprint&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">app</span>
+</pre></div>
+<p>Flask-Imp Blueprints have the ability to import configuration from a toml file, import resources, and initialize session
+variables.</p>
+<h4>Example of a Flask-Imp Blueprint:</h4>
+<div class="highlight"><pre><span></span>app
+├── my_blueprint
+│   ├── routes
+│   │   └── index.py
+│   ├── static
+│   │   └── css
+│   │       └── style.css
+│   ├── templates
+│   │   └── my_blueprint
+│   │       └── index.html
+│   ├── __init__.py
+│   └── config.toml
+└── ...
+</pre></div>
+<p>File: <code>__init__.py</code></p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">Blueprint</span>
+
+<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">bp</span><span class="o">.</span><span class="n">import_resources</span><span class="p">(</span><span class="s2">&quot;routes&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@bp</span><span class="o">.</span><span class="n">before_app_request</span>
+<span class="k">def</span> <span class="nf">before_app_request</span><span class="p">():</span>
+    <span class="n">bp</span><span class="o">.</span><span class="n">init_session</span><span class="p">()</span>
+</pre></div>
+<h4>Example of a standard Flask Blueprint:</h4>
+<div class="highlight"><pre><span></span>app
+├── my_blueprint
+│   ├── ...
+│   └── __init__.py
+└── ...
+</pre></div>
+<p>File: <code>__init__.py</code></p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Blueprint</span>
+
+<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s2">&quot;my_blueprint&quot;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="s2">&quot;/my-blueprint&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;regular_blueprint&quot;</span>
 </pre></div>
 
 </section>

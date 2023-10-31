@@ -5,19 +5,13 @@
 Flask-Imp's main purpose is to help simplify the importing of blueprints, resources, and models. It has a few extra
 features built in to help with securing pages and password authentication.
 
-## Setup
+## Install Flask-Imp
 
-Create a new project folder and navigate to it.
-
-```text
-# Linux
-cd /path/to/project-folder
-
-# Windows
-cd C:\path\to\project-folder
+```bash
+pip install flask-imp
 ```
 
-## Create a virtual environment and activate it
+We recommend using a virtual environment, then installing Flask-Imp.
 
 **Linux / MacOS**
 
@@ -39,8 +33,3 @@ python -m venv venv
 .\venv\Scripts\activate
 ```
 
-## Install Flask-Imp
-
-```bash
-pip install flask-imp
-```

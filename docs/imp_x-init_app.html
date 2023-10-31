@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Include_csrf - Flask_imp.security | Flask-Imp</title>
+    <title>Imp.init_app | Flask-Imp</title>
     <link rel="stylesheet" href="static/water.css">
     <link rel="stylesheet" href="static/pygments.emacs-dull.css">
     <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
@@ -244,9 +244,20 @@
 </aside>
 
 <section>
-    <h1 style="font-size: 2.6rem; margin: 0;">include_csrf - flask_imp.security</h1>
-    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.security</span> <span class="kn">import</span> <span class="n">include_csrf</span>
+    <h1 style="font-size: 2.6rem; margin: 0;">Imp.init_app</h1>
+    <div class="highlight"><pre><span></span><span class="n">init_app</span><span class="p">(</span>
+    <span class="n">app</span><span class="p">:</span> <span class="n">Flask</span><span class="p">,</span>
+    <span class="n">app_config_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;IMP_CONFIG&quot;</span><span class="p">),</span>
+    <span class="n">ignore_missing_env_variables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </pre></div>
+<hr />
+<p>Initializes the flask app to work with flask-imp.</p>
+<p>If no <code>app_config_file</code> specified, an attempt to read <code>IMP_CONFIG</code> from the environment will be made.</p>
+<p>If <code>IMP_CONFIG</code> is not in the environment variables, an attempt to load <code>default.config.toml</code> will be made.</p>
+<p><code>default.config.toml</code> will be created, and used if not found.</p>
+<p>If <code>ignore_missing_env_variables</code> is <code>True</code>, then missing environment variables will be ignored.</p>
+<p>If <code>ignore_missing_env_variables</code> is <code>False</code> (default), then missing environment variables will raise a ValueError</p>
 
 </section>
 
