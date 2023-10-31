@@ -1,11 +1,12 @@
-import re
 import itertools
+import re
+import typing as t
 from dataclasses import dataclass
 from datetime import datetime
 from hashlib import sha1, sha256, sha512
 from random import choice
 from random import randrange
-from string import punctuation, ascii_letters
+from string import punctuation, ascii_letters, ascii_uppercase, digits
 
 
 class Auth:
@@ -15,6 +16,27 @@ class Auth:
         """
         Checks if email_address is a valid email address.
 
+        Is not completely RFC 5322 compliant, but it is good enough for most use cases.
+
+        :raw-html:`<br />`
+
+        Here are examples of mistakes that it will not catch:
+
+        :raw-html:`<br />`
+
+        Valid but fails:
+
+         - email@[123.123.123.123] is VALID => PASSED : False
+         - “email”@example.com is VALID => PASSED : False
+         - very.unusual.“@”.unusual.com@example.com is VALID => PASSED : False
+         - very.“(),:;<>[]”.VERY.“very@\\ "very”.unusual@strange.example.com is VALID => PASSED : False
+
+         Invalid but passes:
+
+         - email@example.com (Joe Smith) is INVALID => PASSED : True
+         - email@111.222.333.44444 is INVALID => PASSED : True
+
+
         :raw-html:`<br />`
 
         -----
@@ -23,54 +45,100 @@ class Auth:
         :return: bool
         """
         pattern = re.compile(
-            r"[a-z\d!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?",
+            r"[a-z\d!#$%&'*+?^_`{|}~-]+(?:\.[a-z\d!#$%&'*+?^_`"
+            r"{|}~-]+)*@(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?",
             re.IGNORECASE
         )
         return bool(pattern.match(email_address))
 
     @classmethod
-    def is_username_valid(cls, username: str, allowed: str = "all") -> bool:
+    def is_username_valid(
+            cls,
+            username: str,
+            allowed: t.Optional[list[t.Literal["all", "dot", "dash", "under"]]] = None
+    ) -> bool:
         """
         Checks if a username is valid.
 
         :raw-html:`<br />`
 
-        Valid usernames can only include letters, numbers, ., -, and _ but cannot begin or end with
+        Valid usernames can only include letters,
+        numbers, ., -, and _ but cannot begin or end with
         the last three mentioned.
 
         :raw-html:`<br />`
 
-        -----
 
-        .. note::
+        **Example use:**
 
-            This method is unstable and needs to be reworked.
         :raw-html:`<br />`
+
+        .. code-block::
+
+                Auth.is_username_valid("username", allowed=["all"])
+
+        :raw-html:`<br />`
+
+        **Output:**
+
+        .. code-block::
+
+            username : WILL PASS : True
+            user.name : WILL PASS : True
+            user-name : WILL PASS : True
+            user_name : WILL PASS : True
+            _user_name : WILL PASS : False
+
+
+        :raw-html:`<br />`
+
+        .. code-block::
+
+                Auth.is_username_valid("username", allowed=["dot", "dash"])
+
+        :raw-html:`<br />`
+
+        **Output:**
+
+        .. code-block::
+
+            username : WILL PASS : True
+            user.name : WILL PASS : True
+            user-name : WILL PASS : True
+            user-name.name : WILL PASS : True
+            user_name : WILL PASS : False
+            _user_name : WILL PASS : False
+            .user.name : WILL PASS : False
 
         -----
 
         :param username: str
-        :param allowed: str - "all", "dot", "dash", "under" - defaults to "all"
+        :param allowed: list - ["all", "dot", "dash", "under"] - defaults to ["all"]
         :return bool:
         """
-        matches = list()
-        if username.isalnum():
-            return True
-        if re.findall(r"([a-zA-Z\d]+(\.+[a-zA-Z\d]+)+)", username):
-            matches.append("dot")
-        if re.findall(r"([a-zA-Z\d]+(-[a-zA-Z\d]+)+)", username):
-            matches.append("dash")
-        if re.findall(r"([a-zA-Z\d]+(_[a-zA-Z\d]+)+)", username):
-            matches.append("under")
-        if allowed == "all" and matches:
-            return True
-        if allowed == "dot" and matches:
+
+        if not username[0].isalnum() or not username[-1].isalnum():
             return False
-        if allowed == "dash" and matches:
-            return False
-        if allowed == "under" and matches:
-            return False
-        return False
+
+        if allowed is None:
+            allowed = ["all"]
+
+        if "all" in allowed:
+            return bool(re.match(r"^[a-zA-Z0-9._-]+$", username))
+
+        if "under" not in allowed:
+            if "_" in username:
+                return False
+
+        if "dot" not in allowed:
+            if "." in username:
+                return False
+
+        if "dash" not in allowed:
+            if "-" in username:
+                return False
+
+        return True
 
     @classmethod
     def generate_csrf_token(cls) -> str:
@@ -92,36 +160,14 @@ class Auth:
         return sha.hexdigest()
 
     @classmethod
-    def generate_form_token(cls) -> str:
-        """
-        Been renamed to generate_csrf_token
-        """
-        return cls.generate_csrf_token()
-
-    @classmethod
-    def generate_salt(cls) -> str:
-        """
-        Generates a string of 4 special characters (punctuation).
-
-        :raw-html:`<br />`
-
-        For use in password salting
-
-        :raw-html:`<br />`
-
-        -----
-
-        :return: str - salt of length 4
-        """
-        return "".join(choice(punctuation) for _ in range(4))
-
-    @classmethod
-    def generate_private_key(cls, hook: str) -> str:
+    def generate_private_key(cls, hook: t.Optional[str]) -> str:
         """
         Generates a sha256 private key from a passed in hook value.
 
         :raw-html:`<br />`
-        For use in any private key generation.
+
+        If no hook is passed in, it will generate a hook using datetime.now() and a
+        random number between 1 and 1000.
 
         :raw-html:`<br />`
 
@@ -130,6 +176,11 @@ class Auth:
         :param hook: str - hook value to generate private key from
         :return: str - sha256
         """
+
+        if hook is None:
+            _range = randrange(1, 1000)
+            hook = f"{datetime.now()}-{_range}"
+
         sha = sha256()
         sha.update(hook.encode("utf-8"))
         return sha.hexdigest()
@@ -137,8 +188,12 @@ class Auth:
     @classmethod
     def generate_numeric_validator(cls, length: int) -> int:
         """
-        Generates (length) of random numbers.
+        Generates random choice between 1 * (length) and 9 * (length).
         
+        :raw-html:`<br />`
+
+        If the length is 4, it will generate a number between 1111 and 9999.
+
         :raw-html:`<br />`
         
         For use in MFA email, or unique filename generation.
@@ -147,11 +202,30 @@ class Auth:
 
         -----
         :param length: int - length of number to generate
-        :return: int - number between 1111 and 9999 if length is 4
+        :return: int - Example return of number between 1111 and 9999 if length is 4
         """
         start = int("1" * length)
         end = int("9" * length)
         return randrange(start, end)
+
+    @classmethod
+    def generate_alphanumeric_validator(cls, length: int) -> str:
+        """
+        Generates (length) of alphanumeric.
+
+        :raw-html:`<br />`
+
+        For use in MFA email, or unique filename generation.
+
+        :raw-html:`<br />`
+
+        -----
+        :param length: int - length of alphanumeric to generate
+        :return: str - Example return of "F5R6" if length is 4
+        """
+
+        _alpha_numeric = ascii_uppercase + digits
+        return "".join([choice(_alpha_numeric) for _ in range(length)])
 
     @classmethod
     def generate_email_validator(cls) -> str:
@@ -170,17 +244,43 @@ class Auth:
         
         :return: str - number between 11111111 and 99999999
         """
-        return str(cls.generate_numeric_validator(length=8))
+        return str(cls.generate_alphanumeric_validator(length=8))
 
     @classmethod
-    def generate_pepper(cls, password: str, length: int = 1) -> str:
+    def generate_salt(cls, length: int = 4) -> str:
         """
-        Chooses a random letter from ascii_letters and joins it onto the user's password,
-        this is used to pepper the password
+        Generates a string of (length) characters of punctuation.
 
         :raw-html:`<br />`
 
-        For use in password hashing.
+        The Default length is 4.
+
+        :raw-html:`<br />`
+
+        For use in password salting
+
+        :raw-html:`<br />`
+
+        -----
+
+        :return: str - salt of (length)
+        """
+        return "".join(choice(punctuation) for _ in range(length))
+
+    @classmethod
+    def _attach_pepper(cls, password: str, length: int = 1, position: t.Literal["start", "end"] = "end") -> str:
+        """
+        Chooses a random letter from ascii_letters and joins it onto the user's password,
+        this is used to pepper the password.
+
+        :raw-html:`<br />`
+
+        You can increase the length of the pepper by passing in a length value.
+        This will add to the complexity of password guessing when using the auth_password method.
+
+        :raw-html:`<br />`
+
+        You can set the position of the pepper by passing in a position value "start" or "end" defaults to "end".
 
         :raw-html:`<br />`
 
@@ -194,21 +294,36 @@ class Auth:
 
         :param password: str - user's password
         :param length: int - length of pepper - defaults to 1, capped at 3
+        :param position: str - "start" or "end" - defaults to "end"
         :return: str - peppered password
         """
         if length > 3:
             length = 3
 
+        if position == "start":
+            return password + "".join(choice(ascii_letters) for _ in range(length))
+
         return "".join(choice(ascii_letters) for _ in range(length)) + password
 
     @classmethod
-    def hash_password(cls, password: str, salt: str, encrypt: int = 512, pepper_length: int = 1) -> str:
+    def encrypt_password(
+            cls,
+            password: str,
+            salt: str,
+            encryption_level: int = 512,
+            pepper_length: int = 1,
+            pepper_position: t.Literal["start", "end"] = "end"
+    ) -> str:
         """
-        Takes the plain password, applies a pepper, salts it, then converts it to sha
+        Takes the plain password, applies a pepper, salts it, then converts it to sha.
 
         :raw-html:`<br />`
 
-        Can set encryption to 256 or 512.
+        You will need to know the pepper length that the password was hashed wit
+
+        :raw-html:`<br />`
+
+        Can set the encryption level to 256 or 512.
 
         :raw-html:`<br />`
 
@@ -220,50 +335,55 @@ class Auth:
 
             pepper_length is capped at 3.
 
+            You must inform the authenticate_password of the pepper length used to hash the password.
+
+            You must inform the authenticate_password of the position of the pepper used to hash the password.
+
+            You must inform the authenticate_password of the encryption level used to hash the password.
+
         :raw-html:`<br />`
 
         -----
 
         :param password: str - plain password
         :param salt: str - salt
-        :param encrypt: int - 256 or 512 - defaults to 512
+        :param encryption_level: int - 256 or 512 - defaults to 512
         :param pepper_length: int - length of pepper
+        :param pepper_position: str - "start" or "end" - defaults to "end"
         :return str: hash:
         """
         if pepper_length > 3:
             pepper_length = 3
 
-        sha = sha512() if encrypt == 512 else sha256()
-        sha.update((cls.generate_pepper(password, pepper_length) + salt).encode("utf-8"))
+        sha = sha512() if encryption_level == 512 else sha256()
+        sha.update((cls._attach_pepper(password, pepper_length, pepper_position) + salt).encode("utf-8"))
         return sha.hexdigest()
 
     @classmethod
-    def sha_password(cls, password: str, salt: str, encrypt: int = 512, pepper_length: int = 1) -> str:
-        """ Legacy method, use hash_password instead """
-        return cls.hash_password(password, salt, encrypt, pepper_length)
-
-    @classmethod
-    def auth_password(
+    def authenticate_password(
             cls,
             input_password: str,
             database_password: str,
             database_salt: str,
-            encrypt: int = 512,
-            pepper_length: int = 1
+            encryption_level: int = 512,
+            pepper_length: int = 1,
+            pepper_position: t.Literal["start", "end"] = "end"
     ) -> bool:
         """
-        Takes plain password, the stored hashed password along with the stored salt
+        Takes the plain input password, the stored hashed password along with the stored salt
         and tries every possible combination of pepper values to find a match.
-
-        :raw-html:`<br />`
-
-        For use in password authentication.
 
         :raw-html:`<br />`
 
         .. Note::
 
             pepper_length is capped at 3.
+
+            You must know the length of the pepper used to hash the password.
+
+            You must know the position of the pepper used to hash the password.
+
+            You must know the encryption level used to hash the password.
 
         :raw-html:`<br />`
 
@@ -272,8 +392,9 @@ class Auth:
         :param input_password: str - plain password
         :param database_password: str - hashed password from database
         :param database_salt: str - salt from database
-        :param encrypt: int - encryption used to generate database password
+        :param encryption_level: int - encryption used to generate database password
         :param pepper_length: int - length of pepper used to generate database password
+        :param pepper_position: str - "start" or "end" - position of pepper used to generate database password
         :return: bool - True if match, False if not
         """
 
@@ -283,8 +404,12 @@ class Auth:
         guesses = [''.join(i) for i in itertools.product(ascii_letters, repeat=pepper_length)]
 
         for index, guess in enumerate(guesses):
-            sha = sha512() if encrypt == 512 else sha256()
-            sha.update((guess + input_password + database_salt).encode("utf-8"))
+            sha = sha512() if encryption_level == 512 else sha256()
+            if pepper_position == "start":
+                sha.update((guess + input_password + database_salt).encode("utf-8"))
+            else:
+                sha.update((input_password + guess + database_salt).encode("utf-8"))
+
             if sha.hexdigest() == database_password:
                 return True
 
@@ -341,6 +466,40 @@ class Auth:
             ) + str(cls.generate_numeric_validator(length=2))
 
         raise ValueError(f"Invalid style passed in {style}")
+
+    # LEGACY METHODS
+
+    @classmethod
+    def auth_password(
+            cls,
+            input_password: str,
+            database_password: str,
+            database_salt: str,
+            encrypt: int = 512,
+            pepper_length: int = 1
+    ) -> bool:
+        """ Legacy method, use authenticate_password instead """
+        return cls.authenticate_password(input_password, database_password, database_salt, encrypt, pepper_length)
+
+    @classmethod
+    def hash_password(cls, password: str, salt: str, encrypt: int = 512, pepper_length: int = 1) -> str:
+        """ Legacy method, use encrypt_password instead """
+        return cls.encrypt_password(password, salt, encrypt, pepper_length)
+
+    @classmethod
+    def sha_password(cls, password: str, salt: str, encrypt: int = 512, pepper_length: int = 1) -> str:
+        """ Legacy method, use encrypt_password instead """
+        return cls.hash_password(password, salt, encrypt, pepper_length)
+
+    @classmethod
+    def generate_pepper(cls, password: str, length: int = 1) -> str:
+        """ Legacy method, use _attach_pepper instead """
+        return cls._attach_pepper(password, length)
+
+    @classmethod
+    def generate_form_token(cls) -> str:
+        """ Legacy method, use generate_csrf_token instead """
+        return cls.generate_csrf_token()
 
 
 @dataclass(frozen=True)
