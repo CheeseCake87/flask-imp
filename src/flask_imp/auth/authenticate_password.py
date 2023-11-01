@@ -14,13 +14,11 @@ def authenticate_password(
 ) -> bool:
     """
     Takes the plain input password, the stored hashed password along with the stored salt
-    and tries every possible combination of pepper values to find a match.
+    and will try every possible combination of pepper values to find a match.
 
     :raw-html:`<br />`
 
     .. Note::
-
-        pepper_length is capped at 3.
 
         You must know the length of the pepper used to hash the password.
 

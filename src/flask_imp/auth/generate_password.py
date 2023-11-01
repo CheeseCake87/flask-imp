@@ -19,7 +19,7 @@ def generate_password(style: str = "mixed", length: int = 3) -> str:
 
     .. code-block::
 
-        Auth.generate_password(style="animals", length=3)
+        generate_password(style="animals", length=3)
 
     :raw-html:`<br />`
 

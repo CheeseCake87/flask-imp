@@ -12,15 +12,15 @@ def encrypt_password(
         pepper_position: t.Literal["start", "end"] = "end"
 ) -> str:
     """
-    Takes the plain password, applies a pepper, salts it, then converts it to sha.
+    Takes the plain password, applies a pepper, salts it, then produces a digested sha512 or sha256 if specified.
 
     :raw-html:`<br />`
 
-    You will need to know the pepper length that the password was hashed wit
+    Can set the encryption level to 256 or 512, defaults to 512.
 
-    :raw-html:`<br />`
+    Can set the pepper length, defaults to 1. Max is 3.
 
-    Can set the encryption level to 256 or 512.
+    Can set the pepper position, "start" or "end", defaults to "end".
 
     :raw-html:`<br />`
 
@@ -30,13 +30,11 @@ def encrypt_password(
 
     .. Note::
 
-        pepper_length is capped at 3.
+        You must inform the authenticate_password function of the pepper length used to hash the password.
 
-        You must inform the authenticate_password of the pepper length used to hash the password.
+        You must inform the authenticate_password function of the position of the pepper used to hash the password.
 
-        You must inform the authenticate_password of the position of the pepper used to hash the password.
-
-        You must inform the authenticate_password of the encryption level used to hash the password.
+        You must inform the authenticate_password function of the encryption level used to hash the password.
 
     :raw-html:`<br />`
 

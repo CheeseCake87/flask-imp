@@ -24,7 +24,7 @@ def is_username_valid(
 
     .. code-block::
 
-            Auth.is_username_valid("username", allowed=["all"])
+            is_username_valid("username", allowed=["all"])
 
     :raw-html:`<br />`
 
@@ -43,7 +43,7 @@ def is_username_valid(
 
     .. code-block::
 
-            Auth.is_username_valid("username", allowed=["dot", "dash"])
+            is_username_valid("username", allowed=["dot", "dash"])
 
     :raw-html:`<br />`
 
@@ -58,6 +58,8 @@ def is_username_valid(
         user_name : WILL PASS : False
         _user_name : WILL PASS : False
         .user.name : WILL PASS : False
+
+    :raw-html:`<br />`
 
     -----
 
