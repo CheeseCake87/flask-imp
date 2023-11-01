@@ -249,7 +249,37 @@
 
 <section>
     <h1 style="font-size: 2.6rem; margin: 0;">Blueprint.tmpl</h1>
-    
+    <div class="highlight"><pre><span></span><span class="n">tmpl</span><span class="p">(</span><span class="n">template</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</pre></div>
+<hr />
+<p>Scopes the template lookup to the name of the blueprint (this takes from the <code>__name__</code> attribute of the Blueprint).</p>
+<p>Due to the way Flask templating works, and to avoid template name collisions.
+It is standard practice to place the name of the Blueprint in the template path,
+then to place any templates under that folder.</p>
+<div class="highlight"><pre><span></span>my_blueprint/
+├── routes/
+│   └── index.py
+├── static/...
+│
+├── templates/
+│   └── my_blueprint/
+│       └── index.html
+│
+├── __init__.py
+└── config.toml
+</pre></div>
+<p>File: <code>my_blueprint/routes/index.py</code></p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">render_template</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">bp</span>
+
+
+<span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">tmpl</span><span class="p">(</span><span class="s2">&quot;index.html&quot;</span><span class="p">))</span>
+</pre></div>
+<p><code>bp.tmpl(&quot;index.html&quot;)</code> will output <code>&quot;my_blueprint/index.html&quot;</code>.</p>
+
 </section>
 
 </body>
