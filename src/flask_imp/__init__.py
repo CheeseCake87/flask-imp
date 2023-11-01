@@ -1,6 +1,11 @@
 from .auth import Auth as Auth
 from .auth import PasswordGeneration as PasswordGeneration
-from .imp import Imp as Imp
 from .blueprint import ImpBlueprint as Blueprint
+from .imp import Imp as Imp
 
-__all__ = ["Auth", "PasswordGeneration", "Imp", "Blueprint"]
+__all__ = [
+    "Auth",
+    "PasswordGeneration",
+    "Imp",
+    "Blueprint"
+]
