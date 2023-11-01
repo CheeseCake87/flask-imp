@@ -251,6 +251,34 @@
     <h1 style="font-size: 2.6rem; margin: 0;">include_csrf - flask_imp.security</h1>
     <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.security</span> <span class="kn">import</span> <span class="n">include_csrf</span>
 </pre></div>
+<div class="highlight"><pre><span></span><span class="n">include_csrf</span><span class="p">(</span>
+    <span class="n">session_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;csrf&quot;</span><span class="p">,</span>
+    <span class="n">form_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;csrf&quot;</span><span class="p">,</span>
+    <span class="n">abort_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">401</span>
+<span class="p">)</span>
+</pre></div>
+<p><code>@include_csrf(...)</code></p>
+<hr />
+<p>A decorator that handles CSRF protection.</p>
+<p>On a <strong>GET</strong> request, a CSRF token is generated and stored in the session key
+specified by the session_key parameter.</p>
+<p>On a <strong>POST</strong> request, the form_key specified is checked against the session_key
+specified.</p>
+<ul>
+<li>If they match, the request is allowed to continue.</li>
+<li>If no match, the response will be abort(abort_code), default 401.</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/admin&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="nd">@include_csrf</span><span class="p">(</span><span class="n">session_key</span><span class="o">=</span><span class="s2">&quot;csrf&quot;</span><span class="p">,</span> <span class="n">form_key</span><span class="o">=</span><span class="s2">&quot;csrf&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">admin_page</span><span class="p">():</span>
+    <span class="o">...</span>
+    <span class="c1"># You must pass in the CSRF token from the session into the template.</span>
+    <span class="c1"># Then add &lt;input type=&quot;hidden&quot; name=&quot;csrf&quot; value=&quot;{{ csrf }}&quot;&gt; to the form.</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;admin.html&quot;</span><span class="p">,</span> <span class="n">csrf</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;csrf&quot;</span><span class="p">))</span>
+</pre></div>
+<p>Form key:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;csrf&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ csrf }}&quot;</span><span class="p">&gt;</span>
+</pre></div>
 
 </section>
 
