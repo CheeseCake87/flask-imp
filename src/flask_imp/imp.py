@@ -497,10 +497,7 @@ class Imp:
         for potential_bp in folder_path.iterdir():
             self.import_blueprint(potential_bp.as_posix())
 
-    def import_models(
-            self,
-            file_or_folder: str
-    ) -> None:
+    def import_models(self, file_or_folder: str) -> None:
         """
         Imports all the models from the given file or folder.
 
