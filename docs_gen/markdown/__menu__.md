@@ -32,14 +32,14 @@
     - api_login_check
     - include_csrf
 - flask_imp.auth
-    - is_email_address_valid
-    - is_username_valid
+    - encrypt_password
+    - authenticate_password
+    - generate_password
+    - generate_salt
     - generate_csrf_token
     - generate_private_key
     - generate_email_validator
     - generate_numeric_validator
     - generate_alphanumeric_validator
-    - generate_password
-    - generate_salt
-    - encrypt_password
-    - authenticate_password
+    - is_email_address_valid
+    - is_username_valid

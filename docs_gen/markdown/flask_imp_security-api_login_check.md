@@ -26,7 +26,7 @@ A decorator that is used to secure API routes that return JSON responses.
 
 `values_allowed` A list of or singular value(s) that the session key must contain.
 
-`fail_json` JSON that is returned on failure. {"error": "You are not logged in."} by default.
+`fail_json` JSON that is returned on failure. `{"error": "You are not logged in."}` by default.
 
 ##### Example:
 

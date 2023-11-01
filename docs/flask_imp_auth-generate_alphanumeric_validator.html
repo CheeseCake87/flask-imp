@@ -18,6 +18,7 @@
 <aside>
     <img width="50%" src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px;">
     <h1>Flask-Imp</h1>
+    <div><small>Current Version: 2.6.x</small></div>
     <div><small>Last Updated:</small></div>
     <div><small>Wed, 01 Nov 2023</small></div>
 
@@ -194,11 +195,19 @@
                 <ul>
                     
                         
-                            <li><a href="flask_imp_auth-is_email_address_valid.html">is_email_address_valid</a></li>
+                            <li><a href="flask_imp_auth-encrypt_password.html">encrypt_password</a></li>
                         
                     
                         
-                            <li><a href="flask_imp_auth-is_username_valid.html">is_username_valid</a></li>
+                            <li><a href="flask_imp_auth-authenticate_password.html">authenticate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_password.html">generate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_salt.html">generate_salt</a></li>
                         
                     
                         
@@ -222,19 +231,11 @@
                         
                     
                         
-                            <li><a href="flask_imp_auth-generate_password.html">generate_password</a></li>
+                            <li><a href="flask_imp_auth-is_email_address_valid.html">is_email_address_valid</a></li>
                         
                     
                         
-                            <li><a href="flask_imp_auth-generate_salt.html">generate_salt</a></li>
-                        
-                    
-                        
-                            <li><a href="flask_imp_auth-encrypt_password.html">encrypt_password</a></li>
-                        
-                    
-                        
-                            <li><a href="flask_imp_auth-authenticate_password.html">authenticate_password</a></li>
+                            <li><a href="flask_imp_auth-is_username_valid.html">is_username_valid</a></li>
                         
                     
                 </ul>
@@ -249,7 +250,17 @@
 
 <section>
     <h1 style="font-size: 2.6rem; margin: 0;">generate_alphanumeric_validator - flask_imp.auth</h1>
-    
+    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.auth</span> <span class="kn">import</span> <span class="n">generate_alphanumeric_validator</span>
+</pre></div>
+<div class="highlight"><pre><span></span><span class="n">generate_alphanumeric_validator</span><span class="p">(</span><span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</pre></div>
+<hr />
+<p>Generates a random alphanumeric string of the given length.</p>
+<p>(letters are capitalized)</p>
+<h5>Example:</h5>
+<div class="highlight"><pre><span></span><span class="n">generate_alphanumeric_validator</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>  <span class="c1"># &gt;&gt;&gt; &#39;A1B2C3D4&#39;</span>
+</pre></div>
+
 </section>
 
 </body>

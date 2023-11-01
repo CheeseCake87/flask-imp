@@ -18,6 +18,7 @@
 <aside>
     <img width="50%" src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px;">
     <h1>Flask-Imp</h1>
+    <div><small>Current Version: 2.6.x</small></div>
     <div><small>Last Updated:</small></div>
     <div><small>Wed, 01 Nov 2023</small></div>
 
@@ -194,11 +195,19 @@
                 <ul>
                     
                         
-                            <li><a href="flask_imp_auth-is_email_address_valid.html">is_email_address_valid</a></li>
+                            <li><a href="flask_imp_auth-encrypt_password.html">encrypt_password</a></li>
                         
                     
                         
-                            <li><a href="flask_imp_auth-is_username_valid.html">is_username_valid</a></li>
+                            <li><a href="flask_imp_auth-authenticate_password.html">authenticate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_password.html">generate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_salt.html">generate_salt</a></li>
                         
                     
                         
@@ -222,19 +231,11 @@
                         
                     
                         
-                            <li><a href="flask_imp_auth-generate_password.html">generate_password</a></li>
+                            <li><a href="flask_imp_auth-is_email_address_valid.html">is_email_address_valid</a></li>
                         
                     
                         
-                            <li><a href="flask_imp_auth-generate_salt.html">generate_salt</a></li>
-                        
-                    
-                        
-                            <li><a href="flask_imp_auth-encrypt_password.html">encrypt_password</a></li>
-                        
-                    
-                        
-                            <li><a href="flask_imp_auth-authenticate_password.html">authenticate_password</a></li>
+                            <li><a href="flask_imp_auth-is_username_valid.html">is_username_valid</a></li>
                         
                     
                 </ul>
@@ -262,7 +263,7 @@
 <p>A decorator that is used to secure API routes that return JSON responses.</p>
 <p><code>session_key</code> The session key to check for.</p>
 <p><code>values_allowed</code> A list of or singular value(s) that the session key must contain.</p>
-<p><code>fail_json</code> JSON that is returned on failure. {&quot;error&quot;: &quot;You are not logged in.&quot;} by default.</p>
+<p><code>fail_json</code> JSON that is returned on failure. <code>{&quot;error&quot;: &quot;You are not logged in.&quot;}</code> by default.</p>
 <h5>Example:</h5>
 <div class="highlight"><pre><span></span><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/api/resource&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
 <span class="nd">@api_login_check</span><span class="p">(</span><span class="s1">&#39;logged_in&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
