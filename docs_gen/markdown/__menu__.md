@@ -9,7 +9,7 @@
     - Introduction
     - config.toml
 - Imp.x
-    - init_app
+    - init_app, __init__
     - init_session
     - import_app_resources
     - import_blueprint
@@ -18,6 +18,7 @@
     - model
     - model_meta
 - Blueprint.x
+    - __init__
     - init_session
     - import_resources
     - import_nested_blueprint

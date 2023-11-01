@@ -19,7 +19,7 @@
     <img width="50%" src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px;">
     <h1>Flask-Imp</h1>
     <div><small>Last Updated:</small></div>
-    <div><small>Tue, 31 Oct 2023</small></div>
+    <div><small>Wed, 01 Nov 2023</small></div>
 
     <h2>Menu</h2>
     <ul>
@@ -31,7 +31,7 @@
                 <li><strong>CLI Commands</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="cli_commands-flask-imp_init.html">flask-imp init</a></li>
@@ -48,7 +48,7 @@
                 <li><strong>Imp</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="imp-introduction.html">Introduction</a></li>
@@ -69,7 +69,7 @@
                 <li><strong>Blueprint</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="blueprint-introduction.html">Introduction</a></li>
@@ -86,10 +86,10 @@
                 <li><strong>Imp.x</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
-                            <li><a href="imp_x-init_app.html">init_app</a></li>
+                            <li><a href="imp_x-init_app-init.html">init_app, __init__</a></li>
                         
                     
                         
@@ -125,7 +125,11 @@
                 <li><strong>Blueprint.x</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
+                    
+                        
+                            <li><a href="blueprint-init.html">__init__</a></li>
+                        
                     
                         
                             <li><a href="blueprint_x-init_session.html">init_session</a></li>
@@ -158,7 +162,7 @@
                 <li><strong>flask_imp.security</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="flask_imp_security-login_check.html">login_check</a></li>
@@ -187,7 +191,7 @@
                 <li><strong>flask_imp.auth</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="flask_imp_auth-is_email_address_valid.html">is_email_address_valid</a></li>
@@ -248,7 +252,15 @@
     <div class="highlight"><pre><span></span><span class="n">import_blueprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blueprint</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </pre></div>
 <hr />
-<p>Import a specified Flask-Imp or standard Flask Blueprint.</p>
+<p>Import a specified Flask-Imp or standard Flask Blueprint relative to the Flask app root.</p>
+<div class="highlight"><pre><span></span>app
+├── my_blueprint
+│   ├── ...
+│   └── __init__.py
+├── ...
+└── __init__.py
+</pre></div>
+<p>File: <code>app/__init__.py</code></p>
 <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
 
 <span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">Imp</span>
@@ -266,7 +278,8 @@
 </pre></div>
 <p>Flask-Imp Blueprints have the ability to import configuration from a toml file, import resources, and initialize session
 variables.</p>
-<h4>Example of a Flask-Imp Blueprint:</h4>
+<p>For more information on how Flask-Imp Blueprints work, see the <a href="blueprint-introduction.html">Blueprint / Introduction</a></p>
+<h5>Example of 'my_blueprint' as a Flask-Imp Blueprint:</h5>
 <div class="highlight"><pre><span></span>app
 ├── my_blueprint
 │   ├── routes
@@ -293,7 +306,15 @@ variables.</p>
 <span class="k">def</span> <span class="nf">before_app_request</span><span class="p">():</span>
     <span class="n">bp</span><span class="o">.</span><span class="n">init_session</span><span class="p">()</span>
 </pre></div>
-<h4>Example of a standard Flask Blueprint:</h4>
+<p>File: <code>routes / index.py</code></p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">bp</span>
+
+
+<span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;regular_blueprint&quot;</span>
+</pre></div>
+<h5>Example of 'my_blueprint' as a standard Flask Blueprint:</h5>
 <div class="highlight"><pre><span></span>app
 ├── my_blueprint
 │   ├── ...
@@ -310,6 +331,8 @@ variables.</p>
 <span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
     <span class="k">return</span> <span class="s2">&quot;regular_blueprint&quot;</span>
 </pre></div>
+<p>Both of the above examples will work with <code>imp.import_blueprint(&quot;my_blueprint&quot;)</code>, they will be registered
+with the Flask app, and will be accessible via <code>url_for(&quot;my_blueprint.index&quot;)</code>.</p>
 
 </section>
 

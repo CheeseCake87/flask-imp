@@ -16,7 +16,7 @@
                 <li><strong>{{ title }}</strong></li>
             {% endif %}
             {% if values["pages"] %}
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     {% for page in values["pages"] %}
                         {% if page[page.keys()|list|first] %}
                             <li><a href="{{ page[page.keys()|list|first] }}">{{ page.keys()|list|first }}</a></li>

@@ -19,7 +19,7 @@
     <img width="50%" src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px;">
     <h1>Flask-Imp</h1>
     <div><small>Last Updated:</small></div>
-    <div><small>Tue, 31 Oct 2023</small></div>
+    <div><small>Wed, 01 Nov 2023</small></div>
 
     <h2>Menu</h2>
     <ul>
@@ -31,7 +31,7 @@
                 <li><strong>CLI Commands</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="cli_commands-flask-imp_init.html">flask-imp init</a></li>
@@ -48,7 +48,7 @@
                 <li><strong>Imp</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="imp-introduction.html">Introduction</a></li>
@@ -69,7 +69,7 @@
                 <li><strong>Blueprint</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="blueprint-introduction.html">Introduction</a></li>
@@ -86,10 +86,10 @@
                 <li><strong>Imp.x</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
-                            <li><a href="imp_x-init_app.html">init_app</a></li>
+                            <li><a href="imp_x-init_app-init.html">init_app, __init__</a></li>
                         
                     
                         
@@ -125,7 +125,11 @@
                 <li><strong>Blueprint.x</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
+                    
+                        
+                            <li><a href="blueprint-init.html">__init__</a></li>
+                        
                     
                         
                             <li><a href="blueprint_x-init_session.html">init_session</a></li>
@@ -158,7 +162,7 @@
                 <li><strong>flask_imp.security</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="flask_imp_security-login_check.html">login_check</a></li>
@@ -187,7 +191,7 @@
                 <li><strong>flask_imp.auth</strong></li>
             
             
-                <ul style="padding-top: 5px; padding-left: 10px;">
+                <ul>
                     
                         
                             <li><a href="flask_imp_auth-is_email_address_valid.html">is_email_address_valid</a></li>
@@ -245,20 +249,7 @@
 
 <section>
     <h1 style="font-size: 2.6rem; margin: 0;">Flask-Imp Introduction</h1>
-    <div class="highlight"><pre><span></span><span class="n">Imp</span><span class="p">(</span>
-    <span class="n">app</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Flask</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">app_config_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">ignore_missing_env_variables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-<span class="c1"># -or- </span>
-<span class="n">init_app</span><span class="p">(</span>
-    <span class="n">app</span><span class="p">:</span> <span class="n">Flask</span><span class="p">,</span>
-    <span class="n">app_config_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">ignore_missing_env_variables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</pre></div>
-<hr />
-<p>Flask-Imp is a Flask extension that provides auto import methods for various Flask resources. It will import models,
+    <p>Flask-Imp is a Flask extension that provides auto import methods for various Flask resources. It will import models,
 blueprints, and other resources from a Flask application. It uses the importlib module to achieve this.</p>
 <p>Flask-Imp favors the application factory pattern as a project structure, and is opinionated towards using only
 Blueprints. However, you can use Flask-Imp without using Blueprints.</p>

@@ -66,9 +66,16 @@ aside ul {
     margin: 0;
 }
 
+aside ul > ul {
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
 section {
     width: 750px;
     padding-left: 290px;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }
 
 section > div:nth-child(2) {

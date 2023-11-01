@@ -31,7 +31,7 @@ enable/disable the Blueprint, and set session variables.
 For more information about the args of a regular Flask Blueprint see:
 [Flask docs (Blueprint)](https://flask.palletsprojects.com/en/3.0.x/api/#flask.Blueprint)
 
-#### Example of advance use case for blueprint config files:
+##### Example of advance use case for blueprint config files:
 
 ```text
 testing_blueprint/

@@ -3,12 +3,6 @@ Menu = Blueprint/Introduction
 Title = Flask-Imp Blueprint Introduction
 ```
 
-```python
-Blueprint(dunder_name: str, config_file: str = "config.toml") -> None
-```
-
----
-
 The Flask-Imp Blueprint inherits from the Flask Blueprint class, then adds some additional methods to allow for auto
 importing of models, resources and other nested blueprints.
 

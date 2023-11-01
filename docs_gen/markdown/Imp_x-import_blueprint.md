@@ -9,7 +9,19 @@ import_blueprint(self, blueprint: str) -> None
 
 ---
 
-Import a specified Flask-Imp or standard Flask Blueprint.
+Import a specified Flask-Imp or standard Flask Blueprint relative to the Flask app root.
+
+
+```text
+app
+├── my_blueprint
+│   ├── ...
+│   └── __init__.py
+├── ...
+└── __init__.py
+```
+
+File: `app/__init__.py`
 
 ```python
 from flask import Flask
@@ -31,7 +43,9 @@ def create_app():
 Flask-Imp Blueprints have the ability to import configuration from a toml file, import resources, and initialize session
 variables.
 
-#### Example of a Flask-Imp Blueprint:
+For more information on how Flask-Imp Blueprints work, see the [Blueprint / Introduction](blueprint-introduction.html)
+
+##### Example of 'my_blueprint' as a Flask-Imp Blueprint:
 
 ```text
 app
@@ -64,7 +78,18 @@ def before_app_request():
     bp.init_session()
 ```
 
-#### Example of a standard Flask Blueprint:
+File: `routes / index.py`
+
+```python
+from .. import bp
+
+
+@bp.route("/")
+def index():
+    return "regular_blueprint"
+```
+
+##### Example of 'my_blueprint' as a standard Flask Blueprint:
 
 ```text
 app
@@ -86,3 +111,6 @@ bp = Blueprint("my_blueprint", __name__, url_prefix="/my-blueprint")
 def index():
     return "regular_blueprint"
 ```
+
+Both of the above examples will work with `imp.import_blueprint("my_blueprint")`, they will be registered
+with the Flask app, and will be accessible via `url_for("my_blueprint.index")`.

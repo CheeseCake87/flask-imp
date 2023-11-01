@@ -3,22 +3,6 @@ Menu = Imp/Introduction
 Title = Flask-Imp Introduction
 ```
 
-```python
-Imp(
-    app: Optional[Flask] = None,
-    app_config_file: Optional[str] = None,
-    ignore_missing_env_variables: bool = False
-) -> None
-# -or- 
-init_app(
-    app: Flask,
-    app_config_file: Optional[str] = None,
-    ignore_missing_env_variables: bool = False
-) -> None
-```
-
----
-
 Flask-Imp is a Flask extension that provides auto import methods for various Flask resources. It will import models,
 blueprints, and other resources from a Flask application. It uses the importlib module to achieve this.
 

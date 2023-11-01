@@ -11,6 +11,80 @@ features built in to help with securing pages and password authentication.
 pip install flask-imp
 ```
 
+## Getting Started
+
+To get started right away, you can utilize the CLI commands to create a new Flask-Imp project.
+
+```bash
+flask-imp init
+```
+
+See [CLI Commands / flask-imp init](cli_commands-flask-imp_init.html) for more information.
+
+## Minimal Flask-Imp Setup
+
+#### Folder Structure
+
+```text
+app/
+├── global/
+│   ├── static/...
+│   ├── templates/
+│   │   └── index.html
+│   └── index.py
+├── default.config.toml
+└── __init__.py
+```
+
+File: `app/__init__.py`
+
+```python
+from flask import Flask
+
+from flask_imp import Imp
+
+imp = Imp()
+
+
+def create_app():
+    app = Flask(__name__)
+    imp.init_app(app)
+
+    imp.import_app_resources()
+    # Takes argument 'folder' default folder is 'global'
+
+    return app
+```
+
+File: `app/global/index.py`
+
+```python
+from flask import current_app as app
+from flask import render_template
+
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+```
+
+File: `app/global/templates/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask-Imp</title>
+</head>
+<body>
+<h1>Flask-Imp</h1>
+</body>
+</html>
+```
+
+---
+
 We recommend using a virtual environment, then installing Flask-Imp.
 
 **Linux / MacOS**

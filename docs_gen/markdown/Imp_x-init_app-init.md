@@ -1,12 +1,18 @@
 ```
-Menu = Imp.x/init_app
-Title = Imp.init_app
+Menu = Imp.x/init_app, __init__
+Title = Imp.init_app, __init__
 ```
 
 ```python
 init_app(
     app: Flask,
-    app_config_file: Optional[str] = os.environ.get("IMP_CONFIG"),
+    app_config_file: Optional[str] = None,
+    ignore_missing_env_variables: bool = False
+) -> None
+# -or- 
+Imp(
+    app: Optional[Flask] = None,
+    app_config_file: Optional[str] = None,
     ignore_missing_env_variables: bool = False
 ) -> None
 ```
