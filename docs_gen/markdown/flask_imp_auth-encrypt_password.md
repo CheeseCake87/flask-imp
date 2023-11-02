@@ -14,7 +14,7 @@ encrypt_password(
     encryption_level: int = 512,
     pepper_length: int = 1,
     pepper_position: t.Literal["start", "end"] = "end"
-    ) -> str
+) -> str
 ```
 
 ---
