@@ -1,7 +1,7 @@
 import typing as t
 from hashlib import sha256, sha512
-
-from .__private_funcs__ import _attach_pepper
+from random import choice
+from string import ascii_letters
 
 
 def encrypt_password(
@@ -47,9 +47,24 @@ def encrypt_password(
     :param pepper_position: str - "start" or "end" - defaults to "end"
     :return str: hash:
     """
+
     if pepper_length > 3:
         pepper_length = 3
 
-    sha = sha512() if encryption_level == 512 else sha256()
-    sha.update((_attach_pepper(password, pepper_length, pepper_position) + salt).encode("utf-8"))
-    return sha.hexdigest()
+    _sha = sha512() if encryption_level == 512 else sha256()
+    _pepper = "".join(choice(ascii_letters) for _ in range(pepper_length))
+
+    def _pps(pepper_, pass_, salt_) -> str:
+        return pepper_ + pass_ + salt_
+
+    def _ppe(pepper_, pass_, salt_) -> str:
+        return pass_ + pepper_ + salt_
+
+    _sha.update(
+        (_pps(
+            _pepper, password, salt
+        ) if pepper_position == "start" else _ppe(
+            _pepper, password, salt
+        )).encode("utf-8")
+    )
+    return _sha.hexdigest()

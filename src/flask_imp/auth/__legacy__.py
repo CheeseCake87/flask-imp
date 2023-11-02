@@ -1,6 +1,7 @@
 import typing as t
+from random import choice
+from string import ascii_letters
 
-from .__private_funcs__ import _attach_pepper
 from .authenticate_password import authenticate_password
 from .encrypt_password import encrypt_password
 from .generate_alphanumeric_validator import generate_alphanumeric_validator
@@ -37,8 +38,8 @@ def sha_password(password: str, salt: str, encrypt: int = 512, pepper_length: in
 
 
 def generate_pepper(password: str, length: int = 1) -> str:
-    """ Legacy method, use _attach_pepper instead """
-    return _attach_pepper(password, length)
+    """ Legacy method, stop using this """
+    return "".join(choice(ascii_letters) for _ in range(length)) + password
 
 
 def generate_form_token() -> str:
@@ -91,11 +92,6 @@ class Auth:
     def generate_salt(cls, length: int = 4) -> str:
         """ Legacy class method, use from flask_imp.auth import generate_salt instead """
         return generate_salt(length)
-
-    @classmethod
-    def _attach_pepper(cls, password: str, length: int = 1, position: t.Literal["start", "end"] = "end") -> str:
-        """ Legacy class method, use from flask_imp.auth import _attach_pepper instead """
-        return _attach_pepper(password, length, position)
 
     @classmethod
     def encrypt_password(
@@ -155,8 +151,8 @@ class Auth:
 
     @classmethod
     def generate_pepper(cls, password: str, length: int = 1) -> str:
-        """ Legacy class method, use from flask_imp.auth import _attach_pepper instead """
-        return _attach_pepper(password, length)
+        """ Legacy class method, stop using this """
+        return "".join(choice(ascii_letters) for _ in range(length)) + password
 
     @classmethod
     def generate_form_token(cls) -> str:

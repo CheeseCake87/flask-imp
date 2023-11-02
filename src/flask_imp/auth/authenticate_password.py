@@ -42,16 +42,24 @@ def authenticate_password(
     if pepper_length > 3:
         pepper_length = 3
 
-    guesses = [''.join(i) for i in itertools.product(ascii_letters, repeat=pepper_length)]
+    _guesses = [''.join(i) for i in itertools.product(ascii_letters, repeat=pepper_length)]
 
-    for index, guess in enumerate(guesses):
-        sha = sha512() if encryption_level == 512 else sha256()
-        if pepper_position == "start":
-            sha.update((guess + input_password + database_salt).encode("utf-8"))
-        else:
-            sha.update((input_password + guess + database_salt).encode("utf-8"))
+    def _pps(pepper_, pass_, salt_) -> str:
+        return pepper_ + pass_ + salt_
 
-        if sha.hexdigest() == database_password:
+    def _ppe(pepper_, pass_, salt_) -> str:
+        return pass_ + pepper_ + salt_
+
+    for index, guess in enumerate(_guesses):
+        _sha = sha512() if encryption_level == 512 else sha256()
+        _sha.update(
+            (_pps(
+                guess, input_password, database_salt
+            ) if pepper_position == "start" else _ppe(
+                guess, input_password, database_salt
+            )).encode("utf-8")
+        )
+        if _sha.hexdigest() == database_password:
             return True
 
     return False
