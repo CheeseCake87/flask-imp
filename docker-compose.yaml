@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: flask-imp
+    build: .
+    volumes:
+      - ./app:/flask-imp/app
+    environment:
+      IMP_CONFIG: default.config.toml
+    ports:
+      - "5000:5000"
