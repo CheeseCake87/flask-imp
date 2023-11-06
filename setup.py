@@ -7,12 +7,14 @@ readme = """
 
 ![Tests](https://github.com/CheeseCake87/Flask-Imp/actions/workflows/tests.yml/badge.svg)
 
-(Previously known as Flask-BigApp)
-
 ## What is Flask-Imp?
 
 Flask-Imp's main purpose is to help simplify the importing of blueprints, resources and models.
 It has a few extra features built in to help with securing pages and password authentication.
+
+## Documentation
+
+[https://cheesecake87.github.io/Flask-Imp/](https://cheesecake87.github.io/Flask-Imp/)
 
 ## Getting Started
 

@@ -198,7 +198,7 @@ console.log('This log is from the file global/static/js/main.js')
     templates_includes_footer_html = """\
 <hr/>
 <p>This is the footer, this is located here: <code>global/templates/includes/footer.html</code></p>
-<p>It is being imported in the <code>global/templates/extends/main.html</code> template.</p>
+<p>It's being imported in the <code>global/templates/extends/main.html</code> template.</p>
 """
 
     # Format to: flask_imp_logo
@@ -209,7 +209,7 @@ console.log('This log is from the file global/static/js/main.js')
     <div>
         <h1 style="margin: 0;">Flask-Imp</h1>
         <p>This is the header, this is located here: <code>global/templates/includes/header.html</code></p>
-        <p>It is being imported in the <code>global/templates/extends/main.html</code> template.</p>
+        <p>It's being imported in the <code>global/templates/extends/main.html</code> template.</p>
     </div>
 </div>
 """

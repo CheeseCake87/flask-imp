@@ -9,6 +9,10 @@
 Flask-Imp's main purpose is to help simplify the importing of blueprints, resources, and models.
 It has a few extra features built in to help with securing pages and password authentication.
 
+## Documentation
+
+[https://cheesecake87.github.io/Flask-Imp/](https://cheesecake87.github.io/Flask-Imp/)
+
 ## Getting Started
 
 ### Setup.
@@ -104,10 +108,10 @@ pip install -r requirements_dev.txt
 pip install -e .
 ```
 
-### Run the Flask app.
+### Run the included Flask app.
 
 ```bash
-Flask run
+Flask run --debug
 ```
 
 ### Run the tests.
@@ -116,8 +120,18 @@ Flask run
 pytest
 ```
 
+### Run the under multiple python versions using docker.
+
+```bash
+python3 test_docker
+```
+
 ### Info
 
-The Flask app is located in the `app` folder. The tests are located in the `tests` folder.
+The Flask app is located in the `app` folder. 
 
-The tests are linked to the tests blueprint located at `app/blueprints/tests`.
+The test Flask app is located in the `test_app` folder. 
+
+The tests are located in the `tests` folder.
+
+The tests are linked to the tests blueprint located at `test_app/blueprints/tests`.

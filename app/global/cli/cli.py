@@ -1,42 +1,52 @@
-from importlib import import_module
+from flask import current_app as app
+from app.extensions import db
+from app.models.example_user_table import ExampleUserTable
 
 
-def collection(app: object):
-    @app.cli.command("add-example-user")
-    def add_example_user():
-        from app.models.example_table import ExampleTable
+@app.cli.command("create-tables")
+def create_tables():
+    db.create_all()
 
-        ExampleTable.add(
-            username="admin",
-            password="password",
-            disabled=False,
-        )
 
-    @app.cli.command("update-example-user")
-    def update_example_user():
-        from app.models.example_table import ExampleTable
+@app.cli.command("get-example-user")
+def get_example_user():
+    result = ExampleUserTable.get_by_id(1)
+    if not result:
+        print("User not found.")
+        return
+    print(
+        f"""
+        user_id: {result.user_id}
+        username: {result.username}
+        salt: {result.salt}
+        password: {result.password}
+        private_key: {result.private_key}
+        disabled: {result.disabled}
+        """
+    )
 
-        ExampleTable.update(
-            user_id=1,
-            username="admin-updated",
-            private_key="private_key",
-            disabled=False,
-        )
 
-    @app.cli.command("delete-example-user")
-    def delete_example_user():
-        from app.models.example_table import ExampleTable
+@app.cli.command("create-example-user")
+def add_example_user():
+    ExampleUserTable.create(
+        username="admin",
+        password="password",
+        disabled=False,
+    )
 
-        ExampleTable.delete(
-            user_id=1,
-        )
 
-    @app.cli.command("example-model-function")
-    def example_model_function():
-        from app.extensions import imp
+@app.cli.command("update-example-user")
+def update_example_user():
+    ExampleUserTable.update(
+        user_id=1,
+        username="admin-updated",
+        private_key="private_key",
+        disabled=False,
+    )
 
-        imp.import_models("models")
 
-        example_table_meta = imp.model_meta("ExampleTable")
-        users_module = import_module(example_table_meta["location"])
-        users_module.example_function()
+@app.cli.command("delete-example-user")
+def delete_example_user():
+    ExampleUserTable.delete(
+        user_id=1,
+    )

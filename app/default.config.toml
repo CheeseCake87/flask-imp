@@ -30,8 +30,6 @@ PREFERRED_URL_SCHEME = "http"
 EXPLAIN_TEMPLATE_LOADING = false
 MAX_COOKIE_SIZE = 4093
 
-TEST = "<TEST>"
-
 
 # This will set the default session variables for the app.
 # Anything here will be accessible using session["your_var_name"]
@@ -50,14 +48,14 @@ SQLALCHEMY_RECORD_QUERIES = false
 # Dialets = mysql / postgresql / sqlite / oracle / mssql
 
 # Uncomment below to generate the SQLALCHEMY_DATABASE_URI.
-[DATABASE.MAIN]
-ENABLED = true
-DIALECT = "sqlite"
-DATABASE_NAME = "<DB_USERNAME>"
-LOCATION = "db"
-PORT = ""
-USERNAME = "database"
-PASSWORD = "password"
+#[DATABASE.MAIN]
+#ENABLED = true
+#DIALECT = "sqlite"
+#DATABASE_NAME = "database"
+#LOCATION = "db"
+#PORT = ""
+#USERNAME = "database"
+#PASSWORD = "password"
 
 # Adding another database is as simple as adding a new section.
 # [DATABASE.ANOTHER] will then be accessible using SQLALCHEMY_BINDS
@@ -69,11 +67,11 @@ PASSWORD = "password"
 #     ...
 
 # Uncomment below to generate and add to SQLALCHEMY_BINDS.
-[DATABASE.ANOTHER]
-ENABLED = true
-DIALECT = "sqlite"
-DATABASE_NAME = "database_another"
-LOCATION = "db"
-PORT = ""
-USERNAME = "user"
-PASSWORD = "password"
+#[DATABASE.ANOTHER]
+#ENABLED = true
+#DIALECT = "sqlite"
+#DATABASE_NAME = "database_another"
+#LOCATION = "db"
+#PORT = ""
+#USERNAME = "user"
+#PASSWORD = "password"
