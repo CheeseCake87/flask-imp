@@ -1,7 +1,11 @@
-import itertools
+import multiprocessing
 import typing as t
-from hashlib import sha256, sha512
+from itertools import product
 from string import ascii_letters
+
+from more_itertools import batched
+
+from .__private_funcs__ import _guess_block
 
 
 def authenticate_password(
@@ -42,24 +46,28 @@ def authenticate_password(
     if pepper_length > 3:
         pepper_length = 3
 
-    _guesses = [''.join(i) for i in itertools.product(ascii_letters, repeat=pepper_length)]
+    _guesses = {''.join(i) for i in product(ascii_letters, repeat=pepper_length)}
 
-    def _pps(pepper_, pass_, salt_) -> str:
-        return pepper_ + pass_ + salt_
+    thread_pool = multiprocessing.Pool(processes=pepper_length)
+    threads = []
 
-    def _ppe(pepper_, pass_, salt_) -> str:
-        return pass_ + pepper_ + salt_
-
-    for index, guess in enumerate(_guesses):
-        _sha = sha512() if encryption_level == 512 else sha256()
-        _sha.update(
-            (_pps(
-                guess, input_password, database_salt
-            ) if pepper_position == "start" else _ppe(
-                guess, input_password, database_salt
-            )).encode("utf-8")
+    for batch in batched(_guesses, 1000):
+        threads.append(
+            thread_pool.apply_async(
+                _guess_block,
+                args=(
+                    batch,
+                    input_password,
+                    database_password,
+                    database_salt,
+                    encryption_level,
+                    pepper_position
+                )
+            )
         )
-        if _sha.hexdigest() == database_password:
+
+    for thread in threads:
+        if thread.get():
             return True
 
     return False

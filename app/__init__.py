@@ -4,6 +4,7 @@ from flask import Flask
 
 from app.extensions import db
 from app.extensions import imp
+from flask_imp.auth import encrypt_password, authenticate_password
 
 os.environ["CONFIG_SECRET_KEY"] = "inserted_from_environment"
 os.environ["DB_USERNAME"] = "database_username"
@@ -27,5 +28,19 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+
+    password = "password"
+
+    encrypted_password = encrypt_password(
+        password, "salt", 512, 1, "start"
+    )
+
+    print(encrypted_password)
+
+    print(
+        authenticate_password(
+            password, encrypted_password, "salt", 512, 1, "start"
+        )
+    )
 
     return app

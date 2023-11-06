@@ -155,3 +155,18 @@ def test_pass_function_check_with_url_value(client):
 def test_pass_function_check_with_url_value_with_ac(client):
     response = client.get('/tests/pass-func-check-with-url-var-replaced-and-app-context/100', follow_redirects=True)
     assert b"URL value: 100" in response.data
+
+
+def test_password_encryption_authentication_correct(client):
+    response = client.get('/tests/auth/password/correct', follow_redirects=True)
+    assert b"True" in response.data
+
+
+def test_password_encryption_authentication_incorrect(client):
+    response = client.get('/tests/auth/password/incorrect', follow_redirects=True)
+    assert b"False" in response.data
+
+
+def test_password_encryption_authentication_correct_long(client):
+    response = client.get('/tests/auth/password/correct/long', follow_redirects=True)
+    assert b"True" in response.data

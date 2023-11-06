@@ -93,6 +93,7 @@ setup(
         'Flask',
         'Flask-SQLAlchemy',
         'toml',
+        'more-itertools'
     ],
     zip_safe=False,
     packages=find_packages(where="src"),
