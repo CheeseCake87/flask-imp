@@ -3,6 +3,8 @@ from hashlib import sha256, sha512
 from random import choice
 from string import ascii_letters
 
+from .__private_funcs__ import _pps, _ppe
+
 
 def encrypt_password(
         password: str,
@@ -53,12 +55,6 @@ def encrypt_password(
 
     _sha = sha512() if encryption_level == 512 else sha256()
     _pepper = "".join(choice(ascii_letters) for _ in range(pepper_length))
-
-    def _pps(pepper_, pass_, salt_) -> str:
-        return pepper_ + pass_ + salt_
-
-    def _ppe(pepper_, pass_, salt_) -> str:
-        return pass_ + pepper_ + salt_
 
     _sha.update(
         (_pps(
