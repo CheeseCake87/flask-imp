@@ -12,17 +12,13 @@ from .utilities import cast_to_bool, process_dict
 
 class Imp(t.Protocol):
     _app: Flask
-    config: dict
+    _config: dict
 
     def import_models(self, file_or_folder: str) -> None:
         ...
 
-    @property
-    def app(self):
-        return self._app
 
-
-def _build_database_uri(database_config_value: dict, app_instance: Flask, imp_config: dict) -> t.Optional[str]:
+def _build_database_uri(database_config_value: dict, app_instance: Flask) -> t.Optional[str]:
     """
     Puts together the correct database URI depending on the type specified.
 
@@ -30,7 +26,6 @@ def _build_database_uri(database_config_value: dict, app_instance: Flask, imp_co
     """
 
     app_root = Path(app_instance.root_path)
-
     db_dialect = database_config_value.get("DIALECT", "None")
     db_name = database_config_value.get('DATABASE_NAME', 'database')
     db_location = database_config_value.get("LOCATION", "instance")
@@ -63,8 +58,8 @@ You can change the file extension by setting the environment variable IMP_SQLITE
         db_location = "instance"
 
     if "sqlite" in db_dialect:
-        set_db_extension = imp_config.get("SQLITE_DB_EXTENSION", ".sqlite")
-        store_db_in_parent = cast_to_bool(imp_config.get("SQLITE_STORE_IN_PARENT", False))
+        set_db_extension = app_instance.config.get("SQLITE_DB_EXTENSION", ".sqlite")
+        store_db_in_parent = cast_to_bool(app_instance.config.get("SQLITE_STORE_IN_PARENT", False))
 
         if store_db_in_parent:
             db_location_path = Path(app_root.parent / db_location)
@@ -117,8 +112,6 @@ def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool,
 
     flask_config = process_dict(config.get("FLASK"), key_case_switch="upper",
                                 ignore_missing_env_variables=ignore_missing_env_variables)
-    imp_config = process_dict(config.get("IMP"), key_case_switch="upper",
-                              ignore_missing_env_variables=ignore_missing_env_variables)
     session_config = process_dict(config.get("SESSION"), key_case_switch="ignore",
                                   ignore_missing_env_variables=ignore_missing_env_variables)
     sqlalchemy_config = process_dict(config.get("SQLALCHEMY"), key_case_switch="upper",
@@ -138,7 +131,7 @@ def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool,
         app.config['SQLALCHEMY_BINDS'] = dict()
         for database_config_key, database_config_values in database_config.items():
             if database_config_values.get("ENABLED", False):
-                database_uri = _build_database_uri(database_config_values, app, imp_config)
+                database_uri = _build_database_uri(database_config_values, app)
                 if database_uri:
                     if database_config_key == "MAIN":
                         app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
@@ -146,8 +139,7 @@ def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool,
 
                     app.config['SQLALCHEMY_BINDS'].update({str(database_config_key).lower(): database_uri})
 
-    return {"FLASK": {**flask_config, **sqlalchemy_config}, "IMP": imp_config, "SESSION": session_config,
-            "DATABASE": database_config}
+    return {"FLASK": {**flask_config, **sqlalchemy_config}, "SESSION": session_config, "DATABASE": database_config}
 
 
 def _init_bp_config(blueprint_name: str, config_file_path: Path, imp_instance: Imp) -> tuple:
@@ -189,13 +181,16 @@ def _init_bp_config(blueprint_name: str, config_file_path: Path, imp_instance: I
                 kwargs.update({setting: settings.get(setting)})
 
     if database_bind_enabled:
-        imp_config = imp_instance.config.get("IMP", {})
-        database_uri = _build_database_uri(database_bind, imp_instance.app, imp_config)
+        print(dir(imp_instance))
+
+        app_instance = getattr(imp_instance, "app")
+
+        database_uri = _build_database_uri(database_bind, app_instance)
 
         if database_uri:
-            if blueprint_name in imp_instance.app.config.get("SQLALCHEMY_BINDS", {}):
+            if blueprint_name in app_instance.config.get("SQLALCHEMY_BINDS", {}):
                 raise ValueError(f"Blueprint {blueprint_name} already has a database bind set")
 
-            imp_instance.app.config['SQLALCHEMY_BINDS'].update({blueprint_name: database_uri})
+            app_instance.config['SQLALCHEMY_BINDS'].update({blueprint_name: database_uri})
 
     return enabled, session, settings, database_bind

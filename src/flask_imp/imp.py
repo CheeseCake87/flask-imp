@@ -18,16 +18,16 @@ from .utilities import cast_to_import_str
 
 
 class Imp:
-    _app: Flask
-    _app_name: str
+    app: Optional[Flask] = None,
+    app_name: str
     _app_path: Path
     _app_folder: Path
     _app_resources_imported: bool = False
 
     __model_registry__: ModelRegistry
 
-    config_path: Path
-    config: Dict
+    _config_path: Path
+    _config: Dict
 
     def __init__(
             self,
@@ -42,6 +42,8 @@ class Imp:
                 app_config_file,
                 ignore_missing_env_variables
             )
+        else:
+            self.app = app
 
     def init_app(
             self,
@@ -84,32 +86,25 @@ class Imp:
         if app_config_file is None:
             app_config_file = "default.config.toml"
 
-        self._app = app
+        self.app = app
 
-        if "imp" in self._app.extensions:
+        if "imp" in self.app.extensions:
             raise ImportError("The app has already been initialized with flask-imp.")
 
-        self._app_name = app.name
-        self._app_path = Path(self._app.root_path)
+        self.app_name = app.name
+        self._app_path = Path(self.app.root_path)
         self._app_folder = self._app_path.parent
-        self.config_path = self._app_path / app_config_file
+        self._config_path = self._app_path / app_config_file
 
         self.__model_registry__ = ModelRegistry()
 
-        self.config = _init_app_config(
-            self.config_path,
+        self._config = _init_app_config(
+            self._config_path,
             ignore_missing_env_variables,
-            self._app
+            self.app
         )
 
-        self._app.extensions["imp"] = self
-
-    @property
-    def app(self) -> Flask:
-        """
-        Returns the current app instance.
-        """
-        return self._app
+        self.app.extensions["imp"] = self
 
     def import_app_resources(
             self,
@@ -273,10 +268,10 @@ class Imp:
             raise ImportError(
                 f"Global collection must be a folder {global_collection_folder}")
 
-        self._app.static_folder = app_static_folder.as_posix() if app_static_folder.exists() else None
-        self._app.template_folder = app_templates_folder.as_posix() if app_templates_folder.exists() else None
+        self.app.static_folder = app_static_folder.as_posix() if app_static_folder.exists() else None
+        self.app.template_folder = app_templates_folder.as_posix() if app_templates_folder.exists() else None
 
-        with self._app.app_context():
+        with self.app.app_context():
             for item in global_collection_folder.iterdir():
 
                 if item.is_dir() and item.name not in skip_folders:
@@ -286,11 +281,11 @@ class Imp:
 
                     for py_file in item.glob("*.py"):
                         module, flask_instance_found = process_module(
-                            f"{cast_to_import_str(self._app_name, item)}.{py_file.stem}")
+                            f"{cast_to_import_str(self.app_name, item)}.{py_file.stem}")
 
                         for instance_factory in app_factories:
                             if hasattr(module, instance_factory):
-                                getattr(module, instance_factory)(self._app)
+                                getattr(module, instance_factory)(self.app)
 
                         if not flask_instance_found and not app_factories:
                             del sys.modules[module.__name__]
@@ -301,11 +296,11 @@ class Imp:
                             continue
 
                     module, flask_instance_found = process_module(
-                        cast_to_import_str(self._app_name, item))
+                        cast_to_import_str(self.app_name, item))
 
                     for instance_factory in app_factories:
                         if hasattr(module, instance_factory):
-                            getattr(module, instance_factory)(self._app)
+                            getattr(module, instance_factory)(self.app)
 
                     if not flask_instance_found and not app_factories:
                         del sys.modules[module.__name__]
@@ -328,8 +323,8 @@ class Imp:
 
         :return: None
         """
-        if self.config.get("SESSION"):
-            for key, value in self.config.get("SESSION", {}).items():
+        if self._config.get("SESSION"):
+            for key, value in self._config.get("SESSION", {}).items():
                 if key not in session:
                     session[key] = value
 
@@ -452,16 +447,16 @@ class Imp:
 
         if potential_bp.exists() and potential_bp.is_dir():
             try:
-                module = import_module(cast_to_import_str(self._app_name, potential_bp))
+                module = import_module(cast_to_import_str(self.app_name, potential_bp))
                 for name, value in getmembers(module):
                     if isinstance(value, Blueprint):
                         if hasattr(value, "enabled"):
                             if value.enabled:
-                                self._app.register_blueprint(value)
+                                self.app.register_blueprint(value)
                             else:
                                 logging.debug(f"Blueprint {name} is disabled")
                         else:
-                            self._app.register_blueprint(value)
+                            self.app.register_blueprint(value)
             except Exception as e:
                 raise ImportError(f"Error when importing {potential_bp.name}: {e}")
 
@@ -591,7 +586,7 @@ class Imp:
             """
             Picks apart the model from_file and builds a registry of the models found.
             """
-            import_string = cast_to_import_str(self._app_name, path)
+            import_string = cast_to_import_str(self.app_name, path)
             try:
                 model_module = import_module(import_string)
                 for name, value in getmembers(model_module, isclass):
