@@ -33,12 +33,6 @@ PREFERRED_URL_SCHEME = "http"
 EXPLAIN_TEMPLATE_LOADING = false
 MAX_COOKIE_SIZE = 4093
 
-# These settings are specific to the Flask-Imp extension.
-# Anything here will be accessible using app.config
-[IMP]
-SQLITE_DB_EXTENSION = ".sqlite"
-SQLITE_STORE_IN_PARENT = false
-
 # This will set the default session variables for the app.
 # Anything here will be accessible using session["your_var_name"]
 # or session.get("your_var_name")
@@ -51,6 +45,8 @@ logged_in = false
 SQLALCHEMY_ECHO = false
 SQLALCHEMY_TRACK_MODIFICATIONS = false
 SQLALCHEMY_RECORD_QUERIES = false
+SQLITE_DB_EXTENSION = ".sqlite"
+SQLITE_STORE_IN_PARENT = false
 
 # [DATABASE.MAIN] is loaded as SQLALCHEMY_DATABASE_URI
 # Dialets = mysql / postgresql / sqlite / oracle / mssql

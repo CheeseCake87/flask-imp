@@ -14,7 +14,7 @@ from .utilities import cast_to_import_str
 
 class Imp(Protocol):
     _app: Flask
-    config: dict
+    _config: dict
 
     def import_models(
             self,
@@ -25,6 +25,10 @@ class Imp(Protocol):
     @property
     def app(self):
         return self._app
+
+    @property
+    def config(self) -> dict:
+        return self._config
 
 
 class ImpBlueprint(Blueprint):
@@ -95,7 +99,7 @@ class ImpBlueprint(Blueprint):
 
         self.location = Path(f"{spec.origin}").parent
         self.bp_name = self.location.name
-        self._imp_instance = self._set_imp_instance()
+        self._imp_instance = self._find_imp_instance()
 
         self.enabled, self.session, self.settings, self.database_bind = _init_bp_config(
             self.bp_name,
@@ -110,7 +114,7 @@ class ImpBlueprint(Blueprint):
                 **self.settings
             )
 
-    def _set_imp_instance(self) -> Imp:
+    def _find_imp_instance(self) -> Imp:
         """
         Internal method.
         Finds the Imp instance in the app module.
@@ -122,7 +126,7 @@ class ImpBlueprint(Blueprint):
             if isinstance(value, Imp):
                 return value
 
-        raise ImportError(f"Cannot find Imp instance in {self.app_name}")
+        raise ValueError(f"Could not find Imp instance {self.app_name}")
 
     def import_resources(self, folder: str = "routes") -> None:
         """

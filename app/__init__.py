@@ -13,8 +13,8 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
-        print(app.config['SQLALCHEMY_DATABASE_URI'])
-        print(app.config['SQLALCHEMY_BINDS'])
+        # print(app.config['SQLALCHEMY_DATABASE_URI'])
+        # print(app.config['SQLALCHEMY_BINDS'])
         db.create_all()
 
     return app

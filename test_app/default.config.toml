@@ -29,8 +29,9 @@ PREFERRED_URL_SCHEME = "http"
 #TEMPLATES_AUTO_RELOAD = true
 EXPLAIN_TEMPLATE_LOADING = false
 MAX_COOKIE_SIZE = 4093
-
 TEST = "<TEST>"
+SQLITE_DB_EXTENSION = ".sqlite"
+SQLITE_STORE_IN_PARENT = false
 
 
 # This will set the default session variables for the app.
@@ -42,7 +43,7 @@ logged_in = false
 # These settings are spcific to the Flask-SQLAlchemy extension.
 # Anything here will be accessible using app.config
 [SQLALCHEMY]
-SQLALCHEMY_ECHO = false
+SQLALCHEMY_ECHO = true
 SQLALCHEMY_TRACK_MODIFICATIONS = false
 SQLALCHEMY_RECORD_QUERIES = false
 
@@ -54,10 +55,10 @@ SQLALCHEMY_RECORD_QUERIES = false
 ENABLED = true
 DIALECT = "sqlite"
 DATABASE_NAME = "<DB_USERNAME>"
-LOCATION = "db"
+LOCATION = ""
 PORT = ""
-USERNAME = "database"
-PASSWORD = "password"
+USERNAME = ""
+PASSWORD = ""
 
 # Adding another database is as simple as adding a new section.
 # [DATABASE.ANOTHER] will then be accessible using SQLALCHEMY_BINDS
@@ -73,7 +74,7 @@ PASSWORD = "password"
 ENABLED = true
 DIALECT = "sqlite"
 DATABASE_NAME = "database_another"
-LOCATION = "db"
+LOCATION = ""
 PORT = ""
-USERNAME = "user"
-PASSWORD = "password"
+USERNAME = ""
+PASSWORD = ""

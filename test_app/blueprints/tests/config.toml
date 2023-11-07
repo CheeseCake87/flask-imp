@@ -13,3 +13,11 @@ static_url_path = "/tests/static"
 [session]
 tests_session = "yes"
 
+[DATABASE_BIND]
+ENABLED = true
+DIALECT = "sqlite"
+DATABASE_NAME = "tests_database"
+LOCATION = ""
+PORT = ""
+USERNAME = ""
+PASSWORD = ""
