@@ -104,6 +104,13 @@ class Imp:
 
         self._app.extensions["imp"] = self
 
+    @property
+    def app(self) -> Flask:
+        """
+        Returns the current app instance.
+        """
+        return self._app
+
     def import_app_resources(
             self,
             folder: str = "global",

@@ -1,6 +1,6 @@
-enabled = "yes"
+ENABLED = true
 
-[settings]
+[SETTINGS]
 url_prefix = "/"
 #subdomain = ""
 #url_defaults = {}
@@ -10,5 +10,14 @@ template_folder = "templates"
 #root_path = ""
 #cli_group = ""
 
-[session]
+[SESSION]
 #www_session = "yes"
+
+[DATABASE_BIND]
+ENABLED = true
+DIALECT = "sqlite"
+DATABASE_NAME = "www"
+LOCATION = ""
+PORT = ""
+USERNAME = ""
+PASSWORD = ""

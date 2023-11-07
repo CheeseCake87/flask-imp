@@ -5,7 +5,7 @@ from inspect import getmembers
 from pathlib import Path
 from typing import Protocol
 
-from flask import Blueprint
+from flask import Blueprint, Flask
 from flask import session
 
 from .helpers import _init_bp_config
@@ -13,11 +13,18 @@ from .utilities import cast_to_import_str
 
 
 class Imp(Protocol):
+    _app: Flask
+    config: dict
+
     def import_models(
             self,
             file_or_folder: str
     ) -> None:
         ...
+
+    @property
+    def app(self):
+        return self._app
 
 
 class ImpBlueprint(Blueprint):
@@ -30,6 +37,7 @@ class ImpBlueprint(Blueprint):
     package: str
     session: dict
     settings: dict
+    database_bind: dict
 
     _imp_instance: Imp
 
@@ -46,21 +54,29 @@ class ImpBlueprint(Blueprint):
         -- config.toml --
         .. code-block::
 
-            enabled = "yes"
+            ENABLED = "yes"
 
-            [settings]
-            url_prefix = ""
-            subdomain = ""
-            url_defaults = { }
-            static_folder = ""
-            template_folder = ""
-            static_url_path = ""
-            #root_path = ""
-            #cli_group = ""
+            [SETTINGS]
+            URL_PREFIX = ""
+            #SUBDOMAIN = ""
+            #URL_DEFAULTS = { }
+            #STATIC_FOLDER = ""
+            TEMPLATE_FOLDER = ""
+            #STATIC_URL_PATH = ""
+            #ROOT_PATH = ""
+            #CLI_GROUP = ""
 
-            [session]
+            [SESSION]
             var = ""
 
+            [DATABASE_BIND]
+            ENABLED = false
+            #DIALECT = "sqlite"
+            #DATABASE_NAME = ""
+            #LOCATION = ""
+            #PORT = ""
+            #USERNAME = ""
+            #PASSWORD = ""
 
         :raw-html:`<br />`
 
@@ -79,8 +95,13 @@ class ImpBlueprint(Blueprint):
 
         self.location = Path(f"{spec.origin}").parent
         self.bp_name = self.location.name
+        self._imp_instance = self._set_imp_instance()
 
-        self.enabled, self.session, self.settings = _init_bp_config(self.bp_name, self.location / config_file)
+        self.enabled, self.session, self.settings, self.database_bind = _init_bp_config(
+            self.bp_name,
+            self.location / config_file,
+            self._imp_instance
+        )
 
         if self.enabled:
             super().__init__(
@@ -88,7 +109,6 @@ class ImpBlueprint(Blueprint):
                 self.package,
                 **self.settings
             )
-            self._imp_instance = self._set_imp_instance()
 
     def _set_imp_instance(self) -> Imp:
         """
@@ -363,7 +383,8 @@ class ImpBlueprint(Blueprint):
 
     def import_models(
             self,
-            file_or_folder: str
+            file_or_folder: str,
+            _remove_bind_keys: bool = True
     ) -> None:
         """
         Same actions as `Imp.import_models()`, but scoped to the current blueprint's package.
@@ -447,6 +468,7 @@ class ImpBlueprint(Blueprint):
         -----
 
         :param file_or_folder: The file or folder to import from. Must be relative.
+        :param _remove_bind_keys: Will remove the bind key from the model.
         :return: None
         """
         if not self.enabled:
