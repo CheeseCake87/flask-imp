@@ -1,25 +1,39 @@
 import logging
 import os
-from pathlib import Path
 import typing as t
+from pathlib import Path
 
+from flask import Flask
 from toml import load as toml_load
 
 from .resources import Resources
 from .utilities import cast_to_bool, process_dict
 
 
-def _build_database_uri(database_config_value: dict, app) -> t.Optional[str]:
+class Imp(t.Protocol):
+    _app: Flask
+    config: dict
+
+    def import_models(self, file_or_folder: str) -> None:
+        ...
+
+    @property
+    def app(self):
+        return self._app
+
+
+def _build_database_uri(database_config_value: dict, app_instance: Flask, imp_config: dict) -> t.Optional[str]:
     """
     Puts together the correct database URI depending on the type specified.
 
     Fails if type is not supported.
     """
-    app_root = Path(app.root_path)
+
+    app_root = Path(app_instance.root_path)
 
     db_dialect = database_config_value.get("DIALECT", "None")
     db_name = database_config_value.get('DATABASE_NAME', 'database')
-    db_location = database_config_value.get("LOCATION", "db")
+    db_location = database_config_value.get("LOCATION", "instance")
     db_port = str(database_config_value.get('PORT', 'None'))
     db_username = database_config_value.get('USERNAME', 'None')
     db_password = database_config_value.get('PASSWORD', 'None')
@@ -35,28 +49,31 @@ Example:
 ENABLED = true
 DIALECT = "sqlite"
 DATABASE_NAME = "database"
-LOCATION = "db"
+LOCATION = "instance"
 PORT = ""
 USERNAME = "database"
 PASSWORD = "password"
 
 This will create a sqlite file called
-database.db in a folder called db.""")
+database.sqlite in a folder called instance.
+
+You can change the file extension by setting the environment variable IMP_SQLITE_DB_EXTENSION""")
+
+    if not db_location:
+        db_location = "instance"
 
     if "sqlite" in db_dialect:
-        if db_location is not None:
+        set_db_extension = imp_config.get("SQLITE_DB_EXTENSION", ".sqlite")
+        store_db_in_parent = cast_to_bool(imp_config.get("SQLITE_STORE_IN_PARENT", False))
 
-            if Path(db_location).exists():
-                database = Path(Path(db_location) / f"{db_name}.db")
-                return f"{db_dialect}:///{database}"
-
+        if store_db_in_parent:
+            db_location_path = Path(app_root.parent / db_location)
+        else:
             db_location_path = Path(app_root / db_location)
-            db_location_path.mkdir(parents=True, exist_ok=True)
-            db_location_file_path = db_location_path / f"{db_name}.db"
-            return f"{db_dialect}:///{db_location_file_path}"
 
-        db_at_root = Path(app_root / f"{db_name}.db")
-        return f"{db_dialect}:///{db_at_root}"
+        db_location_path.mkdir(parents=True, exist_ok=True)
+        db_location_file_path = db_location_path / f"{db_name}{set_db_extension}"
+        return f"{db_dialect}:///{db_location_file_path}"
 
     for dialect in allowed_dialects:
         if dialect in db_dialect:
@@ -71,13 +88,15 @@ Example:
 ENABLED = true
 DIALECT = "sqlite"
 DATABASE_NAME = "database"
-LOCATION = "db"
+LOCATION = "instance"
 PORT = ""
 USERNAME = "database"
 PASSWORD = "password"
 
 This will create a sqlite file called
-database.db in a folder called db.""")
+database.sqlite in a folder called instance.
+
+You can change the file extension by setting the environment variable IMP_SQLITE_DB_EXTENSION""")
 
 
 def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool, app) -> dict:
@@ -87,10 +106,7 @@ def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool,
     if not config_file_path.exists():
         logging.critical("Config file was not found, creating default.config.toml to use")
 
-        config_file_path.write_text(
-            Resources.default_config.format(
-                secret_key=os.urandom(24).hex())
-        )
+        config_file_path.write_text(Resources.default_config.format(secret_key=os.urandom(24).hex()))
 
     config_suffix = ('.toml', '.tml')
 
@@ -99,27 +115,16 @@ def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool,
 
     config = process_dict(toml_load(config_file_path))
 
-    flask_config = process_dict(
-        config.get("FLASK"),
-        key_case_switch="upper",
-        ignore_missing_env_variables=ignore_missing_env_variables
-    )
-    session_config = process_dict(
-        config.get("SESSION"),
-        key_case_switch="ignore",
-        ignore_missing_env_variables=ignore_missing_env_variables
-    )
-    sqlalchemy_config = process_dict(
-        config.get("SQLALCHEMY"),
-        key_case_switch="upper",
-        ignore_missing_env_variables=ignore_missing_env_variables,
-    )
-    database_config = process_dict(
-        config.get("DATABASE"),
-        key_case_switch="upper",
-        ignore_missing_env_variables=ignore_missing_env_variables,
-        crawl=True
-    )
+    flask_config = process_dict(config.get("FLASK"), key_case_switch="upper",
+                                ignore_missing_env_variables=ignore_missing_env_variables)
+    imp_config = process_dict(config.get("IMP"), key_case_switch="upper",
+                              ignore_missing_env_variables=ignore_missing_env_variables)
+    session_config = process_dict(config.get("SESSION"), key_case_switch="ignore",
+                                  ignore_missing_env_variables=ignore_missing_env_variables)
+    sqlalchemy_config = process_dict(config.get("SQLALCHEMY"), key_case_switch="upper",
+                                     ignore_missing_env_variables=ignore_missing_env_variables, )
+    database_config = process_dict(config.get("DATABASE"), key_case_switch="upper",
+                                   ignore_missing_env_variables=ignore_missing_env_variables, crawl=True)
 
     if flask_config is not None and isinstance(flask_config, dict):
         for flask_config_key, flask_config_value in flask_config.items():
@@ -133,24 +138,19 @@ def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool,
         app.config['SQLALCHEMY_BINDS'] = dict()
         for database_config_key, database_config_values in database_config.items():
             if database_config_values.get("ENABLED", False):
-                database_uri = _build_database_uri(database_config_values, app)
+                database_uri = _build_database_uri(database_config_values, app, imp_config)
                 if database_uri:
                     if database_config_key == "MAIN":
                         app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
                         continue
 
-                    app.config['SQLALCHEMY_BINDS'].update({
-                        str(database_config_key).lower(): database_uri
-                    })
+                    app.config['SQLALCHEMY_BINDS'].update({str(database_config_key).lower(): database_uri})
 
-    return {
-        "FLASK": {**flask_config, **sqlalchemy_config},
-        "SESSION": session_config,
-        "DATABASE": database_config
-    }
+    return {"FLASK": {**flask_config, **sqlalchemy_config}, "IMP": imp_config, "SESSION": session_config,
+            "DATABASE": database_config}
 
 
-def _init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:
+def _init_bp_config(blueprint_name: str, config_file_path: Path, imp_instance: Imp) -> tuple:
     """
     Attempts to load and process the blueprint configuration file.
     """
@@ -163,30 +163,39 @@ def _init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:
     if config_file_path.suffix not in config_suffix:
         raise TypeError("Blueprint Config must be one of the following types: .toml / .tml")
 
-    config = process_dict(toml_load(config_file_path), key_case_switch="lower")
-
-    enabled = cast_to_bool(config.get('enabled', False))
+    config = process_dict(toml_load(config_file_path), key_case_switch="upper")
+    enabled = cast_to_bool(config.get('ENABLED', False))
 
     if not enabled:
-        return enabled, {}, {}
+        return enabled, {}, {}, {}
 
-    session = config.get('session', {})
-    settings = config.get('settings', {})
+    session = process_dict(config.get('SESSION', {}), key_case_switch="ignore")
+    settings = process_dict(config.get('SETTINGS', {}), key_case_switch="lower")
+    database_bind = process_dict(config.get('DATABASE_BIND', {}), key_case_switch="upper")
+    database_bind_enabled = cast_to_bool(database_bind.get("ENABLED", False))
 
-    kwargs = dict()
+    kwargs = {}
 
     valid_settings = (
-        'url_prefix', 'subdomain', 'url_defaults', 'static_folder', 'template_folder', 'static_url_path', 'root_path'
-    )
+        'url_prefix', 'subdomain', 'url_defaults', 'static_folder', 'template_folder', 'static_url_path', 'root_path')
 
     for setting in valid_settings:
         if setting == 'url_prefix':
-            kwargs.update(
-                {'url_prefix': settings.get('url_prefix') if settings.get('url_prefix') != "" else f"/{blueprint_name}"}
-            )
+            kwargs.update({
+                'url_prefix': settings.get('url_prefix') if settings.get('url_prefix') != "" else f"/{blueprint_name}"})
             continue
         if setting in settings:
             if settings.get(setting, False):
                 kwargs.update({setting: settings.get(setting)})
 
-    return enabled, session, settings
+    if database_bind_enabled:
+        imp_config = imp_instance.config.get("IMP", {})
+        database_uri = _build_database_uri(database_bind, imp_instance.app, imp_config)
+
+        if database_uri:
+            if blueprint_name in imp_instance.app.config.get("SQLALCHEMY_BINDS", {}):
+                raise ValueError(f"Blueprint {blueprint_name} already has a database bind set")
+
+            imp_instance.app.config['SQLALCHEMY_BINDS'].update({blueprint_name: database_uri})
+
+    return enabled, session, settings, database_bind

@@ -15,20 +15,31 @@ def before_app_request():
 
     # Format to: name, url_prefix
     config_toml = """\
-enabled = "yes"
+ENABLED = "yes"
 
-[settings]
-url_prefix = "/{url_prefix}"
-#subdomain = ""
-#url_defaults = {{}}
-static_folder = "static"
-template_folder = "templates"
-static_url_path = "/static/{name}"
-#root_path = ""
-#cli_group = ""
+[SETTINGS]
+URL_PREFIX = "/{url_prefix}"
+#SUBDOMAIN = ""
+#URL_DEFAULTS = {{}}
+#STATIC_FOLDER = "static"
+TEMPLATE_FOLDER = "templates"
+#STATIC_URL_PATH = "/static/{name}"
+#ROOT_PATH = ""
+#CLI_GROUP = ""
 
-[session]
+[SESSION]
 #{name}_session = "yes"
+
+# Set ENABLED to true to allow the blueprint
+# to create a database bind, change settings accordingly.
+[DATABASE_BIND]
+ENABLED = false
+DIALECT = "sqlite"
+DATABASE_NAME = "{name}_database"
+LOCATION = ""
+PORT = ""
+USERNAME = ""
+PASSWORD = ""
 """
 
     # Format to: NONE
@@ -87,20 +98,31 @@ def index():
 class InitAppBlueprintFileLib:
     # Format to: name, url_prefix
     config_toml = """\
-enabled = "yes"
+ENABLED = "yes"
 
-[settings]
-url_prefix = "/{url_prefix}"
-#subdomain = ""
-#url_defaults = {{}}
-#static_folder = "static"
-template_folder = "templates"
-#static_url_path = "/static/{name}"
-#root_path = ""
-#cli_group = ""
+[SETTINGS]
+URL_PREFIX = "/{url_prefix}"
+#SUBDOMAIN = ""
+#URL_DEFAULTS = {{}}
+#STATIC_FOLDER = "static"
+TEMPLATE_FOLDER = "templates"
+#STATIC_URL_PATH = "/static/{name}"
+#ROOT_PATH = ""
+#CLI_GROUP = ""
 
-[session]
+[SESSION]
 #{name}_session = "yes"
+
+# Set ENABLED to true to allow the blueprint
+# to create a database bind, change settings accordingly.
+[DATABASE_BIND]
+ENABLED = false
+DIALECT = "sqlite"
+DATABASE_NAME = "{name}_database"
+LOCATION = ""
+PORT = ""
+USERNAME = ""
+PASSWORD = ""
 """
 
     templates_index_html = """\

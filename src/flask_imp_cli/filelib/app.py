@@ -33,6 +33,11 @@ PREFERRED_URL_SCHEME = "http"
 EXPLAIN_TEMPLATE_LOADING = false
 MAX_COOKIE_SIZE = 4093
 
+# These settings are specific to the Flask-Imp extension.
+# Anything here will be accessible using app.config
+[IMP]
+SQLITE_DB_EXTENSION = ".sqlite"
+SQLITE_STORE_IN_PARENT = false
 
 # This will set the default session variables for the app.
 # Anything here will be accessible using session["your_var_name"]
@@ -40,7 +45,7 @@ MAX_COOKIE_SIZE = 4093
 [SESSION]
 logged_in = false
 
-# These settings are spcific to the Flask-SQLAlchemy extension.
+# These settings are specific to the Flask-SQLAlchemy extension.
 # Anything here will be accessible using app.config
 [SQLALCHEMY]
 SQLALCHEMY_ECHO = false
@@ -88,13 +93,10 @@ from {app_name}.extensions import imp, db
 def create_app():
     app = Flask(__name__)
     imp.init_app(app)
-    # db.init_app(app)
-
     imp.import_app_resources()
-
     imp.import_blueprints("blueprints")
-
     # imp.import_models("models")
+    # db.init_app(app)
 
     return app
 """
