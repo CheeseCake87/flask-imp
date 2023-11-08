@@ -453,7 +453,6 @@ class Imp:
                             else:
                                 logging.debug(f"Blueprint {name} is disabled")
                         else:
-                            print(f"Importing Blueprint {name}")
                             self.app.register_blueprint(value)
 
             except Exception as e:
