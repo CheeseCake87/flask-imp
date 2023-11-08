@@ -95,8 +95,8 @@ def create_app():
     imp.init_app(app)
     imp.import_app_resources()
     imp.import_blueprints("blueprints")
-    # imp.import_models("models")
-    # db.init_app(app)
+    imp.import_models("models")
+    db.init_app(app)
 
     return app
 """
@@ -122,12 +122,15 @@ __all__ = [
     "update",
     "delete",
     "insert",
-    "relationship",
 ]
 """
 
     # Format to: None
     models_example_user_table_py = """\
+from flask_imp.auth import authenticate_password
+from flask_imp.auth import encrypt_password
+from flask_imp.auth import generate_private_key
+from flask_imp.auth import generate_salt
 from . import *
 
 
@@ -140,18 +143,29 @@ class ExampleUserTable(db.Model):
     disabled = db.Column(db.Boolean)
 
     @classmethod
-    def get_by_id(cls, user_id):
+    def login(cls, username, password: str) -> bool:
+        user = cls.get_by_username(username)
+        if user is None:
+            return False
+        return authenticate_password(password, user.password, user.salt)
+
+    @classmethod
+    def get_by_id(cls, user_id: int):
         return db.session.execute(
             select(cls).filter_by(user_id=user_id).limit(1)
         ).scalar_one_or_none()
 
     @classmethod
-    def create(cls, username, password, disabled):
-        from flask_imp.auth import Auth
+    def get_by_username(cls, username: str):
+        return db.session.execute(
+            select(cls).filter_by(username=username).limit(1)
+        ).scalar_one_or_none()
 
-        salt = Auth.generate_salt()
-        salt_pepper_password = Auth.hash_password(password, salt)
-        private_key = Auth.generate_private_key(username)
+    @classmethod
+    def create(cls, username, password, disabled):
+        salt = generate_salt()
+        salt_pepper_password = encrypt_password(password, salt)
+        private_key = generate_private_key(username)
 
         db.session.execute(
             insert(cls).values(
@@ -165,10 +179,10 @@ class ExampleUserTable(db.Model):
         db.session.commit()
 
     @classmethod
-    def update(cls, user_id, username, private_key, disabled):
+    def update(cls, user_id: int, username, private_key, disabled):
         db.session.execute(
             update(cls).where(
-                cls.user_id == user_id  # noqa
+                cls.user_id == user_id
             ).values(
                 username=username,
                 private_key=private_key,
@@ -178,10 +192,10 @@ class ExampleUserTable(db.Model):
         db.session.commit()
 
     @classmethod
-    def delete(cls, user_id):
+    def delete(cls, user_id: int):
         db.session.execute(
             delete(cls).where(
-                cls.user_id == user_id  # noqa
+                cls.user_id == user_id
             )
         )
         db.session.commit()
