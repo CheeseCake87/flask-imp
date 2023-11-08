@@ -1,9 +1,26 @@
-from typing import Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable, Union
 
 
 @runtime_checkable
 class Blueprint(Protocol):
     root_path: str
+
+
+@runtime_checkable
+class ImpBlueprint(Protocol):
+    app_path: str
+    app_config: dict
+
+    settings: dict
+
+    def register_blueprint(self, blueprint: Blueprint):
+        ...
+
+    def _register(self, app: 'Flask', options: dict) -> None:
+        ...
+
+    def _setup_imp_blueprint(self, imp_instance) -> None:
+        ...
 
 
 @runtime_checkable
@@ -16,5 +33,5 @@ class Flask(Protocol):
     def app_context(self):
         ...
 
-    def register_blueprint(self, blueprint: Blueprint):
+    def register_blueprint(self, blueprint: Union[Blueprint, ImpBlueprint]):
         ...

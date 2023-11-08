@@ -14,9 +14,9 @@ static_url_path = "/tests/static"
 tests_session = "yes"
 
 [DATABASE_BIND]
-ENABLED = true
+ENABLED = false
 DIALECT = "sqlite"
-DATABASE_NAME = "tests_database"
+DATABASE_NAME = "tests_blueprint"
 LOCATION = ""
 PORT = ""
 USERNAME = ""

@@ -10,9 +10,8 @@ from typing import Dict, Union, Optional, List
 from flask import Blueprint, session
 from flask_sqlalchemy.model import DefaultMeta
 
-from .blueprint import ImpBlueprint
 from .helpers import _init_app_config
-from .protocols import Flask
+from .protocols import Flask, ImpBlueprint
 from .registeries import ModelRegistry
 from .utilities import cast_to_import_str
 
@@ -448,7 +447,7 @@ class Imp:
             try:
                 module = import_module(cast_to_import_str(self.app_name, potential_bp))
                 for name, value in getmembers(module):
-                    if isinstance(value, Union[Blueprint, ImpBlueprint]):
+                    if isinstance(value, Blueprint) or isinstance(value, ImpBlueprint):
                         if hasattr(value, "enabled"):
                             if value.enabled:
                                 value._setup_imp_blueprint(self)

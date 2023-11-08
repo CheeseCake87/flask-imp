@@ -12,7 +12,7 @@ static_url_path = "/nested_test/static"
 #www_session = "yes"
 
 [DATABASE_BIND]
-ENABLED = true
+ENABLED = false
 DIALECT = "sqlite"
 DATABASE_NAME = "nested_test_database"
 LOCATION = ""
