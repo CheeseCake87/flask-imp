@@ -1,4 +1,4 @@
-from typing import Protocol, runtime_checkable, Union
+from typing import Protocol, runtime_checkable, Union, Any, Optional
 
 
 @runtime_checkable
@@ -29,9 +29,10 @@ class Flask(Protocol):
     root_path: str
     extensions: dict
     config: dict
+    static_folder: Optional[str]
+    template_folder: Optional[str]
 
-    def app_context(self):
-        ...
+    app_context: Any
 
     def register_blueprint(self, blueprint: Union[Blueprint, ImpBlueprint]):
         ...

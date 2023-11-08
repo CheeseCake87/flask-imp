@@ -17,7 +17,7 @@ from .utilities import cast_to_import_str
 
 
 class Imp:
-    app: Optional[Flask] = None,
+    app: Flask
     app_name: str
     app_path: Path
     app_folder: Path
@@ -41,8 +41,6 @@ class Imp:
                 app_config_file,
                 ignore_missing_env_variables
             )
-        else:
-            self.app = app
 
     def init_app(
             self,
@@ -448,8 +446,8 @@ class Imp:
                 module = import_module(cast_to_import_str(self.app_name, potential_bp))
                 for name, value in getmembers(module):
                     if isinstance(value, Blueprint) or isinstance(value, ImpBlueprint):
-                        if hasattr(value, "enabled"):
-                            if value.enabled:
+                        if hasattr(value, "_setup_imp_blueprint"):
+                            if getattr(value, "enabled", False):
                                 value._setup_imp_blueprint(self)
                                 self.app.register_blueprint(value)
                             else:

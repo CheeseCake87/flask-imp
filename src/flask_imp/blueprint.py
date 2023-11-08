@@ -4,7 +4,6 @@ from importlib import import_module
 from importlib.util import find_spec
 from inspect import getmembers
 from pathlib import Path
-from typing import Union
 
 from flask import Blueprint
 from flask import session
@@ -533,8 +532,8 @@ class ImpBlueprint(Blueprint):
             module = import_module(cast_to_import_str(self.package.split(".")[0], potential_bp))
             for name, value in getmembers(module):
                 if isinstance(value, Blueprint) or isinstance(value, ImpBlueprint):
-                    if hasattr(value, "enabled"):
-                        if value.enabled:
+                    if hasattr(value, "_setup_imp_blueprint"):
+                        if getattr(value, "enabled", False):
                             value._setup_imp_blueprint(imp_instance)
                             self.register_blueprint(value)
                         else:
