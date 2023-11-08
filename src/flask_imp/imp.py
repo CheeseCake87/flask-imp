@@ -7,12 +7,12 @@ from inspect import isclass
 from pathlib import Path
 from typing import Dict, Union, Optional, List
 
-from flask import Blueprint
-from flask import Flask
-from flask import session
+from flask import Blueprint, session
 from flask_sqlalchemy.model import DefaultMeta
 
+from .blueprint import ImpBlueprint
 from .helpers import _init_app_config
+from .protocols import Flask
 from .registeries import ModelRegistry
 from .utilities import cast_to_import_str
 
@@ -20,14 +20,14 @@ from .utilities import cast_to_import_str
 class Imp:
     app: Optional[Flask] = None,
     app_name: str
-    _app_path: Path
-    _app_folder: Path
-    _app_resources_imported: bool = False
+    app_path: Path
+    app_folder: Path
+    app_resources_imported: bool = False
 
     __model_registry__: ModelRegistry
 
-    _config_path: Path
-    _config: Dict
+    config_path: Path
+    config: Dict
 
     def __init__(
             self,
@@ -51,7 +51,6 @@ class Imp:
             app_config_file: Optional[str] = os.environ.get("IMP_CONFIG"),
             ignore_missing_env_variables: bool = False
     ) -> None:
-
         """
         Initializes the flask app to work with flask-imp.
         
@@ -79,10 +78,11 @@ class Imp:
 
         if app is None:
             raise ImportError(
-                "No app was passed in, do ba = Imp(flaskapp) or app.init_app(flaskapp)")
+                "No app was passed in, do ba = Imp(flaskapp) or app.initapp(flaskapp)")
         if not isinstance(app, Flask):
             raise TypeError(
                 "The app that was passed in is not an instance of Flask")
+
         if app_config_file is None:
             app_config_file = "default.config.toml"
 
@@ -92,18 +92,17 @@ class Imp:
             raise ImportError("The app has already been initialized with flask-imp.")
 
         self.app_name = app.name
-        self._app_path = Path(self.app.root_path)
-        self._app_folder = self._app_path.parent
-        self._config_path = self._app_path / app_config_file
+        self.app_path = Path(self.app.root_path)
+        self.app_folder = self.app_path.parent
+        self.config_path = self.app_path / app_config_file
 
-        self.__model_registry__ = ModelRegistry()
-
-        self._config = _init_app_config(
-            self._config_path,
+        self.config = _init_app_config(
+            self.config_path,
             ignore_missing_env_variables,
             self.app
         )
 
+        self.__model_registry__ = ModelRegistry()
         self.app.extensions["imp"] = self
 
     def import_app_resources(
@@ -139,7 +138,7 @@ class Imp:
 
         .. code-block:: text
 
-            imp.import_app_resources(folder="global")
+            imp.importapp_resources(folder="global")
 
         ...
         :raw-html:`<br />`
@@ -169,7 +168,7 @@ class Imp:
 
         .. code-block::
 
-            from flask import current_app as app
+            from flask import currentapp as app
             from flask import render_template
 
             @app.route("/")
@@ -188,7 +187,7 @@ class Imp:
 
         .. code-block::
 
-            imp.import_app_resources(folder="global", app_factories=["development_cli"])
+            imp.importapp_resources(folder="global", app_factories=["development_cli"])
 
         :raw-html:`<br />`
 
@@ -241,10 +240,10 @@ class Imp:
         if scope_root_files_to is None:
             scope_root_files_to = []
 
-        if self._app_resources_imported:
+        if self.app_resources_imported:
             raise ImportError("The app resources can only be imported once.")
 
-        self._app_resources_imported = True
+        self.app_resources_imported = True
 
         def process_module(import_location: str) -> tuple:
             module_file = import_module(import_location)
@@ -256,7 +255,7 @@ class Imp:
             return module_file, flask_instance
 
         skip_folders = ("static", "templates",)
-        global_collection_folder = self._app_path / folder
+        global_collection_folder = self.app_path / folder
         app_static_folder = global_collection_folder / static_folder
         app_templates_folder = global_collection_folder / templates_folder
 
@@ -323,8 +322,8 @@ class Imp:
 
         :return: None
         """
-        if self._config.get("SESSION"):
-            for key, value in self._config.get("SESSION", {}).items():
+        if self.config.get("SESSION"):
+            for key, value in self.config.get("SESSION", {}).items():
                 if key not in session:
                     session[key] = value
 
@@ -376,8 +375,8 @@ class Imp:
             bp.import_resources("routes")
 
 
-            @bp.before_app_request
-            def before_app_request():
+            @bp.beforeapp_request
+            def beforeapp_request():
                 bp.init_session()
 
 
@@ -443,20 +442,23 @@ class Imp:
         if Path(blueprint).is_absolute():
             potential_bp = Path(blueprint)
         else:
-            potential_bp = Path(self._app_path / blueprint)
+            potential_bp = Path(self.app_path / blueprint)
 
         if potential_bp.exists() and potential_bp.is_dir():
             try:
                 module = import_module(cast_to_import_str(self.app_name, potential_bp))
                 for name, value in getmembers(module):
-                    if isinstance(value, Blueprint):
+                    if isinstance(value, Union[Blueprint, ImpBlueprint]):
                         if hasattr(value, "enabled"):
                             if value.enabled:
+                                value._setup_imp_blueprint(self)
                                 self.app.register_blueprint(value)
                             else:
                                 logging.debug(f"Blueprint {name} is disabled")
                         else:
+                            print(f"Importing Blueprint {name}")
                             self.app.register_blueprint(value)
+
             except Exception as e:
                 raise ImportError(f"Error when importing {potential_bp.name}: {e}")
 
@@ -494,7 +496,7 @@ class Imp:
         :param folder: The folder to import from. Must be relative.
         """
 
-        folder_path = Path(self._app_path / folder)
+        folder_path = Path(self.app_path / folder)
 
         for potential_bp in folder_path.iterdir():
             self.import_blueprint(potential_bp.as_posix())
@@ -599,7 +601,7 @@ class Imp:
         if Path(file_or_folder).is_absolute():
             file_or_folder_path = Path(file_or_folder)
         else:
-            file_or_folder_path = Path(self._app_path / file_or_folder)
+            file_or_folder_path = Path(self.app_path / file_or_folder)
 
         if file_or_folder_path.is_file() and file_or_folder_path.suffix == ".py":
             model_processor(file_or_folder_path)
