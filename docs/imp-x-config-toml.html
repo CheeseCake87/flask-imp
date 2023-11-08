@@ -20,7 +20,7 @@
     <h1>Flask-Imp</h1>
     <div><small>Current Version: 2.7.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Mon, 06 Nov 2023</small></div>
+    <div><small>Wed, 08 Nov 2023</small></div>
 
     <h2>Menu</h2>
     <ul>
@@ -307,6 +307,12 @@
 <span class="n">SQLALCHEMY_ECHO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
 <span class="n">SQLALCHEMY_TRACK_MODIFICATIONS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
 <span class="n">SQLALCHEMY_RECORD_QUERIES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="c1"># Below are extra settings that Flask-Imp uses but relates to Flask-SQLAlchemy.</span>
+<span class="c1"># This sets the file extension for SQLite databases, and where to create the folder</span>
+<span class="c1"># that the database will be stored in. true will create the folder on the same level as your</span>
+<span class="c1"># app, false will create the folder in the app root.</span>
+<span class="n">SQLITE_DB_EXTENSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;.sqlite&quot;</span>
+<span class="n">SQLITE_STORE_IN_PARENT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 
 <span class="c1"># [DATABASE.MAIN] is loaded as SQLALCHEMY_DATABASE_URI</span>
 <span class="c1"># Dialets = mysql / postgresql / sqlite / oracle / mssql</span>

@@ -20,7 +20,7 @@
     <h1>Flask-Imp</h1>
     <div><small>Current Version: 2.7.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Mon, 06 Nov 2023</small></div>
+    <div><small>Wed, 08 Nov 2023</small></div>
 
     <h2>Menu</h2>
     <ul>
@@ -267,11 +267,31 @@
 
 <span class="k">[session]</span>
 <span class="n">var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+
+<span class="c1"># Set ENABLED to true to allow the blueprint</span>
+<span class="c1"># to create a database bind, change settings accordingly.</span>
+<span class="k">[DATABASE_BIND]</span>
+<span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;sqlite&quot;</span>
+<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;example&quot;</span>
+<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
 </pre></div>
 <p>This config reflects the args that are passed to a regular Flask Blueprint class, the addition of the ability to
 enable/disable the Blueprint, and set session variables.</p>
 <p>For more information about the args of a regular Flask Blueprint see:
 <a href="https://flask.palletsprojects.com/en/3.0.x/api/#flask.Blueprint">Flask docs (Blueprint)</a></p>
+<p>You can also allow the blueprint to create a database bind, by setting <code>ENABLED</code> to <code>true</code> in the <code>DATABASE_BIND</code>
+section.</p>
+<p>This will add to the Flask app's <code>SQLALCHEMY_BINDS</code> config variable, and allows blueprints to be more modular
+with their database connections.</p>
+<p>Including the attribute <code>__bind_key__</code> in the blueprint's model(s) will match the model to the database bind.</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">__bind_key__</span> <span class="o">=</span> <span class="s2">&quot;example&quot;</span>
+    <span class="o">...</span>
+</pre></div>
 <h5>Example of advance use case for blueprint config files:</h5>
 <div class="highlight"><pre><span></span>testing_blueprint/
 ├── routes/
@@ -289,7 +309,7 @@ enable/disable the Blueprint, and set session variables.</p>
 <span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">Blueprint</span>
 
 <span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span>
-    <span class="vm">__name__</span><span class="p">,</span> 
+    <span class="vm">__name__</span><span class="p">,</span>
     <span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;dev_config.toml&quot;</span> <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;pro_config.py&quot;</span>
 <span class="p">)</span>
 
@@ -315,6 +335,17 @@ enable/disable the Blueprint, and set session variables.</p>
 
 <span class="k">[session]</span>
 <span class="c1">#var = &quot;&quot;</span>
+
+<span class="c1"># Set ENABLED to true to allow the blueprint</span>
+<span class="c1"># to create a database bind, change settings accordingly.</span>
+<span class="k">[DATABASE_BIND]</span>
+<span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;sqlite&quot;</span>
+<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;example&quot;</span>
+<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
 </pre></div>
 <p>File: <code>dev_config.py</code></p>
 <div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;yes&quot;</span>
@@ -331,6 +362,17 @@ enable/disable the Blueprint, and set session variables.</p>
 
 <span class="k">[session]</span>
 <span class="c1">#var = &quot;&quot;</span>
+
+<span class="c1"># Set ENABLED to true to allow the blueprint</span>
+<span class="c1"># to create a database bind, change settings accordingly.</span>
+<span class="k">[DATABASE_BIND]</span>
+<span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;sqlite&quot;</span>
+<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;example&quot;</span>
+<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
 </pre></div>
 <p>In the example above, the <code>testing_blueprint</code> will only be enabled if the Flask app is running in debug mode.</p>
 

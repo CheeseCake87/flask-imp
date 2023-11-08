@@ -67,6 +67,12 @@ logged_in = false
 SQLALCHEMY_ECHO = false
 SQLALCHEMY_TRACK_MODIFICATIONS = false
 SQLALCHEMY_RECORD_QUERIES = false
+# Below are extra settings that Flask-Imp uses but relates to Flask-SQLAlchemy.
+# This sets the file extension for SQLite databases, and where to create the folder
+# that the database will be stored in. true will create the folder on the same level as your
+# app, false will create the folder in the app root.
+SQLITE_DB_EXTENSION = ".sqlite"
+SQLITE_STORE_IN_PARENT = true
 
 # [DATABASE.MAIN] is loaded as SQLALCHEMY_DATABASE_URI
 # Dialets = mysql / postgresql / sqlite / oracle / mssql

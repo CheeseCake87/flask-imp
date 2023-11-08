@@ -23,6 +23,17 @@ static_url_path = ""
 
 [session]
 var = ""
+
+# Set ENABLED to true to allow the blueprint
+# to create a database bind, change settings accordingly.
+[DATABASE_BIND]
+ENABLED = true
+DIALECT = "sqlite"
+DATABASE_NAME = "example"
+LOCATION = ""
+PORT = ""
+USERNAME = ""
+PASSWORD = ""
 ```
 
 This config reflects the args that are passed to a regular Flask Blueprint class, the addition of the ability to
@@ -30,6 +41,20 @@ enable/disable the Blueprint, and set session variables.
 
 For more information about the args of a regular Flask Blueprint see:
 [Flask docs (Blueprint)](https://flask.palletsprojects.com/en/3.0.x/api/#flask.Blueprint)
+
+You can also allow the blueprint to create a database bind, by setting `ENABLED` to `true` in the `DATABASE_BIND`
+section.
+
+This will add to the Flask app's `SQLALCHEMY_BINDS` config variable, and allows blueprints to be more modular
+with their database connections.
+
+Including the attribute `__bind_key__` in the blueprint's model(s) will match the model to the database bind.
+
+```python
+class User(db.Model):
+    __bind_key__ = "example"
+    ...
+```
 
 ##### Example of advance use case for blueprint config files:
 
@@ -52,7 +77,7 @@ from app import app
 from flask_imp import Blueprint
 
 bp = Blueprint(
-    __name__, 
+    __name__,
     config_file="dev_config.toml" if app.config["DEBUG"] else "pro_config.py"
 )
 
@@ -81,6 +106,17 @@ enabled = "no"
 
 [session]
 #var = ""
+
+# Set ENABLED to true to allow the blueprint
+# to create a database bind, change settings accordingly.
+[DATABASE_BIND]
+ENABLED = false
+DIALECT = "sqlite"
+DATABASE_NAME = "example"
+LOCATION = ""
+PORT = ""
+USERNAME = ""
+PASSWORD = ""
 ```
 
 File: `dev_config.py`
@@ -100,6 +136,17 @@ template_folder = "templates"
 
 [session]
 #var = ""
+
+# Set ENABLED to true to allow the blueprint
+# to create a database bind, change settings accordingly.
+[DATABASE_BIND]
+ENABLED = true
+DIALECT = "sqlite"
+DATABASE_NAME = "example"
+LOCATION = ""
+PORT = ""
+USERNAME = ""
+PASSWORD = ""
 ```
 
 In the example above, the `testing_blueprint` will only be enabled if the Flask app is running in debug mode.
