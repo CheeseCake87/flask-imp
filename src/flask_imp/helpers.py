@@ -10,14 +10,6 @@ from .resources import Resources
 from .utilities import cast_to_bool, process_dict
 
 
-class Imp(t.Protocol):
-    _app: Flask
-    _config: dict
-
-    def import_models(self, file_or_folder: str) -> None:
-        ...
-
-
 def _build_database_uri(database_config_value: dict, app_instance: Flask) -> t.Optional[str]:
     """
     Puts together the correct database URI depending on the type specified.
@@ -142,7 +134,7 @@ def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool,
     return {"FLASK": {**flask_config, **sqlalchemy_config}, "SESSION": session_config, "DATABASE": database_config}
 
 
-def _init_bp_config(blueprint_name: str, config_file_path: Path, imp_instance: Imp) -> tuple:
+def _init_bp_config(blueprint_name: str, config_file_path: Path) -> tuple:
     """
     Attempts to load and process the blueprint configuration file.
     """
@@ -164,7 +156,6 @@ def _init_bp_config(blueprint_name: str, config_file_path: Path, imp_instance: I
     session = process_dict(config.get('SESSION', {}), key_case_switch="ignore")
     settings = process_dict(config.get('SETTINGS', {}), key_case_switch="lower")
     database_bind = process_dict(config.get('DATABASE_BIND', {}), key_case_switch="upper")
-    database_bind_enabled = cast_to_bool(database_bind.get("ENABLED", False))
 
     kwargs = {}
 
@@ -179,18 +170,5 @@ def _init_bp_config(blueprint_name: str, config_file_path: Path, imp_instance: I
         if setting in settings:
             if settings.get(setting, False):
                 kwargs.update({setting: settings.get(setting)})
-
-    if database_bind_enabled:
-        print(dir(imp_instance))
-
-        app_instance = getattr(imp_instance, "app")
-
-        database_uri = _build_database_uri(database_bind, app_instance)
-
-        if database_uri:
-            if blueprint_name in app_instance.config.get("SQLALCHEMY_BINDS", {}):
-                raise ValueError(f"Blueprint {blueprint_name} already has a database bind set")
-
-            app_instance.config['SQLALCHEMY_BINDS'].update({blueprint_name: database_uri})
 
     return enabled, session, settings, database_bind

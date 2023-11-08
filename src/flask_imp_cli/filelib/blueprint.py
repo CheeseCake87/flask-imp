@@ -35,7 +35,7 @@ TEMPLATE_FOLDER = "templates"
 [DATABASE_BIND]
 ENABLED = false
 DIALECT = "sqlite"
-DATABASE_NAME = "{name}_database"
+DATABASE_NAME = "{name}"
 LOCATION = ""
 PORT = ""
 USERNAME = ""
@@ -118,7 +118,7 @@ TEMPLATE_FOLDER = "templates"
 [DATABASE_BIND]
 ENABLED = false
 DIALECT = "sqlite"
-DATABASE_NAME = "{name}_database"
+DATABASE_NAME = "{name}"
 LOCATION = ""
 PORT = ""
 USERNAME = ""
