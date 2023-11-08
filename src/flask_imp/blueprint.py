@@ -430,7 +430,6 @@ class ImpBlueprint(Blueprint):
         -----
 
         :param file_or_folder: The file or folder to import from. Must be relative.
-        :param _remove_bind_keys: Will remove the bind key from the model.
         :return: None
         """
         if not self.enabled:
@@ -489,6 +488,9 @@ class ImpBlueprint(Blueprint):
         return f"{self.name}/{template}"
 
     def _setup_imp_blueprint(self, imp_instance) -> None:
+        """
+        Sets up the ImpBlueprint instance. This is a private method and should not be called directly.
+        """
         bind_enabled = self.database_bind.get("ENABLED", False)
 
         app_instance = imp_instance.app
@@ -530,7 +532,7 @@ class ImpBlueprint(Blueprint):
         if potential_bp.exists() and potential_bp.is_dir():
             module = import_module(cast_to_import_str(self.package.split(".")[0], potential_bp))
             for name, value in getmembers(module):
-                if isinstance(value, Union[Blueprint, ImpBlueprint]):
+                if isinstance(value, Blueprint) or isinstance(value, ImpBlueprint):
                     if hasattr(value, "enabled"):
                         if value.enabled:
                             value._setup_imp_blueprint(imp_instance)
