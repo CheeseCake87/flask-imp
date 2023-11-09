@@ -67,7 +67,7 @@ flask-Imp init
 
 setup(
     name='Flask-Imp',
-    version='2.7.2',
+    version='2.7.3',
     url='https://github.com/CheeseCake87/Flask-Imp',
     license='GNU Lesser General Public License v2.1',
     author='David Carmichael',

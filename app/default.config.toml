@@ -10,7 +10,7 @@ DEBUG = false
 #PROPAGATE_EXCEPTIONS = true
 TRAP_HTTP_EXCEPTIONS = false
 #TRAP_BAD_REQUEST_ERRORS = true
-SECRET_KEY = "super_secret_key"
+SECRET_KEY = "a73644a54963a005c5c94099af17493d1d22640b6fc3f6d1"
 SESSION_COOKIE_NAME = "session"
 #SESSION_COOKIE_DOMAIN = "domain-here.com"
 #SESSION_COOKIE_PATH = "/"
@@ -36,7 +36,7 @@ MAX_COOKIE_SIZE = 4093
 [SESSION]
 logged_in = false
 
-# These settings are spcific to the Flask-SQLAlchemy extension.
+# These settings are specific to the Flask-SQLAlchemy extension.
 # Anything here will be accessible using app.config
 [SQLALCHEMY]
 SQLALCHEMY_ECHO = false
@@ -47,11 +47,10 @@ SQLALCHEMY_RECORD_QUERIES = false
 # that the database will be stored in. true will create the folder on the same level as your
 # app, false will create the folder in the app root.
 SQLITE_DB_EXTENSION = ".sqlite"
-SQLITE_STORE_IN_PARENT = true
+SQLITE_STORE_IN_PARENT = false
 
 # [DATABASE.MAIN] is loaded as SQLALCHEMY_DATABASE_URI
 # Dialets = mysql / postgresql / sqlite / oracle / mssql
-
 # Uncomment below to generate the SQLALCHEMY_DATABASE_URI.
 [DATABASE.MAIN]
 ENABLED = true
@@ -75,8 +74,8 @@ PASSWORD = ""
 #[DATABASE.ANOTHER]
 #ENABLED = true
 #DIALECT = "sqlite"
-#DATABASE_NAME = "database_another"
-#LOCATION = "db"
+#DATABASE_NAME = "another"
+#LOCATION = ""
 #PORT = ""
-#USERNAME = "user"
-#PASSWORD = "password"
+#USERNAME = ""
+#PASSWORD = ""

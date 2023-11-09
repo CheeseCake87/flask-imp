@@ -6,7 +6,8 @@ from pathlib import Path
 from flask import Flask
 from toml import load as toml_load
 
-from .resources import Resources
+from flask_imp_cli.filelib import AppFileLib
+
 from .utilities import cast_to_bool, process_dict
 
 
@@ -93,7 +94,7 @@ def _init_app_config(config_file_path: Path, ignore_missing_env_variables: bool,
     if not config_file_path.exists():
         logging.critical("Config file was not found, creating default.config.toml to use")
 
-        config_file_path.write_text(Resources.default_config.format(secret_key=os.urandom(24).hex()))
+        config_file_path.write_text(AppFileLib.default_config_toml.format(secret_key=os.urandom(24).hex()))
 
     config_suffix = ('.toml', '.tml')
 

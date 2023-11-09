@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import click
@@ -88,8 +89,8 @@ def init_new_app(name):
     app_files_lu = {
         "default.config.toml": (
             app_folder / "default.config.toml",
-            AppFileLib.default_config_toml,
-            {}
+            AppFileLib.default_init_config_toml,
+            {"secret_key": os.urandom(24).hex()}
         ),
         "__init__.py": (
             app_folder / "__init__.py",
