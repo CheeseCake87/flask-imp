@@ -3,6 +3,7 @@ import click
 from .helpers import Sprinkles as Sp
 from .blueprint import add_blueprint as _add_blueprint
 from .init_new_app import init_new_app as _init_new_app
+from .init_new_app import slim_init_new_app as _slim_init_new_app
 
 
 @click.group()
@@ -40,3 +41,15 @@ def add_blueprint(folder, name):
 )
 def init_new_app(name):
     _init_new_app(name)
+
+
+@cli.command("init-slim", help="Create a new slim flask-imp app")
+@click.option(
+    '-n', '--name',
+    nargs=1,
+    default="app",
+    prompt='What would you like to call your app?',
+    help='The name of the app folder that will be created'
+)
+def init_new_app(name):
+    _slim_init_new_app(name)

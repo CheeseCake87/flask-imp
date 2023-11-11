@@ -141,3 +141,20 @@ PASSWORD = ""
     </div>
 {{% endblock %}}
 """
+
+    templates_index_html_slim = """\
+{{% extends 'www/extends/main.html' %}}
+
+{{% block content %}}
+    <div style="margin-bottom: 2rem;">
+        <cite>
+            This is the index route of the included example blueprint.<br/>
+            This template page is located in <code>blueprints/www/templates/www/index.html</code><br/>
+            it extends from <code>global/templates/extends/main.html</code><br/>
+            with its route defined in <code>blueprints/www/routes/index.py</code><br/><br/>
+            It's being imported by <code>bp.import_resources("routes")</code> <br/>
+            in the <code>blueprints/www/__init__.py</code> file.
+        </cite>
+    </div>
+{{% endblock %}}
+"""

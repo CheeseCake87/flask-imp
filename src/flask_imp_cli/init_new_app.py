@@ -3,13 +3,12 @@ from pathlib import Path
 
 import click
 
-from .helpers import Sprinkles as Sp
-from .init_new_app_blueprint import init_new_app_blueprint as _init_new_app_blueprint
-
 from .filelib.all_files import GlobalFileLib
 from .filelib.app import AppFileLib
 from .filelib.flask_imp_logo import flask_imp_logo
 from .filelib.water_css import water_css
+from .helpers import Sprinkles as Sp
+from .init_new_app_blueprint import init_new_app_blueprint as _init_new_app_blueprint
 
 
 def init_new_app(name):
@@ -256,6 +255,242 @@ def init_new_app(name):
                 f"{Sp.WARNING}Global collections file already exists: {file_path}, skipping{Sp.END}")
 
     _init_new_app_blueprint(f"{name}/blueprints", "www")
+
+    click.echo(" ")
+    click.echo(f"{Sp.OKBLUE}==================={Sp.END}")
+    click.echo(f"{Sp.OKBLUE}Flask app deployed!{Sp.END}")
+    click.echo(f"{Sp.OKBLUE}==================={Sp.END}")
+    click.echo(" ")
+    click.echo(f"{Sp.OKGREEN}'/' route is set by the blueprint named www{Sp.END}")
+    click.echo(f"{Sp.OKGREEN}found in the blueprints folder. It is encouraged{Sp.END}")
+    click.echo(f"{Sp.OKGREEN}to use blueprints to set all app routes.{Sp.END}")
+    click.echo(" ")
+    click.echo(f"{Sp.OKGREEN}All app (non-blueprint) resources can be found{Sp.END}")
+    click.echo(f"{Sp.OKGREEN}in the global folder. Have a look through this{Sp.END}")
+    click.echo(f"{Sp.OKGREEN}folder to find out more.{Sp.END}")
+    click.echo(" ")
+    if name == 'app':
+        click.echo(f"{Sp.OKBLUE}Your app has the default name of 'app'{Sp.END}")
+        click.echo(f"{Sp.OKBLUE}Flask will automatically look for this!{Sp.END}")
+        click.echo(f"{Sp.OKBLUE}Run: flask run --debug{Sp.END}")
+    else:
+        click.echo(f"{Sp.OKBLUE}Your app has the name of '{name}'{Sp.END}")
+        click.echo(f"{Sp.OKBLUE}Run: flask --app {name} run --debug{Sp.END}")
+
+
+def slim_init_new_app(name):
+    cwd = Path.cwd()
+
+    app_folder = cwd / name
+
+    if app_folder.exists():
+        click.echo(f"{Sp.FAIL}{name} folder already exists!{Sp.END}")
+        click.confirm("Are you sure you want to continue?", abort=True)
+
+    _init_new_app_blueprint(f"{name}", "www")
+
+    gc_folder = app_folder / "global"
+    www_folder = app_folder / "www"
+    www_static_folder = www_folder / "static"
+    www_templates_folder = www_folder / "templates" / "www"
+    extensions_folder = app_folder / "extensions"
+
+    app_folders = (
+        app_folder,
+        gc_folder,
+        www_folder,
+        www_static_folder,
+        extensions_folder,
+        www_templates_folder
+    )
+
+    # Create app folders
+    for folder in app_folders:
+        if not folder.exists():
+            folder.mkdir(parents=True)
+
+    global_tlf = (
+        "cli",
+    )
+
+    www_static_folders = (
+        "css",
+        "js",
+    )
+
+    www_templates_folders = (
+        "errors",
+        "extends",
+        "includes",
+    )
+
+    global_tlf_lookup = dict()
+    www_tlf_lookup = dict()
+
+    # Prepare global folder structure
+    for folder in global_tlf:
+        global_tlf_lookup[folder] = gc_folder / folder
+        this_folder = gc_folder / folder
+        if not this_folder.exists():
+            click.echo(f"{Sp.OKGREEN}Global collections folder: {this_folder.name}, created{Sp.END}")
+            this_folder.mkdir(parents=True)
+
+    # Prepare www static folders
+    for folder in www_static_folders:
+        www_tlf_lookup[folder] = www_folder / "static" / folder
+        this_folder = www_folder / "static" / folder
+        if not this_folder.exists():
+            click.echo(
+                f"{Sp.OKGREEN}www static folder: {this_folder.name}, created{Sp.END}")
+            this_folder.mkdir(parents=True)
+
+    # Prepare www templates folders
+    for folder in www_templates_folders:
+        www_tlf_lookup[folder] = www_templates_folder / folder
+        this_folder = www_templates_folder / folder
+        if not this_folder.exists():
+            click.echo(
+                f"{Sp.OKGREEN}www templates folder: {this_folder.name}, created{Sp.END}")
+            this_folder.mkdir(parents=True)
+
+    app_files_lu = {
+        "default.config.toml": (
+            app_folder / "default.config.toml",
+            AppFileLib.default_init_config_toml,
+            {"secret_key": os.urandom(24).hex()}
+        ),
+        "__init__.py": (
+            app_folder / "__init__.py",
+            AppFileLib.init_py,
+            {"app_name": name}
+        ),
+    }
+
+    # Extensions files lookup
+    extensions_files_lu = {
+        "__init__.py": (
+            extensions_folder / "__init__.py",
+            AppFileLib.extensions_init_py,
+            {}
+        ),
+    }
+
+    global_file_lu = {
+        "cli.py": (
+            global_tlf_lookup["cli"] / "cli.py",
+            GlobalFileLib.collections_cli_py,
+            {"app_name": name}
+        ),
+    }
+
+    www_file_lu = {
+        "water.css": (
+            www_static_folder / "css" / "water.css",
+            water_css,
+            {}
+        ),
+        "main.js": (
+            www_static_folder / "js" / "main.js",
+            GlobalFileLib.static_main_js,
+            {}
+        ),
+        "index.html": (
+            www_templates_folder / "index.html",
+            GlobalFileLib.templates_index_html,
+            {}
+        ),
+        "400.html": (
+            www_templates_folder / "errors" / "400.html",
+            GlobalFileLib.templates_errors_400_html,
+            {}
+        ),
+        "401.html": (
+            www_templates_folder / "errors" / "401.html",
+            GlobalFileLib.templates_errors_401_html,
+            {}
+        ),
+        "403.html": (
+            www_templates_folder / "errors" / "403.html",
+            GlobalFileLib.templates_errors_403_html,
+            {}
+        ),
+        "404.html": (
+            www_templates_folder / "errors" / "404.html",
+            GlobalFileLib.templates_errors_404_html,
+            {}
+        ),
+        "405.html": (
+            www_templates_folder / "errors" / "405.html",
+            GlobalFileLib.templates_errors_405_html,
+            {}
+        ),
+        "500.html": (
+            www_templates_folder / "errors" / "500.html",
+            GlobalFileLib.templates_errors_500_html,
+            {}
+        ),
+        "main.html": (
+            www_templates_folder / "extends" / "main.html",
+            GlobalFileLib.templates_extends_main_html,
+            {}
+        ),
+        "footer.html": (
+            www_templates_folder / "includes" / "footer.html",
+            GlobalFileLib.templates_includes_footer_html,
+            {}
+        ),
+        "header.html": (
+            www_templates_folder / "includes" / "header.html",
+            GlobalFileLib.templates_includes_header_html,
+            {"flask_imp_logo": flask_imp_logo}
+        ),
+    }
+
+    # Create app files
+    for file_name, (file_path, file_content, formatter) in app_files_lu.items():
+        if not file_path.exists():
+            if formatter:
+                file_path.write_text(file_content.format(**formatter), encoding="utf-8")
+            else:
+                file_path.write_text(file_content, encoding="utf-8")
+            click.echo(f"{Sp.OKGREEN}App file: {file_name}, created{Sp.END}")
+        else:
+            click.echo(f"{Sp.WARNING}App file already exists: {file_path}, skipping{Sp.END}")
+
+    # Create extensions files
+    for file_name, (file_path, file_content, formatter) in extensions_files_lu.items():
+        if not file_path.exists():
+            if formatter:
+                file_path.write_text(file_content.format(**formatter), encoding="utf-8")
+            else:
+                file_path.write_text(file_content, encoding="utf-8")
+            click.echo(f"{Sp.OKGREEN}Extensions file: {file_name}, created{Sp.END}")
+        else:
+            click.echo(f"{Sp.WARNING}Extensions file already exists: {file_path}, skipping{Sp.END}")
+
+    # Prepare global folder files
+    for file_name, (file_path, file_content, formatter) in global_file_lu.items():
+        if not file_path.exists():
+            if formatter:
+                file_path.write_text(file_content.format(**formatter), encoding="utf-8")
+            else:
+                file_path.write_text(file_content, encoding="utf-8")
+            click.echo(f"{Sp.OKGREEN}Global collections file: {file_name}, created{Sp.END}")
+        else:
+            click.echo(
+                f"{Sp.WARNING}Global collections file already exists: {file_path}, skipping{Sp.END}")
+
+    # Prepare www folder files
+    for file_name, (file_path, file_content, formatter) in www_file_lu.items():
+        if not file_path.exists():
+            if formatter:
+                file_path.write_text(file_content.format(**formatter), encoding="utf-8")
+            else:
+                file_path.write_text(file_content, encoding="utf-8")
+            click.echo(f"{Sp.OKGREEN}www file: {file_name}, created{Sp.END}")
+        else:
+            click.echo(
+                f"{Sp.WARNING}www file already exists: {file_path}, skipping{Sp.END}")
 
     click.echo(" ")
     click.echo(f"{Sp.OKBLUE}==================={Sp.END}")
