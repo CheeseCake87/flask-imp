@@ -9,5 +9,4 @@ __all__ = [
     "update",
     "delete",
     "insert",
-    "relationship",
 ]

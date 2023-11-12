@@ -2,14 +2,13 @@
 
 <html lang="en">
 <head>
-
 {#    https://github.com/joshbuchea/HEAD #}
 
-    <title>{% block title %}{% endblock %}Flask-Imp</title>
+    <title>{% block title %}{% endblock %}Flask-Imp Blueprint: www</title>
     <base href="{{ request.base_url }}">
 
     <!-- Security -->
-{#    <meta http-equiv="Content-Security-Policy" content="font-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self';">#}
+{#    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';">#}
 
     <!-- Bots -->
     <meta name="robots" content="index,follow">
@@ -31,7 +30,7 @@
     <meta name="geo.position" content="55.86012186235461;-4.252010320043988">
     <meta name="geo.region" content="GB-SCT">
     <meta name="geo.placename" content="Glasgow">
-    <meta name="DC.title" content="Flask-Imp"/>
+    <meta name="DC.title" content="Flask-Imp Blueprint: www"/>
 
     <!-- Page Specific -->
     <meta name="rating" content="general">
@@ -47,7 +46,7 @@
 {#    <meta name="norton-safeweb-site-verification" content="norton_code"><!-- Norton Safe Web -->#}
 
     <!-- facebook -->
-    {#    <meta property="fb:app_id" content="123456789">#}
+{#    <meta property="fb:app_id" content="123456789">#}
     <meta property="og:url" content="{{ request.base_url }}">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Flask-Imp">
@@ -61,7 +60,7 @@
     <!-- twitter -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@site_account">
-    {#    <meta name="twitter:creator" content="@individual_account">#}
+{#    <meta name="twitter:creator" content="@individual_account">#}
     <meta name="twitter:url" content="{{ request.base_url }}">
     <meta name="twitter:title" content="Flask-Imp Website">
     <meta name="twitter:description" content="Content description less than 200 characters">
@@ -85,9 +84,9 @@
 {#    <link rel="icon" type="image/png" sizes="16x16" href="~ static folder here ~/16x16-favicon.png">#}
 {#    <link rel="manifest" href="~ static folder here ~/site.webmanifest">#}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/water.css') }}">
+    <link rel="stylesheet" href="{{ url_for('www.static', filename='css/water.css') }}">
 
-    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script defer src="{{ url_for('www.static', filename='js/main.js') }}"></script>
 
     <script>
         // inline script
@@ -96,8 +95,9 @@
 </head>
 
 <body>
-{% include "includes/header.html" %}
+{% include 'www/includes/header.html' %}
 {% block content %}{% endblock %}
-{% include "includes/footer.html" %}
+{% include 'www/includes/footer.html' %}
 </body>
+
 </html>

@@ -3,6 +3,11 @@ from app.extensions import db
 from app.models.example_user_table import ExampleUserTable
 
 
+@app.cli.command("config")
+def create_tables():
+    print(app.config)
+
+
 @app.cli.command("create-tables")
 def create_tables():
     db.create_all()

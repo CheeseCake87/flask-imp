@@ -1,20 +1,22 @@
-ENABLED = true
+ENABLED = "yes"
 
 [SETTINGS]
-url_prefix = "/"
-#subdomain = ""
-#url_defaults = {}
-#static_folder = "static"
-template_folder = "templates"
-#static_url_path = "/static/www"
-#root_path = ""
-#cli_group = ""
+URL_PREFIX = "/"
+#SUBDOMAIN = ""
+#URL_DEFAULTS = {}
+STATIC_FOLDER = "static"
+TEMPLATE_FOLDER = "templates"
+STATIC_URL_PATH = "/static"
+#ROOT_PATH = ""
+#CLI_GROUP = ""
 
 [SESSION]
 #www_session = "yes"
 
+# Set ENABLED to true to allow the blueprint
+# to create a database bind, change settings accordingly.
 [DATABASE_BIND]
-ENABLED = true
+ENABLED = false
 DIALECT = "sqlite"
 DATABASE_NAME = "www"
 LOCATION = ""
