@@ -202,7 +202,20 @@ def create_app():
     imp.import_blueprint("www")
 
     return app
-    """
+"""
+
+    minimal_init_py = """\
+from flask import Flask
+from {app_name}.extensions import imp
+
+
+def create_app():
+    app = Flask(__name__, static_url_path="/")
+    imp.init_app(app)
+    imp.import_app_resources()
+
+    return app
+"""
 
     extensions_init_py = """\
 from flask_imp import Imp

@@ -1,5 +1,9 @@
-def head_tag_generator(title="Flask-Imp", static_endpoint="static"):
+def head_tag_generator(title="Flask-Imp", static_endpoint="static", no_js=False):
     """Generate the head tag for the HTML template files."""
+
+    js = (f'<script defer src=\"{{{{ url_for(\'{static_endpoint}\', '
+          f'filename=\'js/main.js\') }}}}\"></script>') if not no_js else ""
+
     return f"""\
 {{#    https://github.com/joshbuchea/HEAD #}}
 
@@ -84,8 +88,7 @@ def head_tag_generator(title="Flask-Imp", static_endpoint="static"):
 {{#    <link rel="manifest" href="~ static folder here ~/site.webmanifest">#}}
 
     <link rel="stylesheet" href="{{{{ url_for('{static_endpoint}', filename='css/water.css') }}}}">
-
-    <script defer src="{{{{ url_for('{static_endpoint}', filename='js/main.js') }}}}"></script>
+    {js}
 
     <script>
         // inline script

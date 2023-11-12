@@ -7,10 +7,13 @@ from .blueprint import add_blueprint
 from .filelib.all_files import GlobalFileLib
 from .filelib.app import AppFileLib
 from .filelib.favicon import favicon
+from .filelib.flask_imp_logo import flask_imp_logo
+from .filelib.head_tag_generator import head_tag_generator
+from .filelib.water_css import water_css
 from .helpers import Sprinkles as Sp
 
 
-def init_app(name, _slim: bool = False):
+def init_app(name, _slim: bool = False, _minimal: bool = False):
     click.echo(f"{Sp.OKGREEN}Creating App: {name}")
 
     cwd = Path.cwd()
@@ -26,12 +29,22 @@ def init_app(name, _slim: bool = False):
         "root": app_folder,
         "extensions": app_folder / "extensions",
         "global": app_folder / "global",
-        "global/cli": app_folder / "global" / "cli",
-        "global/error_handlers": app_folder / "global" / "error_handlers",
         "global/static": app_folder / "global" / "static",
         "global/templates": app_folder / "global" / "templates",
-        "global/templates/errors": app_folder / "global" / "templates" / "errors",
     }
+
+    if _minimal:
+        folders.update({
+            "global/static/css": app_folder / "global" / "static" / "css",
+            "global/static/img": app_folder / "global" / "static" / "img",
+        })
+
+    if not _minimal:
+        folders.update({
+            "global/cli": app_folder / "global" / "cli",
+            "global/error_handlers": app_folder / "global" / "error_handlers",
+            "global/templates/errors": app_folder / "global" / "templates" / "errors",
+        })
 
     if not _slim:
         folders.update({
@@ -58,51 +71,87 @@ def init_app(name, _slim: bool = False):
                 app_name=name
             ) if not _slim else AppFileLib.slim_init_py.format(
                 app_name=name
-            )
-        ),
-        "extensions/__init__.py": (
-            folders['extensions'] / "__init__.py",
-            AppFileLib.extensions_init_py if not _slim else AppFileLib.slim_extensions_init_py
-        ),
-        "global/cli/cli.py": (
-            folders['global/cli'] / "cli.py",
-            GlobalFileLib.collections_cli_py.format(
+            ) if not _minimal else AppFileLib.minimal_init_py.format(
                 app_name=name
-            ) if not _slim else GlobalFileLib.slim_collections_cli_py
-        ),
-        "global/error_handlers/error_handlers.py": (
-            folders['global/error_handlers'] / "error_handlers.py",
-            GlobalFileLib.collections_error_handlers_py
+            )
         ),
         "global/static/favicon.ico": (
             folders['global/static'] / "favicon.ico",
             favicon,
         ),
-        "global/templates/errors/400.html": (
-            folders['global/templates/errors'] / "400.html",
-            GlobalFileLib.templates_errors_400_html
-        ),
-        "global/templates/errors/401.html": (
-            folders['global/templates/errors'] / "401.html",
-            GlobalFileLib.templates_errors_401_html
-        ),
-        "global/templates/errors/403.html": (
-            folders['global/templates/errors'] / "403.html",
-            GlobalFileLib.templates_errors_403_html
-        ),
-        "global/templates/errors/404.html": (
-            folders['global/templates/errors'] / "404.html",
-            GlobalFileLib.templates_errors_404_html
-        ),
-        "global/templates/errors/405.html": (
-            folders['global/templates/errors'] / "405.html",
-            GlobalFileLib.templates_errors_405_html
-        ),
-        "global/templates/errors/500.html": (
-            folders['global/templates/errors'] / "500.html",
-            GlobalFileLib.templates_errors_500_html
+        "extensions/__init__.py": (
+            folders['extensions'] / "__init__.py",
+            AppFileLib.extensions_init_py if not _slim else AppFileLib.slim_extensions_init_py
         ),
     }
+
+    if _minimal:
+        files.update({
+            "global/templates/index.html": (
+                folders['global/templates'] / "index.html",
+                GlobalFileLib.minimal_templates_index_html.format(
+                    head_tag=head_tag_generator(
+                        title="Minimal Flask-Imp App",
+                        no_js=True,
+                    ),
+                    static_path="static",
+                    index_py=folders['global'] / "index.py",
+                    index_html=folders['global/templates'] / "index.html",
+                    init_py=folders['root'] / "__init__.py",
+                )
+            ),
+            "global/static/css/main.css": (
+                folders['global/static/css'] / "water.css",
+                water_css,
+            ),
+            "global/static/img/flask-imp-logo.png": (
+                folders['global/static/img'] / "flask-imp-logo.png",
+                flask_imp_logo,
+            ),
+            "global/routes.py": (
+                folders['global'] / "routes.py",
+                GlobalFileLib.minimal_collections_routes_py
+            ),
+        })
+
+    if not _minimal:
+        files.update({
+            "global/cli/cli.py": (
+                folders['global/cli'] / "cli.py",
+                GlobalFileLib.collections_cli_py.format(
+                    app_name=name
+                ) if not _slim else GlobalFileLib.slim_collections_cli_py
+            ),
+
+            "global/error_handlers/error_handlers.py": (
+                folders['global/error_handlers'] / "error_handlers.py",
+                GlobalFileLib.collections_error_handlers_py
+            ),
+            "global/templates/errors/400.html": (
+                folders['global/templates/errors'] / "400.html",
+                GlobalFileLib.templates_errors_400_html
+            ),
+            "global/templates/errors/401.html": (
+                folders['global/templates/errors'] / "401.html",
+                GlobalFileLib.templates_errors_401_html
+            ),
+            "global/templates/errors/403.html": (
+                folders['global/templates/errors'] / "403.html",
+                GlobalFileLib.templates_errors_403_html
+            ),
+            "global/templates/errors/404.html": (
+                folders['global/templates/errors'] / "404.html",
+                GlobalFileLib.templates_errors_404_html
+            ),
+            "global/templates/errors/405.html": (
+                folders['global/templates/errors'] / "405.html",
+                GlobalFileLib.templates_errors_405_html
+            ),
+            "global/templates/errors/500.html": (
+                folders['global/templates/errors'] / "500.html",
+                GlobalFileLib.templates_errors_500_html
+            ),
+        })
 
     if not _slim:
         files.update({
@@ -144,7 +193,7 @@ def init_app(name, _slim: bool = False):
     for file, (path, content) in files.items():
         if not path.exists():
 
-            if file == "global/static/favicon.ico":
+            if file == "global/static/favicon.ico" or file == "global/static/img/flask-imp-logo.png":
                 path.write_bytes(bytes.fromhex(content))
                 continue
 
@@ -154,25 +203,18 @@ def init_app(name, _slim: bool = False):
         else:
             click.echo(f"{Sp.WARNING}App file already exists: {file}, skipping{Sp.END}")
 
-    add_blueprint(
-        f"{name}/blueprints",
-        "www",
-        _init_app=True,
-        _cwd=folders['blueprints'] if not _slim else folders['root']
-    )
+    if not _minimal:
+        add_blueprint(
+            f"{name}/blueprints",
+            "www",
+            _init_app=True,
+            _cwd=folders['blueprints'] if not _slim else folders['root']
+        )
 
     click.echo(" ")
     click.echo(f"{Sp.OKBLUE}==================={Sp.END}")
     click.echo(f"{Sp.OKBLUE}Flask app deployed!{Sp.END}")
     click.echo(f"{Sp.OKBLUE}==================={Sp.END}")
-    click.echo(" ")
-    click.echo(f"{Sp.OKGREEN}'/' route is set by the blueprint named www{Sp.END}")
-    click.echo(f"{Sp.OKGREEN}found in the blueprints folder. It is encouraged{Sp.END}")
-    click.echo(f"{Sp.OKGREEN}to use blueprints to set all app routes.{Sp.END}")
-    click.echo(" ")
-    click.echo(f"{Sp.OKGREEN}All app (non-blueprint) resources can be found{Sp.END}")
-    click.echo(f"{Sp.OKGREEN}in the global folder. Have a look through this{Sp.END}")
-    click.echo(f"{Sp.OKGREEN}folder to find out more.{Sp.END}")
     click.echo(" ")
     if name == 'app':
         click.echo(f"{Sp.OKBLUE}Your app has the default name of 'app'{Sp.END}")
@@ -181,3 +223,4 @@ def init_app(name, _slim: bool = False):
     else:
         click.echo(f"{Sp.OKBLUE}Your app has the name of '{name}'{Sp.END}")
         click.echo(f"{Sp.OKBLUE}Run: flask --app {name} run --debug{Sp.END}")
+    click.echo(" ")

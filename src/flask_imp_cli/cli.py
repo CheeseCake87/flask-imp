@@ -44,5 +44,13 @@ def add_blueprint(folder, name):
     default=False,
     help='Create a slim app'
 )
-def init_new_app(name, slim):
-    _init_app(name, slim)
+@click.option(
+    '-m', '--minimal',
+    is_flag=True,
+    default=False,
+    help='Create a minimal app'
+)
+def init_new_app(name, slim, minimal):
+    if minimal:
+        slim = True
+    _init_app(name, slim, minimal)

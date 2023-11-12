@@ -79,7 +79,7 @@ def index():
 {{% extends 'www/extends/main.html' %}}
 
 {{% block content %}}
-    <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
+<div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
     <div>
         <h2 style="margin: 0;">Blueprint: {name}</h2>
         <h3>This is the index route of the included example blueprint.</h3>
