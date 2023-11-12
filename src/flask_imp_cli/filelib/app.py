@@ -179,7 +179,7 @@ from {app_name}.extensions import imp, db
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path="/")
     imp.init_app(app)
     imp.import_app_resources()
     imp.import_blueprints("blueprints")
