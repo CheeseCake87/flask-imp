@@ -86,6 +86,12 @@ You can also deploy a slim app, that will have one blueprint and no models, like
 flask-imp init -n my_app --slim
 ```
 
+You can also deploy a minimal app, that will have no blueprints, models, or extensions, like so:
+
+```bash
+flask-imp init -n my_app --minimal
+```
+
 ## init Folder structures
 
 ### Full app
