@@ -33,17 +33,10 @@ What would you like to call your app? [app]:
 Flask app deployed!
 ===================
  
-'/' route is set by the blueprint named www
-found in the blueprints folder. It is encouraged
-to use blueprints to set all app routes.
- 
-All app (non-blueprint) resources can be found
-in the global folder. Have a look through this
-folder to find out more.
- 
 Your app has the default name of 'app'
 Flask will automatically look for this!
 Run: flask run --debug
+
 ```
 
 If you called your app something other than 'app', like 'new' for example, you will see:
@@ -52,17 +45,10 @@ If you called your app something other than 'app', like 'new' for example, you w
 ===================
 Flask app deployed!
 ===================
- 
-'/' route is set by the blueprint named www
-found in the blueprints folder. It is encouraged
-to use blueprints to set all app routes.
- 
-All app (non-blueprint) resources can be found
-in the global folder. Have a look through this
-folder to find out more.
- 
+
 Your app has the name of 'new'
 Run: flask --app new run --debug
+
 ```
 
 As you can see from the output, it gives you instructions on how to start your app, depending on the name you gave it.
