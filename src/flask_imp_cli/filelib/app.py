@@ -1,5 +1,9 @@
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
 class AppFileLib:
-    # Format to: app_name
+    # Format to: secret_key
     default_init_config_toml = """\
 # Flask-Imp Config File
 # ------------------------
@@ -168,6 +172,7 @@ SQLITE_STORE_IN_PARENT = false
 #PASSWORD = ""
 """
 
+    # Format to: app_name
     init_py = """\
 from flask import Flask
 from {app_name}.extensions import imp, db
