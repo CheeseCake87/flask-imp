@@ -19,9 +19,17 @@ To get started right away, you can utilize the CLI commands to create a new Flas
 flask-imp init
 ```
 
+### Minimal Flask-Imp Setup
+
+Run the following command to create a minimal Flask-Imp project.
+
+```bash
+flask-imp init -n app --minimal
+```
+
 See [CLI Commands / flask-imp init](cli_commands-flask-imp_init.html) for more information.
 
-## Minimal Flask-Imp Setup
+### Build minimal manually
 
 #### Folder Structure
 

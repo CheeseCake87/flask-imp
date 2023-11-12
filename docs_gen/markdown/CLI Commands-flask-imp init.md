@@ -199,3 +199,27 @@ app/
 ├── __init__.py
 └── default.config.toml
 ```
+
+### Minimal app
+
+`flask-imp init --minimal`:
+
+```text
+app/
+├── extensions
+│   └── __init__.py
+│
+├── global
+│   ├── static
+│   │   ├── css
+│   │   │   └── water.css
+│   │   ├── img
+│   │   │   └── flask-imp-logo.png
+│   │   └── favicon.ico
+│   ├── templates
+│   │   └── index.html
+│   └── routes.py
+│
+├── __init__.py
+└── default.config.toml
+```
