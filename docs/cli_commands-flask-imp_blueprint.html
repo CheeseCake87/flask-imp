@@ -20,7 +20,7 @@
     <h1>Flask-Imp</h1>
     <div><small>Current Version: 2.7.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Wed, 08 Nov 2023</small></div>
+    <div><small>Sun, 12 Nov 2023</small></div>
 
     <h2>Menu</h2>
     <ul>
@@ -251,7 +251,10 @@
 <section>
     <h1 style="font-size: 2.6rem; margin: 0;">Generate a Flask-Imp Blueprint</h1>
     <p>Flask-Imp has its own type of blueprint. It can read some configuration from a toml file and has some extra methods for
-auto importing. To generate a Flask-Imp blueprint, run the following command:</p>
+auto importing.</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>blueprint<span class="w"> </span>--help
+</pre></div>
+<p>To generate a Flask-Imp blueprint, run the following command:</p>
 <div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>blueprint
 </pre></div>
 <p>After running this command, you will be prompted to enter the location of where you want to create your blueprint:</p>
@@ -280,19 +283,34 @@ Name of the blueprint to create [my_new_blueprint]: admin
 │   └── admin
 │       ├── routes
 │       │   └── index.py
+│       │
 │       ├── static
-│       │   └── water.css
+│       │   ├── css
+│       │   │   └── water.css
+│       │   ├── img
+│       │   │   └── flask-imp-logo.png
+│       │   └── js
+│       │       └── main.js
+│       │
 │       ├── templates
-│       │   └── admin
+│       │   └── www
 │       │       ├── extends
 │       │       │   └── main.html
+│       │       ├── includes
+│       │       │   ├── footer.html
+│       │       │   └── header.html
 │       │       └── index.html
-│       ├── config.toml
-│       └── __init__.py
+│       │
+│       ├── __init__.py
+│       └─── config.toml
+│
 ...
 </pre></div>
 <p>This is a self-contained blueprint, so it has its own static, templates and routes folders. You can now navigate '
 /admin'</p>
+<p>You can streamline this process by specifying the name of the blueprint and the folder to create it in, like so:</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>blueprint<span class="w"> </span>-n<span class="w"> </span>admin<span class="w"> </span>-f<span class="w"> </span>app/blueprints
+</pre></div>
 
 </section>
 

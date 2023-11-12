@@ -7,6 +7,10 @@ Flask-Imp has a cli command that deploys a new ready-to-go project.
 This project is structured in a way to give you the best idea of
 how to use Flask-Imp.
 
+```bash
+flask-imp init --help
+```
+
 ## Create a new project
 
 Make sure you are in the virtual environment, and at the root of your project folder, then run the following command:
@@ -63,12 +67,30 @@ Run: flask --app new run --debug
 
 As you can see from the output, it gives you instructions on how to start your app, depending on the name you gave it.
 
-## init Folder structure
-
 You should see a new folder that has been given the name you specified in
-the `flask-imp init` command. 
+the `flask-imp init` command.
 
-This folder contains the following files and folders:
+### Additional options
+
+You can also specify a name for your app in the command itself, like so:
+
+```bash
+flask-imp init -n my_app
+```
+
+This will create a new app called 'my_app'.
+
+You can also deploy a slim app, that will have one blueprint and no models, like so:
+
+```bash
+flask-imp init -n my_app --slim
+```
+
+## init Folder structures
+
+### Full app
+
+`flask-imp init`:
 
 ```text
 app/
@@ -78,8 +100,20 @@ app/
 │       ├── __init__.py
 │       ├── routes
 │       │   └── index.py
+│       ├── static
+│       │   ├── css
+│       │   │   └── water.css
+│       │   ├── img
+│       │   │   └── flask-imp-logo.png
+│       │   └── js
+│       │       └── main.js
 │       └── templates
 │           └── www
+│               ├── extends
+│               │   └── main.html
+│               ├── includes
+│               │   ├── footer.html
+│               │   └── header.html
 │               └── index.html
 │
 ├── extensions
@@ -88,25 +122,16 @@ app/
 ├── global
 │   ├── cli
 │   │   └── cli.py
-│   │
 │   ├── context_processors
 │   │   └── context_processors.py
-│   │
 │   ├── error_handlers
 │   │   └── error_handlers.py
-│   │
 │   ├── filters
 │   │   └── filters.py
-│   │
 │   ├── routes
 │   │   └── routes.py
-│   │
 │   ├── static
-│   │   ├── css
-│   │   │   └── water.css
-│   │   └── js
-│   │       └── main.js
-│   │
+│   │   └── favicon.ico
 │   └── templates
 │       ├── errors
 │       │   ├── 400.html
@@ -115,20 +140,62 @@ app/
 │       │   ├── 404.html
 │       │   ├── 405.html
 │       │   └── 500.html
-│       │
-│       ├── extends
-│       │   └── main.html
-│       │
-│       ├── includes
-│       │   ├── footer.html
-│       │   └── header.html
-│       │
 │       └── index.html
 │
 ├── models
 │   ├── example_user_table.py
 │   └── __init__.py
-│    
+│
+├── __init__.py
+└── default.config.toml
+```
+
+### Slim app
+
+`flask-imp init --slim`:
+
+```text
+app/
+├── extensions
+│   └── __init__.py
+│
+├── global
+│   ├── cli
+│   │   └── cli.py
+│   ├── error_handlers
+│   │   └── error_handlers.py
+│   ├── static
+│   │   └── favicon.ico
+│   └── templates
+│       └── errors
+│           ├── 400.html
+│           ├── 401.html
+│           ├── 403.html
+│           ├── 404.html
+│           ├── 405.html
+│           └── 500.html
+│
+├── www
+│   ├── config.toml
+│   ├── __init__.py
+│   ├── routes
+│   │   └── index.py
+│   ├── static
+│   │   ├── css
+│   │   │   └── water.css
+│   │   ├── img
+│   │   │   └── flask-imp-logo.png
+│   │   └── js
+│   │       └── main.js
+│   └── templates
+│       └── www
+│           ├── extends
+│           │   └── main.html
+│           ├── includes
+│           │   ├── footer.html
+│           │   └── header.html
+│           └── index.html
+│
 ├── __init__.py
 └── default.config.toml
 ```

@@ -4,7 +4,13 @@ Title = Generate a Flask-Imp Blueprint
 ```
 
 Flask-Imp has its own type of blueprint. It can read some configuration from a toml file and has some extra methods for
-auto importing. To generate a Flask-Imp blueprint, run the following command:
+auto importing. 
+
+```bash
+flask-imp blueprint --help
+```
+
+To generate a Flask-Imp blueprint, run the following command:
 
 ```bash
 flask-imp blueprint
@@ -50,17 +56,35 @@ app/
 │   └── admin
 │       ├── routes
 │       │   └── index.py
+│       │
 │       ├── static
-│       │   └── water.css
+│       │   ├── css
+│       │   │   └── water.css
+│       │   ├── img
+│       │   │   └── flask-imp-logo.png
+│       │   └── js
+│       │       └── main.js
+│       │
 │       ├── templates
-│       │   └── admin
+│       │   └── www
 │       │       ├── extends
 │       │       │   └── main.html
+│       │       ├── includes
+│       │       │   ├── footer.html
+│       │       │   └── header.html
 │       │       └── index.html
-│       ├── config.toml
-│       └── __init__.py
+│       │
+│       ├── __init__.py
+│       └─── config.toml
+│
 ...
 ```
 
 This is a self-contained blueprint, so it has its own static, templates and routes folders. You can now navigate '
 /admin'
+
+You can streamline this process by specifying the name of the blueprint and the folder to create it in, like so:
+
+```bash
+flask-imp blueprint -n admin -f app/blueprints
+```
