@@ -88,6 +88,7 @@ PASSWORD = ""
 #PASSWORD = ""
 """
 
+    # Format to: secret_key
     default_config_toml = """\
 # Flask-Imp Config File
 # ------------------------
@@ -125,7 +126,7 @@ MAX_COOKIE_SIZE = 4093
 # Anything here will be accessible using session["your_var_name"]
 # or session.get("your_var_name")
 [SESSION]
-logged_in = false
+#logged_in = false
 
 # These settings are specific to the Flask-SQLAlchemy extension.
 # Anything here will be accessible using app.config
@@ -189,12 +190,32 @@ def create_app():
     return app
 """
 
+    slim_init_py = """\
+from flask import Flask
+from {app_name}.extensions import imp
+
+
+def create_app():
+    app = Flask(__name__, static_url_path="/")
+    imp.init_app(app)
+    imp.import_app_resources()
+    imp.import_blueprint("www")
+
+    return app
+    """
+
     extensions_init_py = """\
 from flask_imp import Imp
 from flask_sqlalchemy import SQLAlchemy
 
 imp = Imp()
 db = SQLAlchemy()
+"""
+
+    slim_extensions_init_py = """\
+from flask_imp import Imp
+
+imp = Imp()
 """
 
     # Format to: app_name

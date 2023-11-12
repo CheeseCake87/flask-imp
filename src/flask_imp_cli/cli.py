@@ -38,5 +38,11 @@ def add_blueprint(folder, name):
     prompt='What would you like to call your app?',
     help='The name of the app folder that will be created'
 )
-def init_new_app(name):
-    _init_app(name)
+@click.option(
+    '-s', '--slim',
+    is_flag=True,
+    default=False,
+    help='Create a slim app'
+)
+def init_new_app(name, slim):
+    _init_app(name, slim)

@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from typing import Optional
 import click
 
 from .filelib import BlueprintFileLib as BpFlib
@@ -11,7 +11,7 @@ from .helpers import Sprinkles as Sp
 from .helpers import to_snake_case
 
 
-def add_blueprint(folder, name, _init_app: bool = False, _cwd: Path = None):
+def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = None):
     click.echo(f"{Sp.OKGREEN}Creating Blueprint: {name}")
 
     if _cwd:

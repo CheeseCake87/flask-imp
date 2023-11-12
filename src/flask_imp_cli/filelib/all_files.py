@@ -6,6 +6,11 @@ from {app_name}.extensions import db
 from {app_name}.models.example_user_table import ExampleUserTable
 
 
+@app.cli.command("config")
+def create_tables():
+    print(app.config)
+
+
 @app.cli.command("create-tables")
 def create_tables():
     db.create_all()
@@ -53,6 +58,15 @@ def delete_example_user():
     ExampleUserTable.delete(
         user_id=1,
     )
+"""
+
+    slim_collections_cli_py = """\
+from flask import current_app as app
+
+
+@app.cli.command("config")
+def create_tables():
+    print(app.config)
 """
 
     # Format to: None

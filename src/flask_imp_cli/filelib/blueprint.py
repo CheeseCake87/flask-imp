@@ -27,7 +27,7 @@ URL_PREFIX = "/{url_prefix}"
 #URL_DEFAULTS = {{}}
 STATIC_FOLDER = "static"
 TEMPLATE_FOLDER = "templates"
-STATIC_URL_PATH = "/{name}/static"
+STATIC_URL_PATH = "/static"
 #ROOT_PATH = ""
 #CLI_GROUP = ""
 
@@ -117,7 +117,7 @@ def index():
     templates_includes_header_html = """\
 <div style="display: flex; flex-direction: row; align-items: center;
             justify-content: start; gap: 2rem; margin-bottom: 2rem;">
-    <img style="border-radius: 50%" 
+    <img style="border-radius: 50%"
          src="{{{{ url_for('{static_path}', filename='img/flask-imp-logo.png') }}}}" alt="flask-imp logo">
     <h1 style="font-size: 4rem;">Flask-Imp</h1>
 </div>
