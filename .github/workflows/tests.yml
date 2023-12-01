@@ -45,7 +45,6 @@ jobs:
       - name: Lint with ruff
         run: |
           ruff check flask-imp
-          ruff format flask-imp
       - name: Test with pytest
         run: |
           pytest
