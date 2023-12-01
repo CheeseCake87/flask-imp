@@ -7,7 +7,9 @@ from flask import session
 from flask_imp.auth import generate_csrf_token
 
 
-def include_csrf(session_key: str = "csrf", form_key: str = "csrf", abort_code: int = 401):
+def include_csrf(
+    session_key: str = "csrf", form_key: str = "csrf", abort_code: int = 401
+):
     """
     A decorator that handles CSRF protection.
 

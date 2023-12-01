@@ -12,12 +12,12 @@ from .__private_funcs__ import _check_against_values_allowed
 
 
 def permission_check(
-        session_key: str,
-        values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
-        fail_endpoint: t.Optional[str] = None,
-        endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
-        message: t.Optional[str] = None,
-        message_category: str = "message"
+    session_key: str,
+    values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
+    fail_endpoint: t.Optional[str] = None,
+    endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
+    message: t.Optional[str] = None,
+    message_category: str = "message",
 ):
     """
     A decorator that checks if the specified session key exists and its value(s) match the specified value(s).
@@ -71,7 +71,6 @@ def permission_check(
             setup_flash(message, message_category)
 
             if fail_endpoint:
-
                 if endpoint_kwargs:
                     return redirect(url_for(fail_endpoint, **endpoint_kwargs))
 

@@ -9,12 +9,12 @@ from .__private_funcs__ import _guess_block
 
 
 def authenticate_password(
-        input_password: str,
-        database_password: str,
-        database_salt: str,
-        encryption_level: int = 512,
-        pepper_length: int = 1,
-        pepper_position: t.Literal["start", "end"] = "end"
+    input_password: str,
+    database_password: str,
+    database_salt: str,
+    encryption_level: int = 512,
+    pepper_length: int = 1,
+    pepper_position: t.Literal["start", "end"] = "end",
 ) -> bool:
     """
     Takes the plain input password, the stored hashed password along with the stored salt
@@ -46,7 +46,7 @@ def authenticate_password(
     if pepper_length > 3:
         pepper_length = 3
 
-    _guesses = {''.join(i) for i in product(ascii_letters, repeat=pepper_length)}
+    _guesses = {"".join(i) for i in product(ascii_letters, repeat=pepper_length)}
 
     thread_pool = multiprocessing.Pool(processes=pepper_length)
     threads = []
@@ -61,8 +61,8 @@ def authenticate_password(
                     database_password,
                     database_salt,
                     encryption_level,
-                    pepper_position
-                )
+                    pepper_position,
+                ),
             )
         )
 

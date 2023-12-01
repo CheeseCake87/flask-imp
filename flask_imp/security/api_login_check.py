@@ -7,9 +7,9 @@ from .__private_funcs__ import _check_against_values_allowed
 
 
 def api_login_check(
-        session_key: str,
-        values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
-        fail_json: t.Optional[t.Dict[str, t.Any]] = None
+    session_key: str,
+    values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
+    fail_json: t.Optional[t.Dict[str, t.Any]] = None,
 ):
     """
     A decorator that is used to secure API routes that return JSON responses.

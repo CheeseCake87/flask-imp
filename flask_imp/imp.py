@@ -29,30 +29,25 @@ class Imp:
     config: Dict
 
     def __init__(
-            self,
-            app: Optional[Flask] = None,
-            app_config_file: Optional[str] = None,
-            ignore_missing_env_variables: bool = False
+        self,
+        app: Optional[Flask] = None,
+        app_config_file: Optional[str] = None,
+        ignore_missing_env_variables: bool = False,
     ) -> None:
-
         if app is not None:
-            self.init_app(
-                app,
-                app_config_file,
-                ignore_missing_env_variables
-            )
+            self.init_app(app, app_config_file, ignore_missing_env_variables)
 
     def init_app(
-            self,
-            app: Flask,
-            app_config_file: Optional[str] = os.environ.get("IMP_CONFIG"),
-            ignore_missing_env_variables: bool = False
+        self,
+        app: Flask,
+        app_config_file: Optional[str] = os.environ.get("IMP_CONFIG"),
+        ignore_missing_env_variables: bool = False,
     ) -> None:
         """
         Initializes the flask app to work with flask-imp.
-        
+
         :raw-html:`<br />`
-        
+
         If no `app_config_file` specified, an attempt to read `IMP_CONFIG` from the environment will be made.
 
         :raw-html:`<br />`
@@ -75,10 +70,10 @@ class Imp:
 
         if app is None:
             raise ImportError(
-                "No app was passed in, do ba = Imp(flaskapp) or app.initapp(flaskapp)")
+                "No app was passed in, do ba = Imp(flaskapp) or app.initapp(flaskapp)"
+            )
         if not isinstance(app, Flask):
-            raise TypeError(
-                "The app that was passed in is not an instance of Flask")
+            raise TypeError("The app that was passed in is not an instance of Flask")
 
         if app_config_file is None:
             app_config_file = "default.config.toml"
@@ -94,22 +89,20 @@ class Imp:
         self.config_path = self.app_path / app_config_file
 
         self.config = _init_app_config(
-            self.config_path,
-            ignore_missing_env_variables,
-            self.app
+            self.config_path, ignore_missing_env_variables, self.app
         )
 
         self.__model_registry__ = ModelRegistry()
         self.app.extensions["imp"] = self
 
     def import_app_resources(
-            self,
-            folder: str = "global",
-            app_factories: Optional[List] = None,
-            static_folder: str = "static",
-            templates_folder: str = "templates",
-            scope_root_folders_to: Optional[List] = None,
-            scope_root_files_to: Optional[List] = None,
+        self,
+        folder: str = "global",
+        app_factories: Optional[List] = None,
+        static_folder: str = "static",
+        templates_folder: str = "templates",
+        scope_root_folders_to: Optional[List] = None,
+        scope_root_files_to: Optional[List] = None,
     ) -> None:
         """
         Import standard app resources from the specified folder.
@@ -244,32 +237,45 @@ class Imp:
 
         def process_module(import_location: str) -> tuple:
             module_file = import_module(import_location)
-            flask_instance = True if [
-                name for name, value in getmembers(module_file) if
-                isinstance(value, Flask)
-            ] else False
+            flask_instance = (
+                True
+                if [
+                    name
+                    for name, value in getmembers(module_file)
+                    if isinstance(value, Flask)
+                ]
+                else False
+            )
 
             return module_file, flask_instance
 
-        skip_folders = ("static", "templates",)
+        skip_folders = (
+            "static",
+            "templates",
+        )
         global_collection_folder = self.app_path / folder
         app_static_folder = global_collection_folder / static_folder
         app_templates_folder = global_collection_folder / templates_folder
 
         if not global_collection_folder.exists():
             raise ImportError(
-                f"Cannot find global collection folder at {global_collection_folder}")
+                f"Cannot find global collection folder at {global_collection_folder}"
+            )
 
         if not global_collection_folder.is_dir():
             raise ImportError(
-                f"Global collection must be a folder {global_collection_folder}")
+                f"Global collection must be a folder {global_collection_folder}"
+            )
 
-        self.app.static_folder = app_static_folder.as_posix() if app_static_folder.exists() else None
-        self.app.template_folder = app_templates_folder.as_posix() if app_templates_folder.exists() else None
+        self.app.static_folder = (
+            app_static_folder.as_posix() if app_static_folder.exists() else None
+        )
+        self.app.template_folder = (
+            app_templates_folder.as_posix() if app_templates_folder.exists() else None
+        )
 
         with self.app.app_context():
             for item in global_collection_folder.iterdir():
-
                 if item.is_dir() and item.name not in skip_folders:
                     if scope_root_folders_to:
                         if item.name not in scope_root_folders_to:
@@ -277,7 +283,8 @@ class Imp:
 
                     for py_file in item.glob("*.py"):
                         module, flask_instance_found = process_module(
-                            f"{cast_to_import_str(self.app_name, item)}.{py_file.stem}")
+                            f"{cast_to_import_str(self.app_name, item)}.{py_file.stem}"
+                        )
 
                         for instance_factory in app_factories:
                             if hasattr(module, instance_factory):
@@ -292,7 +299,8 @@ class Imp:
                             continue
 
                     module, flask_instance_found = process_module(
-                        cast_to_import_str(self.app_name, item))
+                        cast_to_import_str(self.app_name, item)
+                    )
 
                     for instance_factory in app_factories:
                         if hasattr(module, instance_factory):
@@ -480,9 +488,9 @@ class Imp:
             │       ├── config.toml
             │       └── __init__.py
             └── ...
-            
+
         :raw-html:`<br />`
-        
+
         See: `import_blueprint` for more information.
 
         :raw-html:`<br />`
@@ -603,7 +611,9 @@ class Imp:
             model_processor(file_or_folder_path)
 
         elif file_or_folder_path.is_dir():
-            for model_file in [_ for _ in file_or_folder_path.iterdir() if "__" not in _.name]:
+            for model_file in [
+                _ for _ in file_or_folder_path.iterdir() if "__" not in _.name
+            ]:
                 model_processor(model_file)
 
     def model(self, class_: str) -> DefaultMeta:

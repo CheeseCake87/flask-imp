@@ -8,22 +8,24 @@ from pathlib import Path
 
 
 class Sprinkles:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END = '\033[0m'
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    END = "\033[0m"
 
 
 def deprecated(message: str):
     def func_wrapper(func):
         @functools.wraps(func)
         def proc_function(*args, **kwargs):
-            logging.critical(f"{Sprinkles.FAIL}Function deprecated: {message}{Sprinkles.END}")
+            logging.critical(
+                f"{Sprinkles.FAIL}Function deprecated: {message}{Sprinkles.END}"
+            )
             return func(*args, **kwargs)
 
         return proc_function
@@ -32,13 +34,12 @@ def deprecated(message: str):
 
 
 def if_env_replace(
-        env_value: t.Optional[t.Any],
-        ignore_missing_env_variables: bool = False
+    env_value: t.Optional[t.Any], ignore_missing_env_variables: bool = False
 ) -> t.Any:
     """
     Looks for the replacement pattern to swap out values in the config file with environment variables.
     """
-    pattern = re.compile(r'<(.*?)>')
+    pattern = re.compile(r"<(.*?)>")
 
     if isinstance(env_value, str):
         if re.match(pattern, env_value):
@@ -57,10 +58,10 @@ def if_env_replace(
 
 
 def process_dict(
-        this_dict: t.Optional[dict],
-        key_case_switch: str = "upper",
-        ignore_missing_env_variables: bool = False,
-        crawl: bool = False
+    this_dict: t.Optional[dict],
+    key_case_switch: str = "upper",
+    ignore_missing_env_variables: bool = False,
+    crawl: bool = False,
 ) -> dict:
     """
     Used to process the config from_file dictionary and replace environment variables. Turns all keys to upper case.
@@ -79,10 +80,7 @@ def process_dict(
         if crawl:
             if isinstance(value, dict):
                 return_dict[cs_key] = process_dict(
-                    value,
-                    key_case_switch,
-                    ignore_missing_env_variables,
-                    crawl
+                    value, key_case_switch, ignore_missing_env_variables, crawl
                 )
                 continue
 
@@ -96,11 +94,11 @@ def cast_to_import_str(app_name: str, folder_path: Path) -> str:
     Takes the folder path and converts it to a string that can be imported
     """
     folder_parts = folder_path.parts
-    parts = folder_parts[folder_parts.index(app_name):]
+    parts = folder_parts[folder_parts.index(app_name) :]
     if sys.version_info.major == 3:
         if sys.version_info.minor < 9:
-            return ".".join(parts).replace('.py', '')
-        return ".".join(parts).removesuffix('.py')
+            return ".".join(parts).replace(".py", "")
+        return ".".join(parts).removesuffix(".py")
     raise NotImplementedError("Python version not supported")
 
 
@@ -108,8 +106,8 @@ def snake(value: str) -> str:
     """
     Switches name of the class CamelCase to snake_case
     """
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', value)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", value)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
 
 
 def class_field(class_: str, field: str) -> str:

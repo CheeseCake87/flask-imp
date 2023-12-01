@@ -7,11 +7,11 @@ from .__private_funcs__ import _pps, _ppe
 
 
 def encrypt_password(
-        password: str,
-        salt: str,
-        encryption_level: int = 512,
-        pepper_length: int = 1,
-        pepper_position: t.Literal["start", "end"] = "end"
+    password: str,
+    salt: str,
+    encryption_level: int = 512,
+    pepper_length: int = 1,
+    pepper_position: t.Literal["start", "end"] = "end",
 ) -> str:
     """
     Takes the plain password, applies a pepper, salts it, then produces a digested sha512 or sha256 if specified.
@@ -57,10 +57,10 @@ def encrypt_password(
     _pepper = "".join(choice(ascii_letters) for _ in range(pepper_length))
 
     _sha.update(
-        (_pps(
-            _pepper, password, salt
-        ) if pepper_position == "start" else _ppe(
-            _pepper, password, salt
-        )).encode("utf-8")
+        (
+            _pps(_pepper, password, salt)
+            if pepper_position == "start"
+            else _ppe(_pepper, password, salt)
+        ).encode("utf-8")
     )
     return _sha.hexdigest()
