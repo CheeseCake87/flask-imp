@@ -3,8 +3,8 @@ import typing as t
 
 
 def is_username_valid(
-        username: str,
-        allowed: t.Optional[t.List[t.Literal["all", "dot", "dash", "under"]]] = None
+    username: str,
+    allowed: t.Optional[t.List[t.Literal["all", "dot", "dash", "under"]]] = None,
 ) -> bool:
     """
     Checks if a username is valid.

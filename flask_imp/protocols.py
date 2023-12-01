@@ -16,7 +16,7 @@ class ImpBlueprint(Protocol):
     def register_blueprint(self, blueprint: Blueprint):
         ...
 
-    def _register(self, app: 'Flask', options: dict) -> None:
+    def _register(self, app: "Flask", options: dict) -> None:
         ...
 
     def _setup_imp_blueprint(self, imp_instance) -> None:

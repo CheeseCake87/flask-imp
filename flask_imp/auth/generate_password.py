@@ -36,21 +36,21 @@ def generate_password(style: str = "mixed", length: int = 3) -> str:
     :return: str - a generated plain text password
     """
     if style == "animals":
-        return '-'.join(
+        return "-".join(
             [choice(PasswordGeneration.animals) for _ in range(length)]
         ) + str(generate_numeric_validator(length=2))
 
     if style == "colors":
-        return '-'.join(
+        return "-".join(
             [choice(PasswordGeneration.colors) for _ in range(length)]
         ) + str(generate_numeric_validator(length=2))
 
     if style == "mixed":
-        return '-'.join(
-            [choice([
-                *PasswordGeneration.animals,
-                *PasswordGeneration.colors
-            ]) for _ in range(length)]
+        return "-".join(
+            [
+                choice([*PasswordGeneration.animals, *PasswordGeneration.colors])
+                for _ in range(length)
+            ]
         ) + str(generate_numeric_validator(length=2))
 
     raise ValueError(f"Invalid style passed in {style}")

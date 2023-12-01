@@ -36,6 +36,6 @@ def is_email_address_valid(email_address: str) -> bool:
     pattern = re.compile(
         r"[a-z\d!#$%&'*+?^_`{|}~-]+(?:\.[a-z\d!#$%&'*+?^_`"
         r"{|}~-]+)*@(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?",
-        re.IGNORECASE
+        re.IGNORECASE,
     )
     return bool(pattern.match(email_address))

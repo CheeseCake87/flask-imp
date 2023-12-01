@@ -12,13 +12,13 @@ from .__private_funcs__ import _check_against_values_allowed
 
 
 def login_check(
-        session_key: str,
-        values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
-        fail_endpoint: t.Optional[str] = None,
-        pass_endpoint: t.Optional[str] = None,
-        endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
-        message: t.Optional[str] = None,
-        message_category: str = "message"
+    session_key: str,
+    values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
+    fail_endpoint: t.Optional[str] = None,
+    pass_endpoint: t.Optional[str] = None,
+    endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
+    message: t.Optional[str] = None,
+    message_category: str = "message",
 ):
     """
     A decorator that checks if the specified session key exists and contains the specified value.
@@ -66,7 +66,6 @@ def login_check(
     """
 
     def login_check_wrapper(func):
-
         @wraps(func)
         def inner(*args, **kwargs):
             skey = session.get(session_key)

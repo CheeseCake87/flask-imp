@@ -16,6 +16,7 @@ class ImpBlueprint(Blueprint):
     """
     A Class that extends the capabilities of the Flask Blueprint class.
     """
+
     enabled: bool = False
     location: Path
     bp_name: str
@@ -88,18 +89,14 @@ class ImpBlueprint(Blueprint):
             self.enabled,
             self.session,
             self.settings,
-            self.database_bind
+            self.database_bind,
         ) = _init_bp_config(
             self.bp_name,
             self.location / config_file,
         )
 
         if self.enabled:
-            super().__init__(
-                self.bp_name,
-                self.package,
-                **self.settings
-            )
+            super().__init__(self.bp_name, self.package, **self.settings)
 
     def import_resources(self, folder: str = "routes") -> None:
         """
@@ -177,7 +174,9 @@ class ImpBlueprint(Blueprint):
             try:
                 import_module(f"{self.package}.{folder}.{resource.stem}")
             except ImportError as e:
-                raise ImportError(f"Error when importing {self.package}.{resource}: {e}")
+                raise ImportError(
+                    f"Error when importing {self.package}.{resource}: {e}"
+                )
 
     def import_nested_blueprint(self, blueprint: str) -> None:
         """
@@ -237,7 +236,9 @@ class ImpBlueprint(Blueprint):
         if not self.enabled:
             return
 
-        self.__nested_blueprint_imports__.append(partial(self._partial_nested_blueprint_import, blueprint=blueprint))
+        self.__nested_blueprint_imports__.append(
+            partial(self._partial_nested_blueprint_import, blueprint=blueprint)
+        )
 
     def import_nested_blueprints(self, folder: str) -> None:
         """
@@ -343,10 +344,7 @@ class ImpBlueprint(Blueprint):
                 session.update(self.session)
                 break
 
-    def import_models(
-            self,
-            file_or_folder: str
-    ) -> None:
+    def import_models(self, file_or_folder: str) -> None:
         """
         Same actions as `Imp.import_models()`, but scoped to the current blueprint's package.
 
@@ -434,7 +432,9 @@ class ImpBlueprint(Blueprint):
         if not self.enabled:
             return
 
-        self.__model_imports__.append(partial(self._partial_models_import, file_or_folder=file_or_folder))
+        self.__model_imports__.append(
+            partial(self._partial_models_import, file_or_folder=file_or_folder)
+        )
 
     def tmpl(self, template: str) -> str:
         """
@@ -499,9 +499,13 @@ class ImpBlueprint(Blueprint):
 
             if database_uri:
                 if self.name in app_instance.config.get("SQLALCHEMY_BINDS", {}):
-                    raise ValueError(f"Blueprint {self.name} already has a database bind set")
+                    raise ValueError(
+                        f"Blueprint {self.name} already has a database bind set"
+                    )
 
-                app_instance.config['SQLALCHEMY_BINDS'].update({self.name: database_uri})
+                app_instance.config["SQLALCHEMY_BINDS"].update(
+                    {self.name: database_uri}
+                )
 
         for partial_models_import in self.__model_imports__:
             partial_models_import(imp_instance=imp_instance)
@@ -510,26 +514,23 @@ class ImpBlueprint(Blueprint):
             partial_nested_blueprint_import(imp_instance=imp_instance)
 
     def _partial_models_import(
-            self,
-            file_or_folder: str,
-            imp_instance,
+        self,
+        file_or_folder: str,
+        imp_instance,
     ) -> None:
         file_or_folder_path = Path(self.location / file_or_folder)
         imp_instance.import_models(file_or_folder_path.as_posix())
 
-    def _partial_nested_blueprint_import(
-            self,
-            blueprint: str,
-            imp_instance
-    ) -> None:
-
+    def _partial_nested_blueprint_import(self, blueprint: str, imp_instance) -> None:
         if Path(blueprint).is_absolute():
             potential_bp = Path(blueprint)
         else:
             potential_bp = Path(self.location / blueprint)
 
         if potential_bp.exists() and potential_bp.is_dir():
-            module = import_module(cast_to_import_str(self.package.split(".")[0], potential_bp))
+            module = import_module(
+                cast_to_import_str(self.package.split(".")[0], potential_bp)
+            )
             for name, value in getmembers(module):
                 if isinstance(value, Blueprint) or isinstance(value, ImpBlueprint):
                     if hasattr(value, "_setup_imp_blueprint"):

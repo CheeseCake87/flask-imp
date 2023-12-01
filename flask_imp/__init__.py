@@ -5,9 +5,4 @@ from .imp import Imp as Imp
 
 __version__ = "2.7.8"
 
-__all__ = [
-    "Auth",
-    "PasswordGeneration",
-    "Imp",
-    "Blueprint"
-]
+__all__ = ["Auth", "PasswordGeneration", "Imp", "Blueprint"]

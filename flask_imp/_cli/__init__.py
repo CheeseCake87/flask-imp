@@ -12,19 +12,23 @@ def cli():
 
 @cli.command("blueprint", help="Create a flask-imp blueprint")
 @click.option(
-    '-f', '--folder',
+    "-f",
+    "--folder",
     nargs=1,
     default="Current Working Directory",
-    prompt=(f'\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n'
-            f'Folder to create blueprint in'),
-    help='The from_folder to create the blueprint in, defaults to the current working directory'
+    prompt=(
+        f"\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n"
+        f"Folder to create blueprint in"
+    ),
+    help="The from_folder to create the blueprint in, defaults to the current working directory",
 )
 @click.option(
-    '-n', '--name',
+    "-n",
+    "--name",
     nargs=1,
     default="my_new_blueprint",
-    prompt='Name of the blueprint to create',
-    help='The name of the blueprint to create'
+    prompt="Name of the blueprint to create",
+    help="The name of the blueprint to create",
 )
 def add_blueprint(folder, name):
     _add_blueprint(folder, name)
@@ -32,23 +36,16 @@ def add_blueprint(folder, name):
 
 @cli.command("init", help="Create a new flask-imp app")
 @click.option(
-    '-n', '--name',
+    "-n",
+    "--name",
     nargs=1,
     default="app",
-    prompt='What would you like to call your app?',
-    help='The name of the app folder that will be created'
+    prompt="What would you like to call your app?",
+    help="The name of the app folder that will be created",
 )
+@click.option("-s", "--slim", is_flag=True, default=False, help="Create a slim app")
 @click.option(
-    '-s', '--slim',
-    is_flag=True,
-    default=False,
-    help='Create a slim app'
-)
-@click.option(
-    '-m', '--minimal',
-    is_flag=True,
-    default=False,
-    help='Create a minimal app'
+    "-m", "--minimal", is_flag=True, default=False, help="Create a minimal app"
 )
 def init_new_app(name, slim, minimal):
     if minimal:

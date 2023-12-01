@@ -18,15 +18,13 @@ def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = 
         cwd = _cwd
 
     else:
-
         if folder != "Current Working Directory":
             cwd = Path(Path.cwd() / folder)
         else:
             cwd = Path.cwd()
 
     if not cwd.exists():
-        click.echo(
-            f"{Sp.FAIL}{folder} does not exist.{Sp.END}")
+        click.echo(f"{Sp.FAIL}{folder} does not exist.{Sp.END}")
         return
 
     name = to_snake_case(name)
@@ -46,69 +44,59 @@ def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = 
 
     # Files
     files = {
-        "root/__init__.py": (
-            folders['root'] / "__init__.py",
-            BpFlib.init_py
-        ),
+        "root/__init__.py": (folders["root"] / "__init__.py", BpFlib.init_py),
         "root/config.toml": (
-            folders['root'] / "config.toml",
-            BpFlib.config_toml.format(name=name, url_prefix="" if _init_app else name)
+            folders["root"] / "config.toml",
+            BpFlib.config_toml.format(name=name, url_prefix="" if _init_app else name),
         ),
-        "routes/index.py": (
-            folders['routes'] / "index.py",
-            BpFlib.routes_index_py
-        ),
+        "routes/index.py": (folders["routes"] / "index.py", BpFlib.routes_index_py),
         "static/img/flask-imp-logo.png": (
-            folders['static/img'] / "flask-imp-logo.png",
-            flask_imp_logo
+            folders["static/img"] / "flask-imp-logo.png",
+            flask_imp_logo,
         ),
-        "static/water.css": (
-            folders['static/css'] / "water.css",
-            water_css
-        ),
+        "static/water.css": (folders["static/css"] / "water.css", water_css),
         "static/main.js": (
-            folders['static/js'] / "main.js",
-            main_js.format(main_js=folders['static'] / "main.js")
+            folders["static/js"] / "main.js",
+            main_js.format(main_js=folders["static"] / "main.js"),
         ),
         "templates/-/index.html": (
-            folders['templates'] / "index.html",
+            folders["templates"] / "index.html",
             BpFlib.templates_index_html.format(
-                root=folders['root'],
-                name=name,
-                flask_imp_logo=flask_imp_logo
-            ) if not _init_app else BpFlib.ia_templates_index_html.format(
+                root=folders["root"], name=name, flask_imp_logo=flask_imp_logo
+            )
+            if not _init_app
+            else BpFlib.ia_templates_index_html.format(
                 name=name,
                 flask_imp_logo=flask_imp_logo,
-                index_html=folders['templates'] / "index.html",
-                extends_main_html=folders['templates/extends'] / "main.html",
-                index_py=folders['routes'] / "index.py",
-                init_py=folders['root'] / "__init__.py",
-            )
+                index_html=folders["templates"] / "index.html",
+                extends_main_html=folders["templates/extends"] / "main.html",
+                index_py=folders["routes"] / "index.py",
+                init_py=folders["root"] / "__init__.py",
+            ),
         ),
         "templates/-/extends/main.html": (
-            folders['templates/extends'] / "main.html",
+            folders["templates/extends"] / "main.html",
             BpFlib.templates_extends_main_html.format(
                 name=name,
                 head_tag=head_tag_generator(
-                    f"Flask-Imp Blueprint: {name}",
-                    f"{name}.static"
+                    f"Flask-Imp Blueprint: {name}", f"{name}.static"
                 ),
-            )
+            ),
         ),
         "templates/-/includes/header.html": (
-            folders['templates/includes'] / "header.html",
+            folders["templates/includes"] / "header.html",
             BpFlib.templates_includes_header_html.format(
-                header_html=folders['templates/includes'] / "header.html",
-                main_html=folders['templates/extends'] / "main.html",
-                static_path=f"{name}.static"
-            )
+                header_html=folders["templates/includes"] / "header.html",
+                main_html=folders["templates/extends"] / "main.html",
+                static_path=f"{name}.static",
+            ),
         ),
         "templates/-/includes/footer.html": (
-            folders['templates/includes'] / "footer.html",
+            folders["templates/includes"] / "footer.html",
             BpFlib.templates_includes_footer_html.format(
-                footer_html=folders['templates/includes'] / "footer.html",
-                main_html=folders['templates/extends'] / "main.html",
-            )
+                footer_html=folders["templates/includes"] / "footer.html",
+                main_html=folders["templates/extends"] / "main.html",
+            ),
         ),
     }
 
@@ -118,12 +106,13 @@ def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = 
             path.mkdir(parents=True)
             click.echo(f"{Sp.OKGREEN}Blueprint folder: {folder}, created{Sp.END}")
         else:
-            click.echo(f"{Sp.WARNING}Blueprint folder already exists: {folder}, skipping{Sp.END}")
+            click.echo(
+                f"{Sp.WARNING}Blueprint folder already exists: {folder}, skipping{Sp.END}"
+            )
 
     # Loop create files
     for file, (path, content) in files.items():
         if not path.exists():
-
             if file == "static/img/flask-imp-logo.png":
                 path.write_bytes(bytes.fromhex(content))
                 continue
@@ -132,6 +121,8 @@ def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = 
 
             click.echo(f"{Sp.OKGREEN}Blueprint file: {file}, created{Sp.END}")
         else:
-            click.echo(f"{Sp.WARNING}Blueprint file already exists: {file}, skipping{Sp.END}")
+            click.echo(
+                f"{Sp.WARNING}Blueprint file already exists: {file}, skipping{Sp.END}"
+            )
 
     click.echo(f"{Sp.OKGREEN}Blueprint created: {folders['root']}{Sp.END}")

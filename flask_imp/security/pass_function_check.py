@@ -9,15 +9,15 @@ from flask import url_for
 
 
 def pass_function_check(
-        function: t.Callable,
-        predefined_args: t.Optional[t.Dict] = None,
-        fail_endpoint: t.Optional[str] = None,
-        pass_endpoint: t.Optional[str] = None,
-        endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
-        message: t.Optional[str] = None,
-        message_category: str = "message",
-        fail_on_missing_kwargs: bool = False,
-        with_app_context: bool = False
+    function: t.Callable,
+    predefined_args: t.Optional[t.Dict] = None,
+    fail_endpoint: t.Optional[str] = None,
+    pass_endpoint: t.Optional[str] = None,
+    endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
+    message: t.Optional[str] = None,
+    message_category: str = "message",
+    fail_on_missing_kwargs: bool = False,
+    with_app_context: bool = False,
 ):
     """
     A decorator that takes the result of a function and checks if it is True or False.
@@ -147,7 +147,6 @@ def pass_function_check(
     def pass_function_wrapper(func):
         @wraps(func)
         def inner(*args, **kwargs):
-
             def setup_flash(_message, _message_category):
                 if _message:
                     partial_flash = partial(flash, _message)
@@ -160,7 +159,6 @@ def pass_function_check(
             passed_in_kwargs = {k: v for k, v in kwargs.items() if k in function_args}
 
             if predefined_args:
-
                 passed_in_kwargs.update(predefined_args)
 
                 for key, value in passed_in_kwargs.items():
