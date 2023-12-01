@@ -29,7 +29,8 @@ dependencies = [
     'Flask',
     'Flask-SQLAlchemy',
     'toml',
-    'more-itertools'
+    'more-itertools',
+    'pyhead',
 ]
 
 [project.scripts]
