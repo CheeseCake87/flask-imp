@@ -1,7 +1,6 @@
 -r requirements.txt
-flake8==6.1.0
-tox==4.11.3
-pytest==7.4.3
-pytest-cov==4.1.0
-mypy==1.6.1
+ruff
+pytest
+pytest-cov
+mypy
 types-toml

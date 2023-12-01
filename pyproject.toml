@@ -1,15 +1,41 @@
 [build-system]
-requires = ["setuptools>=65"]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
-[tool.pytest.ini_options]
-addopts = [
-    "--import-mode=importlib",
+[project]
+name = "flask-imp"
+description = 'A Flask auto importer that allows your Flask apps to grow big.'
+authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Web Environment', 'Intended Audience :: Developers',
+    'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
+    'Operating System :: OS Independent', 'Programming Language :: Python',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Natural Language :: English',
 ]
-pythonpath = [
-    ".", "src",
+requires-python = ">=3.8"
+dynamic = ["version"]
+dependencies = [
+    'click',
+    'Flask',
+    'Flask-SQLAlchemy',
+    'toml',
+    'more-itertools'
 ]
-filterwarnings = [
-    "ignore::UserWarning",
-    "ignore::DeprecationWarning"
-]
+
+[project.scripts]
+flask-imp = "flask_imp_cli:cli"
+
+[project.urls]
+Documentation = "https://cheesecake87.github.io/flask-imp/"
+Source = "https://github.com/CheeseCake87/flask-imp"
+

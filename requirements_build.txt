@@ -1,6 +1,2 @@
 -r requirements.txt
-twine==4.0.2
-build==1.0.3
-sphinx==7.2.6
-myst-parser==2.0.0
-setuptools==68.2.2
+flit

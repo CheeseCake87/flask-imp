@@ -1,5 +1,4 @@
 -r requirements.txt
-flask
-mistune==3.0.2
+mistune
 pygments
 pytz
