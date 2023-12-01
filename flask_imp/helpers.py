@@ -6,7 +6,7 @@ from pathlib import Path
 from flask import Flask
 from toml import load as toml_load
 
-from flask_imp_cli.filelib import AppFileLib
+from ._cli.filelib import AppFileLib
 
 from .utilities import cast_to_bool, process_dict
 
