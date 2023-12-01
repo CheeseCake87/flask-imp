@@ -39,3 +39,17 @@ flask-imp = "flask_imp_cli:cli"
 Documentation = "https://cheesecake87.github.io/flask-imp/"
 Source = "https://github.com/CheeseCake87/flask-imp"
 
+[tool.flit.sdist]
+include = ["flask_imp/", "flask_imp_cli"]
+exclude = [
+    "tests/",
+    "test_app/",
+    "docs/",
+    "docs_gen/",
+    "app/",
+    "_assets/",
+    ".github/",
+    ".gitignore",
+    ".env",
+    "docker-compose.yaml",
+]
