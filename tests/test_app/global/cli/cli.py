@@ -4,7 +4,7 @@ from importlib import import_module
 def collection(app: object):
     @app.cli.command("add-example-user")
     def add_example_user():
-        from test_app.models.example_table import ExampleTable
+        from ...models.example_table import ExampleTable
 
         ExampleTable.add(
             username="admin",
@@ -14,7 +14,7 @@ def collection(app: object):
 
     @app.cli.command("update-example-user")
     def update_example_user():
-        from test_app.models.example_table import ExampleTable
+        from ...models.example_table import ExampleTable
 
         ExampleTable.update(
             user_id=1,
@@ -25,7 +25,7 @@ def collection(app: object):
 
     @app.cli.command("delete-example-user")
     def delete_example_user():
-        from test_app.models.example_table import ExampleTable
+        from ...models.example_table import ExampleTable
 
         ExampleTable.delete(
             user_id=1,
@@ -33,7 +33,7 @@ def collection(app: object):
 
     @app.cli.command("example-model-function")
     def example_model_function():
-        from test_app.extensions import imp
+        from ...extensions import imp
 
         imp.import_models("models")
 

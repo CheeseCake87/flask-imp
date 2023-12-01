@@ -1,6 +1,6 @@
 from sqlalchemy import ForeignKey
 
-from test_app import db
+from ..extensions import db
 from flask_imp.utilities import class_field
 
 

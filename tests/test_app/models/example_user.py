@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 
-from test_app import db
+from ..extensions import db
 
 
 class ExampleUser(db.Model):

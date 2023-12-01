@@ -3,8 +3,8 @@ import os
 from flask import Flask
 
 from flask_imp.auth import encrypt_password, authenticate_password
-from test_app.extensions import db
-from test_app.extensions import imp
+from .extensions import db
+from .extensions import imp
 
 os.environ["CONFIG_SECRET_KEY"] = "inserted_from_environment"
 os.environ["DB_USERNAME"] = "database_username"

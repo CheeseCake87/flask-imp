@@ -1,4 +1,4 @@
-from test_app import db
+from ..extensions import db
 
 
 class ExampleUserBind(db.Model):

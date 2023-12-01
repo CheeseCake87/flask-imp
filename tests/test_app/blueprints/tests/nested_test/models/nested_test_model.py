@@ -1,4 +1,4 @@
-from test_app.extensions import db
+from .....extensions import db
 
 
 class NestedTestModel(db.Model):
