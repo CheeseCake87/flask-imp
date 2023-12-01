@@ -33,23 +33,28 @@ dependencies = [
 ]
 
 [project.scripts]
-flask-imp = "flask_imp_cli:cli"
+flask-imp = "flask_imp._cli:cli"
 
 [project.urls]
 Documentation = "https://cheesecake87.github.io/flask-imp/"
 Source = "https://github.com/CheeseCake87/flask-imp"
 
 [tool.flit.sdist]
-include = ["flask_imp/", "flask_imp_cli"]
 exclude = [
-    "tests/",
-    "test_app/",
+    ".github/",
+    "_assets/",
+    "app/",
+    "dist/",
     "docs/",
     "docs_gen/",
-    "app/",
-    "_assets/",
-    ".github/",
-    ".gitignore",
+    "test_app/",
+    "test_docker/",
+    "tests/",
     ".env",
+    ".gitignore",
     "docker-compose.yaml",
+    "Dockerfile",
+    "requirements_build.txt",
+    "requirements_dev.txt",
+    "requirements_docs.txt",
 ]
