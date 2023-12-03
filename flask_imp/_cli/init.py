@@ -13,7 +13,7 @@ from .filelib.water_css import water_css
 from .helpers import Sprinkles as Sp
 
 
-def init_app(name, _slim: bool = False, _minimal: bool = False):
+def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = False):
     click.echo(f"{Sp.OKGREEN}Creating App: {name}")
 
     cwd = Path.cwd()
@@ -101,7 +101,6 @@ def init_app(name, _slim: bool = False, _minimal: bool = False):
                     folders["global/templates"] / "index.html",
                     GlobalFileLib.minimal_templates_index_html.format(
                         head_tag=head_tag_generator(
-                            title="Minimal Flask-Imp App",
                             no_js=True,
                         ),
                         static_path="static",

@@ -174,11 +174,15 @@ def example__num_to_month(num: str) -> str:
 from flask import current_app as app
 from flask import render_template
 
+from pyhead import Head
+
 
 @app.route("/global")
 def index():
+    head = Head(title="Flask Imp Global Template")
     return render_template(
         "index.html",
+        head=head
     )
 """
 
@@ -186,19 +190,25 @@ def index():
 from flask import current_app as app
 from flask import render_template
 
+from pyhead import Head
+
 
 @app.route("/")
 def index():
+    head = Head(title="Flask Imp")
     return render_template(
         "index.html",
+        head=head
     )
 """
 
     # Format to: None
     templates_index_html = """\
+<!doctype html>
 <html lang="en">
+
 <head>
-    <title>Flask-Imp Global Template</title>
+    {{{{ head() }}}}
 </head>
 <body>
     <p>This is the example global template file located in <code>global/templates/index.html</code></p>

@@ -17,8 +17,8 @@ def cli():
     nargs=1,
     default="Current Working Directory",
     prompt=(
-        f"\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n"
-        f"Folder to create blueprint in"
+            f"\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n"
+            f"Folder to create blueprint in"
     ),
     help="The from_folder to create the blueprint in, defaults to the current working directory",
 )
@@ -39,15 +39,39 @@ def add_blueprint(folder, name):
     "-n",
     "--name",
     nargs=1,
-    default="app",
-    prompt="What would you like to call your app?",
+    default=None,
     help="The name of the app folder that will be created",
 )
+@click.option("-f", "--full", is_flag=True, default=False, help="Create a full app")
 @click.option("-s", "--slim", is_flag=True, default=False, help="Create a slim app")
 @click.option(
     "-m", "--minimal", is_flag=True, default=False, help="Create a minimal app"
 )
-def init_new_app(name, slim, minimal):
+def init_new_app(name, full, slim, minimal):
+    if not full and not slim and not minimal:
+        choice = click.prompt(
+            "What type of app would you like to create?",
+            default="full",
+            type=click.Choice(["full", "slim", "minimal"]),
+        )
+
+        if choice == "full":
+            full = True
+        elif choice == "slim":
+            slim = True
+        elif choice == "minimal":
+            minimal = True
+
+    if name is None:
+        set_name = click.prompt(
+            "What would you like to call your app?",
+            default="app"
+        )
+
+    else:
+        set_name = name
+
     if minimal:
         slim = True
-    _init_app(name, slim, minimal)
+
+    _init_app(set_name, full, slim, minimal)

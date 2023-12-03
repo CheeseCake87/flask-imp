@@ -49,7 +49,8 @@ def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = 
             folders["root"] / "config.toml",
             BpFlib.config_toml.format(name=name, url_prefix="" if _init_app else name),
         ),
-        "routes/index.py": (folders["routes"] / "index.py", BpFlib.routes_index_py),
+        "routes/index.py": (folders["routes"] / "index.py",
+                            BpFlib.routes_index_py.format(name=name)),
         "static/img/flask-imp-logo.png": (
             folders["static/img"] / "flask-imp-logo.png",
             flask_imp_logo,
@@ -78,9 +79,7 @@ def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = 
             folders["templates/extends"] / "main.html",
             BpFlib.templates_extends_main_html.format(
                 name=name,
-                head_tag=head_tag_generator(
-                    f"Flask-Imp Blueprint: {name}", f"{name}.static"
-                ),
+                head_tag=head_tag_generator(f"{name}.static"),
             ),
         ),
         "templates/-/includes/header.html": (
