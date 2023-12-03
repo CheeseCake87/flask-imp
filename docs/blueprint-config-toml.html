@@ -20,7 +20,7 @@
     <h1>Flask-Imp</h1>
     <div><small>Current Version: 2.7.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Sun, 12 Nov 2023</small></div>
+    <div><small>Sun, 03 Dec 2023</small></div>
 
     <h2>Menu</h2>
     <ul>
@@ -253,31 +253,31 @@
     <p>The Flask-Imp Blueprint will load configuration from a <code>config.toml</code> file, which is located in the same directory as the
 <code>__init__.py</code> file.</p>
 <p>File: <code>config.toml</code></p>
-<div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;yes&quot;</span>
+<div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;yes&quot;</span>
 
 <span class="k">[settings]</span>
-<span class="n">url_prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">subdomain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">url_prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">subdomain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="n">url_defaults</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
-<span class="n">static_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">template_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">static_url_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">static_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">template_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">static_url_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="c1">#root_path = &quot;&quot;</span>
 <span class="c1">#cli_group = &quot;&quot;</span>
 
 <span class="k">[session]</span>
-<span class="n">var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 
 <span class="c1"># Set ENABLED to true to allow the blueprint</span>
 <span class="c1"># to create a database bind, change settings accordingly.</span>
 <span class="k">[DATABASE_BIND]</span>
 <span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;sqlite&quot;</span>
-<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;example&quot;</span>
-<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sqlite&quot;</span>
+<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;example&quot;</span>
+<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 </pre></div>
 <p>This config reflects the args that are passed to a regular Flask Blueprint class, the addition of the ability to
 enable/disable the Blueprint, and set session variables.</p>
@@ -321,7 +321,7 @@ with their database connections.</p>
     <span class="n">bp</span><span class="o">.</span><span class="n">init_session</span><span class="p">()</span>
 </pre></div>
 <p>File: <code>pro_config.py</code></p>
-<div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;no&quot;</span>
+<div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;no&quot;</span>
 
 <span class="k">[settings]</span>
 <span class="c1">#url_prefix = &quot;&quot;</span>
@@ -340,22 +340,22 @@ with their database connections.</p>
 <span class="c1"># to create a database bind, change settings accordingly.</span>
 <span class="k">[DATABASE_BIND]</span>
 <span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
-<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;sqlite&quot;</span>
-<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;example&quot;</span>
-<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sqlite&quot;</span>
+<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;example&quot;</span>
+<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 </pre></div>
 <p>File: <code>dev_config.py</code></p>
-<div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;yes&quot;</span>
+<div class="highlight"><pre><span></span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;yes&quot;</span>
 
 <span class="k">[settings]</span>
-<span class="n">url_prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/testing&quot;</span>
+<span class="n">url_prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/testing&quot;</span>
 <span class="c1">#subdomain = &quot;&quot;</span>
 <span class="c1">#url_defaults = { }</span>
-<span class="n">static_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;static&quot;</span>
-<span class="n">template_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;templates&quot;</span>
+<span class="n">static_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;static&quot;</span>
+<span class="n">template_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;templates&quot;</span>
 <span class="c1">#static_url_path = &quot;&quot;</span>
 <span class="c1">#root_path = &quot;&quot;</span>
 <span class="c1">#cli_group = &quot;&quot;</span>
@@ -367,12 +367,12 @@ with their database connections.</p>
 <span class="c1"># to create a database bind, change settings accordingly.</span>
 <span class="k">[DATABASE_BIND]</span>
 <span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;sqlite&quot;</span>
-<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;example&quot;</span>
-<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sqlite&quot;</span>
+<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;example&quot;</span>
+<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 </pre></div>
 <p>In the example above, the <code>testing_blueprint</code> will only be enabled if the Flask app is running in debug mode.</p>
 

@@ -190,16 +190,10 @@ def index():
 from flask import current_app as app
 from flask import render_template
 
-from pyhead import Head
-
 
 @app.route("/")
 def index():
-    head = Head(title="Flask Imp")
-    return render_template(
-        "index.html",
-        head=head
-    )
+    return render_template("index.html")
 """
 
     # Format to: None
@@ -208,7 +202,10 @@ def index():
 <html lang="en">
 
 <head>
-    {{{{ head() }}}}
+    <meta charset="utf-8">
+    <meta name="viewport" content="'width=device-width, initial-scale=1.0'">
+    <title>Flask-Imp Global Template</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" sizes="16x16 32x32" type="image/x-icon">
 </head>
 <body>
     <p>This is the example global template file located in <code>global/templates/index.html</code></p>

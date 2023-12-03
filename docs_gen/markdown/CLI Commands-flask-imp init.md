@@ -19,7 +19,16 @@ Make sure you are in the virtual environment, and at the root of your project fo
 flask-imp init
 ```
 
-After running this command, you will be prompted to enter a name for your app:
+After running this command, you will be prompted to choose what type of app you want to deploy:
+
+```text
+~ $ flask-imp init
+What type of app would you like to create? (full, slim, minimal) [full]:
+```
+
+See below for the differences between the app types.
+
+After this, you will be prompted to enter a name for your app:
 
 ```text
 ~ $ flask-imp init

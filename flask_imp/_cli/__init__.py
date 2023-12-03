@@ -17,8 +17,8 @@ def cli():
     nargs=1,
     default="Current Working Directory",
     prompt=(
-            f"\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n"
-            f"Folder to create blueprint in"
+        f"\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n"
+        f"Folder to create blueprint in"
     ),
     help="The from_folder to create the blueprint in, defaults to the current working directory",
 )
@@ -63,10 +63,7 @@ def init_new_app(name, full, slim, minimal):
             minimal = True
 
     if name is None:
-        set_name = click.prompt(
-            "What would you like to call your app?",
-            default="app"
-        )
+        set_name = click.prompt("What would you like to call your app?", default="app")
 
     else:
         set_name = name
