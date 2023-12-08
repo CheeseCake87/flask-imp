@@ -50,18 +50,12 @@ PASSWORD = ""
     routes_index_py = """\
 from flask import render_template
 
-from pyhead import Head
-
 from .. import bp
 
 
 @bp.route("/", methods=["GET"])
 def index():
-    head = Head(title="Flask Imp Blueprint: {name}")
-    return render_template(
-        bp.tmpl("index.html"),
-        head=head
-    )
+    return render_template(bp.tmpl("index.html"))
 """
 
     # Format to: root, name, flask_imp_logo
