@@ -15,12 +15,16 @@ def authenticate_password(
     encryption_level: int = 512,
     pepper_length: int = 1,
     pepper_position: t.Literal["start", "end"] = "end",
+    use_multiprocessing: bool = False,
 ) -> bool:
     """
     Takes the plain input password, the stored hashed password along with the stored salt
     and will try every possible combination of pepper values to find a match.
 
     :raw-html:`<br />`
+
+    NOTE: use_multiprocessing is not compatible with coroutine workers, e.g. eventlet/gevent
+     commonly used with socketio.
 
     .. Note::
 
@@ -40,6 +44,7 @@ def authenticate_password(
     :param encryption_level: int - encryption used to generate database password
     :param pepper_length: int - length of pepper used to generate database password
     :param pepper_position: str - "start" or "end" - position of pepper used to generate database password
+    :param use_multiprocessing: bool - use multiprocessing to speed up the process (not compatible with eventlet/gevent)
     :return: bool - True if match, False if not
     """
 
@@ -47,6 +52,20 @@ def authenticate_password(
         pepper_length = 3
 
     _guesses = {"".join(i) for i in product(ascii_letters, repeat=pepper_length)}
+
+    if not use_multiprocessing:
+        for guess in _guesses:
+            if _guess_block(
+                {guess},
+                input_password,
+                database_password,
+                database_salt,
+                encryption_level,
+                pepper_position,
+            ):
+                return True
+
+        return False
 
     thread_pool = multiprocessing.Pool(processes=pepper_length)
     threads = []
