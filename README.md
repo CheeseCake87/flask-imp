@@ -2,7 +2,11 @@
 
 # Flask-Imp
 
-![Tests](https://github.com/CheeseCake87/Flask-Imp/actions/workflows/tests.yml/badge.svg)
+![tests](https://github.com/CheeseCake87/Flask-Imp/actions/workflows/tests.yml/badge.svg)
+[![PyPI version](https://img.shields.io/pypi/v/flask-imp)](https://pypi.org/project/flask-imp/)
+[![License](https://img.shields.io/badge/license-LGPL_v2-red.svg)](https://raw.githubusercontent.com/CheeseCake87/flask-imp/master/LICENSE)
+![Downloads](https://static.pepy.tech/badge/flask-imp)
+![black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
 ## What is Flask-Imp?
 
@@ -105,7 +109,7 @@ pip install -r requirements_dev.txt
 ### Install the local version of Flask-Imp.
 
 ```bash
-pip install -e .
+flit install
 ```
 
 ### Run the included Flask app.
@@ -128,10 +132,24 @@ python3 test_docker
 
 ### Info
 
-The Flask app is located in the `app` folder. 
-
-The test Flask app is located in the `test_app` folder. 
+The Flask app is located in the `app` folder.
 
 The tests are located in the `tests` folder.
 
+The test Flask app is located in the `tests/test_app` folder. 
+
 The tests are linked to the tests blueprint located at `test_app/blueprints/tests`.
+
+### Building the docs.
+
+All docs are generated from the [docs_md](docs_md) folder. Edit these files then run the following command to generate the docs.
+
+```bash
+flask --app gdocs compile
+```
+
+You can set it to watch for changes and automatically recompile the docs by adding the `--watch` flag.
+
+```bash
+flask --app gdocs compile --watch
+```
