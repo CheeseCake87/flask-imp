@@ -50,7 +50,4 @@ def get_relative_files_in_the_docs_folder(docs_dir: Path) -> list:
 
 
 def excessive_br_cleanup(base_xml: str) -> str:
-    return base_xml.replace(
-        '</p><br/>', '</p>'
-    ).replace(
-        '<ol><br/>', '<ol>')
+    return base_xml.replace("</p><br/>", "</p>").replace("<ol><br/>", "<ol>")

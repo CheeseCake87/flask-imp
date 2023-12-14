@@ -13,6 +13,6 @@ class HighlightRenderer(mistune.HTMLRenderer):
             try:
                 lexer = get_lexer_by_name(info, stripall=True)
             except ClassNotFound:
-                lexer = get_lexer_by_name('text', stripall=True)
+                lexer = get_lexer_by_name("text", stripall=True)
             return highlight(code, lexer, HtmlFormatter())
-        return '<pre><code>' + mistune.escape(code) + '</code></pre>'
+        return "<pre><code>" + mistune.escape(code) + "</code></pre>"

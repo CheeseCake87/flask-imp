@@ -6,11 +6,7 @@ import mistune
 from flask import render_template
 
 from .exceptions import NoPostDefinition
-from .helpers import (
-    get_relative_files_in_the_docs_folder,
-    pytz_dt_now,
-    post_date
-)
+from .helpers import get_relative_files_in_the_docs_folder, pytz_dt_now, post_date
 from .render_engines import HighlightRenderer
 
 
@@ -25,8 +21,8 @@ def _raw_markdown_processor(raw_markdown: str) -> tuple[t.Optional[list], str, s
     split_md = raw_markdown.split("```")[1:]
     raw_meta = split_md[0]
 
-    menu_ptn = re.compile(r'Menu =(.*?)\n', re.IGNORECASE)
-    title_ptn = re.compile(r'Title =(.*?)\n', re.IGNORECASE)
+    menu_ptn = re.compile(r"Menu =(.*?)\n", re.IGNORECASE)
+    title_ptn = re.compile(r"Title =(.*?)\n", re.IGNORECASE)
 
     try:
         menu = menu_ptn.findall(raw_meta)[0].strip().split("/")
@@ -47,11 +43,8 @@ def _raw_markdown_processor(raw_markdown: str) -> tuple[t.Optional[list], str, s
 
 
 def replace_post_date(content: str, new_date: str) -> str:
-    date_ptn = re.compile(r'Date =(.*?)\n', re.IGNORECASE)
-    return content.replace(
-        date_ptn.findall(content)[0],
-        f" {new_date}"
-    )
+    date_ptn = re.compile(r"Date =(.*?)\n", re.IGNORECASE)
+    return content.replace(date_ptn.findall(content)[0], f" {new_date}")
 
 
 def compiler(docs_dir: Path, markdown_dir: Path):
@@ -67,15 +60,18 @@ def compiler(docs_dir: Path, markdown_dir: Path):
         for line in menu_file.readlines():
             if line.startswith("-"):
                 line_strip = line.strip()
-                markdown_menu_dict[line_strip.replace("- ", "").strip()] = {"page": "", "pages": []}
+                markdown_menu_dict[line_strip.replace("- ", "").strip()] = {
+                    "page": "",
+                    "pages": [],
+                }
                 continue
 
             if line.startswith(" ") or line.startswith("\t"):
                 line_strip = line.strip()
                 if line_strip.startswith("-"):
-                    markdown_menu_dict[list(markdown_menu_dict.keys())[-1]]["pages"].append(
-                        {line_strip.replace("- ", "").strip(): ""}
-                    )
+                    markdown_menu_dict[list(markdown_menu_dict.keys())[-1]][
+                        "pages"
+                    ].append({line_strip.replace("- ", "").strip(): ""})
 
     index_html = docs_dir / "index.html"
 
@@ -90,7 +86,6 @@ def compiler(docs_dir: Path, markdown_dir: Path):
         (docs_dir / f"{file}.html").unlink()
 
     for file in markdown_dir_files:
-
         if "__" in file.stem:
             continue
 
@@ -101,7 +96,7 @@ def compiler(docs_dir: Path, markdown_dir: Path):
         html_pages[html_filename] = {
             "menu": menu,
             "title": title,
-            "content": html_engine(post)
+            "content": html_engine(post),
         }
 
         if menu is not None:
@@ -115,13 +110,15 @@ def compiler(docs_dir: Path, markdown_dir: Path):
     # write html files
     for page, meta in html_pages.items():
         with open(docs_dir / page, mode="w") as html_file:
-            html_file.write(render_template(
-                "__main__.html",
-                menu=markdown_menu_dict,
-                title=meta["title"],
-                date=post_date(dt_date),
-                content=meta["content"]
-            ))
+            html_file.write(
+                render_template(
+                    "__main__.html",
+                    menu=markdown_menu_dict,
+                    title=meta["title"],
+                    date=post_date(dt_date),
+                    content=meta["content"],
+                )
+            )
 
     # write main index.html
     index_html.write_text(
@@ -129,6 +126,6 @@ def compiler(docs_dir: Path, markdown_dir: Path):
             "index.html",
             menu=markdown_menu_dict,
             date=post_date(dt_date),
-            index=html_engine(markdown_index.read_text())
+            index=html_engine(markdown_index.read_text()),
         )
     )
