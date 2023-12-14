@@ -14,7 +14,8 @@ authenticate_password(
     database_salt: str,
     encryption_level: int = 512,
     pepper_length: int = 1,
-    pepper_position: t.Literal["start", "end"] = "end"
+    pepper_position: t.Literal["start", "end"] = "end",
+    use_multiprocessing: bool = False
 ) -> bool
 ```
 
@@ -26,6 +27,13 @@ To be used alongside the [flask_imp.auth / encrypt_password](flask_imp_auth-encr
 
 Takes the plain input password, the stored hashed password along with the stored salt
 and will try every possible combination of pepper values to find a match.
+
+**Note:**
+
+**use_multiprocessing is not compatible with coroutine workers, e.g. eventlet/gevent
+commonly used with socketio.**
+
+If you are using socketio, you must set use_multiprocessing to False (default).
 
 **Note:**
 
