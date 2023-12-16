@@ -2,7 +2,7 @@
 
 # Flask-Imp
 
-![tests](https://github.com/CheeseCake87/Flask-Imp/actions/workflows/tests.yml/badge.svg)
+![tests](https://github.com/CheeseCake87/flask-imp/actions/workflows/tests.yml/badge.svg)
 [![PyPI version](https://img.shields.io/pypi/v/flask-imp)](https://pypi.org/project/flask-imp/)
 [![License](https://img.shields.io/badge/license-LGPL_v2-red.svg)](https://raw.githubusercontent.com/CheeseCake87/flask-imp/master/LICENSE)
 ![Downloads](https://static.pepy.tech/badge/flask-imp)
@@ -15,7 +15,7 @@ It has a few extra features built in to help with securing pages and password au
 
 ## Documentation
 
-[https://cheesecake87.github.io/Flask-Imp/](https://cheesecake87.github.io/Flask-Imp/)
+[https://cheesecake87.github.io/flask-imp/](https://cheesecake87.github.io/flask-imp/)
 
 ## Getting Started
 
@@ -74,7 +74,7 @@ flask-imp init
 **Create a new project folder and navigate to it in the terminal, then clone this repository.**
 
 ```bash
-git clone https://github.com/CheeseCake87/Flask-Imp.git
+git clone https://github.com/CheeseCake87/flask-imp.git
 ```
 
 ### Create a virtual environment and activate it.
