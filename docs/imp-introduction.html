@@ -20,7 +20,7 @@
     <h1>Flask-Imp</h1>
     <div><small>Current Version: 2.7.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Sat, 16 Dec 2023</small></div>
+    <div><small>Thu, 21 Dec 2023</small></div>
 
     <h2>Menu</h2>
     <ul>
@@ -260,7 +260,7 @@ Blueprints. However, you can use Flask-Imp without using Blueprints.</p>
 │   ├── admin/...
 │   ├── api/...
 │   └── www/...
-├── global/
+├── resources/
 │   ├── filters/...
 │   ├── context_processors/...
 │   ├── static/...
@@ -283,7 +283,7 @@ Blueprints. However, you can use Flask-Imp without using Blueprints.</p>
     <span class="n">imp</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
     <span class="n">db</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 
-    <span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="s2">&quot;global&quot;</span><span class="p">)</span>
+    <span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="s2">&quot;resources&quot;</span><span class="p">)</span>
     <span class="n">imp</span><span class="o">.</span><span class="n">import_models</span><span class="p">(</span><span class="s2">&quot;models&quot;</span><span class="p">)</span>
     <span class="n">imp</span><span class="o">.</span><span class="n">import_blueprints</span><span class="p">(</span><span class="s2">&quot;blueprints&quot;</span><span class="p">)</span>
 
@@ -297,7 +297,7 @@ It will also load variables under <code>[DATABASE]</code> into the Flask app con
     <span class="n">imp</span><span class="o">.</span><span class="n">init_session</span><span class="p">()</span>
 </pre></div>
 <p>See more about the config file here: <a href="imp-x-config-toml.html">Imp / x.config.toml</a></p>
-<p><code>import_app_resources</code> will walk one level deep into the <code>global</code> folder, and import all <code>.py</code> files as modules. It will
+<p><code>import_app_resources</code> will walk one level deep into the <code>resources</code> folder, and import all <code>.py</code> files as modules. It will
 also check for the existence of a <code>static</code> and <code>templates</code> folder, and register them with the Flask app.</p>
 <p>There is a couple of options for <code>import_app_resources</code> to control what
 is imported, see: <a href="imp_x-import_app_resources.html">Imp.x / import_app_resources</a></p>

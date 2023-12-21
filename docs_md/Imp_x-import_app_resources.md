@@ -5,7 +5,7 @@ Title = Imp.import_app_resources
 
 ```python
 import_app_resources(
-    folder: str = "global",
+    folder: str = "resources",
     app_factories: Optional[List] = None,
     static_folder: str = "static",
     templates_folder: str = "templates",
@@ -30,14 +30,14 @@ config.
 #### Small example of usage:
 
 ```python
-imp.import_app_resources(folder="global")
+imp.import_app_resources(folder="resources")
 ```
 
-Folder Structure: `global`
+Folder Structure: `resources`
 
 ```text
 app
-├── global
+├── resources
 │   ├── routes.py
 │   ├── app_fac.py
 │   ├── static
@@ -67,7 +67,7 @@ def index():
 
 ```python
 imp.import_app_resources(
-    folder="global",
+    folder="resources",
     app_factories=["development_cli"]
 )
 ```

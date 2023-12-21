@@ -17,7 +17,7 @@ app/
 │   ├── admin/...
 │   ├── api/...
 │   └── www/...
-├── global/
+├── resources/
 │   ├── filters/...
 │   ├── context_processors/...
 │   ├── static/...
@@ -43,7 +43,7 @@ def create_app():
     imp.init_app(app)
     db.init_app(app)
 
-    imp.import_app_resources("global")
+    imp.import_app_resources("resources")
     imp.import_models("models")
     imp.import_blueprints("blueprints")
 
@@ -63,7 +63,7 @@ def before_request():
 
 See more about the config file here: [Imp / x.config.toml](imp-x-config-toml.html)
 
-`import_app_resources` will walk one level deep into the `global` folder, and import all `.py` files as modules. It will
+`import_app_resources` will walk one level deep into the `resources` folder, and import all `.py` files as modules. It will
 also check for the existence of a `static` and `templates` folder, and register them with the Flask app.
 
 There is a couple of options for `import_app_resources` to control what

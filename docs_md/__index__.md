@@ -35,7 +35,7 @@ See [CLI Commands / flask-imp init](cli_commands-flask-imp_init.html) for more i
 
 ```text
 app/
-├── global/
+├── resources/
 │   ├── static/...
 │   ├── templates/
 │   │   └── index.html
@@ -59,12 +59,12 @@ def create_app():
     imp.init_app(app)
 
     imp.import_app_resources()
-    # Takes argument 'folder' default folder is 'global'
+    # Takes argument 'folder' default folder is 'resources'
 
     return app
 ```
 
-File: `app/global/index.py`
+File: `app/resources/index.py`
 
 ```python
 from flask import current_app as app
@@ -76,7 +76,7 @@ def index():
     return render_template("index.html")
 ```
 
-File: `app/global/templates/index.html`
+File: `app/resources/templates/index.html`
 
 ```html
 <!DOCTYPE html>

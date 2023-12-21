@@ -20,7 +20,7 @@
     <h1>Flask-Imp</h1>
     <div><small>Current Version: 2.7.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Sat, 16 Dec 2023</small></div>
+    <div><small>Thu, 21 Dec 2023</small></div>
 
     <h2>Menu</h2>
     <ul>
@@ -251,7 +251,7 @@
 <section>
     <h1 style="font-size: 2.6rem; margin: 0;">Imp.import_app_resources</h1>
     <div class="highlight"><pre><span></span><span class="n">import_app_resources</span><span class="p">(</span>
-    <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;global&quot;</span><span class="p">,</span>
+    <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;resources&quot;</span><span class="p">,</span>
     <span class="n">app_factories</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">static_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
     <span class="n">templates_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;templates&quot;</span><span class="p">,</span>
@@ -267,11 +267,11 @@
 <p>If no static and or template folder is found, the static and or template folder will be set to None in the Flask app
 config.</p>
 <h4>Small example of usage:</h4>
-<div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;resources&quot;</span><span class="p">)</span>
 </pre></div>
-<p>Folder Structure: <code>global</code></p>
+<p>Folder Structure: <code>resources</code></p>
 <div class="highlight"><pre><span></span>app
-├── global
+├── resources
 │   ├── routes.py
 │   ├── app_fac.py
 │   ├── static
@@ -294,7 +294,7 @@ config.</p>
 <h4>app_factories</h4>
 <p><code>app_factories</code> are functions that are called when importing the app resources. Here's an example:</p>
 <div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span>
-    <span class="n">folder</span><span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="p">,</span>
+    <span class="n">folder</span><span class="o">=</span><span class="s2">&quot;resources&quot;</span><span class="p">,</span>
     <span class="n">app_factories</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;development_cli&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 </pre></div>

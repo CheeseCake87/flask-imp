@@ -120,7 +120,7 @@ app/
 ├── extensions
 │   └── __init__.py
 │
-├── global
+├── resources
 │   ├── cli
 │   │   └── cli.py
 │   ├── context_processors
@@ -160,7 +160,7 @@ app/
 ├── extensions
 │   └── __init__.py
 │
-├── global
+├── resources
 │   ├── cli
 │   │   └── cli.py
 │   ├── error_handlers
@@ -210,7 +210,7 @@ app/
 ├── extensions
 │   └── __init__.py
 │
-├── global
+├── resources
 │   ├── static
 │   │   ├── css
 │   │   │   └── water.css
