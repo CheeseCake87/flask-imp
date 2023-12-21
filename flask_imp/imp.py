@@ -263,9 +263,7 @@ class Imp:
             )
 
         if not resources_folder.is_dir():
-            raise ImportError(
-                f"Global collection must be a folder {resources_folder}"
-            )
+            raise ImportError(f"Global collection must be a folder {resources_folder}")
 
         self.app.static_folder = (
             app_static_folder.as_posix() if app_static_folder.exists() else None
