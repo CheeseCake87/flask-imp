@@ -177,7 +177,7 @@ from flask import render_template
 from pyhead import Head
 
 
-@app.route("/global")
+@app.route("/resources")
 def index():
     head = Head(title="Flask Imp Global Template")
     return render_template(
@@ -208,7 +208,7 @@ def index():
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" sizes="16x16 32x32" type="image/x-icon">
 </head>
 <body>
-    <p>This is the example global template file located in <code>global/templates/index.html</code></p>
+    <p>This is the example resources template file located in <code>resources/templates/index.html</code></p>
 </body>
 """
 

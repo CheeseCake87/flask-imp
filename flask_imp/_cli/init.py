@@ -28,26 +28,26 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
     folders = {
         "root": app_folder,
         "extensions": app_folder / "extensions",
-        "global": app_folder / "global",
-        "global/static": app_folder / "global" / "static",
-        "global/templates": app_folder / "global" / "templates",
+        "resources": app_folder / "resources",
+        "resources/static": app_folder / "resources" / "static",
+        "resources/templates": app_folder / "resources" / "templates",
     }
 
     if _minimal:
         folders.update(
             {
-                "global/static/css": app_folder / "global" / "static" / "css",
-                "global/static/img": app_folder / "global" / "static" / "img",
+                "resources/static/css": app_folder / "resources" / "static" / "css",
+                "resources/static/img": app_folder / "resources" / "static" / "img",
             }
         )
 
     if not _minimal:
         folders.update(
             {
-                "global/cli": app_folder / "global" / "cli",
-                "global/error_handlers": app_folder / "global" / "error_handlers",
-                "global/templates/errors": app_folder
-                / "global"
+                "resources/cli": app_folder / "resources" / "cli",
+                "resources/error_handlers": app_folder / "resources" / "error_handlers",
+                "resources/templates/errors": app_folder
+                / "resources"
                 / "templates"
                 / "errors",
             }
@@ -58,11 +58,11 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
             {
                 "models": app_folder / "models",
                 "blueprints": app_folder / "blueprints",
-                "global/context_processors": app_folder
-                / "global"
+                "resources/context_processors": app_folder
+                / "resources"
                 / "context_processors",
-                "global/filters": app_folder / "global" / "filters",
-                "global/routes": app_folder / "global" / "routes",
+                "resources/filters": app_folder / "resources" / "filters",
+                "resources/routes": app_folder / "resources" / "routes",
             }
         )
 
@@ -82,8 +82,8 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
             if not _minimal
             else AppFileLib.minimal_init_py.format(app_name=name),
         ),
-        "global/static/favicon.ico": (
-            folders["global/static"] / "favicon.ico",
+        "resources/static/favicon.ico": (
+            folders["resources/static"] / "favicon.ico",
             favicon,
         ),
         "extensions/__init__.py": (
@@ -97,28 +97,28 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
     if _minimal:
         files.update(
             {
-                "global/templates/index.html": (
-                    folders["global/templates"] / "index.html",
+                "resources/templates/index.html": (
+                    folders["resources/templates"] / "index.html",
                     GlobalFileLib.minimal_templates_index_html.format(
                         head_tag=head_tag_generator(
                             no_js=True,
                         ),
                         static_path="static",
-                        index_py=folders["global"] / "index.py",
-                        index_html=folders["global/templates"] / "index.html",
+                        index_py=folders["resources"] / "index.py",
+                        index_html=folders["resources/templates"] / "index.html",
                         init_py=folders["root"] / "__init__.py",
                     ),
                 ),
-                "global/static/css/main.css": (
-                    folders["global/static/css"] / "water.css",
+                "resources/static/css/main.css": (
+                    folders["resources/static/css"] / "water.css",
                     water_css,
                 ),
-                "global/static/img/flask-imp-logo.png": (
-                    folders["global/static/img"] / "flask-imp-logo.png",
+                "resources/static/img/flask-imp-logo.png": (
+                    folders["resources/static/img"] / "flask-imp-logo.png",
                     flask_imp_logo,
                 ),
-                "global/routes.py": (
-                    folders["global"] / "routes.py",
+                "resources/routes.py": (
+                    folders["resources"] / "routes.py",
                     GlobalFileLib.minimal_collections_routes_py,
                 ),
             }
@@ -127,38 +127,38 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
     if not _minimal:
         files.update(
             {
-                "global/cli/cli.py": (
-                    folders["global/cli"] / "cli.py",
+                "resources/cli/cli.py": (
+                    folders["resources/cli"] / "cli.py",
                     GlobalFileLib.collections_cli_py.format(app_name=name)
                     if not _slim
                     else GlobalFileLib.slim_collections_cli_py,
                 ),
-                "global/error_handlers/error_handlers.py": (
-                    folders["global/error_handlers"] / "error_handlers.py",
+                "resources/error_handlers/error_handlers.py": (
+                    folders["resources/error_handlers"] / "error_handlers.py",
                     GlobalFileLib.collections_error_handlers_py,
                 ),
-                "global/templates/errors/400.html": (
-                    folders["global/templates/errors"] / "400.html",
+                "resources/templates/errors/400.html": (
+                    folders["resources/templates/errors"] / "400.html",
                     GlobalFileLib.templates_errors_400_html,
                 ),
-                "global/templates/errors/401.html": (
-                    folders["global/templates/errors"] / "401.html",
+                "resources/templates/errors/401.html": (
+                    folders["resources/templates/errors"] / "401.html",
                     GlobalFileLib.templates_errors_401_html,
                 ),
-                "global/templates/errors/403.html": (
-                    folders["global/templates/errors"] / "403.html",
+                "resources/templates/errors/403.html": (
+                    folders["resources/templates/errors"] / "403.html",
                     GlobalFileLib.templates_errors_403_html,
                 ),
-                "global/templates/errors/404.html": (
-                    folders["global/templates/errors"] / "404.html",
+                "resources/templates/errors/404.html": (
+                    folders["resources/templates/errors"] / "404.html",
                     GlobalFileLib.templates_errors_404_html,
                 ),
-                "global/templates/errors/405.html": (
-                    folders["global/templates/errors"] / "405.html",
+                "resources/templates/errors/405.html": (
+                    folders["resources/templates/errors"] / "405.html",
                     GlobalFileLib.templates_errors_405_html,
                 ),
-                "global/templates/errors/500.html": (
-                    folders["global/templates/errors"] / "500.html",
+                "resources/templates/errors/500.html": (
+                    folders["resources/templates/errors"] / "500.html",
                     GlobalFileLib.templates_errors_500_html,
                 ),
             }
@@ -175,20 +175,20 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
                     folders["models"] / "example_user_table.py",
                     AppFileLib.models_example_user_table_py,
                 ),
-                "global/context_processors/context_processors.py": (
-                    folders["global/context_processors"] / "context_processors.py",
+                "resources/context_processors/context_processors.py": (
+                    folders["resources/context_processors"] / "context_processors.py",
                     GlobalFileLib.collections_context_processors_py,
                 ),
-                "global/filters/filters.py": (
-                    folders["global/filters"] / "filters.py",
+                "resources/filters/filters.py": (
+                    folders["resources/filters"] / "filters.py",
                     GlobalFileLib.collections_filters_py,
                 ),
-                "global/routes/routes.py": (
-                    folders["global/routes"] / "routes.py",
+                "resources/routes/routes.py": (
+                    folders["resources/routes"] / "routes.py",
                     GlobalFileLib.collections_routes_py,
                 ),
-                "global/templates/index.html": (
-                    folders["global/templates"] / "index.html",
+                "resources/templates/index.html": (
+                    folders["resources/templates"] / "index.html",
                     GlobalFileLib.templates_index_html,
                 ),
             }
@@ -208,8 +208,8 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
     for file, (path, content) in files.items():
         if not path.exists():
             if (
-                file == "global/static/favicon.ico"
-                or file == "global/static/img/flask-imp-logo.png"
+                file == "resources/static/favicon.ico"
+                or file == "resources/static/img/flask-imp-logo.png"
             ):
                 path.write_bytes(bytes.fromhex(content))
                 continue

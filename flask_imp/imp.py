@@ -97,7 +97,7 @@ class Imp:
 
     def import_app_resources(
         self,
-        folder: str = "global",
+        folder: str = "resources",
         app_factories: Optional[List] = None,
         static_folder: str = "static",
         templates_folder: str = "templates",
@@ -128,19 +128,19 @@ class Imp:
 
         .. code-block:: text
 
-            imp.importapp_resources(folder="global")
+            imp.importapp_resources(folder="resources")
 
         ...
         :raw-html:`<br />`
 
         ---
-        `global` folder structure
+        `resources` folder structure
         ---
 
         .. code-block:: text
 
             app
-            ├── global
+            ├── resources
             │   ├── routes.py
             │   ├── app_fac.py
             │   ├── static
@@ -177,7 +177,7 @@ class Imp:
 
         .. code-block::
 
-            imp.importapp_resources(folder="global", app_factories=["development_cli"])
+            imp.import_app_resources(folder="resources", app_factories=["development_cli"])
 
         :raw-html:`<br />`
 
@@ -253,18 +253,18 @@ class Imp:
             "static",
             "templates",
         )
-        global_collection_folder = self.app_path / folder
-        app_static_folder = global_collection_folder / static_folder
-        app_templates_folder = global_collection_folder / templates_folder
+        resources_folder = self.app_path / folder
+        app_static_folder = resources_folder / static_folder
+        app_templates_folder = resources_folder / templates_folder
 
-        if not global_collection_folder.exists():
+        if not resources_folder.exists():
             raise ImportError(
-                f"Cannot find global collection folder at {global_collection_folder}"
+                f"Cannot find resources collection folder at {resources_folder}"
             )
 
-        if not global_collection_folder.is_dir():
+        if not resources_folder.is_dir():
             raise ImportError(
-                f"Global collection must be a folder {global_collection_folder}"
+                f"Global collection must be a folder {resources_folder}"
             )
 
         self.app.static_folder = (
@@ -275,7 +275,7 @@ class Imp:
         )
 
         with self.app.app_context():
-            for item in global_collection_folder.iterdir():
+            for item in resources_folder.iterdir():
                 if item.is_dir() and item.name not in skip_folders:
                     if scope_root_folders_to:
                         if item.name not in scope_root_folders_to:
