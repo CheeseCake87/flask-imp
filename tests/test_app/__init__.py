@@ -13,7 +13,7 @@ os.environ["DB_USERNAME"] = "database_username"
 def create_app():
     app = Flask(__name__)
     imp.init_app(app, ignore_missing_env_variables=True)
-    imp.import_app_resources(app_factories=["collection"])
+    imp.import_app_resources(factories=["collection"])
     imp.import_blueprint("root_blueprint")
     imp.import_blueprints("blueprints")
     imp.import_models("models")
