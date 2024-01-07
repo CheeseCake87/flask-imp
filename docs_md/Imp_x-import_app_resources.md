@@ -97,8 +97,6 @@ To disable this, set `files_to_import` and or
 imp.import_app_resources(files_to_import=[None], folders_to_import=[None])
 ```
 
-:raw-html:`<br />`
-
 To scope the imports, set the `files_to_import` and or `folders_to_import` to a list of files and or folders.
 
 `files_to_import=["cli.py", "routes.py"]` => will only import the files `resources/cli.py`
