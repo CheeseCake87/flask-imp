@@ -1,5 +1,4 @@
 ![](https://raw.githubusercontent.com/CheeseCake87/Flask-Imp/master/_assets/Flask-Imp-Small.png)
-
 # Flask-Imp
 
 ![tests](https://github.com/CheeseCake87/flask-imp/actions/workflows/tests.yml/badge.svg)
@@ -16,6 +15,10 @@ It has a few extra features built in to help with securing pages and password au
 ## Documentation
 
 [https://cheesecake87.github.io/flask-imp/](https://cheesecake87.github.io/flask-imp/)
+
+### Notable Breaking Changes
+
+[2.x.x to 3.0.0](https://github.com/CheeseCake87/flask-imp/releases/tag/3.0.0)
 
 ## Getting Started
 
