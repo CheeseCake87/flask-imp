@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
@@ -98,11 +97,11 @@ class Imp:
     def import_app_resources(
         self,
         folder: str = "resources",
-        app_factories: Optional[List] = None,
+        factories: Optional[List] = None,
         static_folder: str = "static",
         templates_folder: str = "templates",
-        scope_root_folders_to: Optional[List] = None,
-        scope_root_files_to: Optional[List] = None,
+        files_to_import: Optional[List] = None,
+        folders_to_import: Optional[List] = None,
     ) -> None:
         """
         Import standard app resources from the specified folder.
@@ -128,9 +127,16 @@ class Imp:
 
         .. code-block:: text
 
-            imp.importapp_resources(folder="resources")
+            imp.import_app_resources(folder="resources")
+            # or
+            imp.import_app_resources()
+            # as the default folder is "resources"
 
-        ...
+        :raw-html:`<br />`
+
+        This will import all files in the resources folder, and set the Flask app static and template folders to
+        `resources/static` and `resources/templates` respectively.
+
         :raw-html:`<br />`
 
         ---
@@ -150,6 +156,7 @@ class Imp:
             │       └── index.html
             └── ...
         ...
+
         :raw-html:`<br />`
 
         ---
@@ -158,7 +165,7 @@ class Imp:
 
         .. code-block::
 
-            from flask import currentapp as app
+            from flask import current_app as app
             from flask import render_template
 
             @app.route("/")
@@ -167,17 +174,17 @@ class Imp:
 
         :raw-html:`<br />`
 
-        **How app app_factories work**
+        **How factories work**
 
         :raw-html:`<br />`
 
-        app_factories are functions that are called when importing the app resources. Here's an example:
+        Factories are functions that are called when importing the app resources. Here's an example:
 
         :raw-html:`<br />`
 
         .. code-block::
 
-            imp.import_app_resources(folder="resources", app_factories=["development_cli"])
+            imp.import_app_resources(folder="resources", factories=["development_cli"])
 
         :raw-html:`<br />`
 
@@ -196,39 +203,54 @@ class Imp:
 
         :raw-html:`<br />`
 
-        **How to scope the import**
+        **Scoping imports**
 
         :raw-html:`<br />`
 
-        scope_root_folders_to=["cli", "routes"] => will only import files from `<folder>/cli/*.py`
-        and `<folder>/routes/*.py`
+        By default, all files and folders will be imported. To disable this, set files_to_import and or
+        folders_to_import to [None].
 
         :raw-html:`<br />`
 
-        scope_root_files_to=["cli.py", "routes.py"] => will only import the files `<folder>/cli.py`
-        and `<folder>/routes.py`
+        .. code-block::
+
+            imp.import_app_resources(files_to_import=[None], folders_to_import=[None])
+
+        :raw-html:`<br />`
+
+        To scope the imports, set the files_to_import and or folders_to_import to a list of files and or folders.
+
+        :raw-html:`<br />`
+
+        files_to_import=["cli.py", "routes.py"] => will only import the files `resources/cli.py`
+        and `resources/routes.py`
+
+        :raw-html:`<br />`
+
+        folders_to_import=["template_filters", "context_processors"] => will import all files in the folders
+        `resources/template_filters/*.py` and `resources/context_processors/*.py`
 
         :raw-html:`<br />`
 
         -----
 
         :param folder: The folder to import from, must be relative.
-        :param app_factories: A list of function names to call with the app instance.
+        :param factories: A list of function names to call with the app instance.
         :param static_folder: The name of the static folder (if not found will be set to None)
         :param templates_folder: The name of the templates folder (if not found will be set to None)
-        :param scope_root_folders_to: A list of folders to scope the import to
-        :param scope_root_files_to: A list of files to scope the import to
+        :param files_to_import: A list of files to import e.g. ["cli.py", "routes.py"] set to ["*"] to import all.
+        :param folders_to_import: A list of folders to import e.g. ["cli", "routes"] set to ["*"] to import all.
         :return: None
         """
 
-        if app_factories is None:
-            app_factories = []
+        if factories is None:
+            factories = []
 
-        if scope_root_folders_to is None:
-            scope_root_folders_to = []
+        if files_to_import is None:
+            files_to_import = ["*"]
 
-        if scope_root_files_to is None:
-            scope_root_files_to = []
+        if folders_to_import is None:
+            folders_to_import = ["*"]
 
         if self.app_resources_imported:
             raise ImportError("The app resources can only be imported once.")
@@ -236,23 +258,19 @@ class Imp:
         self.app_resources_imported = True
 
         def process_module(import_location: str) -> tuple:
+            def gm(mf):
+                with self.app.app_context():
+                    return getmembers(mf)
+
             module_file = import_module(import_location)
             flask_instance = (
                 True
-                if [
-                    name
-                    for name, value in getmembers(module_file)
-                    if isinstance(value, Flask)
-                ]
+                if [name for name, value in gm(module_file) if isinstance(value, Flask)]
                 else False
             )
 
             return module_file, flask_instance
 
-        skip_folders = (
-            "static",
-            "templates",
-        )
         resources_folder = self.app_path / folder
         app_static_folder = resources_folder / static_folder
         app_templates_folder = resources_folder / templates_folder
@@ -272,40 +290,51 @@ class Imp:
             app_templates_folder.as_posix() if app_templates_folder.exists() else None
         )
 
-        with self.app.app_context():
-            for item in resources_folder.iterdir():
-                if item.is_dir() and item.name not in skip_folders:
-                    if scope_root_folders_to:
-                        if item.name not in scope_root_folders_to:
-                            continue
+        import_all_files = True if "*" in files_to_import else False
+        import_all_folders = True if "*" in folders_to_import else False
 
-                    for py_file in item.glob("*.py"):
-                        module, flask_instance_found = process_module(
+        skip_folders = (
+            "static",
+            "templates",
+        )
+
+        for item in resources_folder.iterdir():
+            # iter over files and folders in the resources folder
+            if item.is_file() and item.suffix == ".py":
+                # only pull in python files
+                if not import_all_files:
+                    # if import_all_files is False, only import the files in the list
+                    if item.name not in files_to_import:
+                        continue
+
+                with self.app.app_context():
+                    file_module = import_module(cast_to_import_str(self.app_name, item))
+
+                for instance_factory in factories:
+                    if hasattr(file_module, instance_factory):
+                        getattr(file_module, instance_factory)(self.app)
+
+            if item.is_dir():
+                # item is a folder
+
+                if item.name in skip_folders:
+                    # skip the static and templates folders
+                    continue
+
+                if not import_all_folders:
+                    # if import_all_folders is False, only import the folders in the list
+                    if item.name not in folders_to_import:
+                        continue
+
+                for py_file in item.glob("*.py"):
+                    with self.app.app_context():
+                        dir_module = import_module(
                             f"{cast_to_import_str(self.app_name, item)}.{py_file.stem}"
                         )
 
-                        for instance_factory in app_factories:
-                            if hasattr(module, instance_factory):
-                                getattr(module, instance_factory)(self.app)
-
-                        if not flask_instance_found and not app_factories:
-                            del sys.modules[module.__name__]
-
-                if item.is_file() and item.suffix == ".py":
-                    if scope_root_files_to:
-                        if item.name not in scope_root_files_to:
-                            continue
-
-                    module, flask_instance_found = process_module(
-                        cast_to_import_str(self.app_name, item)
-                    )
-
-                    for instance_factory in app_factories:
-                        if hasattr(module, instance_factory):
-                            getattr(module, instance_factory)(self.app)
-
-                    if not flask_instance_found and not app_factories:
-                        del sys.modules[module.__name__]
+                for instance_factory in factories:
+                    if hasattr(dir_module, instance_factory):
+                        getattr(dir_module, instance_factory)(self.app)
 
     def init_session(self) -> None:
         """

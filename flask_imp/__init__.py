@@ -3,6 +3,6 @@ from .auth import PasswordGeneration as PasswordGeneration
 from .blueprint import ImpBlueprint as Blueprint
 from .imp import Imp as Imp
 
-__version__ = "2.8.0"
+__version__ = "3.0.0"
 
 __all__ = ["Auth", "PasswordGeneration", "Imp", "Blueprint"]
