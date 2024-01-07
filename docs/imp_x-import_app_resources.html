@@ -18,9 +18,9 @@
 <aside>
     <img src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px; width: 50%">
     <h1>Flask-Imp</h1>
-    <div><small>Current Version: 2.7.x</small></div>
+    <div><small>Current Version: 3.0.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Thu, 21 Dec 2023</small></div>
+    <div><small>Sun, 07 Jan 2024</small></div>
 
     <h2>Menu</h2>
     <ul>
@@ -252,12 +252,12 @@
     <h1 style="font-size: 2.6rem; margin: 0;">Imp.import_app_resources</h1>
     <div class="highlight"><pre><span></span><span class="n">import_app_resources</span><span class="p">(</span>
     <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;resources&quot;</span><span class="p">,</span>
-    <span class="n">app_factories</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">factories</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">static_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
     <span class="n">templates_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;templates&quot;</span><span class="p">,</span>
-    <span class="n">scope_root_folders_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">scope_root_files_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+    <span class="n">files_to_import</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">folders_to_import</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </pre></div>
 <hr />
 <p>Import standard app resources from the specified folder.</p>
@@ -268,6 +268,9 @@
 config.</p>
 <h4>Small example of usage:</h4>
 <div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;resources&quot;</span><span class="p">)</span>
+<span class="c1"># or</span>
+<span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">()</span>
+<span class="c1"># as the default folder is &quot;resources&quot;</span>
 </pre></div>
 <p>Folder Structure: <code>resources</code></p>
 <div class="highlight"><pre><span></span>app
@@ -291,11 +294,11 @@ config.</p>
 <span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;index.html&quot;</span><span class="p">)</span>
 </pre></div>
-<h4>app_factories</h4>
-<p><code>app_factories</code> are functions that are called when importing the app resources. Here's an example:</p>
+<h4>How factories work</h4>
+<p>Factories are functions that are called when importing the app resources. Here's an example:</p>
 <div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span>
     <span class="n">folder</span><span class="o">=</span><span class="s2">&quot;resources&quot;</span><span class="p">,</span>
-    <span class="n">app_factories</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;development_cli&quot;</span><span class="p">]</span>
+    <span class="n">factories</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;development_cli&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
 <p><code>[&quot;development_cli&quot;]</code> =&gt; <code>development_cli(app)</code> function will be called, and the current app will be passed in.</p>
@@ -305,11 +308,18 @@ config.</p>
     <span class="k">def</span> <span class="nf">dev</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dev cli command&quot;</span><span class="p">)</span>
 </pre></div>
-<h4>scope_root_folders_to &amp; scope_root_files_to</h4>
-<p><code>scope_root_folders_to=[&quot;cli&quot;, &quot;routes&quot;]</code> =&gt; will only import files from <code>&lt;folder&gt;/cli/*.py</code>
-and <code>&lt;folder&gt;/routes/*.py</code></p>
-<p><code>scope_root_files_to=[&quot;cli.py&quot;, &quot;routes.py&quot;]</code> =&gt; will only import the files <code>&lt;folder&gt;/cli.py</code>
-and <code>&lt;folder&gt;/routes.py</code></p>
+<h4>Scoping imports</h4>
+<p>By default, all files and folders will be imported.</p>
+<p>To disable this, set <code>files_to_import</code> and or
+<code>folders_to_import</code> to <code>[None]</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="n">files_to_import</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">folders_to_import</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+</pre></div>
+<p>:raw-html:<code>&lt;br /&gt;</code></p>
+<p>To scope the imports, set the <code>files_to_import</code> and or <code>folders_to_import</code> to a list of files and or folders.</p>
+<p><code>files_to_import=[&quot;cli.py&quot;, &quot;routes.py&quot;]</code> =&gt; will only import the files <code>resources/cli.py</code>
+and <code>resources/routes.py</code></p>
+<p><code>folders_to_import=[&quot;template_filters&quot;, &quot;context_processors&quot;]</code> =&gt; will import all files in the folders
+<code>resources/template_filters/*.py</code> and <code>resources/context_processors/*.py</code></p>
 
 </section>
 

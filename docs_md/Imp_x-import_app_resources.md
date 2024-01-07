@@ -6,12 +6,12 @@ Title = Imp.import_app_resources
 ```python
 import_app_resources(
     folder: str = "resources",
-    app_factories: Optional[List] = None,
+    factories: Optional[List] = None,
     static_folder: str = "static",
     templates_folder: str = "templates",
-    scope_root_folders_to: Optional[List] = None,
-    scope_root_files_to: Optional[List] = None,
-) -> None
+    files_to_import: Optional[List] = None,
+    folders_to_import: Optional[List] = None,
+    ) -> None
 ```
 
 ---
@@ -31,6 +31,9 @@ config.
 
 ```python
 imp.import_app_resources(folder="resources")
+# or
+imp.import_app_resources()
+# as the default folder is "resources"
 ```
 
 Folder Structure: `resources`
@@ -61,14 +64,14 @@ def index():
     return render_template("index.html")
 ```
 
-#### app_factories
+#### How factories work
 
-`app_factories` are functions that are called when importing the app resources. Here's an example:
+Factories are functions that are called when importing the app resources. Here's an example:
 
 ```python
 imp.import_app_resources(
     folder="resources",
-    app_factories=["development_cli"]
+    factories=["development_cli"]
 )
 ```
 
@@ -83,10 +86,23 @@ def development_cli(app):
         print("dev cli command")
 ```
 
-#### scope_root_folders_to & scope_root_files_to
+#### Scoping imports
 
-`scope_root_folders_to=["cli", "routes"]` => will only import files from `<folder>/cli/*.py`
-and `<folder>/routes/*.py`
+By default, all files and folders will be imported.
 
-`scope_root_files_to=["cli.py", "routes.py"]` => will only import the files `<folder>/cli.py`
-and `<folder>/routes.py`
+To disable this, set `files_to_import` and or
+`folders_to_import` to `[None]`.
+
+```python
+imp.import_app_resources(files_to_import=[None], folders_to_import=[None])
+```
+
+:raw-html:`<br />`
+
+To scope the imports, set the `files_to_import` and or `folders_to_import` to a list of files and or folders.
+
+`files_to_import=["cli.py", "routes.py"]` => will only import the files `resources/cli.py`
+and `resources/routes.py`
+
+`folders_to_import=["template_filters", "context_processors"]` => will import all files in the folders
+`resources/template_filters/*.py` and `resources/context_processors/*.py`
