@@ -174,16 +174,11 @@ def example__num_to_month(num: str) -> str:
 from flask import current_app as app
 from flask import render_template
 
-from pyhead import Head
-
 
 @app.route("/resources")
 def index():
     head = Head(title="Flask Imp Global Template")
-    return render_template(
-        "index.html",
-        head=head
-    )
+    return render_template("index.html")
 """
 
     minimal_collections_routes_py = """\
