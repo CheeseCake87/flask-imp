@@ -299,6 +299,9 @@ class Imp:
         )
 
         for item in resources_folder.iterdir():
+            if "__" in item.name:
+                continue
+
             # iter over files and folders in the resources folder
             if item.is_file() and item.suffix == ".py":
                 # only pull in python files
