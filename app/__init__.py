@@ -1,4 +1,5 @@
 from flask import Flask
+
 from app.extensions import imp, db
 
 
@@ -7,7 +8,8 @@ def create_app():
     imp.init_app(app)
     imp.import_app_resources(
         files_to_import=["*"],
-        folders_to_import=["*"]
+        folders_to_import=["*"],
+        factories=["test_factory"]
     )
     imp.import_blueprints("blueprints")
     imp.import_models("models")
