@@ -9,7 +9,7 @@ def create_app():
     imp.import_app_resources(
         files_to_import=["*"],
         folders_to_import=["*"],
-        factories=["test_factory"]
+        factories=["factory_in_folder"]
     )
     imp.import_blueprints("blueprints")
     imp.import_models("models")
