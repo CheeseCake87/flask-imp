@@ -331,13 +331,13 @@ class Imp:
 
                 for py_file in item.glob("*.py"):
                     with self.app.app_context():
-                        dir_module = import_module(
+                        py_file_module = import_module(
                             f"{cast_to_import_str(self.app_name, item)}.{py_file.stem}"
                         )
 
-                for instance_factory in factories:
-                    if hasattr(dir_module, instance_factory):
-                        getattr(dir_module, instance_factory)(self.app)
+                    for instance_factory in factories:
+                        if hasattr(py_file_module, instance_factory):
+                            getattr(py_file_module, instance_factory)(self.app)
 
     def init_session(self) -> None:
         """
