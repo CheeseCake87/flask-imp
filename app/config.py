@@ -1,0 +1,33 @@
+class ImpConfig:
+    INIT_SESSION = {"logged_in": False}
+    SQLALCHEMY = {
+        "SQLALCHEMY_ECHO": False,
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+        "SQLALCHEMY_RECORD_QUERIES": False,
+    }
+
+
+class Config:
+    DEBUG = False
+    # PROPAGATE_EXCEPTIONS = True
+    TRAP_HTTP_EXCEPTIONS = False
+    # TRAP_BAD_REQUEST_ERRORS = True
+    SECRET_KEY = "flask-imp"
+    SESSION_COOKIE_NAME = "session"
+    # SESSION_COOKIE_DOMAIN = "domain-here.com"
+    # SESSION_COOKIE_PATH = "/"
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SAMESITE = "Lax"
+    PERMANENT_SESSION_LIFETIME = 3600  # 1 hour
+    SESSION_REFRESH_EACH_REQUEST = True
+    USE_X_SENDFILE = False
+    # SEND_FILE_MAX_AGE_DEFAULT = 43200
+    ERROR_404_HELP = True
+    # SERVER_NAME = "localhost:5000"
+    APPLICATION_ROOT = "/"
+    PREFERRED_URL_SCHEME = "http"
+    # MAX_CONTENT_LENGTH = 0
+    # TEMPLATES_AUTO_RELOAD = True
+    EXPLAIN_TEMPLATE_LOADING = False
+    MAX_COOKIE_SIZE = 4093

@@ -23,7 +23,7 @@ def deprecated(message: str):
     def func_wrapper(func):
         @functools.wraps(func)
         def proc_function(*args, **kwargs):
-            logging.critical(
+            logging.warning(
                 f"{Sprinkles.FAIL}Function deprecated: {message}{Sprinkles.END}"
             )
             return func(*args, **kwargs)
