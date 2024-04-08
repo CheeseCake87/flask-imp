@@ -57,7 +57,7 @@ ENABLED = true
 DIALECT = "sqlite"
 DATABASE_NAME = "database"
 LOCATION = ""
-PORT = ""
+PORT = 0
 USERNAME = ""
 PASSWORD = ""
 
@@ -71,11 +71,11 @@ PASSWORD = ""
 #     ...
 
 # Uncomment below to generate and add to SQLALCHEMY_BINDS.
-#[DATABASE.ANOTHER]
-#ENABLED = true
-#DIALECT = "sqlite"
-#DATABASE_NAME = "another"
-#LOCATION = ""
-#PORT = ""
-#USERNAME = ""
-#PASSWORD = ""
+[DATABASE.ANOTHER]
+ENABLED = true
+DIALECT = "sqlite"
+DATABASE_NAME = "another"
+LOCATION = ""
+PORT = ""
+USERNAME = ""
+PASSWORD = ""

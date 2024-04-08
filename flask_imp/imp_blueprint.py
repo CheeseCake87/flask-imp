@@ -8,7 +8,7 @@ from pathlib import Path
 from flask import Blueprint
 from flask import session
 
-from .helpers import _init_bp_config, _build_database_uri
+# from .helpers import _init_bp_config, _build_database_uri
 from .utilities import cast_to_import_str
 
 
@@ -85,15 +85,15 @@ class ImpBlueprint(Blueprint):
         self.location = Path(f"{spec.origin}").parent
         self.bp_name = self.location.name
 
-        (
-            self.enabled,
-            self.session,
-            self.settings,
-            self.database_bind,
-        ) = _init_bp_config(
-            self.bp_name,
-            self.location / config_file,
-        )
+        # (
+        #     self.enabled,
+        #     self.session,
+        #     self.settings,
+        #     self.database_bind,
+        # ) = _init_bp_config(
+        #     self.bp_name,
+        #     self.location / config_file,
+        # )
 
         if self.enabled:
             super().__init__(self.bp_name, self.package, **self.settings)
@@ -486,32 +486,32 @@ class ImpBlueprint(Blueprint):
         """
         return f"{self.name}/{template}"
 
-    def _setup_imp_blueprint(self, imp_instance) -> None:
-        """
-        Sets up the ImpBlueprint instance. This is a private method and should not be called directly.
-        """
-        bind_enabled = self.database_bind.get("ENABLED", False)
-
-        app_instance = imp_instance.app
-
-        if bind_enabled:
-            database_uri = _build_database_uri(self.database_bind, app_instance)
-
-            if database_uri:
-                if self.name in app_instance.config.get("SQLALCHEMY_BINDS", {}):
-                    raise ValueError(
-                        f"Blueprint {self.name} already has a database bind set"
-                    )
-
-                app_instance.config["SQLALCHEMY_BINDS"].update(
-                    {self.name: database_uri}
-                )
-
-        for partial_models_import in self.__model_imports__:
-            partial_models_import(imp_instance=imp_instance)
-
-        for partial_nested_blueprint_import in self.__nested_blueprint_imports__:
-            partial_nested_blueprint_import(imp_instance=imp_instance)
+    # def _setup_imp_blueprint(self, imp_instance) -> None:
+    #     """
+    #     Sets up the ImpBlueprint instance. This is a private method and should not be called directly.
+    #     """
+    #     bind_enabled = self.database_bind.get("ENABLED", False)
+    #
+    #     app_instance = imp_instance.app
+    #
+    #     if bind_enabled:
+    #         database_uri = _build_database_uri(self.database_bind, app_instance)
+    #
+    #         if database_uri:
+    #             if self.name in app_instance.config.get("SQLALCHEMY_BINDS", {}):
+    #                 raise ValueError(
+    #                     f"Blueprint {self.name} already has a database bind set"
+    #                 )
+    #
+    #             app_instance.config["SQLALCHEMY_BINDS"].update(
+    #                 {self.name: database_uri}
+    #             )
+    #
+    #     for partial_models_import in self.__model_imports__:
+    #         partial_models_import(imp_instance=imp_instance)
+    #
+    #     for partial_nested_blueprint_import in self.__nested_blueprint_imports__:
+    #         partial_nested_blueprint_import(imp_instance=imp_instance)
 
     def _partial_models_import(
         self,

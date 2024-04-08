@@ -1,6 +1,5 @@
 import functools
 import logging
-import os
 import re
 import sys
 import typing as t
@@ -31,62 +30,6 @@ def deprecated(message: str):
         return proc_function
 
     return func_wrapper
-
-
-def if_env_replace(
-    env_value: t.Optional[t.Any], ignore_missing_env_variables: bool = False
-) -> t.Any:
-    """
-    Looks for the replacement pattern to swap out values in the config file with environment variables.
-    """
-    pattern = re.compile(r"<(.*?)>")
-
-    if isinstance(env_value, str):
-        if re.match(pattern, env_value):
-            env_var = re.findall(pattern, env_value)[0]
-
-            if env_var:
-                if os.environ.get(env_var):
-                    return parse_config_env_var(os.environ.get(env_var))
-
-                if ignore_missing_env_variables:
-                    return None
-
-                raise ValueError(f"Environment variable {env_value} not found")
-
-    return env_value
-
-
-def process_dict(
-    this_dict: t.Optional[dict],
-    key_case_switch: str = "upper",
-    ignore_missing_env_variables: bool = False,
-    crawl: bool = False,
-) -> dict:
-    """
-    Used to process the config from_file dictionary and replace environment variables. Turns all keys to upper case.
-    """
-
-    if this_dict is None:
-        return {}
-
-    return_dict = {}
-    for key, value in this_dict.items():
-        if key_case_switch == "ignore":
-            cs_key = key
-        else:
-            cs_key = key.upper() if key_case_switch == "upper" else key.lower()
-
-        if crawl:
-            if isinstance(value, dict):
-                return_dict[cs_key] = process_dict(
-                    value, key_case_switch, ignore_missing_env_variables, crawl
-                )
-                continue
-
-        return_dict[cs_key] = if_env_replace(value, ignore_missing_env_variables)
-
-    return return_dict
 
 
 def cast_to_import_str(app_name: str, folder_path: Path) -> str:
@@ -143,25 +86,28 @@ def cast_to_bool(value: t.Union[str, bool, None]) -> bool:
         raise TypeError(f"Cannot cast {value} to bool")
 
 
-def parse_config_env_var(value: t.Optional[str]) -> t.Optional[t.Union[bool, str, int]]:
+def cast_to_int(value: t.Union[str, int, float, bool]) -> int:
     """
-    Casts value to a boolean, string, or int if possible. If not, returns none.
+    Casts string, float, and bool to int
     """
-    if value == "None":
-        return None
+    if isinstance(value, int):
+        return value
 
     if isinstance(value, str):
-        true_str = ("true", "yes", "y", "1")
-        false_str = ("false", "no", "n", "0")
+        if value == "":
+            return 0
 
-        if value.lower() in true_str:
-            return True
-        elif value.lower() in false_str:
-            return False
-        else:
-            try:
-                return int(value)
-            except ValueError:
-                return value
+        try:
+            return int(value)
+        except ValueError:
+            raise TypeError(f"Cannot cast {value} to int")
 
-    return None
+    if isinstance(value, float):
+        return int(value)
+
+    if isinstance(value, bool):
+        if value:
+            return 1
+        return 0
+
+    raise TypeError(f"Cannot cast {value} to int")

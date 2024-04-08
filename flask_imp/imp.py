@@ -1,15 +1,17 @@
 import logging
 import os
+import typing as t
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
-from typing import Dict, Union, Optional, List
 
 from flask import Blueprint, session
 from flask_sqlalchemy.model import DefaultMeta
 
-from .helpers import _init_app_config
+from .config_imp_template import ImpConfigTemplate
+from .config_object_parser import load_object
+from .config_toml_parser import load_toml
 from .protocols import Flask, ImpBlueprint
 from .registeries import ModelRegistry
 from .utilities import cast_to_import_str
@@ -24,23 +26,20 @@ class Imp:
 
     __model_registry__: ModelRegistry
 
-    config_path: Path
-    config: Dict
+    config: ImpConfigTemplate
 
     def __init__(
-        self,
-        app: Optional[Flask] = None,
-        app_config_file: Optional[str] = None,
-        ignore_missing_env_variables: bool = False,
+            self,
+            app: t.Optional[Flask] = None,
+            config: t.Optional[t.Union[str, ImpConfigTemplate]] = None,
     ) -> None:
         if app is not None:
-            self.init_app(app, app_config_file, ignore_missing_env_variables)
+            self.init_app(app, config)
 
     def init_app(
-        self,
-        app: Flask,
-        app_config_file: Optional[str] = os.environ.get("IMP_CONFIG"),
-        ignore_missing_env_variables: bool = False,
+            self,
+            app: Flask,
+            config: t.Union[str, ImpConfigTemplate] = os.environ.get("IMP_CONFIG"),
     ) -> None:
         """
         Initializes the flask app to work with flask-imp.
@@ -74,34 +73,42 @@ class Imp:
         if not isinstance(app, Flask):
             raise TypeError("The app that was passed in is not an instance of Flask")
 
-        if app_config_file is None:
-            app_config_file = "default.config.toml"
-
-        self.app = app
-
-        if "imp" in self.app.extensions:
+        if "imp" in app.extensions:
             raise ImportError("The app has already been initialized with flask-imp.")
 
+        self.app = app
         self.app_name = app.name
         self.app_path = Path(self.app.root_path)
         self.app_folder = self.app_path.parent
-        self.config_path = self.app_path / app_config_file
-
-        self.config = _init_app_config(
-            self.config_path, ignore_missing_env_variables, self.app
-        )
-
-        self.__model_registry__ = ModelRegistry()
         self.app.extensions["imp"] = self
 
+        self.__model_registry__ = ModelRegistry()
+
+        _toml_suffix = (".toml", ".tml")
+
+        if isinstance(config, ImpConfigTemplate):
+            self.config = config
+
+        if isinstance(config, str):
+            if (
+                    Path(self.app_path / config).exists()
+                    and Path(self.app_path / config).is_file()
+                    and Path(self.app_path / config).suffix.lower() in _toml_suffix
+            ):
+                self.config = load_toml(config, self.app_path)
+            else:
+                self.config = load_object(config)
+
+        self.config.set_app_config(flask_app=self.app, app_path=self.app_path)
+
     def import_app_resources(
-        self,
-        folder: str = "resources",
-        factories: Optional[List] = None,
-        static_folder: str = "static",
-        templates_folder: str = "templates",
-        files_to_import: Optional[List] = None,
-        folders_to_import: Optional[List] = None,
+            self,
+            folder: str = "resources",
+            factories: t.Optional[t.List] = None,
+            static_folder: str = "static",
+            templates_folder: str = "templates",
+            files_to_import: t.Optional[t.List] = None,
+            folders_to_import: t.Optional[t.List] = None,
     ) -> None:
         """
         Import standard app resources from the specified folder.
@@ -257,20 +264,6 @@ class Imp:
 
         self.app_resources_imported = True
 
-        def process_module(import_location: str) -> tuple:
-            def gm(mf):
-                with self.app.app_context():
-                    return getmembers(mf)
-
-            module_file = import_module(import_location)
-            flask_instance = (
-                True
-                if [name for name, value in gm(module_file) if isinstance(value, Flask)]
-                else False
-            )
-
-            return module_file, flask_instance
-
         resources_folder = self.app_path / folder
         app_static_folder = resources_folder / static_folder
         app_templates_folder = resources_folder / templates_folder
@@ -357,10 +350,10 @@ class Imp:
 
         :return: None
         """
-        if self.config.get("SESSION"):
-            for key, value in self.config.get("SESSION", {}).items():
-                if key not in session:
-                    session[key] = value
+        if self.config.INIT_SESSION:
+            session.update(
+                {k: v for k, v in self.config.INIT_SESSION.items() if k not in session}
+            )
 
     def import_blueprint(self, blueprint: str) -> None:
         """
@@ -695,7 +688,7 @@ class Imp:
         """
         return self.__model_registry__.class_(class_)
 
-    def model_meta(self, class_: Union[str, DefaultMeta]) -> dict:
+    def model_meta(self, class_: t.Union[str, DefaultMeta]) -> dict:
         """
         Returns meta information for the given ORM class name
 
