@@ -1,4 +1,4 @@
-import logging
+import typing as t
 from functools import partial
 from importlib import import_module
 from importlib.util import find_spec
@@ -8,8 +8,19 @@ from pathlib import Path
 from flask import Blueprint
 from flask import session
 
-# from .helpers import _init_bp_config, _build_database_uri
-from .utilities import cast_to_import_str
+from .config_imp_blueprint_template import ImpBlueprintConfigTemplate
+from .config_object_parser import load_object
+from .config_toml_parser import load_app_blueprint_toml
+from .utilities import _toml_suffix, cast_to_import_str, slug, _partial_models_import
+
+
+def _prevent_if_disabled(func) -> t.Callable:
+    def decorator(self, *args, **kwargs):
+        if not self.config.ENABLED:
+            return
+        return func(self, *args, **kwargs)
+
+    return decorator
 
 
 class ImpBlueprint(Blueprint):
@@ -17,19 +28,20 @@ class ImpBlueprint(Blueprint):
     A Class that extends the capabilities of the Flask Blueprint class.
     """
 
-    enabled: bool = False
+    config: ImpBlueprintConfigTemplate
+
     location: Path
     bp_name: str
     package: str
 
-    session: dict
-    settings: dict
-    database_bind: dict
+    _models: set = set()
+    _nested_blueprints: set["ImpBlueprint", Blueprint] = set()
 
-    __model_imports__: list
-    __nested_blueprint_imports__: list
-
-    def __init__(self, dunder_name: str, config_file: str = "config.toml") -> None:
+    def __init__(
+            self,
+            dunder_name: str,
+            config: t.Union[str, ImpBlueprintConfigTemplate] = "config.toml",
+    ) -> None:
         """
         Creates a new ImpBlueprint instance.
 
@@ -73,10 +85,8 @@ class ImpBlueprint(Blueprint):
         :param dunder_name: __name__
         :param config_file: Must be in the same directory as the blueprint, defaults to "config.toml"
         """
-        self.package = dunder_name
-        self.__model_imports__ = []
-        self.__nested_blueprint_imports__ = []
 
+        self.package = dunder_name
         spec = find_spec(self.package)
 
         if spec is None:
@@ -85,19 +95,33 @@ class ImpBlueprint(Blueprint):
         self.location = Path(f"{spec.origin}").parent
         self.bp_name = self.location.name
 
-        # (
-        #     self.enabled,
-        #     self.session,
-        #     self.settings,
-        #     self.database_bind,
-        # ) = _init_bp_config(
-        #     self.bp_name,
-        #     self.location / config_file,
-        # )
+        self.load_config(config, self.location)
 
-        if self.enabled:
-            super().__init__(self.bp_name, self.package, **self.settings)
+        if not hasattr(self, "URL_PREFIX"):
+            self.config.URL_PREFIX = f"/{slug(self.bp_name)}"
 
+        super().__init__(self.bp_name, self.package, **self.config.super_settings())
+
+    def load_config(
+            self,
+            config: t.Union[str, ImpBlueprintConfigTemplate],
+            location: t.Optional[Path],
+    ) -> None:
+        if isinstance(config, ImpBlueprintConfigTemplate):
+            self.config = config
+
+        if isinstance(config, str):
+            if (
+                    Path(location / config).exists()
+                    and Path(location / config).is_file()
+                    and Path(location / config).suffix.lower() in _toml_suffix
+            ):
+                self.config = load_app_blueprint_toml(config, location)
+            else:
+                self.config = load_object(f"{self.package}.{config}")
+                print(self.config)
+
+    @_prevent_if_disabled
     def import_resources(self, folder: str = "routes") -> None:
         """
         Will import all the resources (cli, routes, filters, context_processors...) from the given folder.
@@ -162,8 +186,6 @@ class ImpBlueprint(Blueprint):
 
         :param folder: Folder to look for resources in. Defaults to "routes". Must be relative.
         """
-        if not self.enabled:
-            return
 
         resource_path = self.location / folder
         if not resource_path.exists():
@@ -178,6 +200,7 @@ class ImpBlueprint(Blueprint):
                     f"Error when importing {self.package}.{resource}: {e}"
                 )
 
+    @_prevent_if_disabled
     def import_nested_blueprint(self, blueprint: str) -> None:
         """
         Imports the specified Flask-Imp Blueprint or a standard Flask Blueprint as a nested blueprint,
@@ -233,13 +256,23 @@ class ImpBlueprint(Blueprint):
         :param blueprint: The blueprint (folder name) to import. Must be relative.
         :return: None
         """
-        if not self.enabled:
-            return
+        if Path(blueprint).is_absolute():
+            potential_bp = Path(blueprint)
+        else:
+            potential_bp = Path(self.location / blueprint)
 
-        self.__nested_blueprint_imports__.append(
-            partial(self._partial_nested_blueprint_import, blueprint=blueprint)
-        )
+        if potential_bp.exists() and potential_bp.is_dir():
+            module = import_module(
+                cast_to_import_str(self.package.split(".")[0], potential_bp)
+            )
+            for name, potential in getmembers(module):
+                if (
+                        isinstance(potential, Blueprint)
+                        or isinstance(potential, ImpBlueprint)
+                ):
+                    self._nested_blueprints.add(potential)
 
+    @_prevent_if_disabled
     def import_nested_blueprints(self, folder: str) -> None:
         """
         Imports all blueprints in the given folder.
@@ -304,14 +337,16 @@ class ImpBlueprint(Blueprint):
         :param folder: Folder to look for nested blueprints in.
         Must be relative.
         """
-        if not self.enabled:
-            return
 
         folder_path = Path(self.location / folder)
 
-        for potential_bp in folder_path.iterdir():
-            self.import_nested_blueprint(potential_bp.as_posix())
+        if not folder_path.exists() or not folder_path.is_dir():
+            raise NotADirectoryError(f"{folder_path} is not a directory")
 
+        for potential_bp in folder_path.iterdir():
+            self.import_nested_blueprint(f"{potential_bp}")
+
+    @_prevent_if_disabled
     def init_session(self) -> None:
         """
         Similar to the `Imp.init_session()` method,
@@ -336,14 +371,15 @@ class ImpBlueprint(Blueprint):
         :return: None
 
         """
-        if not self.enabled:
+        if not self.config.ENABLED:
             return
 
-        for key in self.session:
+        for key in self.config.INIT_SESSION:
             if key not in session:
-                session.update(self.session)
+                session.update(self.config.INIT_SESSION)
                 break
 
+    @_prevent_if_disabled
     def import_models(self, file_or_folder: str) -> None:
         """
         Same actions as `Imp.import_models()`, but scoped to the current blueprint's package.
@@ -429,11 +465,15 @@ class ImpBlueprint(Blueprint):
         :param file_or_folder: The file or folder to import from. Must be relative.
         :return: None
         """
-        if not self.enabled:
+        if not self.config.ENABLED:
             return
 
-        self.__model_imports__.append(
-            partial(self._partial_models_import, file_or_folder=file_or_folder)
+        self._models.add(
+            partial(
+                _partial_models_import,
+                location=self.location,
+                file_or_folder=file_or_folder,
+            )
         )
 
     def tmpl(self, template: str) -> str:
@@ -485,59 +525,3 @@ class ImpBlueprint(Blueprint):
         :return: str - The template name with the blueprint name pushed to it.
         """
         return f"{self.name}/{template}"
-
-    # def _setup_imp_blueprint(self, imp_instance) -> None:
-    #     """
-    #     Sets up the ImpBlueprint instance. This is a private method and should not be called directly.
-    #     """
-    #     bind_enabled = self.database_bind.get("ENABLED", False)
-    #
-    #     app_instance = imp_instance.app
-    #
-    #     if bind_enabled:
-    #         database_uri = _build_database_uri(self.database_bind, app_instance)
-    #
-    #         if database_uri:
-    #             if self.name in app_instance.config.get("SQLALCHEMY_BINDS", {}):
-    #                 raise ValueError(
-    #                     f"Blueprint {self.name} already has a database bind set"
-    #                 )
-    #
-    #             app_instance.config["SQLALCHEMY_BINDS"].update(
-    #                 {self.name: database_uri}
-    #             )
-    #
-    #     for partial_models_import in self.__model_imports__:
-    #         partial_models_import(imp_instance=imp_instance)
-    #
-    #     for partial_nested_blueprint_import in self.__nested_blueprint_imports__:
-    #         partial_nested_blueprint_import(imp_instance=imp_instance)
-
-    def _partial_models_import(
-        self,
-        file_or_folder: str,
-        imp_instance,
-    ) -> None:
-        file_or_folder_path = Path(self.location / file_or_folder)
-        imp_instance.import_models(file_or_folder_path.as_posix())
-
-    def _partial_nested_blueprint_import(self, blueprint: str, imp_instance) -> None:
-        if Path(blueprint).is_absolute():
-            potential_bp = Path(blueprint)
-        else:
-            potential_bp = Path(self.location / blueprint)
-
-        if potential_bp.exists() and potential_bp.is_dir():
-            module = import_module(
-                cast_to_import_str(self.package.split(".")[0], potential_bp)
-            )
-            for name, value in getmembers(module):
-                if isinstance(value, Blueprint) or isinstance(value, ImpBlueprint):
-                    if hasattr(value, "_setup_imp_blueprint"):
-                        if getattr(value, "enabled", False):
-                            value._setup_imp_blueprint(imp_instance)
-                            self.register_blueprint(value)
-                        else:
-                            logging.debug(f"Blueprint {name} is disabled")
-                    else:
-                        self.register_blueprint(value)

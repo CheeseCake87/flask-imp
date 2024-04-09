@@ -1,7 +1,11 @@
-from flask_imp import FlaskConfigTemplate, ImpConfigTemplate, DatabaseConfigTemplate
+from flask_imp import (
+    FlaskConfigTemplate,
+    Config,
+    DatabaseConfigTemplate
+)
 
 
-class ImpConfig(ImpConfigTemplate):
+class ImpConfig(Config):
     FLASK = FlaskConfigTemplate(
         DEBUG=False,
         # PROPAGATE_EXCEPTIONS = True,

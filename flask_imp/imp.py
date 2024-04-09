@@ -1,4 +1,3 @@
-import logging
 import os
 import typing as t
 from importlib import import_module
@@ -11,10 +10,10 @@ from flask_sqlalchemy.model import DefaultMeta
 
 from .config_imp_template import ImpConfigTemplate
 from .config_object_parser import load_object
-from .config_toml_parser import load_toml
+from .config_toml_parser import load_app_toml
 from .protocols import Flask, ImpBlueprint
 from .registeries import ModelRegistry
-from .utilities import cast_to_import_str
+from .utilities import cast_to_import_str, _toml_suffix
 
 
 class Imp:
@@ -24,7 +23,7 @@ class Imp:
     app_folder: Path
     app_resources_imported: bool = False
 
-    __model_registry__: ModelRegistry
+    model_registry: ModelRegistry
 
     config: ImpConfigTemplate
 
@@ -61,8 +60,7 @@ class Imp:
         -----
 
         :param app: The flask app to initialize.
-        :param app_config_file: The config file to use.
-        :param ignore_missing_env_variables: Will ignore missing environment variables in the config if set to True.
+        :param config: The config to use
         :return: None
         """
 
@@ -82,9 +80,7 @@ class Imp:
         self.app_folder = self.app_path.parent
         self.app.extensions["imp"] = self
 
-        self.__model_registry__ = ModelRegistry()
-
-        _toml_suffix = (".toml", ".tml")
+        self.model_registry = ModelRegistry()
 
         if isinstance(config, ImpConfigTemplate):
             self.config = config
@@ -95,7 +91,7 @@ class Imp:
                     and Path(self.app_path / config).is_file()
                     and Path(self.app_path / config).suffix.lower() in _toml_suffix
             ):
-                self.config = load_toml(config, self.app_path)
+                self.config = load_app_toml(config, self.app_path)
             else:
                 self.config = load_object(config)
 
@@ -292,7 +288,7 @@ class Imp:
         )
 
         for item in resources_folder.iterdir():
-            if "__" in item.name:
+            if item.name.startswith("__"):
                 continue
 
             # iter over files and folders in the resources folder
@@ -467,27 +463,56 @@ class Imp:
         :param blueprint: The blueprint (folder name) to import. Must be relative.
         :return: None
         """
+
+        def process_nested_blueprint_registration(
+                parent: t.Union[Blueprint, ImpBlueprint],
+                child: t.Union[Blueprint, ImpBlueprint],
+        ):
+            if hasattr(child, "config"):
+                if child.config.ENABLED:
+                    parent.register_blueprint(child)
+
+                    if hasattr(child, "_models"):
+                        for partial_model in child._models:
+                            partial_model(imp_instance=self)
+
+                else:
+                    print(f"Blueprint {child.name} is disabled")
+
+        def process_blueprint_registration(pbp: t.Union[Blueprint, ImpBlueprint]):
+            if hasattr(pbp, "config"):
+                if pbp.config.ENABLED:
+                    if hasattr(pbp, "_nested_blueprints"):
+                        for nested_bp in pbp._nested_blueprints:
+                            process_nested_blueprint_registration(pbp, nested_bp)
+
+                    if hasattr(pbp, "_models"):
+                        for partial_model in pbp._models:
+                            partial_model(imp_instance=self)
+
+                    self.app.register_blueprint(pbp)
+
+                else:
+                    print(f"Blueprint {potential_bp.name} is disabled")
+            else:
+                self.app.register_blueprint(pbp)
+
         if Path(blueprint).is_absolute():
             potential_bp = Path(blueprint)
         else:
             potential_bp = Path(self.app_path / blueprint)
 
         if potential_bp.exists() and potential_bp.is_dir():
-            try:
-                module = import_module(cast_to_import_str(self.app_name, potential_bp))
-                for name, value in getmembers(module):
-                    if isinstance(value, Blueprint) or isinstance(value, ImpBlueprint):
-                        if hasattr(value, "_setup_imp_blueprint"):
-                            if getattr(value, "enabled", False):
-                                value._setup_imp_blueprint(self)
-                                self.app.register_blueprint(value)
-                            else:
-                                logging.debug(f"Blueprint {name} is disabled")
-                        else:
-                            self.app.register_blueprint(value)
+            # try:
+            module = import_module(cast_to_import_str(self.app_name, potential_bp))
+            for name, potential in getmembers(module):
+                if isinstance(potential, Blueprint) or isinstance(
+                        potential, ImpBlueprint
+                ):
+                    process_blueprint_registration(potential)
 
-            except Exception as e:
-                raise ImportError(f"Error when importing {potential_bp.name}: {e}")
+            # except Exception as e:
+            #     raise ImportError(f"Error when importing {potential_bp.name}: {e}")
 
     def import_blueprints(self, folder: str) -> None:
         """
@@ -525,8 +550,14 @@ class Imp:
 
         folder_path = Path(self.app_path / folder)
 
+        if not folder_path.exists():
+            raise ImportError(f"Cannot find blueprints folder at {folder_path}")
+
+        if not folder_path.is_dir():
+            raise ImportError(f"Blueprints must be a folder {folder_path}")
+
         for potential_bp in folder_path.iterdir():
-            self.import_blueprint(potential_bp.as_posix())
+            self.import_blueprint(f"{potential_bp}")
 
     def import_models(self, file_or_folder: str) -> None:
         """
@@ -620,7 +651,7 @@ class Imp:
                 model_module = import_module(import_string)
                 for name, value in getmembers(model_module, isclass):
                     if hasattr(value, "__tablename__"):
-                        self.__model_registry__.add(name, value)
+                        self.model_registry.add(name, value)
 
             except ImportError as e:
                 raise ImportError(f"Error when importing {import_string}: {e}")
@@ -686,7 +717,7 @@ class Imp:
         :param class_: The class name of the model to return.
         :return: The model class [DefaultMeta].
         """
-        return self.__model_registry__.class_(class_)
+        return self.model_registry.class_(class_)
 
     def model_meta(self, class_: t.Union[str, DefaultMeta]) -> dict:
         """
@@ -752,7 +783,7 @@ class Imp:
                 raise AttributeError(f"{model_} is not a valid model")
 
         if isinstance(class_, str):
-            model = self.__model_registry__.class_(class_)
+            model = self.model_registry.class_(class_)
             check_for_table_name(model)
             return {
                 "location": model.__module__,

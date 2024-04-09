@@ -1,10 +1,13 @@
 import typing as t
+from dataclasses import dataclass
 from pathlib import Path
 
 from flask_imp import FlaskConfigTemplate, DatabaseConfigTemplate
 from flask_imp.protocols import Flask
+from flask_imp.utilities import build_database_main, build_database_binds
 
 
+@dataclass
 class ImpConfigTemplate:
     """
     FLASK: t.Union[dict, t.Type[FlaskConfigTemplate]]
@@ -19,19 +22,19 @@ class ImpConfigTemplate:
     ]
     """
 
-    FLASK: t.Optional[FlaskConfigTemplate]
+    FLASK: t.Optional[FlaskConfigTemplate] = None
 
-    INIT_SESSION: t.Optional[dict]
+    INIT_SESSION: t.Optional[dict] = None
 
-    SQLALCHEMY_ECHO: t.Optional[bool]
-    SQLALCHEMY_TRACK_MODIFICATIONS: t.Optional[bool]
-    SQLALCHEMY_RECORD_QUERIES: t.Optional[bool]
+    SQLALCHEMY_ECHO: t.Optional[bool] = None
+    SQLALCHEMY_TRACK_MODIFICATIONS: t.Optional[bool] = None
+    SQLALCHEMY_RECORD_QUERIES: t.Optional[bool] = None
 
-    SQLITE_DB_EXTENSION: t.Optional[str]
-    SQLITE_STORE_IN_PARENT: t.Optional[bool]
+    SQLITE_DB_EXTENSION: t.Optional[str] = None
+    SQLITE_STORE_IN_PARENT: t.Optional[bool] = None
 
-    DATABASE_MAIN: t.Optional[DatabaseConfigTemplate]
-    DATABASE_BINDS: t.Optional[t.Set[DatabaseConfigTemplate]]
+    DATABASE_MAIN: t.Optional[DatabaseConfigTemplate] = None
+    DATABASE_BINDS: t.Optional[t.Set[DatabaseConfigTemplate]] = None
 
     _attrs = (
         "FLASK",
@@ -40,16 +43,14 @@ class ImpConfigTemplate:
         "DATABASE_BINDS",
     )
 
-    _addi_attrs = (
-        "SQLALCHEMY_ECHO",
-        "SQLALCHEMY_TRACK_MODIFICATIONS",
-        "SQLALCHEMY_RECORD_QUERIES",
-        "SQLITE_DB_EXTENSION",
-        "SQLITE_STORE_IN_PARENT",
+    _known_funcs = (
+        "set_using_args",
+        "set_app_config",
     )
 
     def __init__(self):
-        pass
+        for attr in self._attrs:
+            setattr(self, attr, None)
 
     def set_using_args(
             self,
@@ -78,48 +79,18 @@ class ImpConfigTemplate:
         flask_app.config.update(**{attr[0]: attr[1] for attr in self.FLASK.attrs()})
 
         # Set additional config, skip if already set in Flask config
-        for attr in self._addi_attrs:
-            if (
-                    hasattr(self, attr)
-                    and getattr(self, attr) is not None
-                    and attr not in flask_app.config
-            ):
-                flask_app.config[attr] = getattr(self, attr)
+        _allowed_types = (str, bool, int, float, dict, list, set)
 
-        # Set database URI
-        if self.DATABASE_MAIN:
-            if self.DATABASE_MAIN.enabled:
-                flask_app.config["SQLALCHEMY_DATABASE_URI"] = self._build_database_uri(
-                    flask_app, app_path, self.DATABASE_MAIN
-                )
+        for attr in self.__dir__():
+            if attr not in self._attrs and attr not in self._known_funcs:
+                _ = getattr(self, attr)
+                if (
+                        not attr.startswith("_")
+                        and _ is not None
+                        and type(attr) in _allowed_types
+                        and attr not in flask_app.config
+                ):
+                    flask_app.config[attr] = getattr(self, attr)
 
-        if self.DATABASE_BINDS:
-            for db in self.DATABASE_BINDS:
-                if db.enabled:
-                    if "SQLALCHEMY_BINDS" not in flask_app.config:
-                        flask_app.config["SQLALCHEMY_BINDS"] = {}
-
-                    flask_app.config["SQLALCHEMY_BINDS"][db.bind_key] = self._build_database_uri(
-                        flask_app, app_path, db
-                    )
-
-    def _build_database_uri(
-            self, flask_app: Flask, app_path: Path, db: DatabaseConfigTemplate
-    ):
-        if db.dialect == "sqlite":
-            filepath = (
-                    app_path
-                    / "instance"
-                    / (
-                        db.name + self.SQLITE_DB_EXTENSION
-                        if self.SQLITE_DB_EXTENSION
-                        else flask_app.config.get("SQLITE_DB_EXTENSION", ".sqlite")
-                    )
-            )
-            return f"{db.dialect}:///{filepath}"
-
-        return (
-            f"{db.dialect}://{db.username}:"
-            f"{db.password}@{db.location}:"
-            f"{db.port}/{db.name}"
-        )
+        build_database_main(flask_app, app_path, self.DATABASE_MAIN)
+        build_database_binds(flask_app, app_path, self.DATABASE_BINDS)

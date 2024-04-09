@@ -1,12 +1,12 @@
-ENABLED = true
+ENABLED = false
 
 [SETTINGS]
-URL_PREFIX = "/"
+#URL_PREFIX = "/nested_two"
 #SUBDOMAIN = ""
 #URL_DEFAULTS = {}
 STATIC_FOLDER = "static"
 TEMPLATE_FOLDER = "templates"
-STATIC_URL_PATH = "/static"
+#STATIC_URL_PATH = "/static"
 #ROOT_PATH = ""
 #CLI_GROUP = ""
 

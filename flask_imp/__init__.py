@@ -2,7 +2,10 @@ from .auth import Auth as Auth
 from .auth import PasswordGeneration as PasswordGeneration
 from .config_database_template import DatabaseConfigTemplate as DatabaseConfigTemplate
 from .config_flask_template import FlaskConfigTemplate as FlaskConfigTemplate
-from .config_imp_template import ImpConfigTemplate as ImpConfigTemplate
+from .config_imp_blueprint_template import (
+    ImpBlueprintConfigTemplate as ImpBlueprintConfig,
+)
+from .config_imp_template import ImpConfigTemplate as ImpConfig
 from .imp import Imp as Imp
 from .imp_blueprint import ImpBlueprint as Blueprint
 
@@ -13,7 +16,8 @@ __all__ = [
     "PasswordGeneration",
     "Imp",
     "Blueprint",
-    "ImpConfigTemplate",
+    "ImpConfig",
+    "ImpBlueprintConfig",
     "FlaskConfigTemplate",
     "DatabaseConfigTemplate",
 ]
