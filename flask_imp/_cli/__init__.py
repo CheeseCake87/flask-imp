@@ -40,7 +40,7 @@ def add_blueprint(folder, name, pyconfig, tomlconfig):
     if not pyconfig and not tomlconfig:
         choice = click.prompt(
             "What type of config file would you like to use?",
-            default="full",
+            default="py",
             type=click.Choice(["py", "toml"]),
         )
 
