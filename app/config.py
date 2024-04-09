@@ -1,17 +1,17 @@
 from flask_imp import (
-    FlaskConfigTemplate,
-    Config,
-    DatabaseConfigTemplate
+    FlaskConfig,
+    ImpConfig,
+    DatabaseConfig
 )
 
 
-class ImpConfig(Config):
-    FLASK = FlaskConfigTemplate(
-        DEBUG=False,
+class Config(ImpConfig):
+    FLASK = FlaskConfig(
+        # DEBUG=False,
         # PROPAGATE_EXCEPTIONS = True,
         TRAP_HTTP_EXCEPTIONS=False,
         # TRAP_BAD_REQUEST_ERRORS = True,
-        SECRET_KEY="flask-imp",
+        SECRET_KEY="flask-imp",  # CHANGE ME
         SESSION_COOKIE_NAME="session",
         # SESSION_COOKIE_DOMAIN = "domain-here.com",
         # SESSION_COOKIE_PATH = "/",
@@ -32,9 +32,9 @@ class ImpConfig(Config):
         MAX_COOKIE_SIZE=4093,
     )
 
-    INIT_SESSION = {
-        "logged_in": False,
-    }
+    # INIT_SESSION = {
+    #     "logged_in": False,
+    # }
 
     # Below are extra settings that Flask-Imp uses but relates to Flask-SQLAlchemy.
     # This sets the file extension for SQLite databases, and where to create the folder
@@ -54,31 +54,27 @@ class ImpConfig(Config):
     #
 
     # Main database settings, this will be turned int the SQLALCHEMY_DATABASE_URI
-    DATABASE_MAIN = DatabaseConfigTemplate(
-        enabled=True,
-        dialect="sqlite",
-        name="main",
-        location="",
-        port=0,
-        username="",
-        password="",
-    )
+    # DATABASE_MAIN = DatabaseConfig(
+    #     enabled=True,
+    #     dialect="sqlite",
+    #     name="main",
+    #     location="",
+    #     port=0,
+    #     username="",
+    #     password="",
+    # )
 
     # Binds are additional databases that can be used in your app
     # These will be added to the SQLALCHEMY_BINDS dictionary
-    DATABASE_BINDS = {
-        DatabaseConfigTemplate(
-            enabled=True,
-            dialect="sqlite",
-            name="additional_database",
-            bind_key="additional_database",
-            location="",
-            port=0,
-            username="",
-            password="",
-        )
-    }
-
-
-if __name__ == '__main__':
-    pass
+    # DATABASE_BINDS = {
+    #     DatabaseConfig(
+    #         enabled=True,
+    #         dialect="sqlite",
+    #         name="additional_database",
+    #         bind_key="additional_database",
+    #         location="",
+    #         port=0,
+    #         username="",
+    #         password="",
+    #     )
+    # }

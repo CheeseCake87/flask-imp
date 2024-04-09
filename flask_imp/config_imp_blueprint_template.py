@@ -1,7 +1,7 @@
 import typing as t
 from dataclasses import dataclass
 
-from flask_imp import DatabaseConfigTemplate
+from flask_imp import DatabaseConfig
 
 
 @dataclass
@@ -36,19 +36,7 @@ class ImpBlueprintConfigTemplate:
 
     INIT_SESSION: t.Optional[dict] = None
 
-    DATABASE_BINDS: t.Optional[t.Set[DatabaseConfigTemplate]] = None
-
-    _attrs = (
-        "ENABLED",
-        "URL_PREFIX",
-        "SUBDOMAIN",
-        "URL_DEFAULTS",
-        "STATIC_FOLDER",
-        "TEMPLATE_FOLDER",
-        "STATIC_URL_PATH",
-        "ROOT_PATH",
-        "CLI_GROUP",
-    )
+    DATABASE_BINDS: t.Optional[t.Set[DatabaseConfig]] = None
 
     _known_funcs = ("set_using_args", "set_app_config")
 
@@ -64,21 +52,20 @@ class ImpBlueprintConfigTemplate:
     )
 
     def __init__(self):
-        for attr in self._attrs:
-            setattr(self, attr, None)
+        pass
 
     def set_using_args(
-            self,
-            enabled: bool = False,
-            url_prefix: str = None,
-            subdomain: str = None,
-            url_defaults: dict = None,
-            static_folder: str = "static",
-            template_folder: str = "templates",
-            static_url_path: str = "/static",
-            root_path: str = None,
-            cli_group: str = None,
-            **kwargs,
+        self,
+        enabled: bool = False,
+        url_prefix: str = None,
+        subdomain: str = None,
+        url_defaults: dict = None,
+        static_folder: str = "static",
+        template_folder: str = "templates",
+        static_url_path: str = "/static",
+        root_path: str = None,
+        cli_group: str = None,
+        **kwargs,
     ):
         if enabled is not None:
             self.ENABLED = enabled

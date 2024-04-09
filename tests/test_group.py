@@ -1,3 +1,8 @@
+def test_config_from_object(client):
+    response = client.get('/tests/')
+    assert response.status_code == 200
+
+
 def test_general_setup(client):
     response = client.get('/tests/')
     assert response.status_code == 200

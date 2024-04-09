@@ -13,7 +13,13 @@ from .filelib.water_css import water_css
 from .helpers import Sprinkles as Sp
 
 
-def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = False):
+def init_app(
+    name,
+    _full: bool = False,
+    _slim: bool = False,
+    _minimal: bool = False,
+    pyconfig: bool = False,
+):
     click.echo(f"{Sp.OKGREEN}Creating App: {name}")
 
     cwd = Path.cwd()
@@ -68,12 +74,6 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
 
     # Files
     files = {
-        "root/default.config.toml": (
-            folders["root"] / "default.config.toml",
-            AppFileLib.default_init_config_toml.format(secret_key=os.urandom(24).hex())
-            if not _slim
-            else AppFileLib.default_config_toml.format(secret_key=os.urandom(24).hex()),
-        ),
         "root/__init__.py": (
             folders["root"] / "__init__.py",
             AppFileLib.init_py.format(app_name=name)
@@ -93,6 +93,25 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
             else AppFileLib.slim_extensions_init_py,
         ),
     }
+
+    if pyconfig:
+        files["root/config.py"] = (
+            folders["root"] / "config.py",
+            AppFileLib.default_config_py.format(secret_key=os.urandom(24).hex())
+            if _full
+            else AppFileLib.default_slim_config_py.format(
+                secret_key=os.urandom(24).hex()
+            ),
+        )
+    else:
+        files["root/config.toml"] = (
+            folders["root"] / "config.toml",
+            AppFileLib.default_config_toml.format(secret_key=os.urandom(24).hex())
+            if _full
+            else AppFileLib.default_slim_config_toml.format(
+                secret_key=os.urandom(24).hex()
+            ),
+        )
 
     if _minimal:
         files.update(
@@ -226,6 +245,7 @@ def init_app(name, _full: bool = False, _slim: bool = False, _minimal: bool = Fa
             "www",
             _init_app=True,
             _cwd=folders["blueprints"] if not _slim else folders["root"],
+            pyconfig=pyconfig,
         )
 
     click.echo(" ")

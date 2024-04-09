@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Initialising A Flask-Imp Project | Flask-Imp</title>
+    <link rel="stylesheet" href="static/water.css">
+    <link rel="stylesheet" href="static/pygments.emacs-dull.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+    <link rel="manifest" href="static/site.webmanifest">
+    <link rel="mask-icon" href="static/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+
+<aside>
+    <img src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px; width: 50%">
+    <h1>Flask-Imp</h1>
+    <div><small>Current Version: 3.1.x</small></div>
+    <div><small>Last Updated:</small></div>
+    <div><small>Wed, 13 Mar 2024</small></div>
+
+    <h2>Menu</h2>
+    <ul>
+        <li><a href="index.html"><strong>Index</strong></a></li>
+    </ul>
+    <ul>
+        
+            
+                <li><strong>CLI Commands</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_init.html">flask-imp init</a></li>
+                        
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_blueprint.html">flask-imp blueprint</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Imp</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="imp-introduction.html">Introduction</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-x-config-toml.html">x.config.toml</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-load-env-vars.html">Load Env Variables</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Blueprint</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="blueprint-introduction.html">Introduction</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint-config-toml.html">config.toml</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Imp.x</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="imp_x-init_app-init.html">init_app, __init__</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-init_session.html">init_session</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_app_resources.html">import_app_resources</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_blueprint.html">import_blueprint</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_blueprints.html">import_blueprints</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_models.html">import_models</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-model.html">model</a></li>
+                        
+                    
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Blueprint.x</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="blueprint-init.html">__init__</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-init_session.html">init_session</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-import_resources.html">import_resources</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-import_nested_blueprint.html">import_nested_blueprint</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-import_nested_blueprints.html">import_nested_blueprints</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-import_models.html">import_models</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-tmpl.html">tmpl</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>flask_imp.security</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="flask_imp_security-login_check.html">login_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-permission_check.html">permission_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-pass_function_check.html">pass_function_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-api_login_check.html">api_login_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-include_csrf.html">include_csrf</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>flask_imp.auth</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="flask_imp_auth-encrypt_password.html">encrypt_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-authenticate_password.html">authenticate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_password.html">generate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_salt.html">generate_salt</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_csrf_token.html">generate_csrf_token</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_private_key.html">generate_private_key</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_email_validator.html">generate_email_validator</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_numeric_validator.html">generate_numeric_validator</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_alphanumeric_validator.html">generate_alphanumeric_validator</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-is_email_address_valid.html">is_email_address_valid</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-is_username_valid.html">is_username_valid</a></li>
+                        
+                    
+                </ul>
+            
+        
+    </ul>
+
+    <div style="padding-top: 5px; margin-bottom: 20px;"><small>These docs are generated by a
+        <a href="https://github.com/CheeseCake87/flask-imp/tree/master/gdocs">Flask Static Site Generator</a>
+        built by <a href="https://github.com/CheeseCake87">David Carmichael</a> hosted on GitHub Pages.</small></div>
+</aside>
+
+<section>
+    <h1 style="font-size: 2.6rem; margin: 0;">Initialising a Flask-Imp Project</h1>
+    <p>Flask-Imp has a cli command that deploys a new ready-to-go project.
+This project is structured in a way to give you the best idea of
+how to use Flask-Imp.</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init<span class="w"> </span>--help
+</pre></div>
+<h2>Create a new project</h2>
+<p>Make sure you are in the virtual environment, and at the root of your project folder, then run the following command:</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init
+</pre></div>
+<p>After running this command, you will be prompted to choose what type of app you want to deploy:</p>
+<div class="highlight"><pre><span></span>~ $ flask-imp init
+What type of app would you like to create? (full, slim, minimal) [full]:
+</pre></div>
+<p>See below for the differences between the app types.</p>
+<p>After this, you will be prompted to enter a name for your app:</p>
+<div class="highlight"><pre><span></span>~ $ flask-imp init
+What would you like to call your app? [app]:
+</pre></div>
+<p>'app' is the default name, so if you just press enter, your app will be called 'app'. You will then see this output:</p>
+<div class="highlight"><pre><span></span>===================
+Flask app deployed!
+===================
+ 
+Your app has the default name of &#39;app&#39;
+Flask will automatically look for this!
+Run: flask run --debug
+</pre></div>
+<p>If you called your app something other than 'app', like 'new' for example, you will see:</p>
+<div class="highlight"><pre><span></span>===================
+Flask app deployed!
+===================
+
+Your app has the name of &#39;new&#39;
+Run: flask --app new run --debug
+</pre></div>
+<p>As you can see from the output, it gives you instructions on how to start your app, depending on the name you gave it.</p>
+<p>You should see a new folder that has been given the name you specified in
+the <code>flask-imp init</code> command.</p>
+<h3>Additional options</h3>
+<p>You can also specify a name for your app in the command itself, like so:</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init<span class="w"> </span>-n<span class="w"> </span>my_app
+</pre></div>
+<p>This will create a new app called 'my_app'.</p>
+<p>You can also deploy a slim app, that will have one blueprint and no models, like so:</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init<span class="w"> </span>-n<span class="w"> </span>my_app<span class="w"> </span>--slim
+</pre></div>
+<p>You can also deploy a minimal app, that will have no blueprints, models, or extensions, like so:</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init<span class="w"> </span>-n<span class="w"> </span>my_app<span class="w"> </span>--minimal
+</pre></div>
+<h2>init Folder structures</h2>
+<h3>Full app</h3>
+<p><code>flask-imp init</code>:</p>
+<div class="highlight"><pre><span></span>app/
+├── blueprints
+│   └── www
+│       ├── config.toml
+│       ├── __init__.py
+│       ├── routes
+│       │   └── index.py
+│       ├── static
+│       │   ├── css
+│       │   │   └── water.css
+│       │   ├── img
+│       │   │   └── flask-imp-logo.png
+│       │   └── js
+│       │       └── main.js
+│       └── templates
+│           └── www
+│               ├── extends
+│               │   └── main.html
+│               ├── includes
+│               │   ├── footer.html
+│               │   └── header.html
+│               └── index.html
+│
+├── extensions
+│   └── __init__.py
+│
+├── resources
+│   ├── cli
+│   │   └── cli.py
+│   ├── context_processors
+│   │   └── context_processors.py
+│   ├── error_handlers
+│   │   └── error_handlers.py
+│   ├── filters
+│   │   └── filters.py
+│   ├── routes
+│   │   └── routes.py
+│   ├── static
+│   │   └── favicon.ico
+│   └── templates
+│       ├── errors
+│       │   ├── 400.html
+│       │   ├── 401.html
+│       │   ├── 403.html
+│       │   ├── 404.html
+│       │   ├── 405.html
+│       │   └── 500.html
+│       └── index.html
+│
+├── models
+│   ├── example_user_table.py
+│   └── __init__.py
+│
+├── __init__.py
+└── default.config.toml
+</pre></div>
+<h3>Slim app</h3>
+<p><code>flask-imp init --slim</code>:</p>
+<div class="highlight"><pre><span></span>app/
+├── extensions
+│   └── __init__.py
+│
+├── resources
+│   ├── cli
+│   │   └── cli.py
+│   ├── error_handlers
+│   │   └── error_handlers.py
+│   ├── static
+│   │   └── favicon.ico
+│   └── templates
+│       └── errors
+│           ├── 400.html
+│           ├── 401.html
+│           ├── 403.html
+│           ├── 404.html
+│           ├── 405.html
+│           └── 500.html
+│
+├── www
+│   ├── config.toml
+│   ├── __init__.py
+│   ├── routes
+│   │   └── index.py
+│   ├── static
+│   │   ├── css
+│   │   │   └── water.css
+│   │   ├── img
+│   │   │   └── flask-imp-logo.png
+│   │   └── js
+│   │       └── main.js
+│   └── templates
+│       └── www
+│           ├── extends
+│           │   └── main.html
+│           ├── includes
+│           │   ├── footer.html
+│           │   └── header.html
+│           └── index.html
+│
+├── __init__.py
+└── default.config.toml
+</pre></div>
+<h3>Minimal app</h3>
+<p><code>flask-imp init --minimal</code>:</p>
+<div class="highlight"><pre><span></span>app/
+├── extensions
+│   └── __init__.py
+│
+├── resources
+│   ├── static
+│   │   ├── css
+│   │   │   └── water.css
+│   │   ├── img
+│   │   │   └── flask-imp-logo.png
+│   │   └── favicon.ico
+│   ├── templates
+│   │   └── index.html
+│   └── routes.py
+│
+├── __init__.py
+└── default.config.toml
+</pre></div>
+
+</section>
+
+</body>
+</html>

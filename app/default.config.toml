@@ -29,7 +29,7 @@ PREFERRED_URL_SCHEME = "http"
 #TEMPLATES_AUTO_RELOAD = true
 EXPLAIN_TEMPLATE_LOADING = false
 MAX_COOKIE_SIZE = 4093
-TEST_VALUE = "{{ test_value:int }}"
+#TEST_VALUE = "{{ test_value:int }}"
 
 # This will set the default session variables for the app.
 # Anything here will be accessible using session["your_var_name"]

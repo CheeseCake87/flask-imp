@@ -5,16 +5,16 @@ import typing as t
 from pathlib import Path
 
 from flask_imp import (
-    FlaskConfigTemplate,
+    FlaskConfig,
     ImpConfig as ImpConfigTemplate,
-    DatabaseConfigTemplate,
-    ImpBlueprintConfig as ImpConfigBlueprintTemplate
+    DatabaseConfig,
+    ImpBlueprintConfig as ImpConfigBlueprintTemplate,
 )
 from flask_imp.utilities import cast_to_int, cast_to_bool
 
 
 def check_if_cast(
-        cs_key, value, cast_key_value_to_str, cast_key_value_to_int, cast_key_value_to_bool
+    cs_key, value, cast_key_value_to_str, cast_key_value_to_int, cast_key_value_to_bool
 ):
     if isinstance(cast_key_value_to_str, list):
         if cs_key in cast_key_value_to_str:
@@ -65,13 +65,13 @@ def replace_env_value(value: t.Any) -> t.Any:
 
 
 def process_dict(
-        this_dict: t.Optional[dict],
-        key_case_switch: t.Literal["upper", "lower", "ignore"] = "upper",
-        crawl: bool = False,
-        rename_keys: t.Dict = None,
-        cast_key_value_to_str: t.List[str] = None,
-        cast_key_value_to_int: t.List[str] = None,
-        cast_key_value_to_bool: t.List[str] = None,
+    this_dict: t.Optional[dict],
+    key_case_switch: t.Literal["upper", "lower", "ignore"] = "upper",
+    crawl: bool = False,
+    rename_keys: t.Dict = None,
+    cast_key_value_to_str: t.List[str] = None,
+    cast_key_value_to_int: t.List[str] = None,
+    cast_key_value_to_bool: t.List[str] = None,
 ) -> dict:
     """
     Used to process the config from_file dictionary. Turns all keys to upper case.
@@ -136,25 +136,25 @@ def load_app_toml(file: str, current_working_directory: Path) -> ImpConfigTempla
 
     database_config = process_dict(
         config.get("DATABASE"),
-        key_case_switch="lower",
+        key_case_switch="upper",
         crawl=True,
-        rename_keys={"database_name": "name"},
-        cast_key_value_to_int=["port"],
+        rename_keys={"DATABASE_NAME": "NAME"},
+        cast_key_value_to_int=["PORT"],
     )
 
     imp_config = ImpConfigTemplate()
-    imp_config.FLASK = FlaskConfigTemplate(**flask_config, **sqlalchemy_config)
+    imp_config.FLASK = FlaskConfig(**flask_config, **sqlalchemy_config)
 
     imp_config.INIT_SESSION = session_config
 
-    main_db = database_config.get("main", {})
+    main_db = database_config.get("MAIN", {})
     if main_db:
-        imp_config.DATABASE_MAIN = DatabaseConfigTemplate(**main_db)
-        del database_config["main"]
+        imp_config.DATABASE_MAIN = DatabaseConfig(**main_db)
+        del database_config["MAIN"]
 
     imp_config.DATABASE_BINDS = {
-        DatabaseConfigTemplate(
-            **{**values, "bind_key": db_key} if "bind_key" not in values else values
+        DatabaseConfig(
+            **{**values, "BIND_KEY": db_key} if "BIND_KEY" not in values else values
         )
         for db_key, values in database_config.items()
     }
@@ -163,7 +163,7 @@ def load_app_toml(file: str, current_working_directory: Path) -> ImpConfigTempla
 
 
 def load_app_blueprint_toml(
-        file: str, current_working_directory: Path
+    file: str, current_working_directory: Path
 ) -> ImpConfigBlueprintTemplate:
     """
     Processes the values from the configuration from_file.
@@ -181,10 +181,10 @@ def load_app_blueprint_toml(
 
     database_config = process_dict(
         config.get("DATABASE_BINDS"),
-        key_case_switch="lower",
+        key_case_switch="upper",
         crawl=True,
-        rename_keys={"database_name": "name"},
-        cast_key_value_to_int=["port"],
+        rename_keys={"DATABASE_NAME": "NAME"},
+        cast_key_value_to_int=["PORT"],
     )
 
     imp_blueprint_config = ImpConfigBlueprintTemplate()
@@ -196,8 +196,8 @@ def load_app_blueprint_toml(
     imp_blueprint_config.INIT_SESSION = session_config
 
     imp_blueprint_config.DATABASE_BINDS = {
-        DatabaseConfigTemplate(
-            **{**values, "bind_key": db_key} if "bind_key" not in values else values
+        DatabaseConfig(
+            **{**values, "BIND_KEY": db_key} if "BIND_KEY" not in values else values
         )
         for db_key, values in database_config.items()
     }

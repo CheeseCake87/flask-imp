@@ -46,6 +46,38 @@ USERNAME = ""
 PASSWORD = ""
 """
 
+    # Format to: name, url_prefix
+    config_py = """\
+from flask_imp import ImpBlueprintConfig, DatabaseConfig
+
+
+class Config(ImpBlueprintConfig):
+    ENABLED: bool = True
+    URL_PREFIX: str = "/{url_prefix}"
+    # SUBDOMAIN: str = ""
+    # URL_DEFAULTS: dict = {{}}
+    STATIC_FOLDER: str = "static"
+    TEMPLATE_FOLDER: str = "templates"
+    STATIC_URL_PATH: str = "/static"
+    # ROOT_PATH: str = ""
+    # CLI_GROUP: str = ""
+
+    # INIT_SESSION: dict = {{}}
+
+    DATABASE_BINDS: set[DatabaseConfig] = {{
+        DatabaseConfig(
+            ENABLED=False,
+            DIALECT="sqlite",
+            NAME="{name}",
+            LOCATION="",
+            BIND_KEY="{name}",
+            PORT=0,
+            USERNAME="",
+            PASSWORD="",
+        )
+    }}
+    """
+
     # Format to: Name
     routes_index_py = """\
 from flask import render_template

@@ -1,6 +1,14 @@
+import os
+from pathlib import Path
+
 import pytest
 
 from test_app import create_app
+
+instance_folder = Path(__file__).parent / "test_app" / "instance"
+
+if not instance_folder.exists():
+    instance_folder.mkdir()
 
 
 @pytest.fixture(scope='session')

@@ -19,30 +19,30 @@ class DatabaseConfigTemplate:
 
     def __init__(
         self,
-        enabled: bool = False,
-        dialect: t.Literal[
+        ENABLED: bool = False,
+        DIALECT: t.Literal[
             "mysql", "postgresql", "sqlite", "oracle", "mssql"
         ] = "sqlite",
-        name: str = "database",
-        bind_key: str = "",
-        location: str = "",
-        port: int = 0,
-        username: str = "",
-        password: str = "",
+        NAME: str = "database",
+        BIND_KEY: str = "",
+        LOCATION: str = "",
+        PORT: int = 0,
+        USERNAME: str = "",
+        PASSWORD: str = "",
     ):
-        if dialect not in self._allowed_dialects:
+        if DIALECT not in self._allowed_dialects:
             raise ValueError(
                 f"Database dialect must be one of: {', '.join(self._allowed_dialects)}"
             )
 
-        self.enabled = enabled
-        self.dialect = dialect
-        self.name = name
-        self.bind_key = bind_key
-        self.location = location
-        self.port = port
-        self.username = username
-        self.password = password
+        self.enabled = ENABLED
+        self.dialect = DIALECT
+        self.name = NAME
+        self.bind_key = BIND_KEY
+        self.location = LOCATION
+        self.port = PORT
+        self.username = USERNAME
+        self.password = PASSWORD
 
     def as_dict(self) -> dict:
         return {

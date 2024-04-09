@@ -8,6 +8,8 @@ from .extensions import imp
 
 os.environ["CONFIG_SECRET_KEY"] = "inserted_from_environment"
 os.environ["DB_USERNAME"] = "database_username"
+os.environ["TEST"] = "Hello Word"
+os.environ["DATABASE_NAME"] = "my_database"
 
 
 def create_app():
@@ -19,6 +21,9 @@ def create_app():
     imp.import_models("models")
 
     db.init_app(app)
+
+    for key, value in app.config.items():
+        print(f"{key}: {value}")
 
     with app.app_context():
         db.create_all()

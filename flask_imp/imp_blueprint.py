@@ -11,7 +11,9 @@ from flask import session
 from .config_imp_blueprint_template import ImpBlueprintConfigTemplate
 from .config_object_parser import load_object
 from .config_toml_parser import load_app_blueprint_toml
-from .utilities import _toml_suffix, cast_to_import_str, slug, _partial_models_import
+from .exceptions import NoConfigProvided
+from .protocols import Flask
+from .utilities import _toml_suffix, cast_to_import_str, slug, _partial_models_import, build_database_binds
 
 
 def _prevent_if_disabled(func) -> t.Callable:
@@ -34,13 +36,13 @@ class ImpBlueprint(Blueprint):
     bp_name: str
     package: str
 
-    _models: set = set()
-    _nested_blueprints: set["ImpBlueprint", Blueprint] = set()
+    _models: t.Set = None
+    _nested_blueprints: t.Union[set, set[t.Union["ImpBlueprint", Blueprint]]] = None
 
     def __init__(
             self,
             dunder_name: str,
-            config: t.Union[str, ImpBlueprintConfigTemplate] = "config.toml",
+            config: t.Union[str, ImpBlueprintConfigTemplate] = None,
     ) -> None:
         """
         Creates a new ImpBlueprint instance.
@@ -86,6 +88,12 @@ class ImpBlueprint(Blueprint):
         :param config_file: Must be in the same directory as the blueprint, defaults to "config.toml"
         """
 
+        if not hasattr(self, "_models") or self._models is None:
+            self._models = set()
+
+        if not hasattr(self, "_nested_blueprints") or self._nested_blueprints is None:
+            self._nested_blueprints = set()
+
         self.package = dunder_name
         spec = find_spec(self.package)
 
@@ -95,12 +103,27 @@ class ImpBlueprint(Blueprint):
         self.location = Path(f"{spec.origin}").parent
         self.bp_name = self.location.name
 
+        if config is None:
+            if Path(self.location / "config.py").exists():
+                config = "config.Config"
+
+            elif Path(self.location / "config.toml").exists():
+                config = "config.toml"
+
+            else:
+                raise NoConfigProvided(
+                    f"No config was provided, and no default config was found in {self.location}"
+                )
+
         self.load_config(config, self.location)
 
-        if not hasattr(self, "URL_PREFIX"):
+        if not self.config.URL_PREFIX:
             self.config.URL_PREFIX = f"/{slug(self.bp_name)}"
 
         super().__init__(self.bp_name, self.package, **self.config.super_settings())
+
+    def set_app_config(self, flask_app: Flask, app_path: Path) -> None:
+        build_database_binds(flask_app, app_path, self.config.DATABASE_BINDS)
 
     def load_config(
             self,
@@ -111,15 +134,11 @@ class ImpBlueprint(Blueprint):
             self.config = config
 
         if isinstance(config, str):
-            if (
-                    Path(location / config).exists()
-                    and Path(location / config).is_file()
-                    and Path(location / config).suffix.lower() in _toml_suffix
-            ):
+            toml_file = Path(location / config)
+            if toml_file.exists() and toml_file.suffix in _toml_suffix:
                 self.config = load_app_blueprint_toml(config, location)
             else:
                 self.config = load_object(f"{self.package}.{config}")
-                print(self.config)
 
     @_prevent_if_disabled
     def import_resources(self, folder: str = "routes") -> None:
@@ -127,11 +146,7 @@ class ImpBlueprint(Blueprint):
         Will import all the resources (cli, routes, filters, context_processors...) from the given folder.
         Given folder must be relative to the blueprint (in the same folder as the __init__.py file).
 
-        :raw-html:`<br />`
-
         **Example use:**
-
-        :raw-html:`<br />`
 
         --- Folder structure ---
 
@@ -146,7 +161,6 @@ class ImpBlueprint(Blueprint):
             │   └── car_settings.py
             ├── __init__.py
             └── config.toml
-
 
         :raw-html:`<br />`
 
@@ -266,9 +280,8 @@ class ImpBlueprint(Blueprint):
                 cast_to_import_str(self.package.split(".")[0], potential_bp)
             )
             for name, potential in getmembers(module):
-                if (
-                        isinstance(potential, Blueprint)
-                        or isinstance(potential, ImpBlueprint)
+                if isinstance(potential, Blueprint) or isinstance(
+                        potential, ImpBlueprint
                 ):
                     self._nested_blueprints.add(potential)
 
@@ -371,10 +384,7 @@ class ImpBlueprint(Blueprint):
         :return: None
 
         """
-        if not self.config.ENABLED:
-            return
-
-        for key in self.config.INIT_SESSION:
+        for key in self.config.INIT_SESSION or {}:
             if key not in session:
                 session.update(self.config.INIT_SESSION)
                 break
