@@ -23,7 +23,7 @@ class ImpBlueprint(t.Protocol):
     location: Path
 
     _models: t.Set
-    _nested_blueprints: t.Union[set, set[t.Any]]
+    _nested_blueprints: t.Union[t.Set, t.Set[t.Any]]
 
     def register_blueprint(self, blueprint: Blueprint): ...
 
