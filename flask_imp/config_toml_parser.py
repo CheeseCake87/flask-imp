@@ -140,7 +140,7 @@ def load_app_toml(file: str, current_working_directory: Path) -> ImpConfigTempla
     config = tml.loads(config_file_path.read_text())
 
     flask_config = process_dict(config.get("FLASK", {}))
-    session_config = config.get("SESSION", {})
+    session_config = config.get("INIT_SESSION", config.get("SESSION", {}))
     sqlalchemy_config = config.get("SQLALCHEMY", {})
 
     database_config = process_dict(
@@ -186,7 +186,7 @@ def load_app_blueprint_toml(
 
     enabled_config = replace_env_value(config.get("ENABLED", config.get("enabled", False)), force="bool")
     settings_config = process_dict(config.get("SETTINGS", {}))
-    session_config = config.get("INI_SESSION", config.get("SESSION", {}))
+    session_config = config.get("INIT_SESSION", config.get("SESSION", {}))
 
     database_config = process_dict(
         config.get("DATABASE_BINDS"),
