@@ -1,4 +1,3 @@
-import multiprocessing
 import subprocess
 import sys
 import time
@@ -46,7 +45,7 @@ enabled_tags = [
     "flask-imp-python-3-10:latest",
     "flask-imp-python-3-11:latest",
     "flask-imp-python-3-12:latest",
-    "flask-imp-python-3-13:latest",
+    # "flask-imp-python-3-13:latest",
 ]
 
 if __name__ == "__main__":
@@ -64,9 +63,13 @@ if __name__ == "__main__":
 
     def build_docker(tag_, file_):
         with DockerCli(f"build -t {tag_} -f {file_} .") as output_:
-            _ = output_
             print("=" * 50)
             print(f"build -t {tag_} -f {file_} .")
+            if "ERROR:" in output_:
+                print("~" * 50)
+                print("An error occurred during the build process.")
+                print(output_)
+                sys.exit(1)
             print("=" * 50)
 
 

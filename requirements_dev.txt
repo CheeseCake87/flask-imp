@@ -5,4 +5,3 @@ pytest
 pytest-cov
 mypy
 types-toml
-pyqwe
