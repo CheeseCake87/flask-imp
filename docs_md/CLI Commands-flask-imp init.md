@@ -13,13 +13,15 @@ flask-imp init --help
 
 ## Create a new project
 
-Make sure you are in the virtual environment, and at the root of your project folder, then run the following command:
+Make sure you are in the virtual environment, and at the root of your 
+project folder, then run the following command:
 
 ```bash
 flask-imp init
 ```
 
-After running this command, you will be prompted to choose what type of app you want to deploy:
+After running this command, you will be prompted to choose what type of 
+app you want to deploy:
 
 ```text
 ~ $ flask-imp init
@@ -32,12 +34,27 @@ After this, you will be prompted to enter a name for your app:
 
 ```text
 ~ $ flask-imp init
+...
 What would you like to call your app? [app]: 
 ```
 
-'app' is the default name, so if you just press enter, your app will be called 'app'. You will then see this output:
+'app' is the default name, so if you just press enter, your app will be 
+called 'app'. You will then see this output:
+
+Next you will be asked what configuration file you would like to use:
 
 ```text
+~ $ flask-imp init
+...
+What type of config file would you like to use? (py, toml) [py]:
+```
+
+`py` is recommended, as it is more flexible.
+
+
+```text
+~ FILES CREATED WILL LOOP OUT HERE ~
+
 ===================
 Flask app deployed!
 ===================
@@ -51,6 +68,8 @@ Run: flask run --debug
 If you called your app something other than 'app', like 'new' for example, you will see:
 
 ```text
+~ FILES CREATED WILL LOOP OUT HERE ~
+
 ===================
 Flask app deployed!
 ===================
@@ -60,7 +79,8 @@ Run: flask --app new run --debug
 
 ```
 
-As you can see from the output, it gives you instructions on how to start your app, depending on the name you gave it.
+As you can see from the output, it gives you instructions on how to start your app, 
+depending on the name you gave it.
 
 You should see a new folder that has been given the name you specified in
 the `flask-imp init` command.
@@ -87,17 +107,33 @@ You can also deploy a minimal app, that will have no blueprints, models, or exte
 flask-imp init -n my_app --minimal
 ```
 
+This also works for what configuration file you would like to use:
+
+```bash
+flask-imp init -n my_app --pyconfig
+```
+or
+```bash
+flask-imp init -n my_app --tomlconfig
+```
+
+This will create a new minimal app called 'my_app' with a python configuration file.
+
+```bash
+flask-imp init -n my_app --minimal --pyconfig
+```
+
 ## init Folder structures
 
 ### Full app
 
-`flask-imp init`:
+`flask-imp init --full`:
 
 ```text
 app/
 ├── blueprints
 │   └── www
-│       ├── config.toml
+│       ├── config.py
 │       ├── __init__.py
 │       ├── routes
 │       │   └── index.py
@@ -148,7 +184,7 @@ app/
 │   └── __init__.py
 │
 ├── __init__.py
-└── default.config.toml
+└── config.py
 ```
 
 ### Slim app
@@ -177,7 +213,7 @@ app/
 │           └── 500.html
 │
 ├── www
-│   ├── config.toml
+│   ├── config.py
 │   ├── __init__.py
 │   ├── routes
 │   │   └── index.py
@@ -198,7 +234,7 @@ app/
 │           └── index.html
 │
 ├── __init__.py
-└── default.config.toml
+└── config.py
 ```
 
 ### Minimal app
@@ -222,5 +258,5 @@ app/
 │   └── routes.py
 │
 ├── __init__.py
-└── default.config.toml
+└── config.py
 ```

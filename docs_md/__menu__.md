@@ -4,7 +4,6 @@
 - Imp
     - Introduction
     - config.x
-    - Load Env Variables
 - Blueprint
     - Introduction
     - config.x
