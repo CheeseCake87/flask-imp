@@ -53,28 +53,28 @@ class Config(ImpConfig):
     SQLALCHEMY_RECORD_QUERIES = False
     #
 
-    # Main database settings, this will be turned int the SQLALCHEMY_DATABASE_URI
+    # Main database settings, this will be converted to SQLALCHEMY_DATABASE_URI
     # DATABASE_MAIN = DatabaseConfig(
-    #     enabled=True,
-    #     dialect="sqlite",
-    #     name="main",
-    #     location="",
-    #     port=0,
-    #     username="",
-    #     password="",
+    #     ENABLED=True,
+    #     DIALECT="sqlite",
+    #     NAME="main",
+    #     LOCATION="",
+    #     PORT=0,
+    #     USERNAME="",
+    #     PASSWORD="",
     # )
 
     # Binds are additional databases that can be used in your app
     # These will be added to the SQLALCHEMY_BINDS dictionary
     # DATABASE_BINDS = {
     #     DatabaseConfig(
-    #         enabled=True,
-    #         dialect="sqlite",
-    #         name="additional_database",
-    #         bind_key="additional_database",
-    #         location="",
-    #         port=0,
-    #         username="",
-    #         password="",
+    #         ENABLED=True,
+    #         DIALECT="sqlite",
+    #         NAME="additional_database",
+    #         BIND_KEY="additional_database",
+    #         LOCATION="",
+    #         PORT=0,
+    #         USERNAME="",
+    #         PASSWORD="",
     #     )
     # }
