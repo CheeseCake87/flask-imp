@@ -13,7 +13,13 @@ from .config_object_parser import load_object
 from .config_toml_parser import load_app_blueprint_toml
 from .exceptions import NoConfigProvided
 from .protocols import Flask
-from .utilities import _toml_suffix, cast_to_import_str, slug, _partial_models_import, build_database_binds
+from .utilities import (
+    _toml_suffix,
+    cast_to_import_str,
+    slug,
+    _partial_models_import,
+    build_database_binds,
+)
 
 
 def _prevent_if_disabled(func) -> t.Callable:
@@ -40,9 +46,9 @@ class ImpBlueprint(Blueprint):
     _nested_blueprints: t.Union[set, set[t.Union["ImpBlueprint", Blueprint]]] = None
 
     def __init__(
-            self,
-            dunder_name: str,
-            config: t.Union[str, ImpBlueprintConfigTemplate] = None,
+        self,
+        dunder_name: str,
+        config: t.Union[str, ImpBlueprintConfigTemplate] = None,
     ) -> None:
         """
         Creates a new ImpBlueprint instance.
@@ -126,9 +132,9 @@ class ImpBlueprint(Blueprint):
         build_database_binds(flask_app, app_path, self.config.DATABASE_BINDS)
 
     def load_config(
-            self,
-            config: t.Union[str, ImpBlueprintConfigTemplate],
-            location: t.Optional[Path],
+        self,
+        config: t.Union[str, ImpBlueprintConfigTemplate],
+        location: t.Optional[Path],
     ) -> None:
         if isinstance(config, ImpBlueprintConfigTemplate):
             self.config = config
@@ -281,7 +287,7 @@ class ImpBlueprint(Blueprint):
             )
             for name, potential in getmembers(module):
                 if isinstance(potential, Blueprint) or isinstance(
-                        potential, ImpBlueprint
+                    potential, ImpBlueprint
                 ):
                     self._nested_blueprints.add(potential)
 

@@ -15,7 +15,7 @@ from flask_imp.utilities import cast_to_int, cast_to_bool
 
 
 def check_if_cast(
-        cs_key, value, cast_key_value_to_str, cast_key_value_to_int, cast_key_value_to_bool
+    cs_key, value, cast_key_value_to_str, cast_key_value_to_int, cast_key_value_to_bool
 ):
     if isinstance(cast_key_value_to_str, list):
         if cs_key in cast_key_value_to_str:
@@ -66,13 +66,13 @@ def replace_env_value(value: t.Any) -> t.Any:
 
 
 def process_dict(
-        this_dict: t.Optional[dict],
-        key_case_switch: t.Literal["upper", "lower", "ignore"] = "upper",
-        crawl: bool = False,
-        rename_keys: t.Dict = None,
-        cast_key_value_to_str: t.List[str] = None,
-        cast_key_value_to_int: t.List[str] = None,
-        cast_key_value_to_bool: t.List[str] = None,
+    this_dict: t.Optional[dict],
+    key_case_switch: t.Literal["upper", "lower", "ignore"] = "upper",
+    crawl: bool = False,
+    rename_keys: t.Dict = None,
+    cast_key_value_to_str: t.List[str] = None,
+    cast_key_value_to_int: t.List[str] = None,
+    cast_key_value_to_bool: t.List[str] = None,
 ) -> dict:
     """
     Used to process the config from_file dictionary. Turns all keys to upper case.
@@ -164,7 +164,7 @@ def load_app_toml(file: str, current_working_directory: Path) -> ImpConfigTempla
 
 
 def load_app_blueprint_toml(
-        file: str, current_working_directory: Path
+    file: str, current_working_directory: Path
 ) -> ImpConfigBlueprintTemplate:
     """
     Processes the values from the configuration from_file.
