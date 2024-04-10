@@ -1,4 +1,4 @@
-from flask_imp import ImpBlueprintConfig
+from flask_imp import ImpBlueprintConfig, DatabaseConfig
 
 
 class Config(ImpBlueprintConfig):
@@ -12,6 +12,19 @@ class Config(ImpBlueprintConfig):
     # ROOT_PATH: str = ""
     # CLI_GROUP: str = ""
 
-    INIT_SESSION: dict = {}
+    INIT_SESSION: dict = {
+        "www_session": "yes"
+    }
 
-    DATABASE_BINDS = None
+    DATABASE_BINDS: set[DatabaseConfig] = {
+        DatabaseConfig(
+            ENABLED=True,
+            DIALECT="sqlite",
+            NAME="www",
+            BIND_KEY="www",
+            LOCATION="",
+            PORT=0,
+            USERNAME="",
+            PASSWORD="",
+        )
+    }
