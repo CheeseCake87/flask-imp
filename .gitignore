@@ -1,3 +1,4 @@
+.DS_Store
 src/old
 src/flask_bigapp.egg-info
 src/dist

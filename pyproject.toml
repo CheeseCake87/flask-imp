@@ -41,12 +41,14 @@ Source = "https://github.com/CheeseCake87/flask-imp"
 
 [tool.flit.sdist]
 exclude = [
+    "venv/",
+    ".venv/",
     ".github/",
     "_assets/",
     "app/",
     "dist/",
     "docs/",
-    "docs_gen/",
+    "gdocs/",
     "test_app/",
     "test_docker/",
     "tests/",
