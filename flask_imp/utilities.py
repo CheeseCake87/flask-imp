@@ -38,16 +38,16 @@ def deprecated(message: str):
 
 
 def _partial_models_import(
-    location: Path,
-    file_or_folder: str,
-    imp_instance: Imp,
+        location: Path,
+        file_or_folder: str,
+        imp_instance: Imp,
 ) -> None:
     file_or_folder_path = Path(location / file_or_folder)
     imp_instance.import_models(f"{file_or_folder_path}")
 
 
 def build_database_main(
-    flask_app: Flask, app_path: Path, database_main: DatabaseConfigTemplate
+        flask_app: Flask, app_path: Path, database_main: DatabaseConfigTemplate
 ):
     if database_main:
         if database_main.enabled:
@@ -57,7 +57,7 @@ def build_database_main(
 
 
 def build_database_binds(
-    flask_app: Flask, app_path: Path, database_binds: t.Set[DatabaseConfigTemplate]
+        flask_app: Flask, app_path: Path, database_binds: t.Set[DatabaseConfigTemplate]
 ):
     if database_binds:
         for db in database_binds:
@@ -73,9 +73,9 @@ def build_database_binds(
 def build_database_uri(flask_app: Flask, app_path: Path, db: DatabaseConfigTemplate):
     if db.dialect == "sqlite":
         filepath = (
-            app_path
-            / "instance"
-            / (db.name + flask_app.config.get("SQLITE_DB_EXTENSION", ".sqlite"))
+                app_path
+                / "instance"
+                / (db.name + flask_app.config.get("SQLITE_DB_EXTENSION", ".sqlite"))
         )
         return f"{db.dialect}:///{filepath}"
 
@@ -91,7 +91,7 @@ def cast_to_import_str(app_name: str, folder_path: Path) -> str:
     Takes the folder path and converts it to a string that can be imported
     """
     folder_parts = folder_path.parts
-    parts = folder_parts[folder_parts.index(app_name) :]
+    parts = folder_parts[folder_parts.index(app_name):]
     if sys.version_info.major == 3:
         if sys.version_info.minor < 9:
             return ".".join(parts).replace(".py", "")
@@ -178,3 +178,34 @@ def cast_to_int(value: t.Union[str, int, float, bool, None]) -> int:
         return 0
 
     raise TypeError(f"Cannot cast {value} to int")
+
+
+def cast_to_float(value: t.Union[str, int, float, bool, None]) -> float:
+    """
+    Casts string, int, and bool to float
+    """
+
+    if value is None:
+        return 0.0
+
+    if isinstance(value, float):
+        return value
+
+    if isinstance(value, str):
+        if value == "":
+            return 0.0
+
+        try:
+            return float(value)
+        except ValueError:
+            raise TypeError(f"Cannot cast {value} to float")
+
+    if isinstance(value, int):
+        return float(value)
+
+    if isinstance(value, bool):
+        if value:
+            return 1.0
+        return 0.0
+
+    raise TypeError(f"Cannot cast {value} to float")
