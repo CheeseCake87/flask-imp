@@ -1,4 +1,4 @@
-ENABLED = "yes"
+ENABLED = true
 
 [SETTINGS]
 URL_PREFIX = "/"

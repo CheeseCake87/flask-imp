@@ -18,9 +18,11 @@
 <aside>
     <img src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px; width: 50%">
     <h1>Flask-Imp</h1>
-    <div><small>Current Version: 3.1.x</small></div>
+    <div><small>Version: 4.0.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Wed, 13 Mar 2024</small></div>
+    <div><small>Wed, 10 Apr 2024</small></div>
+
+    <p><a href="v3/index.html">Switch to version 3 docs</a></p>
 
     <h2>Menu</h2>
     <ul>
@@ -56,11 +58,7 @@
                         
                     
                         
-                            <li><a href="imp-x-config-toml.html">x.config.toml</a></li>
-                        
-                    
-                        
-                            <li><a href="imp-load-env-vars.html">Load Env Variables</a></li>
+                            <li><a href="imp-config-x.html">config.x</a></li>
                         
                     
                 </ul>
@@ -77,7 +75,7 @@
                         
                     
                         
-                            <li><a href="blueprint-config-toml.html">config.toml</a></li>
+                            <li><a href="blueprint-config-x.html">config.x</a></li>
                         
                     
                 </ul>
@@ -256,20 +254,32 @@ how to use Flask-Imp.</p>
 <div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init<span class="w"> </span>--help
 </pre></div>
 <h2>Create a new project</h2>
-<p>Make sure you are in the virtual environment, and at the root of your project folder, then run the following command:</p>
+<p>Make sure you are in the virtual environment, and at the root of your
+project folder, then run the following command:</p>
 <div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init
 </pre></div>
-<p>After running this command, you will be prompted to choose what type of app you want to deploy:</p>
+<p>After running this command, you will be prompted to choose what type of
+app you want to deploy:</p>
 <div class="highlight"><pre><span></span>~ $ flask-imp init
 What type of app would you like to create? (full, slim, minimal) [full]:
 </pre></div>
 <p>See below for the differences between the app types.</p>
 <p>After this, you will be prompted to enter a name for your app:</p>
 <div class="highlight"><pre><span></span>~ $ flask-imp init
+...
 What would you like to call your app? [app]:
 </pre></div>
-<p>'app' is the default name, so if you just press enter, your app will be called 'app'. You will then see this output:</p>
-<div class="highlight"><pre><span></span>===================
+<p>'app' is the default name, so if you just press enter, your app will be
+called 'app'. You will then see this output:</p>
+<p>Next you will be asked what configuration file you would like to use:</p>
+<div class="highlight"><pre><span></span>~ $ flask-imp init
+...
+What type of config file would you like to use? (py, toml) [py]:
+</pre></div>
+<p><code>py</code> is recommended, as it is more flexible.</p>
+<div class="highlight"><pre><span></span>~ FILES CREATED WILL LOOP OUT HERE ~
+
+===================
 Flask app deployed!
 ===================
  
@@ -278,14 +288,17 @@ Flask will automatically look for this!
 Run: flask run --debug
 </pre></div>
 <p>If you called your app something other than 'app', like 'new' for example, you will see:</p>
-<div class="highlight"><pre><span></span>===================
+<div class="highlight"><pre><span></span>~ FILES CREATED WILL LOOP OUT HERE ~
+
+===================
 Flask app deployed!
 ===================
 
 Your app has the name of &#39;new&#39;
 Run: flask --app new run --debug
 </pre></div>
-<p>As you can see from the output, it gives you instructions on how to start your app, depending on the name you gave it.</p>
+<p>As you can see from the output, it gives you instructions on how to start your app,
+depending on the name you gave it.</p>
 <p>You should see a new folder that has been given the name you specified in
 the <code>flask-imp init</code> command.</p>
 <h3>Additional options</h3>
@@ -299,13 +312,22 @@ the <code>flask-imp init</code> command.</p>
 <p>You can also deploy a minimal app, that will have no blueprints, models, or extensions, like so:</p>
 <div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init<span class="w"> </span>-n<span class="w"> </span>my_app<span class="w"> </span>--minimal
 </pre></div>
+<p>This also works for what configuration file you would like to use:</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init<span class="w"> </span>-n<span class="w"> </span>my_app<span class="w"> </span>--pyconfig
+</pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init<span class="w"> </span>-n<span class="w"> </span>my_app<span class="w"> </span>--tomlconfig
+</pre></div>
+<p>This will create a new minimal app called 'my_app' with a python configuration file.</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>init<span class="w"> </span>-n<span class="w"> </span>my_app<span class="w"> </span>--minimal<span class="w"> </span>--pyconfig
+</pre></div>
 <h2>init Folder structures</h2>
 <h3>Full app</h3>
-<p><code>flask-imp init</code>:</p>
+<p><code>flask-imp init --full</code>:</p>
 <div class="highlight"><pre><span></span>app/
 ├── blueprints
 │   └── www
-│       ├── config.toml
+│       ├── config.py
 │       ├── __init__.py
 │       ├── routes
 │       │   └── index.py
@@ -356,7 +378,7 @@ the <code>flask-imp init</code> command.</p>
 │   └── __init__.py
 │
 ├── __init__.py
-└── default.config.toml
+└── config.py
 </pre></div>
 <h3>Slim app</h3>
 <p><code>flask-imp init --slim</code>:</p>
@@ -381,7 +403,7 @@ the <code>flask-imp init</code> command.</p>
 │           └── 500.html
 │
 ├── www
-│   ├── config.toml
+│   ├── config.py
 │   ├── __init__.py
 │   ├── routes
 │   │   └── index.py
@@ -402,7 +424,7 @@ the <code>flask-imp init</code> command.</p>
 │           └── index.html
 │
 ├── __init__.py
-└── default.config.toml
+└── config.py
 </pre></div>
 <h3>Minimal app</h3>
 <p><code>flask-imp init --minimal</code>:</p>
@@ -422,7 +444,7 @@ the <code>flask-imp init</code> command.</p>
 │   └── routes.py
 │
 ├── __init__.py
-└── default.config.toml
+└── config.py
 </pre></div>
 
 </section>

@@ -3,11 +3,10 @@
     - flask-imp blueprint
 - Imp
     - Introduction
-    - x.config.toml
-    - Load Env Variables
+    - config.x
 - Blueprint
     - Introduction
-    - config.toml
+    - config.x
 - Imp.x
     - init_app, __init__
     - init_session

@@ -1,5 +1,5 @@
-import multiprocessing
 import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Optional
@@ -45,7 +45,7 @@ enabled_tags = [
     "flask-imp-python-3-10:latest",
     "flask-imp-python-3-11:latest",
     "flask-imp-python-3-12:latest",
-    "flask-imp-python-3-13:latest",
+    # "flask-imp-python-3-13:latest",
 ]
 
 if __name__ == "__main__":
@@ -63,8 +63,14 @@ if __name__ == "__main__":
 
     def build_docker(tag_, file_):
         with DockerCli(f"build -t {tag_} -f {file_} .") as output_:
+            print("=" * 50)
             print(f"build -t {tag_} -f {file_} .")
-            _ = output_
+            if "ERROR:" in output_:
+                print("~" * 50)
+                print("An error occurred during the build process.")
+                print(output_)
+                sys.exit(1)
+            print("=" * 50)
 
 
     def create_docker(tag_):
@@ -79,19 +85,20 @@ if __name__ == "__main__":
             _ = output_
 
 
-    build_pool = multiprocessing.Pool()
-
-    running_builds = []
+    # build_pool = multiprocessing.Pool()
+    #
+    # running_builds = []
 
     print("Building test environments, please wait...")
 
     for tag, file in tags.items():
         if tag in enabled_tags:
-            p_build = build_pool.apply_async(build_docker, args=(tag, file))
-            running_builds.append(p_build)
+            build_docker(tag, file)
+            # p_build = build_pool.apply_async(build_docker, args=(tag, file))
+            # running_builds.append(p_build)
 
-    for pro in running_builds:
-        pro.wait()
+    # for pro in running_builds:
+    #     pro.wait()
 
     print("Creating test environments, please wait...")
 

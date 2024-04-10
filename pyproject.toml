@@ -58,3 +58,10 @@ exclude = [
     "requirements_dev.txt",
     "requirements_docs.txt",
 ]
+
+[tool.pyqwe]
+install = "*:flit install --symlink"
+build = "*:flit build"
+publish = "*:flit publish"
+docs = "*:flask --app gdocs compile"
+docs-watch = "*:flask --app gdocs compile --watch"

@@ -31,7 +31,7 @@ STATIC_URL_PATH = "/static"
 #ROOT_PATH = ""
 #CLI_GROUP = ""
 
-[SESSION]
+[INIT_SESSION]
 #{name}_session = "yes"
 
 # Set ENABLED to true to allow the blueprint
@@ -39,12 +39,47 @@ STATIC_URL_PATH = "/static"
 [DATABASE_BIND]
 ENABLED = false
 DIALECT = "sqlite"
-DATABASE_NAME = "{name}"
+NAME = "{name}"
+BIND_KEY = "{name}"
 LOCATION = ""
 PORT = ""
 USERNAME = ""
 PASSWORD = ""
 """
+
+    # Format to: name, url_prefix
+    config_py = """\
+from flask_imp import ImpBlueprintConfig, DatabaseConfig
+
+
+class Config(ImpBlueprintConfig):
+    ENABLED: bool = True
+    URL_PREFIX: str = "/{url_prefix}"
+    # SUBDOMAIN: str = ""
+    # URL_DEFAULTS: dict = {{}}
+    STATIC_FOLDER: str = "static"
+    TEMPLATE_FOLDER: str = "templates"
+    STATIC_URL_PATH: str = "/static"
+    # ROOT_PATH: str = ""
+    # CLI_GROUP: str = ""
+
+    INIT_SESSION: dict = {{
+        "{name}_session": "yes"
+    }}
+
+    DATABASE_BINDS: set[DatabaseConfig] = {{
+        DatabaseConfig(
+            ENABLED=False,
+            DIALECT="sqlite",
+            NAME="{name}",
+            BIND_KEY="{name}",
+            LOCATION="",
+            PORT=0,
+            USERNAME="",
+            PASSWORD="",
+        )
+    }}
+    """
 
     # Format to: Name
     routes_index_py = """\

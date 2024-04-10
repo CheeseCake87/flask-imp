@@ -30,8 +30,26 @@ def cli():
     prompt="Name of the blueprint to create",
     help="The name of the blueprint to create",
 )
-def add_blueprint(folder, name):
-    _add_blueprint(folder, name)
+@click.option(
+    "-pyc", "--pyconfig", is_flag=True, default=False, help="Use python config files"
+)
+@click.option(
+    "-tc", "--tomlconfig", is_flag=True, default=False, help="Use python config files"
+)
+def add_blueprint(folder, name, pyconfig, tomlconfig):
+    if not pyconfig and not tomlconfig:
+        choice = click.prompt(
+            "What type of config file would you like to use?",
+            default="py",
+            type=click.Choice(["py", "toml"]),
+        )
+
+        if choice == "py":
+            pyconfig = True
+        elif choice == "toml":
+            pyconfig = False
+
+    _add_blueprint(folder, name, pyconfig=pyconfig)
 
 
 @cli.command("init", help="Create a new flask-imp app")
@@ -47,7 +65,13 @@ def add_blueprint(folder, name):
 @click.option(
     "-m", "--minimal", is_flag=True, default=False, help="Create a minimal app"
 )
-def init_new_app(name, full, slim, minimal):
+@click.option(
+    "-pyc", "--pyconfig", is_flag=True, default=False, help="Use python config files"
+)
+@click.option(
+    "-tc", "--tomlconfig", is_flag=True, default=False, help="Use python config files"
+)
+def init_new_app(name, full, slim, minimal, pyconfig, tomlconfig):
     if not full and not slim and not minimal:
         choice = click.prompt(
             "What type of app would you like to create?",
@@ -71,4 +95,16 @@ def init_new_app(name, full, slim, minimal):
     if minimal:
         slim = True
 
-    _init_app(set_name, full, slim, minimal)
+    if not pyconfig and not tomlconfig:
+        choice = click.prompt(
+            "What type of config file would you like to use?",
+            default="py",
+            type=click.Choice(["py", "toml"]),
+        )
+
+        if choice == "py":
+            pyconfig = True
+        elif choice == "toml":
+            pyconfig = False
+
+    _init_app(set_name, full, slim, minimal, pyconfig)

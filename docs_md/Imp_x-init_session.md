@@ -17,7 +17,7 @@ def before_request():
     imp.init_session()
 ```
 
-File: `default.config.toml`
+File: `config.toml`
 
 ```toml
 ...

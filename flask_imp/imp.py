@@ -1,18 +1,25 @@
-import logging
 import os
+import typing as t
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
-from typing import Dict, Union, Optional, List
 
 from flask import Blueprint, session
 from flask_sqlalchemy.model import DefaultMeta
 
-from .helpers import _init_app_config
+from .config_imp_template import ImpConfigTemplate as ImpConfig
+from .config_object_parser import load_object
+from .config_toml_parser import load_app_toml
+from .exceptions import NoConfigProvided
 from .protocols import Flask, ImpBlueprint
 from .registeries import ModelRegistry
-from .utilities import cast_to_import_str
+from .utilities import (
+    cast_to_import_str,
+    _toml_suffix,
+    build_database_main,
+    build_database_binds,
+)
 
 
 class Imp:
@@ -22,25 +29,22 @@ class Imp:
     app_folder: Path
     app_resources_imported: bool = False
 
-    __model_registry__: ModelRegistry
+    model_registry: ModelRegistry
 
-    config_path: Path
-    config: Dict
+    config: ImpConfig
 
     def __init__(
         self,
-        app: Optional[Flask] = None,
-        app_config_file: Optional[str] = None,
-        ignore_missing_env_variables: bool = False,
+        app: Flask = None,
+        config: t.Union[str, ImpConfig] = None,
     ) -> None:
         if app is not None:
-            self.init_app(app, app_config_file, ignore_missing_env_variables)
+            self.init_app(app, config)
 
     def init_app(
         self,
         app: Flask,
-        app_config_file: Optional[str] = os.environ.get("IMP_CONFIG"),
-        ignore_missing_env_variables: bool = False,
+        config: t.Union[str, ImpConfig] = os.environ.get("IMP_CONFIG"),
     ) -> None:
         """
         Initializes the flask app to work with flask-imp.
@@ -62,8 +66,7 @@ class Imp:
         -----
 
         :param app: The flask app to initialize.
-        :param app_config_file: The config file to use.
-        :param ignore_missing_env_variables: Will ignore missing environment variables in the config if set to True.
+        :param config: The config to use
         :return: None
         """
 
@@ -74,34 +77,69 @@ class Imp:
         if not isinstance(app, Flask):
             raise TypeError("The app that was passed in is not an instance of Flask")
 
-        if app_config_file is None:
-            app_config_file = "default.config.toml"
-
-        self.app = app
-
-        if "imp" in self.app.extensions:
+        if "imp" in app.extensions:
             raise ImportError("The app has already been initialized with flask-imp.")
 
+        self.app = app
         self.app_name = app.name
         self.app_path = Path(self.app.root_path)
         self.app_folder = self.app_path.parent
-        self.config_path = self.app_path / app_config_file
-
-        self.config = _init_app_config(
-            self.config_path, ignore_missing_env_variables, self.app
-        )
-
-        self.__model_registry__ = ModelRegistry()
         self.app.extensions["imp"] = self
+
+        self.model_registry = ModelRegistry()
+
+        if config is None:
+            if Path(self.app_path / "config.py").exists():
+                config = f"{self.app_path.name}.config.Config"
+
+            elif Path(self.app_path / "config.toml").exists():
+                config = "config.toml"
+
+            else:
+                raise NoConfigProvided(
+                    f"No config was provided, and no default config was found in {self.app_path}"
+                )
+
+        if isinstance(config, ImpConfig):
+            self.config = config
+
+        if isinstance(config, str):
+            toml_file = Path(self.app_path / config)
+            if toml_file.suffix.lower() in _toml_suffix and toml_file.exists():
+                self.config = load_app_toml(config, self.app_path)
+            else:
+                self.config = load_object(config)
+
+        self.set_app_config(flask_app=app)
+
+    def set_app_config(self, flask_app: Flask) -> None:
+        flask_app.config.update(
+            **{attr[0]: attr[1] for attr in self.config.FLASK.attrs()}
+        )
+        _allowed_types = (str, bool, int, float, dict, list, set)
+
+        for attr in self.config.__dir__():
+            if attr not in self.config._attrs and attr not in self.config._known_funcs:
+                _ = getattr(self.config, attr)
+                if (
+                    not attr.startswith("_")
+                    and _ is not None
+                    and type(attr) in _allowed_types
+                    and attr not in flask_app.config
+                ):
+                    flask_app.config[attr] = getattr(self.config, attr)
+
+        build_database_main(flask_app, self.app_path, self.config.DATABASE_MAIN)
+        build_database_binds(flask_app, self.app_path, self.config.DATABASE_BINDS)
 
     def import_app_resources(
         self,
         folder: str = "resources",
-        factories: Optional[List] = None,
+        factories: t.Optional[t.List] = None,
         static_folder: str = "static",
         templates_folder: str = "templates",
-        files_to_import: Optional[List] = None,
-        folders_to_import: Optional[List] = None,
+        files_to_import: t.Optional[t.List] = None,
+        folders_to_import: t.Optional[t.List] = None,
     ) -> None:
         """
         Import standard app resources from the specified folder.
@@ -257,20 +295,6 @@ class Imp:
 
         self.app_resources_imported = True
 
-        def process_module(import_location: str) -> tuple:
-            def gm(mf):
-                with self.app.app_context():
-                    return getmembers(mf)
-
-            module_file = import_module(import_location)
-            flask_instance = (
-                True
-                if [name for name, value in gm(module_file) if isinstance(value, Flask)]
-                else False
-            )
-
-            return module_file, flask_instance
-
         resources_folder = self.app_path / folder
         app_static_folder = resources_folder / static_folder
         app_templates_folder = resources_folder / templates_folder
@@ -299,7 +323,7 @@ class Imp:
         )
 
         for item in resources_folder.iterdir():
-            if "__" in item.name:
+            if item.name.startswith("__"):
                 continue
 
             # iter over files and folders in the resources folder
@@ -357,10 +381,10 @@ class Imp:
 
         :return: None
         """
-        if self.config.get("SESSION"):
-            for key, value in self.config.get("SESSION", {}).items():
-                if key not in session:
-                    session[key] = value
+        if self.config.INIT_SESSION:
+            session.update(
+                {k: v for k, v in self.config.INIT_SESSION.items() if k not in session}
+            )
 
     def import_blueprint(self, blueprint: str) -> None:
         """
@@ -474,27 +498,62 @@ class Imp:
         :param blueprint: The blueprint (folder name) to import. Must be relative.
         :return: None
         """
+
+        def process_nested_blueprint_registration(
+            parent: t.Union[Blueprint, ImpBlueprint],
+            child: t.Union[Blueprint, ImpBlueprint],
+        ):
+            if hasattr(child, "config"):
+                if child.config.ENABLED:
+                    parent.register_blueprint(child)
+
+                    if hasattr(child, "_models"):
+                        for partial_model in child._models:
+                            partial_model(imp_instance=self)
+
+                    if hasattr(child, "set_app_config"):
+                        child.set_app_config(self.app, self.app_path)
+
+                else:
+                    print(f"Blueprint {child.name} is disabled")
+
+        def process_blueprint_registration(pbp: t.Union[Blueprint, ImpBlueprint]):
+            if hasattr(pbp, "config"):
+                if pbp.config.ENABLED:
+                    if hasattr(pbp, "_nested_blueprints"):
+                        for nested_bp in pbp._nested_blueprints:
+                            process_nested_blueprint_registration(pbp, nested_bp)
+
+                    if hasattr(pbp, "_models"):
+                        for partial_model in pbp._models:
+                            partial_model(imp_instance=self)
+
+                    if hasattr(pbp, "set_app_config"):
+                        pbp.set_app_config(self.app, self.app_path)
+
+                    self.app.register_blueprint(pbp)
+
+                else:
+                    print(f"Blueprint {potential_bp.name} is disabled")
+            else:
+                self.app.register_blueprint(pbp)
+
         if Path(blueprint).is_absolute():
             potential_bp = Path(blueprint)
         else:
             potential_bp = Path(self.app_path / blueprint)
 
         if potential_bp.exists() and potential_bp.is_dir():
-            try:
-                module = import_module(cast_to_import_str(self.app_name, potential_bp))
-                for name, value in getmembers(module):
-                    if isinstance(value, Blueprint) or isinstance(value, ImpBlueprint):
-                        if hasattr(value, "_setup_imp_blueprint"):
-                            if getattr(value, "enabled", False):
-                                value._setup_imp_blueprint(self)
-                                self.app.register_blueprint(value)
-                            else:
-                                logging.debug(f"Blueprint {name} is disabled")
-                        else:
-                            self.app.register_blueprint(value)
+            # try:
+            module = import_module(cast_to_import_str(self.app_name, potential_bp))
+            for name, potential in getmembers(module):
+                if isinstance(potential, Blueprint) or isinstance(
+                    potential, ImpBlueprint
+                ):
+                    process_blueprint_registration(potential)
 
-            except Exception as e:
-                raise ImportError(f"Error when importing {potential_bp.name}: {e}")
+            # except Exception as e:
+            #     raise ImportError(f"Error when importing {potential_bp.name}: {e}")
 
     def import_blueprints(self, folder: str) -> None:
         """
@@ -532,8 +591,14 @@ class Imp:
 
         folder_path = Path(self.app_path / folder)
 
+        if not folder_path.exists():
+            raise ImportError(f"Cannot find blueprints folder at {folder_path}")
+
+        if not folder_path.is_dir():
+            raise ImportError(f"Blueprints must be a folder {folder_path}")
+
         for potential_bp in folder_path.iterdir():
-            self.import_blueprint(potential_bp.as_posix())
+            self.import_blueprint(f"{potential_bp}")
 
     def import_models(self, file_or_folder: str) -> None:
         """
@@ -627,7 +692,7 @@ class Imp:
                 model_module = import_module(import_string)
                 for name, value in getmembers(model_module, isclass):
                     if hasattr(value, "__tablename__"):
-                        self.__model_registry__.add(name, value)
+                        self.model_registry.add(name, value)
 
             except ImportError as e:
                 raise ImportError(f"Error when importing {import_string}: {e}")
@@ -693,9 +758,9 @@ class Imp:
         :param class_: The class name of the model to return.
         :return: The model class [DefaultMeta].
         """
-        return self.__model_registry__.class_(class_)
+        return self.model_registry.class_(class_)
 
-    def model_meta(self, class_: Union[str, DefaultMeta]) -> dict:
+    def model_meta(self, class_: t.Union[str, DefaultMeta]) -> dict:
         """
         Returns meta information for the given ORM class name
 
@@ -759,7 +824,7 @@ class Imp:
                 raise AttributeError(f"{model_} is not a valid model")
 
         if isinstance(class_, str):
-            model = self.__model_registry__.class_(class_)
+            model = self.model_registry.class_(class_)
             check_for_table_name(model)
             return {
                 "location": model.__module__,

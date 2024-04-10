@@ -1,3 +1,8 @@
+def test_config_from_object(client):
+    response = client.get('/tests/')
+    assert response.status_code == 200
+
+
 def test_general_setup(client):
     response = client.get('/tests/')
     assert response.status_code == 200
@@ -24,17 +29,17 @@ def test_regular_blueprint(client):
 
 
 def test_nested_blueprint(client):
-    response = client.get('/tests/nested_test/')
+    response = client.get('/tests/nested-test/')
     assert response.status_code == 200
 
 
 def test_group_nested_blueprint_one(client):
-    response = client.get('/tests/nested_test_one/')
+    response = client.get('/tests/nested-test-one/')
     assert response.status_code == 200
 
 
 def test_group_nested_blueprint_two(client):
-    response = client.get('/tests/nested_test_two/')
+    response = client.get('/tests/nested-test-two/')
     assert response.status_code == 200
 
 

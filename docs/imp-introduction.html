@@ -18,9 +18,11 @@
 <aside>
     <img src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px; width: 50%">
     <h1>Flask-Imp</h1>
-    <div><small>Current Version: 3.1.x</small></div>
+    <div><small>Version: 4.0.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Wed, 13 Mar 2024</small></div>
+    <div><small>Wed, 10 Apr 2024</small></div>
+
+    <p><a href="v3/index.html">Switch to version 3 docs</a></p>
 
     <h2>Menu</h2>
     <ul>
@@ -56,11 +58,7 @@
                         
                     
                         
-                            <li><a href="imp-x-config-toml.html">x.config.toml</a></li>
-                        
-                    
-                        
-                            <li><a href="imp-load-env-vars.html">Load Env Variables</a></li>
+                            <li><a href="imp-config-x.html">config.x</a></li>
                         
                     
                 </ul>
@@ -77,7 +75,7 @@
                         
                     
                         
-                            <li><a href="blueprint-config-toml.html">config.toml</a></li>
+                            <li><a href="blueprint-config-x.html">config.x</a></li>
                         
                     
                 </ul>
@@ -266,7 +264,7 @@ Blueprints. However, you can use Flask-Imp without using Blueprints.</p>
 │   ├── static/...
 │   └── templates/...
 ├── models/...
-├── default.config.toml
+├── config.py
 └── __init__.py
 </pre></div>
 <p>Here's an example of the <code>app/__init__.py</code> file:</p>
@@ -289,16 +287,14 @@ Blueprints. However, you can use Flask-Imp without using Blueprints.</p>
 
     <span class="k">return</span> <span class="n">app</span>
 </pre></div>
-<p>During <code>imp.init_app</code> the <code>default.config.toml</code> file will load variables under <code>[FLASK]</code> into the Flask app config.
-It will also load variables under <code>[DATABASE]</code> into the Flask app config as <code>SQLALCHEMY_DATABASE_URI</code>.</p>
-<p>Values under <code>[SESSION]</code> can be loaded with:</p>
-<div class="highlight"><pre><span></span><span class="nd">@app</span><span class="o">.</span><span class="n">before_request</span>
-<span class="k">def</span> <span class="nf">before_request</span><span class="p">():</span>
-    <span class="n">imp</span><span class="o">.</span><span class="n">init_session</span><span class="p">()</span>
-</pre></div>
-<p>See more about the config file here: <a href="imp-x-config-toml.html">Imp / x.config.toml</a></p>
-<p><code>import_app_resources</code> will walk one level deep into the <code>resources</code> folder, and import all <code>.py</code> files as modules. It will
-also check for the existence of a <code>static</code> and <code>templates</code> folder, and register them with the Flask app.</p>
+<p>The <code>init_app</code> method of the Imp class will automatically load configuration
+if the config argument is not set to <code>None</code>.</p>
+<p>An attempt to load the configuration from either <code>config.toml</code> file or a <code>Config</code>
+class from a <code>config.py</code> file will be made.</p>
+<p>For more information about the <code>config</code> parameter see: <a href="imp-config-x.html">Imp / config.x</a></p>
+<p><code>import_app_resources</code> will walk one level deep into the <code>resources</code> folder, and import
+all <code>.py</code> files as modules.
+It will also check for the existence of a <code>static</code> and <code>templates</code> folder, and register them with the Flask app.</p>
 <p>There is a couple of options for <code>import_app_resources</code> to control what
 is imported, see: <a href="imp_x-import_app_resources.html">Imp.x / import_app_resources</a></p>
 <p><code>import_models</code> will import all Model classes from the specified file or folder. It will also place each model found

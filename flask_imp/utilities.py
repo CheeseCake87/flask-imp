@@ -1,10 +1,11 @@
 import functools
 import logging
-import os
 import re
 import sys
 import typing as t
 from pathlib import Path
+
+from flask_imp.protocols import Flask, DatabaseConfigTemplate, Imp
 
 
 class Sprinkles:
@@ -19,11 +20,14 @@ class Sprinkles:
     END = "\033[0m"
 
 
+_toml_suffix = (".toml", ".tml")
+
+
 def deprecated(message: str):
     def func_wrapper(func):
         @functools.wraps(func)
         def proc_function(*args, **kwargs):
-            logging.critical(
+            logging.warning(
                 f"{Sprinkles.FAIL}Function deprecated: {message}{Sprinkles.END}"
             )
             return func(*args, **kwargs)
@@ -33,60 +37,53 @@ def deprecated(message: str):
     return func_wrapper
 
 
-def if_env_replace(
-    env_value: t.Optional[t.Any], ignore_missing_env_variables: bool = False
-) -> t.Any:
-    """
-    Looks for the replacement pattern to swap out values in the config file with environment variables.
-    """
-    pattern = re.compile(r"<(.*?)>")
-
-    if isinstance(env_value, str):
-        if re.match(pattern, env_value):
-            env_var = re.findall(pattern, env_value)[0]
-
-            if env_var:
-                if os.environ.get(env_var):
-                    return parse_config_env_var(os.environ.get(env_var))
-
-                if ignore_missing_env_variables:
-                    return None
-
-                raise ValueError(f"Environment variable {env_value} not found")
-
-    return env_value
+def _partial_models_import(
+    location: Path,
+    file_or_folder: str,
+    imp_instance: Imp,
+) -> None:
+    file_or_folder_path = Path(location / file_or_folder)
+    imp_instance.import_models(f"{file_or_folder_path}")
 
 
-def process_dict(
-    this_dict: t.Optional[dict],
-    key_case_switch: str = "upper",
-    ignore_missing_env_variables: bool = False,
-    crawl: bool = False,
-) -> dict:
-    """
-    Used to process the config from_file dictionary and replace environment variables. Turns all keys to upper case.
-    """
+def build_database_main(
+    flask_app: Flask, app_path: Path, database_main: DatabaseConfigTemplate
+):
+    if database_main:
+        if database_main.enabled:
+            flask_app.config["SQLALCHEMY_DATABASE_URI"] = build_database_uri(
+                flask_app, app_path, database_main
+            )
 
-    if this_dict is None:
-        return {}
 
-    return_dict = {}
-    for key, value in this_dict.items():
-        if key_case_switch == "ignore":
-            cs_key = key
-        else:
-            cs_key = key.upper() if key_case_switch == "upper" else key.lower()
+def build_database_binds(
+    flask_app: Flask, app_path: Path, database_binds: t.Set[DatabaseConfigTemplate]
+):
+    if database_binds:
+        for db in database_binds:
+            if db.enabled:
+                if "SQLALCHEMY_BINDS" not in flask_app.config:
+                    flask_app.config["SQLALCHEMY_BINDS"] = {}
 
-        if crawl:
-            if isinstance(value, dict):
-                return_dict[cs_key] = process_dict(
-                    value, key_case_switch, ignore_missing_env_variables, crawl
+                flask_app.config["SQLALCHEMY_BINDS"][db.bind_key] = build_database_uri(
+                    flask_app, app_path, db
                 )
-                continue
 
-        return_dict[cs_key] = if_env_replace(value, ignore_missing_env_variables)
 
-    return return_dict
+def build_database_uri(flask_app: Flask, app_path: Path, db: DatabaseConfigTemplate):
+    if db.dialect == "sqlite":
+        filepath = (
+            app_path
+            / "instance"
+            / (db.name + flask_app.config.get("SQLITE_DB_EXTENSION", ".sqlite"))
+        )
+        return f"{db.dialect}:///{filepath}"
+
+    return (
+        f"{db.dialect}://{db.username}:"
+        f"{db.password}@{db.location}:"
+        f"{db.port}/{db.name}"
+    )
 
 
 def cast_to_import_str(app_name: str, folder_path: Path) -> str:
@@ -108,6 +105,15 @@ def snake(value: str) -> str:
     """
     s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", value)
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
+
+
+def slug(value: str) -> str:
+    """
+    Switches name of the class CamelCase to slug-case
+    """
+    value = value.replace("_", "-")
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1-\2", value)
+    return re.sub("([a-z0-9])([A-Z])", r"\1-\2", s1).lower()
 
 
 def class_field(class_: str, field: str) -> str:
@@ -143,25 +149,63 @@ def cast_to_bool(value: t.Union[str, bool, None]) -> bool:
         raise TypeError(f"Cannot cast {value} to bool")
 
 
-def parse_config_env_var(value: t.Optional[str]) -> t.Optional[t.Union[bool, str, int]]:
+def cast_to_int(value: t.Union[str, int, float, bool, None]) -> int:
     """
-    Casts value to a boolean, string, or int if possible. If not, returns none.
+    Casts string, float, and bool to int
     """
-    if value == "None":
-        return None
+
+    if value is None:
+        return 0
+
+    if isinstance(value, int):
+        return value
 
     if isinstance(value, str):
-        true_str = ("true", "yes", "y", "1")
-        false_str = ("false", "no", "n", "0")
+        if value == "":
+            return 0
 
-        if value.lower() in true_str:
-            return True
-        elif value.lower() in false_str:
-            return False
-        else:
-            try:
-                return int(value)
-            except ValueError:
-                return value
+        try:
+            return int(value)
+        except ValueError:
+            raise TypeError(f"Cannot cast {value} to int")
 
-    return None
+    if isinstance(value, float):
+        return int(value)
+
+    if isinstance(value, bool):
+        if value:
+            return 1
+        return 0
+
+    raise TypeError(f"Cannot cast {value} to int")
+
+
+def cast_to_float(value: t.Union[str, int, float, bool, None]) -> float:
+    """
+    Casts string, int, and bool to float
+    """
+
+    if value is None:
+        return 0.0
+
+    if isinstance(value, float):
+        return value
+
+    if isinstance(value, str):
+        if value == "":
+            return 0.0
+
+        try:
+            return float(value)
+        except ValueError:
+            raise TypeError(f"Cannot cast {value} to float")
+
+    if isinstance(value, int):
+        return float(value)
+
+    if isinstance(value, bool):
+        if value:
+            return 1.0
+        return 0.0
+
+    raise TypeError(f"Cannot cast {value} to float")

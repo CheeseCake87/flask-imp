@@ -11,7 +11,13 @@ from .helpers import Sprinkles as Sp
 from .helpers import to_snake_case
 
 
-def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = None):
+def add_blueprint(
+    folder,
+    name,
+    _init_app: bool = False,
+    _cwd: Optional[Path] = None,
+    pyconfig: bool = False,
+):
     click.echo(f"{Sp.OKGREEN}Creating Blueprint: {name}")
 
     if _cwd:
@@ -45,10 +51,6 @@ def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = 
     # Files
     files = {
         "root/__init__.py": (folders["root"] / "__init__.py", BpFlib.init_py),
-        "root/config.toml": (
-            folders["root"] / "config.toml",
-            BpFlib.config_toml.format(name=name, url_prefix="" if _init_app else name),
-        ),
         "routes/index.py": (
             folders["routes"] / "index.py",
             BpFlib.routes_index_py.format(name=name),
@@ -100,6 +102,17 @@ def add_blueprint(folder, name, _init_app: bool = False, _cwd: Optional[Path] = 
             ),
         ),
     }
+
+    if pyconfig:
+        files["root/config.py"] = (
+            folders["root"] / "config.py",
+            BpFlib.config_py.format(name=name, url_prefix="" if _init_app else name),
+        )
+    else:
+        files["root/config.toml"] = (
+            folders["root"] / "config.toml",
+            BpFlib.config_toml.format(name=name, url_prefix="" if _init_app else name),
+        )
 
     # Loop create folders
     for folder, path in folders.items():
