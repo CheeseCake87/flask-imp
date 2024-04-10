@@ -184,7 +184,9 @@ def load_app_blueprint_toml(
 
     config = tml.loads(config_file_path.read_text())
 
-    enabled_config = replace_env_value(config.get("ENABLED", config.get("enabled", False)), force="bool")
+    enabled_config = replace_env_value(
+        config.get("ENABLED", config.get("enabled", False)), force="bool"
+    )
     settings_config = process_dict(config.get("SETTINGS", {}))
     session_config = config.get("INIT_SESSION", config.get("SESSION", {}))
 
