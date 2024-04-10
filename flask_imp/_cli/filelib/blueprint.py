@@ -31,7 +31,7 @@ STATIC_URL_PATH = "/static"
 #ROOT_PATH = ""
 #CLI_GROUP = ""
 
-[SESSION]
+[INIT_SESSION]
 #{name}_session = "yes"
 
 # Set ENABLED to true to allow the blueprint
