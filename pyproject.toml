@@ -64,6 +64,6 @@ exclude = [
 [tool.pyqwe]
 install = "*:flit install --symlink"
 build = "*:flit build"
-publish = "*:flit publish"
+publish = "*shell:export=FLIT_USERNAME=__token__ && flit publish"
 docs = "*:flask --app gdocs compile"
 docs-watch = "*:flask --app gdocs compile --watch"

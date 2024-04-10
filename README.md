@@ -3,7 +3,7 @@
 
 ![tests](https://github.com/CheeseCake87/flask-imp/actions/workflows/tests.yml/badge.svg)
 [![PyPI version](https://img.shields.io/pypi/v/flask-imp)](https://pypi.org/project/flask-imp/)
-[![License](https://img.shields.io/badge/license-LGPL_v2-red.svg)](https://raw.githubusercontent.com/CheeseCake87/flask-imp/master/LICENSE)
+[![License](https://img.shields.io/github/license/CheeseCake87/flask-imp)](https://raw.githubusercontent.com/CheeseCake87/flask-imp/master/LICENSE)
 ![Downloads](https://static.pepy.tech/badge/flask-imp)
 ![black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
