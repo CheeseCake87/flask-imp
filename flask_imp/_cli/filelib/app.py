@@ -62,7 +62,7 @@ SQLITE_STORE_IN_PARENT = false
 [DATABASE.MAIN]
 ENABLED = true
 DIALECT = "sqlite"
-DATABASE_NAME = "database"
+NAME = "database"
 LOCATION = ""
 PORT = ""
 USERNAME = ""
@@ -81,7 +81,7 @@ PASSWORD = ""
 #[DATABASE.ANOTHER]
 #ENABLED = true
 #DIALECT = "sqlite"
-#DATABASE_NAME = "another"
+#NAME = "another"
 #LOCATION = ""
 #PORT = ""
 #USERNAME = ""
@@ -147,7 +147,7 @@ SQLITE_STORE_IN_PARENT = false
 #[DATABASE.MAIN]
 #ENABLED = true
 #DIALECT = "sqlite"
-#DATABASE_NAME = "database"
+#NAME = "database"
 #LOCATION = ""
 #PORT = ""
 #USERNAME = ""
@@ -166,7 +166,7 @@ SQLITE_STORE_IN_PARENT = false
 #[DATABASE.ANOTHER]
 #ENABLED = true
 #DIALECT = "sqlite"
-#DATABASE_NAME = "another"
+#NAME = "another"
 #LOCATION = ""
 #PORT = ""
 #USERNAME = ""
