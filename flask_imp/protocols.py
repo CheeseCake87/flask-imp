@@ -3,6 +3,7 @@ from pathlib import Path
 
 from flask_imp.config_imp_blueprint_template import ImpBlueprintConfigTemplate
 
+ImpBlueprintSelf = t.TypeVar("ImpBlueprintSelf", bound="ImpBlueprint")
 
 @t.runtime_checkable
 class Blueprint(t.Protocol):
@@ -22,7 +23,7 @@ class ImpBlueprint(t.Protocol):
     location: Path
 
     _models: t.Set
-    _nested_blueprints: t.Union[set, set[t.Union[t.Self, Blueprint]]]
+    _nested_blueprints: t.Union[set, set[t.Union[ImpBlueprintSelf, Blueprint]]]
 
     def register_blueprint(self, blueprint: Blueprint): ...
 
