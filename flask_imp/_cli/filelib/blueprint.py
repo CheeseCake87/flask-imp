@@ -39,7 +39,8 @@ STATIC_URL_PATH = "/static"
 [DATABASE_BIND]
 ENABLED = false
 DIALECT = "sqlite"
-DATABASE_NAME = "{name}"
+NAME = "{name}"
+BIND_KEY = "{name}"
 LOCATION = ""
 PORT = ""
 USERNAME = ""
@@ -62,15 +63,17 @@ class Config(ImpBlueprintConfig):
     # ROOT_PATH: str = ""
     # CLI_GROUP: str = ""
 
-    # INIT_SESSION: dict = {{}}
+    INIT_SESSION: dict = {{
+        "{name}_session": "yes"
+    }}
 
     DATABASE_BINDS: set[DatabaseConfig] = {{
         DatabaseConfig(
             ENABLED=False,
             DIALECT="sqlite",
             NAME="{name}",
-            LOCATION="",
             BIND_KEY="{name}",
+            LOCATION="",
             PORT=0,
             USERNAME="",
             PASSWORD="",
