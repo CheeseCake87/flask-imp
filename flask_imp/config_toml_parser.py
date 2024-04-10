@@ -11,7 +11,7 @@ from flask_imp import (
     DatabaseConfig,
     ImpBlueprintConfig as ImpConfigBlueprintTemplate,
 )
-from flask_imp.utilities import cast_to_int, cast_to_bool
+from flask_imp.utilities import cast_to_int, cast_to_bool, cast_to_float
 
 
 def check_if_cast(
@@ -32,7 +32,7 @@ def check_if_cast(
     return value
 
 
-def replace_env_value(value: t.Any) -> t.Any:
+def replace_env_value(value: t.Any, force: t.Literal["str", "bool"] = None) -> t.Any:
     """
     Replaces environment variables in the string with their values.
     """
@@ -53,10 +53,18 @@ def replace_env_value(value: t.Any) -> t.Any:
                 val, type_ = value.split(":")
                 value_found = attempt_to_find_env(val)
 
+                if force == "str":
+                    return str(value_found)
+
+                if force == "bool":
+                    return cast_to_bool(value_found)
+
                 if type_ == "int":
                     return cast_to_int(value_found)
                 if type_ == "bool":
                     return cast_to_bool(value_found)
+                if type_ == "float":
+                    return cast_to_float(value_found)
 
                 return value_found
 
@@ -176,7 +184,7 @@ def load_app_blueprint_toml(
 
     config = tml.loads(config_file_path.read_text())
 
-    enabled_config = cast_to_bool(config.get("ENABLED", config.get("enabled", False)))
+    enabled_config = replace_env_value(config.get("ENABLED", config.get("enabled", False)), force="bool")
     settings_config = process_dict(config.get("SETTINGS", {}))
     session_config = config.get("INI_SESSION", config.get("SESSION", {}))
 
