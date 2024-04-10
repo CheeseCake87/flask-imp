@@ -4,16 +4,14 @@ Title = Imp.init_app, __init__
 ```
 
 ```python
-init_app(
+def init_app(
     app: Flask,
-    app_config_file: Optional[str] = None,
-    ignore_missing_env_variables: bool = False
-) -> None
+    config: t.Union[str, ImpConfig] = os.environ.get("IMP_CONFIG")
+) -> None:
 # -or- 
 Imp(
-    app: Optional[Flask] = None,
-    app_config_file: Optional[str] = None,
-    ignore_missing_env_variables: bool = False
+    app: Flask,
+    config: t.Union[str, ImpConfig] = os.environ.get("IMP_CONFIG")
 ) -> None
 ```
 
@@ -21,11 +19,17 @@ Imp(
 
 Initializes the flask app to work with flask-imp.
 
-If no `app_config_file` specified, an attempt to read `IMP_CONFIG` from the environment will be made.
+If no `config` specified, an attempt to read `IMP_CONFIG` from the environment will be made.
 
-If `IMP_CONFIG` is not in the environment variables, an attempt to load `default.config.toml` will be made.
+The config value can be a toml file `my_config.toml`, for example; or an import string. An example
+of an import string would be `config.Config` where `config` is the module and `Config` is the class.
 
-`default.config.toml` will be created, and used if not found.
+If `IMP_CONFIG` is not in the environment variables, an attempt to load `config.toml` will be made. 
+
+If `config.toml` is not found, an attempt to load a class called `Config` from `config.py` will be made. 
+The Config class must be an instance of `ImpConfig` `from flask_imp import ImpConfig`.
+
+An exception will be raised if none of the above methods are successful.
 
 If `ignore_missing_env_variables` is `True`, then missing environment variables will be ignored.
 
