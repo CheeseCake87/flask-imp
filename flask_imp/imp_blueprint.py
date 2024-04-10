@@ -43,7 +43,7 @@ class ImpBlueprint(Blueprint):
     package: str
 
     _models: t.Set = None
-    _nested_blueprints: t.Union[set, set[t.Union["ImpBlueprint", Blueprint]]] = None
+    _nested_blueprints: t.Union[t.Set, t.Set[t.Union["ImpBlueprint", Blueprint]]] = None
 
     def __init__(
         self,
