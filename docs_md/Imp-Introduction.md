@@ -23,7 +23,7 @@ app/
 │   ├── static/...
 │   └── templates/...
 ├── models/...
-├── config.toml
+├── config.py
 └── __init__.py
 ```
 
@@ -50,21 +50,17 @@ def create_app():
     return app
 ```
 
-During `imp.init_app` the `default.config.toml` file will load variables under `[FLASK]` into the Flask app config.
-It will also load variables under `[DATABASE]` into the Flask app config as `SQLALCHEMY_DATABASE_URI`.
+The `init_app` method of the Imp class will automatically load configuration
+if the config argument is not set to `None`.
 
-Values under `[SESSION]` can be loaded with:
+An attempt to load the configuration from either `config.toml` file or a `Config`
+class from a `config.py` file will be made.
 
-```python
-@app.before_request
-def before_request():
-    imp.init_session()
-```
+For more information about the `config` parameter see: [Imp / config.x](imp-config-x.html)
 
-See more about the config file here: [Imp / x.config.toml](imp-x-config-toml.html)
-
-`import_app_resources` will walk one level deep into the `resources` folder, and import all `.py` files as modules. It will
-also check for the existence of a `static` and `templates` folder, and register them with the Flask app.
+`import_app_resources` will walk one level deep into the `resources` folder, and import 
+all `.py` files as modules. 
+It will also check for the existence of a `static` and `templates` folder, and register them with the Flask app.
 
 There is a couple of options for `import_app_resources` to control what
 is imported, see: [Imp.x / import_app_resources](imp_x-import_app_resources.html)

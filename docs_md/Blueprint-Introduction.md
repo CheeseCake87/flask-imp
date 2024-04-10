@@ -6,7 +6,8 @@ Title = Flask-Imp Blueprint Introduction
 The Flask-Imp Blueprint inherits from the Flask Blueprint class, then adds some additional methods to allow for auto
 importing of models, resources and other nested blueprints.
 
-The Flask-Imp Blueprint reads configuration from a config.toml file, which is located in the same directory as the
+The Flask-Imp Blueprint by default, reads configuration from a config.toml file or from a config class, 
+which is located in the same directory as the
 `__init__.py` file.
 
 Here's an example of a Flask-Imp Blueprint structure:
@@ -17,15 +18,15 @@ www/
 │   ├── blueprint_one/
 │   │   ├── ...
 │   │   ├── __init__.py
-│   │   └── config.toml
+│   │   └── config.py
 │   └── blueprint_two/
 │       ├── ...
 │       ├── __init__.py
-│       └── config.toml
+│       └── config.py
 ├── standalone_nested_blueprint/
 │   ├── ...
 │   ├── __init__.py
-│   └── config.toml
+│   └── config.py
 ├── models/
 │   └── ...
 ├── routes/
@@ -36,7 +37,7 @@ www/
 │   └── www/
 │       └── index.html
 ├── __init__.py
-└── config.toml
+└── config.py
 ```
 
 File: `__init__.py`
@@ -57,8 +58,10 @@ def before_app_request():
     bp.init_session()
 ```
 
-That `config.toml` file is loaded during the `__init__` method of the Blueprint class.
-To see more about the config file see: [Blueprint / config.toml](blueprint-config-toml.html)
+During the `__init__` method of the Blueprint class, if the config argument is not set to `None`, the Blueprint will
+attempt to load the configuration from either `config.toml` file or a `Config` class from a `config.py` file.
+
+To see more about configuration see: [Blueprint / config.x](blueprint-config-x.html)
 
 `import_resources` method will walk one level deep into the `routes` folder, and import all `.py` files as modules.
 For more information see: [Blueprint.x / import_resources](blueprint_x-import_resources.html)
@@ -74,4 +77,4 @@ nested to the current blueprint. For example `www.blueprint_one.index`
 
 `bp.init_session` will load the session variables from the config file into the session object. For more information
 see: [Blueprint.x / init_session](blueprint_x-init_session.html) and
-[Blueprint / config.toml](blueprint-config-toml.html)
+[Blueprint / config.x](blueprint-config-x.html)

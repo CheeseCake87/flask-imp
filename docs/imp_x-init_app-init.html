@@ -56,7 +56,7 @@
                         
                     
                         
-                            <li><a href="imp-x-config-toml.html">x.config.toml</a></li>
+                            <li><a href="imp-config-x.html">config.x</a></li>
                         
                     
                         
@@ -77,7 +77,7 @@
                         
                     
                         
-                            <li><a href="blueprint-config-toml.html">config.toml</a></li>
+                            <li><a href="blueprint-config-x.html">config.x</a></li>
                         
                     
                 </ul>
@@ -250,23 +250,25 @@
 
 <section>
     <h1 style="font-size: 2.6rem; margin: 0;">Imp.init_app, __init__</h1>
-    <div class="highlight"><pre><span></span><span class="n">init_app</span><span class="p">(</span>
+    <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">init_app</span><span class="p">(</span>
     <span class="n">app</span><span class="p">:</span> <span class="n">Flask</span><span class="p">,</span>
-    <span class="n">app_config_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">ignore_missing_env_variables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ImpConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;IMP_CONFIG&quot;</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="c1"># -or- </span>
 <span class="n">Imp</span><span class="p">(</span>
-    <span class="n">app</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Flask</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">app_config_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">ignore_missing_env_variables</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">app</span><span class="p">:</span> <span class="n">Flask</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ImpConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;IMP_CONFIG&quot;</span><span class="p">)</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </pre></div>
 <hr />
 <p>Initializes the flask app to work with flask-imp.</p>
-<p>If no <code>app_config_file</code> specified, an attempt to read <code>IMP_CONFIG</code> from the environment will be made.</p>
-<p>If <code>IMP_CONFIG</code> is not in the environment variables, an attempt to load <code>default.config.toml</code> will be made.</p>
-<p><code>default.config.toml</code> will be created, and used if not found.</p>
+<p>If no <code>config</code> specified, an attempt to read <code>IMP_CONFIG</code> from the environment will be made.</p>
+<p>The config value can be a toml file <code>my_config.toml</code>, for example; or an import string. An example
+of an import string would be <code>config.Config</code> where <code>config</code> is the module and <code>Config</code> is the class.</p>
+<p>If <code>IMP_CONFIG</code> is not in the environment variables, an attempt to load <code>config.toml</code> will be made.</p>
+<p>If <code>config.toml</code> is not found, an attempt to load a class called <code>Config</code> from <code>config.py</code> will be made.
+The Config class must be an instance of <code>ImpConfig</code> <code>from flask_imp import ImpConfig</code>.</p>
+<p>An exception will be raised if none of the above methods are successful.</p>
 <p>If <code>ignore_missing_env_variables</code> is <code>True</code>, then missing environment variables will be ignored.</p>
 <p>If <code>ignore_missing_env_variables</code> is <code>False</code> (default), then missing environment variables will raise a ValueError</p>
 

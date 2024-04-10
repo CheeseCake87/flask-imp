@@ -56,7 +56,7 @@
                         
                     
                         
-                            <li><a href="imp-x-config-toml.html">x.config.toml</a></li>
+                            <li><a href="imp-config-x.html">config.x</a></li>
                         
                     
                         
@@ -77,7 +77,7 @@
                         
                     
                         
-                            <li><a href="blueprint-config-toml.html">config.toml</a></li>
+                            <li><a href="blueprint-config-x.html">config.x</a></li>
                         
                     
                 </ul>
@@ -250,18 +250,155 @@
 
 <section>
     <h1 style="font-size: 2.6rem; margin: 0;">The Flask-Imp Config File</h1>
-    <p>Flask-Imp loads configuration settings from a toml file found in the root of your app package.</p>
-<p><code>app/default.config.toml</code> is the default config file, this will be created if no config file is found or set.</p>
-<p>Here's an example file structure:</p>
+    <hr />
+<p><strong>Recommendation:</strong> Try and favour the use of a py file for your
+configuration settings, as this will trigger reloads under
+debug mode.</p>
+<p>Also, the bonus of being able to use Python to programmatically
+set values is nice.</p>
+<hr />
+<p>Flask-Imp loads configuration settings from either a class
+defined in a module or from a toml file.</p>
+<p><strong>This example:</strong></p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_app</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">imp</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="s2">&quot;dev.config.toml&quot;</span><span class="p">)</span>
+</pre></div>
+<p>Will load configuration from the <code>dev.config.toml</code> file.</p>
+<p><strong>This example:</strong></p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_app</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">imp</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="s2">&quot;config.Config&quot;</span><span class="p">)</span>
+</pre></div>
+<p>Will load the configuration from the <code>Config</code> class from the <code>config.py</code> file.</p>
+<p>Both of these files need to be located in the root of the app.</p>
+<p>The config class must be an instance of <code>ImpConfig</code> from <code>flask_imp</code>.</p>
+<p>You can also set the config by using the <code>IMP_CONFIG</code> environment
+variable, but you will need to omit or set the <code>config</code> parameter to <code>None</code>.</p>
+<p>For example, given the following folder structure:</p>
 <div class="highlight"><pre><span></span>Project/
 ├── app/
 │   ├── ...
 │   ├── __init__.py
-│   └── default.config.toml
+│   ├── config.py
+│   └── dev.config.toml
 ├── venv/...
 └── ...
 </pre></div>
-<p>Here's an example of the default config file that is created:</p>
+<p>You'd set the <code>IMP_CONFIG=dev.config.toml</code> and this will load the <code>dev.config.toml</code> file.</p>
+<h3>Using environment variables</h3>
+<h4>toml</h4>
+<p>In a toml config, you can set environment variables by using <code>{{ }}</code></p>
+<div class="highlight"><pre><span></span><span class="n">TEST_VALUE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ test_value }}&quot;</span>
+</pre></div>
+<p>You can also set the type of the variable by using <code>:type</code> after the variable name.</p>
+<div class="highlight"><pre><span></span><span class="n">TEST_VALUE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ test_value:int }}&quot;</span>
+</pre></div>
+<p><strong>Supported types are <code>int</code>, <code>float</code>, <code>bool</code>, <code>str</code>.</strong></p>
+<h4>py</h4>
+<p>In a py config, you can set environment variables by using <code>os.getenv</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">TEST_VALUE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TEST_VALUE&quot;</span><span class="p">,</span> <span class="s2">&quot;default_value_here&quot;</span><span class="p">)</span>
+</pre></div>
+<h3>Example <code>config.py</code> configuration file:</h3>
+<div class="highlight"><pre><span></span>Project/
+├── app/
+│   ├── ...
+│   ├── __init__.py
+│   └── config.py
+├── venv/...
+└── ...
+</pre></div>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FlaskConfig</span><span class="p">,</span>
+    <span class="n">ImpConfig</span><span class="p">,</span>
+    <span class="n">DatabaseConfig</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">ImpConfig</span><span class="p">):</span>
+    <span class="n">FLASK</span> <span class="o">=</span> <span class="n">FlaskConfig</span><span class="p">(</span>
+        <span class="c1"># DEBUG=False,</span>
+        <span class="c1"># PROPAGATE_EXCEPTIONS = True,</span>
+        <span class="n">TRAP_HTTP_EXCEPTIONS</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="c1"># TRAP_BAD_REQUEST_ERRORS = True,</span>
+        <span class="n">SECRET_KEY</span><span class="o">=</span><span class="s2">&quot;flask-imp&quot;</span><span class="p">,</span>  <span class="c1"># CHANGE ME</span>
+        <span class="n">SESSION_COOKIE_NAME</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">,</span>
+        <span class="c1"># SESSION_COOKIE_DOMAIN = &quot;domain-here.com&quot;,</span>
+        <span class="c1"># SESSION_COOKIE_PATH = &quot;/&quot;,</span>
+        <span class="n">SESSION_COOKIE_HTTPONLY</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">SESSION_COOKIE_SECURE</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">SESSION_COOKIE_SAMESITE</span><span class="o">=</span><span class="s2">&quot;Lax&quot;</span><span class="p">,</span>
+        <span class="n">PERMANENT_SESSION_LIFETIME</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>  <span class="c1"># 1 hour,</span>
+        <span class="n">SESSION_REFRESH_EACH_REQUEST</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">USE_X_SENDFILE</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="c1"># SEND_FILE_MAX_AGE_DEFAULT = 43200,</span>
+        <span class="n">ERROR_404_HELP</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="c1"># SERVER_NAME = &quot;localhost:5000&quot;,</span>
+        <span class="n">APPLICATION_ROOT</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">,</span>
+        <span class="n">PREFERRED_URL_SCHEME</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="p">,</span>
+        <span class="c1"># MAX_CONTENT_LENGTH = 0,</span>
+        <span class="c1"># TEMPLATES_AUTO_RELOAD = True,</span>
+        <span class="n">EXPLAIN_TEMPLATE_LOADING</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">MAX_COOKIE_SIZE</span><span class="o">=</span><span class="mi">4093</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># This will set the default session variables for the app.</span>
+    <span class="n">INIT_SESSION</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;logged_in&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Below are extra settings that Flask-Imp uses but relates to Flask-SQLAlchemy.</span>
+    <span class="c1"># This sets the file extension for SQLite databases, and where to create the folder</span>
+    <span class="c1"># that the database will be stored in.</span>
+    <span class="c1"># True will create the folder on the same level as your</span>
+    <span class="c1"># app, False will create the folder in the app root.</span>
+    <span class="n">SQLITE_DB_EXTENSION</span> <span class="o">=</span> <span class="s2">&quot;.sqlite&quot;</span>
+    <span class="n">SQLITE_STORE_IN_PARENT</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1">#</span>
+
+    <span class="c1"># SQLAlchemy settings that will be passed to Flask</span>
+    <span class="c1"># Any SQLAlchemy setting here will overwrite anything</span>
+    <span class="c1"># set in the config above</span>
+    <span class="n">SQLALCHEMY_ECHO</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">SQLALCHEMY_TRACK_MODIFICATIONS</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">SQLALCHEMY_RECORD_QUERIES</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1">#</span>
+
+    <span class="c1"># Main database settings, this will be converted to SQLALCHEMY_DATABASE_URI</span>
+    <span class="n">DATABASE_MAIN</span> <span class="o">=</span> <span class="n">DatabaseConfig</span><span class="p">(</span>
+        <span class="n">ENABLED</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">DIALECT</span><span class="o">=</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span>
+        <span class="n">NAME</span><span class="o">=</span><span class="s2">&quot;main&quot;</span><span class="p">,</span>
+        <span class="n">LOCATION</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">PORT</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">USERNAME</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">PASSWORD</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Binds are additional databases that can be used in your app</span>
+    <span class="c1"># These will be added to the SQLALCHEMY_BINDS dictionary</span>
+    <span class="c1"># DATABASE_BINDS = {</span>
+    <span class="c1">#     DatabaseConfig(</span>
+    <span class="c1">#         ENABLED=True,</span>
+    <span class="c1">#         DIALECT=&quot;sqlite&quot;,</span>
+    <span class="c1">#         NAME=&quot;additional_database&quot;,</span>
+    <span class="c1">#         BIND_KEY=&quot;additional_database&quot;,</span>
+    <span class="c1">#         LOCATION=&quot;&quot;,</span>
+    <span class="c1">#         PORT=0,</span>
+    <span class="c1">#         USERNAME=&quot;&quot;,</span>
+    <span class="c1">#         PASSWORD=&quot;&quot;,</span>
+    <span class="c1">#     )</span>
+    <span class="c1"># }</span>
+</pre></div>
+<h3>Example <code>config.toml</code> configuration file:</h3>
+<div class="highlight"><pre><span></span>Project/
+├── app/
+│   ├── ...
+│   ├── __init__.py
+│   └── config.toml
+├── venv/...
+└── ...
+</pre></div>
 <div class="highlight"><pre><span></span><span class="c1"># Flask-Imp Config File</span>
 <span class="c1"># ------------------------</span>
 <span class="c1"># Updates the Flask app config with the variables below.</span>
@@ -270,7 +407,7 @@
 <span class="c1"># app.config. All key names defined below will be</span>
 <span class="c1"># capitalised when imported.</span>
 <span class="k">[FLASK]</span>
-<span class="n">DEBUG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="c1">#DEBUG = false</span>
 <span class="c1">#PROPAGATE_EXCEPTIONS = true</span>
 <span class="n">TRAP_HTTP_EXCEPTIONS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
 <span class="c1">#TRAP_BAD_REQUEST_ERRORS = true</span>
@@ -318,14 +455,14 @@
 <span class="c1"># Dialets = mysql / postgresql / sqlite / oracle / mssql</span>
 
 <span class="c1"># Uncomment below to generate the SQLALCHEMY_DATABASE_URI.</span>
-<span class="c1">#[DATABASE.MAIN]</span>
-<span class="c1">#ENABLED = true</span>
-<span class="c1">#DIALECT = &quot;sqlite&quot;</span>
-<span class="c1">#DATABASE_NAME = &quot;database&quot;</span>
-<span class="c1">#LOCATION = &quot;db&quot;</span>
-<span class="c1">#PORT = &quot;&quot;</span>
-<span class="c1">#USERNAME = &quot;database&quot;</span>
-<span class="c1">#PASSWORD = &quot;password&quot;</span>
+<span class="k">[DATABASE.MAIN]</span>
+<span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sqlite&quot;</span>
+<span class="n">NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;database&quot;</span>
+<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;db&quot;</span>
+<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 
 <span class="c1"># Adding another database is as simple as adding a new section.</span>
 <span class="c1"># [DATABASE.ANOTHER] will then be accessible using SQLALCHEMY_BINDS</span>
@@ -340,29 +477,11 @@
 <span class="c1">#[DATABASE.ANOTHER]</span>
 <span class="c1">#ENABLED = true</span>
 <span class="c1">#DIALECT = &quot;sqlite&quot;</span>
-<span class="c1">#DATABASE_NAME = &quot;database_another&quot;</span>
+<span class="c1">#NAME = &quot;database_another&quot;</span>
 <span class="c1">#LOCATION = &quot;db&quot;</span>
 <span class="c1">#PORT = &quot;&quot;</span>
 <span class="c1">#USERNAME = &quot;user&quot;</span>
 <span class="c1">#PASSWORD = &quot;password&quot;</span>
-</pre></div>
-<p>To change what config file is loaded, you can set the <code>IMP_CONFIG</code> environment
-variable to the name of the config file you want to load.</p>
-<p>For example, given the following folder structure:</p>
-<div class="highlight"><pre><span></span>Project/
-├── app/
-│   ├── ...
-│   ├── __init__.py
-│   ├── production.config.toml
-│   └── default.config.toml
-├── venv/...
-└── ...
-</pre></div>
-<p>You'd set the <code>IMP_CONFIG=production.config.toml</code></p>
-<p>Or you can set the file in the <code>imp.init_app()</code> method:</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_app</span><span class="p">():</span>
-    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-    <span class="n">imp</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">app_config_file</span><span class="o">=</span><span class="s2">&quot;production.config.toml&quot;</span><span class="p">)</span>
 </pre></div>
 
 </section>
