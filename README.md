@@ -101,8 +101,7 @@ python -m venv venv
 ### Install the requirements.
 
 ```bash
-pip install -r requirements.txt
-pip install -r requirements_dev.txt
+pip install -r requirements/development.txt
 ```
 
 ### Install the local version of Flask-Imp.
@@ -141,10 +140,12 @@ The tests are linked to the tests blueprint located at `test_app/blueprints/test
 
 ### Building the docs.
 
-All docs are generated from the [docs_md](docs_md) folder. Edit these files then run the following command to generate the docs.
+All docs are generated from the [docs](docs) folder. 
+
+Edit these files, then run the following command to generate the docs.
 
 ```bash
-flask --app gdocs compile
+flask --app docs compile
 ```
 
 You can set it to watch for changes and automatically recompile the docs by adding the `--watch` flag.

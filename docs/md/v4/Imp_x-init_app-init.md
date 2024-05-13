@@ -30,8 +30,3 @@ If `config.toml` is not found, an attempt to load a class called `Config` from `
 The Config class must be an instance of `ImpConfig` `from flask_imp import ImpConfig`.
 
 An exception will be raised if none of the above methods are successful.
-
-If `ignore_missing_env_variables` is `True`, then missing environment variables will be ignored.
-
-If `ignore_missing_env_variables` is `False` (default), then missing environment variables will raise a ValueError
-
