@@ -4,8 +4,8 @@ from time import sleep
 import click
 from flask import Flask
 
+from .config import Config
 from .ssg import compiler
-from .ssg.helpers import pytz_dt_epoch
 
 cwd = Path(__file__).parent
 
@@ -15,8 +15,8 @@ def create_app():
     app.static_folder = "static"
     app.template_folder = "templates"
 
-    doc_path = cwd.parent / "docs"
-    markdown_path = cwd.parent / "docs_md"
+    doc_path = Path(cwd / Config.latest)
+    markdown_path = Path(cwd / "md" / Config.latest)
 
     @app.cli.command("compile")
     @click.option("--watch", is_flag=True, help="Watch for file changes")

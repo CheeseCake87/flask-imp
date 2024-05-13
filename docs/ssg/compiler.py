@@ -42,11 +42,6 @@ def _raw_markdown_processor(raw_markdown: str) -> tuple[t.Optional[list], str, s
     return menu, title, post
 
 
-def replace_post_date(content: str, new_date: str) -> str:
-    date_ptn = re.compile(r"Date =(.*?)\n", re.IGNORECASE)
-    return content.replace(date_ptn.findall(content)[0], f" {new_date}")
-
-
 def compiler(docs_dir: Path, markdown_dir: Path):
     docs_dir.mkdir(exist_ok=True)
     markdown_dir.mkdir(exist_ok=True)
@@ -73,6 +68,7 @@ def compiler(docs_dir: Path, markdown_dir: Path):
                         "pages"
                     ].append({line_strip.replace("- ", "").strip(): ""})
 
+    main_index_html = docs_dir.parent / "index.html"
     index_html = docs_dir / "index.html"
 
     docs_dir_files = get_relative_files_in_the_docs_folder(docs_dir)
@@ -81,6 +77,11 @@ def compiler(docs_dir: Path, markdown_dir: Path):
 
     html_pages = dict()
     dt_date = pytz_dt_now()
+
+    main_index_html.unlink(missing_ok=True)
+    main_index_html.write_text(
+        render_template("main_index.html", latest_version=docs_dir.name)
+    )
 
     for file in docs_dir_files:
         (docs_dir / f"{file}.html").unlink()
