@@ -267,8 +267,6 @@ of an import string would be <code>config.Config</code> where <code>config</code
 <p>If <code>config.toml</code> is not found, an attempt to load a class called <code>Config</code> from <code>config.py</code> will be made.
 The Config class must be an instance of <code>ImpConfig</code> <code>from flask_imp import ImpConfig</code>.</p>
 <p>An exception will be raised if none of the above methods are successful.</p>
-<p>If <code>ignore_missing_env_variables</code> is <code>True</code>, then missing environment variables will be ignored.</p>
-<p>If <code>ignore_missing_env_variables</code> is <code>False</code> (default), then missing environment variables will raise a ValueError</p>
 
 </section>
 
