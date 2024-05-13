@@ -5,18 +5,17 @@ import click
 from flask import Flask
 
 from .config import Config
-from .ssg import compiler
+from ._ssg import compiler
 
 cwd = Path(__file__).parent
 
 
 def create_app():
     app = Flask(__name__)
-    app.static_folder = "static"
-    app.template_folder = "templates"
+    app.template_folder = "_templates"
 
     doc_path = Path(cwd / Config.latest)
-    markdown_path = Path(cwd / "md" / Config.latest)
+    markdown_path = Path(cwd / "_md" / Config.latest)
 
     @app.cli.command("compile")
     @click.option("--watch", is_flag=True, help="Watch for file changes")
