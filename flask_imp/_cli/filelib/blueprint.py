@@ -67,7 +67,7 @@ class Config(ImpBlueprintConfig):
         "{name}_session": "yes"
     }}
 
-    DATABASE_BINDS: = {{
+    DATABASE_BINDS: dict[DatabaseConfig] = {{
         DatabaseConfig(
             ENABLED=False,
             DIALECT="sqlite",
