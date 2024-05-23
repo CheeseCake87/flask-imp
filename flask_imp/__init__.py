@@ -9,7 +9,7 @@ from .config_imp_template import ImpConfigTemplate as ImpConfig
 from .imp import Imp as Imp
 from .imp_blueprint import ImpBlueprint as Blueprint
 
-__version__ = "4.0.1"
+__version__ = "4.0.2"
 
 __all__ = [
     "Auth",
