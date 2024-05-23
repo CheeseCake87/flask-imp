@@ -177,7 +177,6 @@ from flask import render_template
 
 @app.route("/resources")
 def index():
-    head = Head(title="Flask Imp Global Template")
     return render_template("index.html")
 """
 
