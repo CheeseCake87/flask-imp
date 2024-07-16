@@ -7,7 +7,7 @@ from {app_name}.models.example_user_table import ExampleUserTable
 
 
 @app.cli.command("config")
-def create_tables():
+def show_config():
     print(app.config)
 
 
@@ -65,7 +65,7 @@ from flask import current_app as app
 
 
 @app.cli.command("config")
-def create_tables():
+def show_config():
     print(app.config)
 """
 
