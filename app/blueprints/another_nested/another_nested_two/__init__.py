@@ -1,8 +1,21 @@
 from importlib.util import find_spec
 
-from flask_imp import Blueprint
+from flask_imp import ImpBlueprint, ImpBlueprintConfig, DatabaseConfig
 
-bp = Blueprint(__name__)
+config = ImpBlueprintConfig(
+    enabled=True,
+    url_prefix="/another_nested_two",
+    database_binds=[
+        DatabaseConfig(
+            enabled=True,
+            dialect="sqlite",
+            name="another_nested_two",
+            bind_key="another_nested_two",
+        )
+    ]
+)
+
+bp = ImpBlueprint(__name__, config)
 
 bp.import_resources("routes")
 

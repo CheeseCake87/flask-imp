@@ -8,23 +8,20 @@ from pathlib import Path
 from flask import Blueprint
 from flask import session
 
-from .config_imp_blueprint_template import ImpBlueprintConfigTemplate
-from .config_object_parser import load_object
-from .config_toml_parser import load_app_blueprint_toml
+from .configs import DatabaseConfig
+from .configs import ImpBlueprintConfig
 from .exceptions import NoConfigProvided
-from .protocols import Flask
 from .utilities import (
-    _toml_suffix,
     cast_to_import_str,
     slug,
     _partial_models_import,
-    build_database_binds,
+    _partial_database_binds,
 )
 
 
 def _prevent_if_disabled(func) -> t.Callable:
     def decorator(self, *args, **kwargs):
-        if not self.config.ENABLED:
+        if not self.config.enabled:
             return
         return func(self, *args, **kwargs)
 
@@ -36,7 +33,7 @@ class ImpBlueprint(Blueprint):
     A Class that extends the capabilities of the Flask Blueprint class.
     """
 
-    config: ImpBlueprintConfigTemplate
+    config: ImpBlueprintConfig
 
     location: Path
     bp_name: str
@@ -46,63 +43,22 @@ class ImpBlueprint(Blueprint):
     _nested_blueprints: t.Union[t.Set, t.Set[t.Union["ImpBlueprint", Blueprint]]] = None
 
     def __init__(
-        self,
-        dunder_name: str,
-        config: t.Union[str, ImpBlueprintConfigTemplate] = None,
+            self,
+            dunder_name: str,
+            config: ImpBlueprintConfig
     ) -> None:
         """
-        Creates a new ImpBlueprint instance.
-
-        :raw-html:`<br />`
-
-        `config.toml` must be in the same directory as the `__init__.py` file.
-
-        :raw-html:`<br />`
-
-        -- config.toml --
-        .. code-block::
-
-            ENABLED = "yes"
-
-            [SETTINGS]
-            URL_PREFIX = ""
-            #SUBDOMAIN = ""
-            #URL_DEFAULTS = { }
-            #STATIC_FOLDER = ""
-            TEMPLATE_FOLDER = ""
-            #STATIC_URL_PATH = ""
-            #ROOT_PATH = ""
-            #CLI_GROUP = ""
-
-            [SESSION]
-            var = ""
-
-            [DATABASE_BIND]
-            ENABLED = false
-            #DIALECT = "sqlite"
-            #DATABASE_NAME = ""
-            #LOCATION = ""
-            #PORT = ""
-            #USERNAME = ""
-            #PASSWORD = ""
-
-        :raw-html:`<br />`
-
-        -----
-
         :param dunder_name: __name__
-        :param config_file: Must be in the same directory as the blueprint, defaults to "config.toml"
+        :param config: The blueprint's config.
         """
 
-        if not hasattr(self, "_models") or self._models is None:
-            self._models = set()
-
-        if not hasattr(self, "_nested_blueprints") or self._nested_blueprints is None:
-            self._nested_blueprints = set()
+        self._models = set()
+        self._database_binds = set()
+        self._nested_blueprints = set()
 
         self.package = dunder_name
-        spec = find_spec(self.package)
 
+        spec = find_spec(self.package)
         if spec is None:
             raise ImportError(f"Cannot find origin of {self.package}")
 
@@ -110,41 +66,35 @@ class ImpBlueprint(Blueprint):
         self.bp_name = self.location.name
 
         if config is None:
-            if Path(self.location / "config.py").exists():
-                config = "config.Config"
+            raise NoConfigProvided(
+                f"No config was provided for {self.location}"
+            )
 
-            elif Path(self.location / "config.toml").exists():
-                config = "config.toml"
+        self.config = config
 
-            else:
-                raise NoConfigProvided(
-                    f"No config was provided, and no default config was found in {self.location}"
-                )
+        if not self.config.url_prefix:
+            self.config.url_prefix = f"/{slug(self.bp_name)}"
 
-        self.load_config(config, self.location)
-
-        if not self.config.URL_PREFIX:
-            self.config.URL_PREFIX = f"/{slug(self.bp_name)}"
+        if config.database_binds:
+            self._process_database_binds(config.database_binds)
 
         super().__init__(self.bp_name, self.package, **self.config.super_settings())
 
-    def set_app_config(self, flask_app: Flask, app_path: Path) -> None:
-        build_database_binds(flask_app, app_path, self.config.DATABASE_BINDS)
+    @_prevent_if_disabled
+    def _process_database_binds(self, database_binds: t.Optional[t.Iterable[DatabaseConfig]] = None) -> None:
+        """
+        Processes the database binds and adds them to the blueprint.
 
-    def load_config(
-        self,
-        config: t.Union[str, ImpBlueprintConfigTemplate],
-        location: t.Optional[Path],
-    ) -> None:
-        if isinstance(config, ImpBlueprintConfigTemplate):
-            self.config = config
-
-        if isinstance(config, str):
-            toml_file = Path(location / config)
-            if toml_file.exists() and toml_file.suffix in _toml_suffix:
-                self.config = load_app_blueprint_toml(config, location)
-            else:
-                self.config = load_object(f"{self.package}.{config}")
+        :param config: The blueprint's config.
+        :return: None
+        """
+        for database_bind in database_binds:
+            self._database_binds.add(
+                partial(
+                    _partial_database_binds,
+                    database_bind=database_bind
+                )
+            )
 
     @_prevent_if_disabled
     def import_resources(self, folder: str = "routes") -> None:
@@ -287,7 +237,7 @@ class ImpBlueprint(Blueprint):
             )
             for name, potential in getmembers(module):
                 if isinstance(potential, Blueprint) or isinstance(
-                    potential, ImpBlueprint
+                        potential, ImpBlueprint
                 ):
                     self._nested_blueprints.add(potential)
 
@@ -390,9 +340,9 @@ class ImpBlueprint(Blueprint):
         :return: None
 
         """
-        for key in self.config.INIT_SESSION or {}:
+        for key in self.config.init_session or {}:
             if key not in session:
-                session.update(self.config.INIT_SESSION)
+                session.update(self.config.init_session)
                 break
 
     @_prevent_if_disabled
@@ -481,9 +431,6 @@ class ImpBlueprint(Blueprint):
         :param file_or_folder: The file or folder to import from. Must be relative.
         :return: None
         """
-        if not self.config.ENABLED:
-            return
-
         self._models.add(
             partial(
                 _partial_models_import,
