@@ -94,7 +94,7 @@ To disable this, set `files_to_import` and or
 `folders_to_import` to `[None]`.
 
 ```python
-imp.import_app_resources(files_to_import=[None], folders_to_import=[None])
+imp.import_app_resources(scope_import=[None], folders_to_import=[None])
 ```
 
 To scope the imports, set the `files_to_import` and or `folders_to_import` to a list of files and or folders.

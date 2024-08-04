@@ -5,7 +5,7 @@ import sys
 import typing as t
 from pathlib import Path
 
-from flask_imp.protocols import Flask, DatabaseConfigTemplate, Imp
+from flask_imp.protocols import Flask, DatabaseConfig, Imp
 
 
 class Sprinkles:
@@ -38,16 +38,32 @@ def deprecated(message: str):
 
 
 def _partial_models_import(
-    location: Path,
-    file_or_folder: str,
-    imp_instance: Imp,
+        location: Path,
+        file_or_folder: str,
+        imp_instance: Imp,
 ) -> None:
     file_or_folder_path = Path(location / file_or_folder)
     imp_instance.import_models(f"{file_or_folder_path}")
 
 
+def _partial_database_binds(
+        imp_instance: Imp,
+        database_bind: DatabaseConfig,
+) -> None:
+    if "SQLALCHEMY_BINDS" in imp_instance.app.config:
+        imp_instance.app.config["SQLALCHEMY_BINDS"][database_bind.bind_key] = build_database_uri(
+            imp_instance.app, imp_instance.app_path, database_bind
+        )
+    else:
+        imp_instance.app.config["SQLALCHEMY_BINDS"] = {
+            database_bind.bind_key: build_database_uri(
+                imp_instance.app, imp_instance.app_path, database_bind
+            )
+        }
+
+
 def build_database_main(
-    flask_app: Flask, app_path: Path, database_main: DatabaseConfigTemplate
+        flask_app: Flask, app_path: Path, database_main: DatabaseConfig
 ):
     if database_main:
         if database_main.enabled:
@@ -57,7 +73,7 @@ def build_database_main(
 
 
 def build_database_binds(
-    flask_app: Flask, app_path: Path, database_binds: t.Set[DatabaseConfigTemplate]
+        flask_app: Flask, app_path: Path, database_binds: t.List[DatabaseConfig]
 ):
     if database_binds:
         for db in database_binds:
@@ -70,12 +86,12 @@ def build_database_binds(
                 )
 
 
-def build_database_uri(flask_app: Flask, app_path: Path, db: DatabaseConfigTemplate):
+def build_database_uri(flask_app: Flask, app_path: Path, db: DatabaseConfig):
     if db.dialect == "sqlite":
         filepath = (
-            app_path
-            / "instance"
-            / (db.name + flask_app.config.get("SQLITE_DB_EXTENSION", ".sqlite"))
+                app_path
+                / "instance"
+                / (db.name + flask_app.config.get("SQLITE_DB_EXTENSION", ".sqlite"))
         )
         return f"{db.dialect}:///{filepath}"
 
@@ -91,7 +107,7 @@ def cast_to_import_str(app_name: str, folder_path: Path) -> str:
     Takes the folder path and converts it to a string that can be imported
     """
     folder_parts = folder_path.parts
-    parts = folder_parts[folder_parts.index(app_name) :]
+    parts = folder_parts[folder_parts.index(app_name):]
     if sys.version_info.major == 3:
         if sys.version_info.minor < 9:
             return ".".join(parts).replace(".py", "")

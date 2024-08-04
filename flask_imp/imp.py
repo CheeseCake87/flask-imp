@@ -1,25 +1,16 @@
-import os
 import typing as t
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
 from pathlib import Path
 
-from flask import Blueprint, session
+from flask import Flask, Blueprint, session
 from flask_sqlalchemy.model import DefaultMeta
 
-from .config_imp_template import ImpConfigTemplate as ImpConfig
-from .config_object_parser import load_object
-from .config_toml_parser import load_app_toml
-from .exceptions import NoConfigProvided
-from .protocols import Flask, ImpBlueprint
+from .configs import ImpConfig
+from .protocols import ImpBlueprint
 from .registeries import ModelRegistry
-from .utilities import (
-    cast_to_import_str,
-    _toml_suffix,
-    build_database_main,
-    build_database_binds,
-)
+from .utilities import cast_to_import_str, build_database_main, build_database_binds
 
 
 class Imp:
@@ -34,37 +25,19 @@ class Imp:
     config: ImpConfig
 
     def __init__(
-        self,
-        app: Flask = None,
-        config: t.Union[str, ImpConfig] = None,
+            self,
+            app: Flask = None,
+            config: ImpConfig = None,
     ) -> None:
         if app is not None:
             self.init_app(app, config)
 
     def init_app(
-        self,
-        app: Flask,
-        config: t.Union[str, ImpConfig] = os.environ.get("IMP_CONFIG"),
+            self,
+            app: Flask,
+            config: ImpConfig = None,
     ) -> None:
         """
-        Initializes the flask app to work with flask-imp.
-
-        :raw-html:`<br />`
-
-        If no `app_config_file` specified, an attempt to read `IMP_CONFIG` from the environment will be made.
-
-        :raw-html:`<br />`
-
-        If `IMP_CONFIG` is not in the environment variables, an attempt to load `default.config.toml` will be made.
-
-        :raw-html:`<br />`
-
-        `default.config.toml` will be created, and used if not found.
-
-        :raw-html:`<br />`
-
-        -----
-
         :param app: The flask app to initialize.
         :param config: The config to use
         :return: None
@@ -72,7 +45,7 @@ class Imp:
 
         if app is None:
             raise ImportError(
-                "No app was passed in, do ba = Imp(flaskapp) or app.initapp(flaskapp)"
+                "No app was passed in, do imp = Imp(flaskapp) or app.init_app(flaskapp)"
             )
         if not isinstance(app, Flask):
             raise TypeError("The app that was passed in is not an instance of Flask")
@@ -88,224 +61,56 @@ class Imp:
 
         self.model_registry = ModelRegistry()
 
-        if config is None:
-            if Path(self.app_path / "config.py").exists():
-                config = f"{self.app_path.name}.config.Config"
-
-            elif Path(self.app_path / "config.toml").exists():
-                config = "config.toml"
-
-            else:
-                raise NoConfigProvided(
-                    f"No config was provided, and no default config was found in {self.app_path}"
-                )
-
-        if isinstance(config, ImpConfig):
+        if config:
             self.config = config
+        else:
+            self.config = ImpConfig()
+            self.config.load_config_from_flask(app)
 
-        if isinstance(config, str):
-            toml_file = Path(self.app_path / config)
-            if toml_file.suffix.lower() in _toml_suffix and toml_file.exists():
-                self.config = load_app_toml(config, self.app_path)
-            else:
-                self.config = load_object(config)
-
-        self.set_app_config(flask_app=app)
-
-    def set_app_config(self, flask_app: Flask) -> None:
-        flask_app.config.update(
-            **{attr[0]: attr[1] for attr in self.config.FLASK.attrs()}
-        )
-        _allowed_types = (str, bool, int, float, dict, list, set)
-
-        for attr in self.config.__dir__():
-            if attr not in self.config._attrs and attr not in self.config._known_funcs:
-                _ = getattr(self.config, attr)
-                if (
-                    not attr.startswith("_")
-                    and _ is not None
-                    and type(attr) in _allowed_types
-                    and attr not in flask_app.config
-                ):
-                    flask_app.config[attr] = getattr(self.config, attr)
-
-        build_database_main(flask_app, self.app_path, self.config.DATABASE_MAIN)
-        build_database_binds(flask_app, self.app_path, self.config.DATABASE_BINDS)
+        self._apply_sqlalchemy_config()
+        self.init_session()
 
     def import_app_resources(
-        self,
-        folder: str = "resources",
-        factories: t.Optional[t.List] = None,
-        static_folder: str = "static",
-        templates_folder: str = "templates",
-        files_to_import: t.Optional[t.List] = None,
-        folders_to_import: t.Optional[t.List] = None,
+            self,
+            folder: str = "resources",
+            factories: t.Optional[t.List] = None,
+            static_folder: str = "static",
+            templates_folder: str = "templates",
+            scope_import: t.Optional[t.Dict] = None,
     ) -> None:
         """
-        Import standard app resources from the specified folder.
-
-        :raw-html:`<br />`
-
-        This will import any resources that have been set to the Flask app. Routes, context processors, cli, etc.
-
-        :raw-html:`<br />`
-
-        **Can only be called once.**
-
-        :raw-html:`<br />`
-
-        If no static and or template folder is found, the static and or template folder will be set to None
-        in the Flask app config.
-
-        :raw-html:`<br />`
-
-        **Small example of usage:**
-
-        :raw-html:`<br />`
-
-        .. code-block:: text
-
-            imp.import_app_resources(folder="resources")
-            # or
-            imp.import_app_resources()
-            # as the default folder is "resources"
-
-        :raw-html:`<br />`
-
-        This will import all files in the resources folder, and set the Flask app static and template folders to
-        `resources/static` and `resources/templates` respectively.
-
-        :raw-html:`<br />`
-
-        ---
-        `resources` folder structure
-        ---
-
-        .. code-block:: text
-
-            app
-            ├── resources
-            │   ├── routes.py
-            │   ├── app_fac.py
-            │   ├── static
-            │   │   └── css
-            │   │       └── style.css
-            │   └── templates
-            │       └── index.html
-            └── ...
-        ...
-
-        :raw-html:`<br />`
-
-        ---
-        `routes.py` file
-        ---
-
-        .. code-block::
-
-            from flask import current_app as app
-            from flask import render_template
-
-            @app.route("/")
-            def index():
-                return render_template("index.html")
-
-        :raw-html:`<br />`
-
-        **How factories work**
-
-        :raw-html:`<br />`
-
-        Factories are functions that are called when importing the app resources. Here's an example:
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            imp.import_app_resources(folder="resources", factories=["development_cli"])
-
-        :raw-html:`<br />`
-
-        ["development_cli"] => development_cli(app) function will be called, and the current app will be passed in.
-
-        :raw-html:`<br />`
-
-        --- `app_fac.py` file ---
-
-        .. code-block::
-
-            def development_cli(app):
-                @app.cli.command("dev")
-                def dev():
-                    print("dev cli command")
-
-        :raw-html:`<br />`
-
-        **Scoping imports**
-
-        :raw-html:`<br />`
-
-        By default, all files and folders will be imported. To disable this, set files_to_import and or
-        folders_to_import to [None].
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            imp.import_app_resources(files_to_import=[None], folders_to_import=[None])
-
-        :raw-html:`<br />`
-
-        To scope the imports, set the files_to_import and or folders_to_import to a list of files and or folders.
-
-        :raw-html:`<br />`
-
-        files_to_import=["cli.py", "routes.py"] => will only import the files `resources/cli.py`
-        and `resources/routes.py`
-
-        :raw-html:`<br />`
-
-        folders_to_import=["template_filters", "context_processors"] => will import all files in the folders
-        `resources/template_filters/*.py` and `resources/context_processors/*.py`
-
-        :raw-html:`<br />`
-
-        -----
-
         :param folder: The folder to import from, must be relative.
         :param factories: A list of function names to call with the app instance.
         :param static_folder: The name of the static folder (if not found will be set to None)
         :param templates_folder: The name of the templates folder (if not found will be set to None)
-        :param files_to_import: A list of files to import e.g. ["cli.py", "routes.py"] set to ["*"] to import all.
-        :param folders_to_import: A list of folders to import e.g. ["cli", "routes"] set to ["*"] to import all.
+        :param scope_import: A dict of files to import e.g. ["folder_name", "routes.py"].
         :return: None
         """
 
-        if factories is None:
-            factories = []
-
-        if files_to_import is None:
-            files_to_import = ["*"]
-
-        if folders_to_import is None:
-            folders_to_import = ["*"]
-
+        # Check if the app resources have already been imported
         if self.app_resources_imported:
             raise ImportError("The app resources can only be imported once.")
 
         self.app_resources_imported = True
 
+        # Set defaults
+        if factories is None:
+            factories = []
+        if scope_import is None:
+            scope_import = {"*": ["*"]}
+
+        # Build folders
         resources_folder = self.app_path / folder
         app_static_folder = resources_folder / static_folder
         app_templates_folder = resources_folder / templates_folder
 
         if not resources_folder.exists():
             raise ImportError(
-                f"Cannot find resources collection folder at {resources_folder}"
+                f"Cannot find resources collection folder at: {resources_folder}"
             )
 
         if not resources_folder.is_dir():
-            raise ImportError(f"Global collection must be a folder {resources_folder}")
+            raise ImportError(f"Resources collection must be a folder, value given: {resources_folder}")
 
         self.app.static_folder = (
             app_static_folder.as_posix() if app_static_folder.exists() else None
@@ -313,9 +118,6 @@ class Imp:
         self.app.template_folder = (
             app_templates_folder.as_posix() if app_templates_folder.exists() else None
         )
-
-        import_all_files = True if "*" in files_to_import else False
-        import_all_folders = True if "*" in folders_to_import else False
 
         skip_folders = (
             "static",
@@ -326,65 +128,51 @@ class Imp:
             if item.name.startswith("__"):
                 continue
 
-            # iter over files and folders in the resources folder
             if item.is_file() and item.suffix == ".py":
-                # only pull in python files
-                if not import_all_files:
-                    # if import_all_files is False, only import the files in the list
-                    if item.name not in files_to_import:
-                        continue
+                if "*" in scope_import:
+                    if "*" in scope_import["*"]:
+                        self._import_resource_module(item, factories)
+                    else:
+                        if item.name in scope_import["*"]:
+                            self._import_resource_module(item, factories)
 
-                with self.app.app_context():
-                    file_module = import_module(cast_to_import_str(self.app_name, item))
-
-                for instance_factory in factories:
-                    if hasattr(file_module, instance_factory):
-                        getattr(file_module, instance_factory)(self.app)
+                if "." in scope_import:
+                    if "*" in scope_import["."]:
+                        self._import_resource_module(item, factories)
+                    else:
+                        if item.name in scope_import["."]:
+                            self._import_resource_module(item, factories)
 
             if item.is_dir():
-                # item is a folder
-
+                # skip the static and templates folders
                 if item.name in skip_folders:
-                    # skip the static and templates folders
                     continue
 
-                if not import_all_folders:
-                    # if import_all_folders is False, only import the folders in the list
-                    if item.name not in folders_to_import:
-                        continue
+                for py_file_in_item in item.glob("*.py"):
+                    if "*" in scope_import:
+                        if "*" in scope_import["*"]:
+                            self._import_resource_module(py_file_in_item, factories)
+                        else:
+                            if py_file_in_item.name in scope_import["*"]:
+                                self._import_resource_module(py_file_in_item, factories)
 
-                for py_file in item.glob("*.py"):
-                    with self.app.app_context():
-                        py_file_module = import_module(
-                            f"{cast_to_import_str(self.app_name, item)}.{py_file.stem}"
-                        )
-
-                    for instance_factory in factories:
-                        if hasattr(py_file_module, instance_factory):
-                            getattr(py_file_module, instance_factory)(self.app)
+                    if item.name in scope_import:
+                        if "*" in scope_import[item.name]:
+                            self._import_resource_module(py_file_in_item, factories)
+                        else:
+                            if py_file_in_item.name in scope_import[item.name]:
+                                self._import_resource_module(py_file_in_item, factories)
 
     def init_session(self) -> None:
         """
-        Initialize the session variables found in the config. Commonly used in `app.before_request`.
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            @app.before_request
-            def before_request():
-                imp.init_session()
-
-        :raw-html:`<br />`
-
-        -----
-
         :return: None
         """
-        if self.config.INIT_SESSION:
-            session.update(
-                {k: v for k, v in self.config.INIT_SESSION.items() if k not in session}
-            )
+        if self.config.IMP_INIT_SESSION:
+            @self.app.before_request
+            def imp_before_request():
+                session.update(
+                    {k: v for k, v in self.config.IMP_INIT_SESSION.items() if k not in session}
+                )
 
     def import_blueprint(self, blueprint: str) -> None:
         """
@@ -498,62 +286,20 @@ class Imp:
         :param blueprint: The blueprint (folder name) to import. Must be relative.
         :return: None
         """
-
-        def process_nested_blueprint_registration(
-            parent: t.Union[Blueprint, ImpBlueprint],
-            child: t.Union[Blueprint, ImpBlueprint],
-        ):
-            if hasattr(child, "config"):
-                if child.config.ENABLED:
-                    parent.register_blueprint(child)
-
-                    if hasattr(child, "_models"):
-                        for partial_model in child._models:
-                            partial_model(imp_instance=self)
-
-                    if hasattr(child, "set_app_config"):
-                        child.set_app_config(self.app, self.app_path)
-
-                else:
-                    print(f"Blueprint {child.name} is disabled")
-
-        def process_blueprint_registration(pbp: t.Union[Blueprint, ImpBlueprint]):
-            if hasattr(pbp, "config"):
-                if pbp.config.ENABLED:
-                    if hasattr(pbp, "_nested_blueprints"):
-                        for nested_bp in pbp._nested_blueprints:
-                            process_nested_blueprint_registration(pbp, nested_bp)
-
-                    if hasattr(pbp, "_models"):
-                        for partial_model in pbp._models:
-                            partial_model(imp_instance=self)
-
-                    if hasattr(pbp, "set_app_config"):
-                        pbp.set_app_config(self.app, self.app_path)
-
-                    self.app.register_blueprint(pbp)
-
-                else:
-                    print(f"Blueprint {potential_bp.name} is disabled")
-            else:
-                self.app.register_blueprint(pbp)
+        from . import ImpBlueprint
 
         if Path(blueprint).is_absolute():
-            potential_bp = Path(blueprint)
+            blueprint_path = Path(blueprint)
         else:
-            potential_bp = Path(self.app_path / blueprint)
+            blueprint_path = Path(self.app_path / blueprint)
 
-        if potential_bp.exists() and potential_bp.is_dir():
-            # try:
-            module = import_module(cast_to_import_str(self.app_name, potential_bp))
-            for name, potential in getmembers(module):
-                if isinstance(potential, Blueprint) or isinstance(
-                    potential, ImpBlueprint
+        if blueprint_path.exists() and blueprint_path.is_dir():
+            module = import_module(cast_to_import_str(self.app_name, blueprint_path))
+            for name, potential_blueprint in getmembers(module):
+                if isinstance(potential_blueprint, Blueprint) or isinstance(
+                        potential_blueprint, ImpBlueprint
                 ):
-                    process_blueprint_registration(potential)
-
-            # except Exception as e:
-            #     raise ImportError(f"Error when importing {potential_bp.name}: {e}")
+                    self._process_blueprint_registration(potential_blueprint)
 
     def import_blueprints(self, folder: str) -> None:
         """
@@ -683,33 +429,19 @@ class Imp:
         :return: None
         """
 
-        def model_processor(path: Path):
-            """
-            Picks apart the model from_file and builds a registry of the models found.
-            """
-            import_string = cast_to_import_str(self.app_name, path)
-            try:
-                model_module = import_module(import_string)
-                for name, value in getmembers(model_module, isclass):
-                    if hasattr(value, "__tablename__"):
-                        self.model_registry.add(name, value)
-
-            except ImportError as e:
-                raise ImportError(f"Error when importing {import_string}: {e}")
-
         if Path(file_or_folder).is_absolute():
             file_or_folder_path = Path(file_or_folder)
         else:
             file_or_folder_path = Path(self.app_path / file_or_folder)
 
         if file_or_folder_path.is_file() and file_or_folder_path.suffix == ".py":
-            model_processor(file_or_folder_path)
+            self._process_model(file_or_folder_path)
 
         elif file_or_folder_path.is_dir():
             for model_file in [
                 _ for _ in file_or_folder_path.iterdir() if "__" not in _.name
             ]:
-                model_processor(model_file)
+                self._process_model(model_file)
 
     def model(self, class_: str) -> DefaultMeta:
         """
@@ -835,3 +567,90 @@ class Imp:
             "location": class_.__module__,
             "table_name": class_.__tablename__,
         }
+
+    def _apply_sqlalchemy_config(self):
+        if "SQLALCHEMY_DATABASE_URI" not in self.app.config:
+            build_database_main(
+                self.app,
+                self.app_path,
+                self.config.IMP_DATABASE_MAIN
+            )
+
+        if "SQLALCHEMY_BINDS" not in self.app.config:
+            build_database_binds(
+                self.app,
+                self.app_path,
+                self.config.IMP_DATABASE_BINDS
+            )
+
+    def _import_resource_module(self, module: Path, factories: list):
+        try:
+            with self.app.app_context():
+                file_module = import_module(cast_to_import_str(self.app_name, module))
+
+                for instance_factory in factories:
+                    if hasattr(file_module, instance_factory):
+                        getattr(file_module, instance_factory)(self.app)
+
+        except ImportError as e:
+            raise ImportError(f"Error when importing {module}: {e}")
+
+    def _process_blueprint_registration(self, blueprint: t.Union[Blueprint, ImpBlueprint]):
+        from . import ImpBlueprint
+
+        if isinstance(blueprint, ImpBlueprint):
+            if blueprint.config.enabled:
+                if hasattr(blueprint, "_nested_blueprints"):
+                    for nested_bp in blueprint._nested_blueprints:  # noqa
+                        self._process_nested_blueprint_registration(blueprint, nested_bp)
+
+                if hasattr(blueprint, "_models"):
+                    for partial_model in blueprint._models:  # noqa
+                        partial_model(imp_instance=self)
+
+                if hasattr(blueprint, "_database_binds"):
+                    for partial_database_bind in blueprint._database_binds:  # noqa
+                        partial_database_bind(imp_instance=self)
+
+                if hasattr(blueprint, "set_app_config"):
+                    blueprint.set_app_config(self.app, self.app_path)
+
+                self.app.register_blueprint(blueprint)
+
+            else:
+                print(f"Blueprint {blueprint.name} is disabled")
+        else:
+            self.app.register_blueprint(blueprint)
+
+    def _process_nested_blueprint_registration(
+            self,
+            parent: t.Union[Blueprint, ImpBlueprint],
+            child: t.Union[Blueprint, ImpBlueprint],
+    ):
+        if hasattr(child, "config"):
+            if child.config.enabled:
+                parent.register_blueprint(child)
+
+                if hasattr(child, "_models"):
+                    for partial_model in child._models:  # noqa
+                        partial_model(imp_instance=self)
+
+                if hasattr(child, "set_app_config"):
+                    child.set_app_config(self.app, self.app_path)
+
+            else:
+                print(f"Blueprint {child.name} is disabled")
+
+    def _process_model(self, path: Path):
+        """
+        Picks apart the model from_file and builds a registry of the models found.
+        """
+        import_string = cast_to_import_str(self.app_name, path)
+        try:
+            model_module = import_module(import_string)
+            for name, value in getmembers(model_module, isclass):
+                if hasattr(value, "__tablename__"):
+                    self.model_registry.add(name, value)
+
+        except ImportError as e:
+            raise ImportError(f"Error when importing {import_string}: {e}")
