@@ -47,6 +47,8 @@ class ImpBlueprint(Blueprint):
             config: ImpBlueprintConfig
     ) -> None:
         """
+        Initializes the ImpBlueprint.
+
         :param dunder_name: __name__
         :param config: The blueprint's config.
         """
@@ -101,59 +103,8 @@ class ImpBlueprint(Blueprint):
         Will import all the resources (cli, routes, filters, context_processors...) from the given folder.
         Given folder must be relative to the blueprint (in the same folder as the __init__.py file).
 
-        **Example use:**
-
-        --- Folder structure ---
-
-        .. code-block::
-
-            my_blueprint
-            ├── user_routes
-            │   ├── user_dashboard.py
-            │   └── user_settings.py
-            ├── car_routes
-            │   ├── car_dashboard.py
-            │   └── car_settings.py
-            ├── __init__.py
-            └── config.toml
-
-        :raw-html:`<br />`
-
-        --- __init__.py ---
-
-        .. code-block::
-
-            from flask_imp import Blueprint
-
-            bp = Blueprint(__name__)
-
-            bp.import_resources("user_routes")
-            bp.import_resources("car_routes")
-            ...
-
-        :raw-html:`<br />`
-
-        --- user_dashboard.py ---
-
-        .. code-block::
-
-            from flask import render_template
-
-            from .. import bp
-
-            @bp.route("/user-dashboard")
-            def user_dashboard():
-                return render_template(bp.tmpl("user_dashboard.html"))
-
-        :raw-html:`<br />`
-
-        The endpoint my_blueprint.user_dashboard will be available at /my_blueprint/user-dashboard
-
-        :raw-html:`<br />`
-
-        -----
-
         :param folder: Folder to look for resources in. Defaults to "routes". Must be relative.
+        :return: None
         """
 
         resource_path = self.location / folder
@@ -174,53 +125,6 @@ class ImpBlueprint(Blueprint):
         """
         Imports the specified Flask-Imp Blueprint or a standard Flask Blueprint as a nested blueprint,
         under the current blueprint.
-
-        :raw-html:`<br />`
-
-        Has the same import rules as the `Imp.import_blueprint()` method.
-
-        :raw-html:`<br />`
-
-        **Must be setup in a Python package**
-
-        :raw-html:`<br />`
-
-        **Example:**
-
-        :raw-html:`<br />`
-
-        --- Folder structure ---
-        .. code-block::
-
-            app
-            ├── my_blueprint
-            │   ├── ...
-            │   ├── my_nested_blueprint
-            │   │   ├── ...
-            │   │   ├── __init__.py
-            │   │   └── config.toml
-            │   ├── __init__.py
-            │   └── config.toml
-            └── ...
-
-        :raw-html:`<br />`
-
-        --- my_blueprint/__init__.py ---
-
-        .. code-block::
-
-            from flask_imp import Blueprint
-
-            bp = Blueprint(__name__)
-
-            bp.import_nested_blueprint("my_nested_blueprint")
-
-            ...
-
-
-        :raw-html:`<br />`
-
-        -----
 
         :param blueprint: The blueprint (folder name) to import. Must be relative.
         :return: None
@@ -243,65 +147,8 @@ class ImpBlueprint(Blueprint):
         """
         Imports all blueprints in the given folder.
 
-        .. Note::
-            Folder has no requirement to be a Python package.
-
-        :raw-html:`<br />`
-
-        See `Imp.import_nested_blueprint()` for more information.
-
-        :raw-html:`<br />`
-
-        **Example:**
-
-        :raw-html:`<br />`
-
-        --- Folder structure ---
-
-        .. code-block::
-
-            app
-            ├── my_blueprint
-            │   ├── ...
-            │   ├── nested_blueprints
-            │   │   ├── my_nested_blueprint_1
-            │   │   │   ├── ...
-            │   │   │   ├── __init__.py
-            │   │   │   └── config.toml
-            │   │   ├── my_nested_blueprint_2
-            │   │   │   ├── ...
-            │   │   │   ├── __init__.py
-            │   │   │   └── config.toml
-            │   │   └── my_nested_blueprint_3
-            │   │       ├── ...
-            │   │       ├── __init__.py
-            │   │       └── config.toml
-            │   ├── __init__.py
-            │   └── config.toml
-            └── ...
-
-        :raw-html:`<br />`
-
-        --- my_blueprint/__init__.py ---
-
-        .. code-block::
-
-            from flask_imp import Blueprint
-
-            bp = Blueprint(__name__)
-            bp.import_nested_blueprints("nested_blueprints")
-            ...
-
-        :raw-html:`<br />`
-
-        All blueprints in the nested_blueprints folder will be imported and nested under my_blueprint.
-
-        :raw-html:`<br />`
-
-        -----
-
         :param folder: Folder to look for nested blueprints in.
-        Must be relative.
+        :return: None
         """
 
         folder_path = Path(self.location / folder)
@@ -316,84 +163,6 @@ class ImpBlueprint(Blueprint):
     def import_models(self, file_or_folder: str) -> None:
         """
         Same actions as `Imp.import_models()`, but scoped to the current blueprint's package.
-
-        :raw-html:`<br />`
-
-        **Each model found will be added to the model registry.**
-
-        :raw-html:`<br />`
-
-        See: `Imp.model()` for more information.
-
-        :raw-html:`<br />`
-
-        **Example usage from files:**
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            # in my_blueprint/__init__.py
-            bp.import_models("users.py")
-            bp.import_models("cars.py")
-
-        :raw-html:`<br />`
-
-        -- Folder structure --
-
-        .. code-block::
-
-            my_blueprint
-            ├── ...
-            ├── users.py
-            ├── cars.py
-            ├── config.toml
-            └── __init__.py
-
-
-        :raw-html:`<br />`
-
-        **Example usage from folders:**
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            # in my_blueprint/__init__.py
-            bp.import_models("models")
-
-        :raw-html:`<br />`
-
-        -- Folder structure --
-
-        .. code-block::
-
-            my_blueprint
-            ├── ...
-            ├── models
-            │   ├── users.py
-            │   └── cars.py
-            ├── config.toml
-            └── __init__.py
-
-        :raw-html:`<br />`
-
-        **Example of model file:**
-
-        :raw-html:`<br />`
-
-        -- users.py --
-
-        .. code-block::
-
-            from app.extensions import db
-
-            class User(db.Model):
-                attribute = db.Column(db.String(255))
-
-        :raw-html:`<br />`
-
-        -----
 
         :param file_or_folder: The file or folder to import from. Must be relative.
         :return: None
@@ -411,45 +180,6 @@ class ImpBlueprint(Blueprint):
         Pushes the blueprint name to the template name.
         This saves time in having to type out the blueprint name when rendering a
         template file from the blueprint's template folder.
-
-        :raw-html:`<br />`
-
-        **Example usage:**
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            @bp.route("/")
-            def index():
-                return render_template(bp.tmpl("index.html"))
-
-        :raw-html:`<br />`
-
-        -- Folder structure --
-
-        .. code-block::
-
-            my_blueprint
-            ├── ...
-            ├── templates
-            │   └── my_blueprint
-            │       └── index.html
-            ├── config.toml
-            └── __init__.py
-
-        :raw-html:`<br />`
-
-        bp.tmpl("index.html") will return "my_blueprint/index.html"
-
-        :raw-html:`<br />`
-
-        This use case is a common workaround in Flask to allow for multiple templates with the same name,
-        but in different registered template folders.
-
-        :raw-html:`<br />`
-
-        -----
 
         :param template: The template name to push the blueprint name to.
         :return: str - The template name with the blueprint name pushed to it.

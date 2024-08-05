@@ -173,6 +173,8 @@ class Imp:
 
     def import_blueprint(self, blueprint: str) -> None:
         """
+        Import a blueprint from the given package.
+
         :param blueprint: The blueprint (folder name) to import. Must be relative.
         :return: None
         """
@@ -190,6 +192,8 @@ class Imp:
 
     def import_blueprints(self, folder: str) -> None:
         """
+        Import all blueprints from the given folder.
+
         :param folder: The folder to import from. Must be relative.
         :return: None
         """
@@ -207,6 +211,8 @@ class Imp:
 
     def import_models(self, file_or_folder: str) -> None:
         """
+        Import all models from the given file or folder.
+
         :param file_or_folder: The file or folder to import from. Must be relative.
         :return: None
         """
@@ -227,6 +233,8 @@ class Imp:
 
     def model(self, class_: str) -> DefaultMeta:
         """
+        Returns the model class for the given ORM class name.
+
         :param class_: The class name of the model to return.
         :return: The model class [DefaultMeta].
         """
