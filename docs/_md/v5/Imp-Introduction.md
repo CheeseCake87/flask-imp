@@ -23,7 +23,6 @@ app/
 │   ├── static/...
 │   └── templates/...
 ├── models/...
-├── config.py
 └── __init__.py
 ```
 
@@ -33,6 +32,7 @@ Here's an example of the `app/__init__.py` file:
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_imp import Imp
+from flask_imp.config import FlaskConfig, ImpConfig
 
 db = SQLAlchemy()
 imp = Imp()
@@ -40,7 +40,13 @@ imp = Imp()
 
 def create_app():
     app = Flask(__name__)
-    imp.init_app(app)
+    FlaskConfig(
+        secret_key="super_secret_key",
+    ).apply_config(app)
+    
+    imp.init_app(app, config=ImpConfig(
+        init_session={"logged_in": False},
+    ))
     db.init_app(app)
 
     imp.import_app_resources("resources")
@@ -50,13 +56,17 @@ def create_app():
     return app
 ```
 
-The `init_app` method of the Imp class will automatically load configuration
-if the config argument is not set to `None`.
+The Flask configuration can be loaded from any standard Flask configuration method, or from the `FlaskConfig` class
+shown above.
 
-An attempt to load the configuration from either `config.toml` file or a `Config`
-class from a `config.py` file will be made.
+This class contains the standard Flask configuration options found in the Flask documentation.
 
-For more information about the `config` parameter see: [Imp / config.x](imp-config-x.html)
+The `ImpConfig` class is used to configure the `Imp` instance.
+
+The `init_session` option of the `ImpConfig` class is used to set the initial session variables for the Flask app. 
+This happens before the request is processed.
+
+For more information about the configuration setting see the flask_imp.config section.
 
 `import_app_resources` will walk one level deep into the `resources` folder, and import 
 all `.py` files as modules. 
@@ -75,4 +85,4 @@ here: [Imp.x / import_models](imp_x-import_models.html) and [Imp.x / model](imp_
 It will check each blueprint folder's `__init__.py` file for an instance of a Flask Blueprint or a
 Flask-Imp Blueprint. That instant will then be registered with the Flask app.
 
-See more about how importing blueprints work here: [Blueprint / Introduction](blueprint-introduction.html)
+See more about how importing blueprints work here: [ImpBlueprint / Introduction](impblueprint-introduction.html)

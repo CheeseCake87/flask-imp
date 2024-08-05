@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Imp.import_app_resources | Flask-Imp</title>
+    <link rel="stylesheet" href="static/water.css">
+    <link rel="stylesheet" href="static/pygments.emacs-dull.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+    <link rel="manifest" href="static/site.webmanifest">
+    <link rel="mask-icon" href="static/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+
+<aside>
+    <img src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px; width: 50%">
+    <h1>Flask-Imp</h1>
+    <div><small>Version: 4.0.x</small></div>
+    <div><small>Last Updated:</small></div>
+    <div><small>Mon, 05 Aug 2024</small></div>
+
+    <p><a href="../v4/index.html">Switch to version 4 docs</a></p>
+    <p><a href="../v3/index.html">Switch to version 3 docs</a></p>
+
+    <h2>Menu</h2>
+    <ul>
+        <li><a href="index.html"><strong>Index</strong></a></li>
+    </ul>
+    <ul>
+        
+            
+                <li><strong>CLI Commands</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_init.html">flask-imp init</a></li>
+                        
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_blueprint.html">flask-imp blueprint</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Imp</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="imp-introduction.html">Introduction</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>ImpBlueprint</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="impblueprint-introduction.html">Introduction</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Imp.x</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="imp_x-init_app-init.html">init_app, __init__</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-init_session.html">init_session</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_app_resources.html">import_app_resources</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_blueprint.html">import_blueprint</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_blueprints.html">import_blueprints</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_models.html">import_models</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-model.html">model</a></li>
+                        
+                    
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>ImpBlueprint.x</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="impblueprint-init.html">__init__</a></li>
+                        
+                    
+                        
+                    
+                        
+                            <li><a href="impblueprint_x-import_resources.html">import_resources</a></li>
+                        
+                    
+                        
+                            <li><a href="impblueprint_x-import_nested_blueprint.html">import_nested_blueprint</a></li>
+                        
+                    
+                        
+                            <li><a href="impblueprint_x-import_nested_blueprints.html">import_nested_blueprints</a></li>
+                        
+                    
+                        
+                            <li><a href="impblueprint_x-import_models.html">import_models</a></li>
+                        
+                    
+                        
+                            <li><a href="impblueprint_x-tmpl.html">tmpl</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>flask_imp.config</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="flask_imp_config-flaskconfig.html">FlaskConfig</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_config-impconfig.html">ImpConfig</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_config-impblueprintconfig.html">ImpBlueprintConfig</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_config-databaseconfig.html">DatabaseConfig</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>flask_imp.security</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="flask_imp_security-login_check.html">login_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-permission_check.html">permission_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-pass_function_check.html">pass_function_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-api_login_check.html">api_login_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-include_csrf.html">include_csrf</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>flask_imp.auth</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="flask_imp_auth-encrypt_password.html">encrypt_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-authenticate_password.html">authenticate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_password.html">generate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_salt.html">generate_salt</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_csrf_token.html">generate_csrf_token</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_private_key.html">generate_private_key</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_email_validator.html">generate_email_validator</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_numeric_validator.html">generate_numeric_validator</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_alphanumeric_validator.html">generate_alphanumeric_validator</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-is_email_address_valid.html">is_email_address_valid</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-is_username_valid.html">is_username_valid</a></li>
+                        
+                    
+                </ul>
+            
+        
+    </ul>
+
+    <div style="padding-top: 5px; margin-bottom: 20px;"><small>These docs are generated by a
+        <a href="https://github.com/CheeseCake87/flask-imp/tree/master/gdocs">Flask Static Site Generator</a>
+        built by <a href="https://github.com/CheeseCake87">David Carmichael</a> hosted on GitHub Pages.</small></div>
+</aside>
+
+<section>
+    <h1 style="font-size: 2.6rem; margin: 0;">Imp.import_app_resources</h1>
+    <div class="highlight"><pre><span></span><span class="n">import_app_resources</span><span class="p">(</span>
+    <span class="n">folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;resources&quot;</span><span class="p">,</span>
+    <span class="n">factories</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">static_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+    <span class="n">templates_folder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;templates&quot;</span><span class="p">,</span>
+    <span class="n">files_to_import</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">folders_to_import</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</pre></div>
+<hr />
+<p>Import standard app resources from the specified folder.</p>
+<p>This will import any resources that have been set to the Flask app.</p>
+<p>Routes, context processors, cli, etc.</p>
+<p><strong>Can only be called once.</strong></p>
+<p>If no static and or template folder is found, the static and or template folder will be set to None in the Flask app
+config.</p>
+<h4>Small example of usage:</h4>
+<div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;resources&quot;</span><span class="p">)</span>
+<span class="c1"># or</span>
+<span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">()</span>
+<span class="c1"># as the default folder is &quot;resources&quot;</span>
+</pre></div>
+<p>Folder Structure: <code>resources</code></p>
+<div class="highlight"><pre><span></span>app
+├── resources
+│   ├── routes.py
+│   ├── app_fac.py
+│   ├── static
+│   │   └── css
+│   │       └── style.css
+│   └── templates
+│       └── index.html
+└── ...
+...
+</pre></div>
+<p>File: <code>routes.py</code></p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span> <span class="k">as</span> <span class="n">app</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">render_template</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;index.html&quot;</span><span class="p">)</span>
+</pre></div>
+<h4>How factories work</h4>
+<p>Factories are functions that are called when importing the app resources. Here's an example:</p>
+<div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span>
+    <span class="n">folder</span><span class="o">=</span><span class="s2">&quot;resources&quot;</span><span class="p">,</span>
+    <span class="n">factories</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;development_cli&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+<p><code>[&quot;development_cli&quot;]</code> =&gt; <code>development_cli(app)</code> function will be called, and the current app will be passed in.</p>
+<p>File: <code>app_fac.py</code></p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">development_cli</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">cli</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;dev&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">dev</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dev cli command&quot;</span><span class="p">)</span>
+</pre></div>
+<h4>Scoping imports</h4>
+<p>By default, all files and folders will be imported.</p>
+<p>To disable this, set <code>files_to_import</code> and or
+<code>folders_to_import</code> to <code>[None]</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">imp</span><span class="o">.</span><span class="n">import_app_resources</span><span class="p">(</span><span class="n">scope_import</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">folders_to_import</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+</pre></div>
+<p>To scope the imports, set the <code>files_to_import</code> and or <code>folders_to_import</code> to a list of files and or folders.</p>
+<p><code>files_to_import=[&quot;cli.py&quot;, &quot;routes.py&quot;]</code> =&gt; will only import the files <code>resources/cli.py</code>
+and <code>resources/routes.py</code></p>
+<p><code>folders_to_import=[&quot;template_filters&quot;, &quot;context_processors&quot;]</code> =&gt; will import all files in the folders
+<code>resources/template_filters/*.py</code> and <code>resources/context_processors/*.py</code></p>
+
+</section>
+
+</body>
+</html>
