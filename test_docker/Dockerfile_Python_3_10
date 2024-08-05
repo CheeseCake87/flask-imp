@@ -6,11 +6,11 @@ ENV FLIT_ROOT_INSTALL=1
 COPY tests tests
 COPY flask_imp flask_imp
 COPY pyproject.toml pyproject.toml
-COPY requirements.txt requirements.txt
-COPY requirements_dev.txt requirements_dev.txt
+COPY requirements/development.txt requirements/development.txt
+COPY requirements/main.txt requirements/main.txt
 COPY pyproject.toml pyproject.toml
 COPY README.md README.md
 COPY LICENSE LICENSE
-RUN pip install -r requirements_dev.txt
+RUN pip install -r requirements/development.txt
 RUN flit install
 ENTRYPOINT ["pytest"]

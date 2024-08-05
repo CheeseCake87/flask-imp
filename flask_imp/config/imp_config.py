@@ -11,13 +11,13 @@ class ImpConfig:
     IMP_INIT_SESSION: t.Optional[dict] = None
 
     IMP_DATABASE_MAIN: t.Optional[DatabaseConfig] = None
-    IMP_DATABASE_BINDS: t.Optional[list[DatabaseConfig]] = None
+    IMP_DATABASE_BINDS: t.Optional[t.List[DatabaseConfig]] = None
 
     def __init__(
             self,
             init_session: dict = None,
             database_main: t.Optional[DatabaseConfig] = None,
-            database_binds: t.Optional[list[DatabaseConfig]] = None
+            database_binds: t.Optional[t.List[DatabaseConfig]] = None
     ):
         self.IMP_INIT_SESSION = init_session
         self.IMP_DATABASE_MAIN = database_main
