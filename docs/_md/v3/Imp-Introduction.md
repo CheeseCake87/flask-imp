@@ -58,7 +58,7 @@ Values under `[SESSION]` can be loaded with:
 ```python
 @app.before_request
 def before_request():
-    imp.init_session()
+    imp._init_session()
 ```
 
 See more about the config file here: [Imp / x.config.toml](imp-x-config-toml.html)

@@ -7,7 +7,7 @@ from pathlib import Path
 from flask import Flask, Blueprint, session
 from flask_sqlalchemy.model import DefaultMeta
 
-from .configs import ImpConfig
+from .config import ImpConfig
 from .protocols import ImpBlueprint
 from .registeries import ModelRegistry
 from .utilities import cast_to_import_str, build_database_main, build_database_binds
@@ -17,6 +17,7 @@ class Imp:
     app: Flask
     app_name: str
     app_path: Path
+    app_instance_path: Path
     app_folder: Path
     app_resources_imported: bool = False
 
@@ -38,6 +39,8 @@ class Imp:
             config: ImpConfig = None,
     ) -> None:
         """
+        Initializes the app with the flask-imp extension.
+
         :param app: The flask app to initialize.
         :param config: The config to use
         :return: None
@@ -56,6 +59,7 @@ class Imp:
         self.app = app
         self.app_name = app.name
         self.app_path = Path(self.app.root_path)
+        self.app_instance_path = Path(self.app.instance_path)
         self.app_folder = self.app_path.parent
         self.app.extensions["imp"] = self
 
@@ -68,7 +72,9 @@ class Imp:
             self.config.load_config_from_flask(app)
 
         self._apply_sqlalchemy_config()
-        self.init_session()
+        self._init_session()
+
+        self.app_instance_path.mkdir(exist_ok=True)
 
     def import_app_resources(
             self,
@@ -79,11 +85,13 @@ class Imp:
             scope_import: t.Optional[t.Dict] = None,
     ) -> None:
         """
+        Imports the app resources from the given folder.
+
         :param folder: The folder to import from, must be relative.
         :param factories: A list of function names to call with the app instance.
         :param static_folder: The name of the static folder (if not found will be set to None)
         :param templates_folder: The name of the templates folder (if not found will be set to None)
-        :param scope_import: A dict of files to import e.g. ["folder_name", "routes.py"].
+        :param scope_import: A dict of files to import e.g. {"folder_name": "*"}.
         :return: None
         """
 
@@ -163,130 +171,11 @@ class Imp:
                             if py_file_in_item.name in scope_import[item.name]:
                                 self._import_resource_module(py_file_in_item, factories)
 
-    def init_session(self) -> None:
-        """
-        :return: None
-        """
-        if self.config.IMP_INIT_SESSION:
-            @self.app.before_request
-            def imp_before_request():
-                session.update(
-                    {k: v for k, v in self.config.IMP_INIT_SESSION.items() if k not in session}
-                )
-
     def import_blueprint(self, blueprint: str) -> None:
         """
-        Import a specified Flask-Imp or standard Flask Blueprint.
-
-        :raw-html:`<br />`
-
-        **Must be setup in a Python package**
-
-        :raw-html:`<br />`
-
-        **Example of a Flask-Imp Blueprint:**
-
-        :raw-html:`<br />`
-
-        Will look for a config.toml file in the blueprint folder.
-
-        :raw-html:`<br />`
-
-        --- Folder structure ---
-        .. code-block:: text
-
-            app
-            ├── my_blueprint
-            │   ├── routes
-            │   │   └── index.py
-            │   ├── static
-            │   │   └── css
-            │   │       └── style.css
-            │   ├── templates
-            │   │   └── my_blueprint
-            │   │       └── index.html
-            │   ├── __init__.py
-            │   └── config.toml
-            └── ...
-
-        :raw-html:`<br />`
-
-        --- __init__.py ---
-
-        .. code-block::
-
-            from flask_imp import Blueprint
-
-            bp = Blueprint(__name__)
-
-            bp.import_resources("routes")
-
-
-            @bp.beforeapp_request
-            def beforeapp_request():
-                bp.init_session()
-
-
-        :raw-html:`<br />`
-
-        --- config.toml ---
-
-        .. code-block::
-
-            enabled = "yes"
-
-            [settings]
-            url_prefix = "/my-blueprint"
-            #subdomain = ""
-            #url_defaults = { }
-            #static_folder = "static"
-            #template_folder = "templates"
-            #static_url_path = "/my-blueprint/static"
-            #root_path = ""
-            #cli_group = ""
-
-            [session]
-            session_values_used_by_blueprint = "will be set by bp.init_session()"
-
-        :raw-html:`<br />`
-
-        **Example of a standard Flask Blueprint:**
-
-        :raw-html:`<br />`
-
-        --- Folder structure ---
-
-        .. code-block:: text
-
-            app
-            ├── my_blueprint
-            │   ├── ...
-            │   └── __init__.py
-            └── ...
-
-        :raw-html:`<br />`
-
-        --- __init__.py ---
-
-        .. code-block::
-
-            from flask import Blueprint
-
-            bp = Blueprint("my_blueprint", __name__, url_prefix="/my-blueprint")
-
-
-            @bp.route("/")
-            def index():
-                return "regular_blueprint"
-
-        :raw-html:`<br />`
-
-        -----
-
         :param blueprint: The blueprint (folder name) to import. Must be relative.
         :return: None
         """
-        from . import ImpBlueprint
 
         if Path(blueprint).is_absolute():
             blueprint_path = Path(blueprint)
@@ -296,43 +185,13 @@ class Imp:
         if blueprint_path.exists() and blueprint_path.is_dir():
             module = import_module(cast_to_import_str(self.app_name, blueprint_path))
             for name, potential_blueprint in getmembers(module):
-                if isinstance(potential_blueprint, Blueprint) or isinstance(
-                        potential_blueprint, ImpBlueprint
-                ):
-                    self._process_blueprint_registration(potential_blueprint)
+                if isinstance(potential_blueprint, Blueprint):
+                    self._blueprint_registration(potential_blueprint)
 
     def import_blueprints(self, folder: str) -> None:
         """
-        Imports all the blueprints in the given folder.
-
-        :raw-html:`<br />`
-
-        **Example folder structure:**
-
-        :raw-html:`<br />`
-
-        .. code-block:: text
-
-            app
-            ├── blueprints
-            │   ├── regular_blueprint
-            │   │   ├── ...
-            │   │   └── __init__.py
-            │   └── flask_imp_blueprint
-            │       ├── ...
-            │       ├── config.toml
-            │       └── __init__.py
-            └── ...
-
-        :raw-html:`<br />`
-
-        See: `import_blueprint` for more information.
-
-        :raw-html:`<br />`
-
-        -----
-
         :param folder: The folder to import from. Must be relative.
+        :return: None
         """
 
         folder_path = Path(self.app_path / folder)
@@ -348,83 +207,6 @@ class Imp:
 
     def import_models(self, file_or_folder: str) -> None:
         """
-        Imports all the models from the given file or folder.
-
-
-        :raw-html:`<br />`
-
-        **Each model found will be added to the model registry.**
-
-        See: `Imp.model()` for more information.
-
-        :raw-html:`<br />`
-
-        **Example usage from files:**
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            imp.import_models("users.py")
-            imp.import_models("cars.py")
-
-
-        :raw-html:`<br />`
-
-        -- Folder structure --
-
-        .. code-block::
-
-            app
-            ├── ...
-            ├── users.py
-            ├── cars.py
-            ├── default.config.toml
-            └── __init__.py
-
-        :raw-html:`<br />`
-
-        **Example usage from folders:**
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            imp.import_models("models")
-
-        :raw-html:`<br />`
-
-        -- Folder structure --
-
-        .. code-block::
-
-            app
-            ├── ...
-            ├── models
-            │   ├── users.py
-            │   └── cars.py
-            ├── default.config.toml
-            └── __init__.py
-
-        :raw-html:`<br />`
-
-        **Example of model file:**
-
-        :raw-html:`<br />`
-
-        -- users.py --
-
-        .. code-block::
-
-            from app.extensions import db
-
-            class User(db.Model):
-                attribute = db.Column(db.String(255))
-
-        :raw-html:`<br />`
-
-        -----
-
         :param file_or_folder: The file or folder to import from. Must be relative.
         :return: None
         """
@@ -445,48 +227,6 @@ class Imp:
 
     def model(self, class_: str) -> DefaultMeta:
         """
-        Returns the model class for the given ORM class name.
-
-        :raw-html:`<br />`
-
-        This is used to omit the need to import the models from their locations.
-
-        :raw-html:`<br />`
-
-        **For example, this:**
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            from app.models.user import User
-            from app.models.cars import Cars
-
-        :raw-html:`<br />`
-
-        **Can be replaced with:**
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            from app.extensions import imp
-
-            User = imp.model("User")
-            Cars = imp.model("Cars")
-
-        :raw-html:`<br />`
-
-        imp.model("User") -> <class 'app.models.User'>
-
-        :raw-html:`<br />`
-
-        Although this method is convenient, you lose out on an IDE's ability of attribute and method
-        suggestions due to the type being unknown.
-
-        :raw-html:`<br />`
-
-        -----
         :param class_: The class name of the model to return.
         :return: The model class [DefaultMeta].
         """
@@ -494,58 +234,7 @@ class Imp:
 
     def model_meta(self, class_: t.Union[str, DefaultMeta]) -> dict:
         """
-        Returns meta information for the given ORM class name
-
-        :raw-html:`<br />`
-
-        **Example:**
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            from app.extensions import imp
-
-            User = imp.model("User")
-
-            print(imp.model_meta(User))
-            # or
-            print(imp.model_meta("User"))
-
-        :raw-html:`<br />`
-        Will output:
-
-        {"location": "app.models.user", "table_name": "user"}
-
-        :raw-html:`<br />`
-
-        **Advanced use case:**
-
-        `location` can be used to import a function from the model file using Pythons importlib.
-
-        :raw-html:`<br />`
-
-        Here's an example:
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            from app.extensions import imp
-
-
-            users_meta = imp.model_meta("User")
-            users_module = import_module(users_meta["location"])
-            users_module.some_function()
-
-        :raw-html:`<br />`
-
-        `table_name` is the snake_case version of the class name, pulled from `__table_name__`, which can be useful
-        if you'd like to use the table name in a raw query in a route.
-
-        :raw-html:`<br />`
-
-        -----
+        Returns meta information for the given ORM class name.
 
         :param class_: The class name of the model to return [Class Instance | Name of class as String].
         :return: dict of meta-information.
@@ -572,14 +261,14 @@ class Imp:
         if "SQLALCHEMY_DATABASE_URI" not in self.app.config:
             build_database_main(
                 self.app,
-                self.app_path,
+                self.app_instance_path,
                 self.config.IMP_DATABASE_MAIN
             )
 
         if "SQLALCHEMY_BINDS" not in self.app.config:
             build_database_binds(
                 self.app,
-                self.app_path,
+                self.app_instance_path,
                 self.config.IMP_DATABASE_BINDS
             )
 
@@ -595,14 +284,10 @@ class Imp:
         except ImportError as e:
             raise ImportError(f"Error when importing {module}: {e}")
 
-    def _process_blueprint_registration(self, blueprint: t.Union[Blueprint, ImpBlueprint]):
-        from . import ImpBlueprint
+    def _blueprint_registration(self, blueprint: t.Union[Blueprint, ImpBlueprint]):
 
-        if isinstance(blueprint, ImpBlueprint):
+        if hasattr(blueprint, "config"):
             if blueprint.config.enabled:
-                if hasattr(blueprint, "_nested_blueprints"):
-                    for nested_bp in blueprint._nested_blueprints:  # noqa
-                        self._process_nested_blueprint_registration(blueprint, nested_bp)
 
                 if hasattr(blueprint, "_models"):
                     for partial_model in blueprint._models:  # noqa
@@ -612,34 +297,61 @@ class Imp:
                     for partial_database_bind in blueprint._database_binds:  # noqa
                         partial_database_bind(imp_instance=self)
 
-                if hasattr(blueprint, "set_app_config"):
-                    blueprint.set_app_config(self.app, self.app_path)
+                if hasattr(blueprint, "_nested_blueprints"):
+                    for nested_blueprint in blueprint._nested_blueprints:  # noqa
+                        self._nested_blueprint_registration(blueprint, nested_blueprint)
+
+                if hasattr(blueprint, "init_session"):
+                    if blueprint.init_session:
+                        self.config.IMP_INIT_SESSION.update(blueprint.init_session)
 
                 self.app.register_blueprint(blueprint)
 
+                return
+
             else:
-                print(f"Blueprint {blueprint.name} is disabled")
+
+                self.app.logger.debug(f"Imp Blueprint [{blueprint.name}] is disabled.")
+
         else:
+
             self.app.register_blueprint(blueprint)
 
-    def _process_nested_blueprint_registration(
+    def _nested_blueprint_registration(
             self,
             parent: t.Union[Blueprint, ImpBlueprint],
             child: t.Union[Blueprint, ImpBlueprint],
     ):
+
+        if hasattr(parent, "config"):
+            if not parent.config.enabled:
+                return
+
         if hasattr(child, "config"):
             if child.config.enabled:
-                parent.register_blueprint(child)
+                parent.register_blueprint(child)  # noqa
 
                 if hasattr(child, "_models"):
                     for partial_model in child._models:  # noqa
                         partial_model(imp_instance=self)
 
-                if hasattr(child, "set_app_config"):
-                    child.set_app_config(self.app, self.app_path)
+                if hasattr(child, "_database_binds"):
+                    for partial_database_bind in child._database_binds:  # noqa
+                        partial_database_bind(imp_instance=self)
+
+                if hasattr(child, "init_session"):
+                    if child.init_session:
+                        self.config.IMP_INIT_SESSION.update(child.init_session)
+
+                return
 
             else:
-                print(f"Blueprint {child.name} is disabled")
+
+                self.app.logger.debug(f"Imp Blueprint [{child.name}] is disabled. Parent: [{parent.name}]")
+
+        else:
+
+            parent.register_blueprint(child)
 
     def _process_model(self, path: Path):
         """
@@ -654,3 +366,14 @@ class Imp:
 
         except ImportError as e:
             raise ImportError(f"Error when importing {import_string}: {e}")
+
+    def _init_session(self) -> None:
+        """
+        :return: None
+        """
+        if self.config.IMP_INIT_SESSION:
+            @self.app.before_request
+            def imp_before_request():
+                session.update(
+                    {k: v for k, v in self.config.IMP_INIT_SESSION.items() if k not in session}
+                )

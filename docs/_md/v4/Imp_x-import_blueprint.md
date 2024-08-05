@@ -75,7 +75,7 @@ bp.import_resources("routes")
 
 @bp.before_app_request
 def before_app_request():
-    bp.init_session()
+    bp._init_session()
 ```
 
 File: `routes / index.py`

@@ -14,7 +14,7 @@ Initialize the session variables found in the config. Commonly used in `app.befo
 ```python
 @app.before_request
 def before_request():
-    imp.init_session()
+    imp._init_session()
 ```
 
 File: `default.config.toml`
@@ -43,6 +43,6 @@ Can also be used to reset the values in the session. Here's an example:
 @app.route('/logout')
 def logout():
     session.clear()
-    imp.init_session()
+    imp._init_session()
     return redirect(url_for('index'))
 ```

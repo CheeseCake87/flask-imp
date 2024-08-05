@@ -13,7 +13,7 @@ class Blueprint(t.Protocol):
 class ImpBlueprint(t.Protocol):
     bp_name: str
     enabled: bool
-    config: "ImpBlueprintConfig"
+    config: t.Any
     package: str
     location: Path
 
@@ -38,9 +38,14 @@ class Flask(t.Protocol):
     static_folder: t.Optional[str]
     template_folder: t.Optional[str]
 
+    logger: t.Any
+
     app_context: t.Any
 
     def register_blueprint(self, blueprint: t.Union[Blueprint, ImpBlueprint]): ...
+
+    @property
+    def before_request(self): ...
 
 
 @t.runtime_checkable

@@ -1,0 +1,15 @@
+{% extends 'extends/main.html' %}
+
+{% block content %}
+    <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
+    <div>
+        <p style="margin-bottom: 0;">
+            This template page is located in <code>[app_root]/resources/templates/index.html</code><br/>
+            it extends from <code>[app_root]/resources/templates/extends/main.html</code><br/>
+            with its route defined in <code>[app_root]/resources/routes/routes.py</code><br/><br/>
+            It's being imported by <code>imp.import_app_resources()</code>
+            in the <code>[app_root]/__init__.py</code> file.
+        </p>
+    </div>
+</div>
+{% endblock %}

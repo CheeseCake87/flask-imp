@@ -1,7 +1,28 @@
+import logging
+
 from flask import Flask
 
-from app.config import flask_config, imp_config
 from app.extensions import imp, db
+from flask_imp.config import DatabaseConfig
+from flask_imp.config import FlaskConfig
+from flask_imp.config import ImpConfig
+
+logging.basicConfig(level=logging.DEBUG)
+
+flask_config = FlaskConfig(
+    debug=True,
+    secret_key="secret_key",
+)
+
+imp_config = ImpConfig(
+    init_session={
+        "logged_in": False,
+    },
+    database_main=DatabaseConfig(
+        enabled=True,
+        dialect="sqlite",
+    )
+)
 
 
 def create_app():

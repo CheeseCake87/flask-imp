@@ -6,10 +6,9 @@ from inspect import getmembers
 from pathlib import Path
 
 from flask import Blueprint
-from flask import session
 
-from .configs import DatabaseConfig
-from .configs import ImpBlueprintConfig
+from .config import DatabaseConfig
+from .config import ImpBlueprintConfig
 from .exceptions import NoConfigProvided
 from .utilities import (
     cast_to_import_str,
@@ -236,9 +235,7 @@ class ImpBlueprint(Blueprint):
                 cast_to_import_str(self.package.split(".")[0], potential_bp)
             )
             for name, potential in getmembers(module):
-                if isinstance(potential, Blueprint) or isinstance(
-                        potential, ImpBlueprint
-                ):
+                if isinstance(potential, Blueprint):
                     self._nested_blueprints.add(potential)
 
     @_prevent_if_disabled
@@ -314,36 +311,6 @@ class ImpBlueprint(Blueprint):
 
         for potential_bp in folder_path.iterdir():
             self.import_nested_blueprint(f"{potential_bp}")
-
-    @_prevent_if_disabled
-    def init_session(self) -> None:
-        """
-        Similar to the `Imp.init_session()` method,
-        but scoped to the current blueprint's config.toml session values.
-
-        :raw-html:`<br />`
-
-        **Example usage:**
-
-        :raw-html:`<br />`
-
-        .. code-block::
-
-            @bp.before_app_request
-            def before_app_request():
-                bp.init_session()
-
-        :raw-html:`<br />`
-
-        -----
-
-        :return: None
-
-        """
-        for key in self.config.init_session or {}:
-            if key not in session:
-                session.update(self.config.init_session)
-                break
 
     @_prevent_if_disabled
     def import_models(self, file_or_folder: str) -> None:

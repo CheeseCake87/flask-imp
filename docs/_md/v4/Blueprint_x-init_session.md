@@ -15,5 +15,5 @@ Blueprint's config file.
 ```python
 @bp.before_app_request
 def before_app_request():
-    bp.init_session()
+    bp._init_session()
 ```

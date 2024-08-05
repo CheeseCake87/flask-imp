@@ -1,10 +1,9 @@
-from flask_imp import Blueprint
+from flask_imp import ImpBlueprint
+from flask_imp.config import ImpBlueprintConfig
 
-bp = Blueprint(__name__)
+bp = ImpBlueprint(__name__, ImpBlueprintConfig(
+    url_prefix="/root-blueprint",
+    init_session={"root_blueprint_session": True}
+))
 
 bp.import_resources("routes")
-
-
-@bp.before_app_request
-def before_app_request():
-    bp.init_session()
