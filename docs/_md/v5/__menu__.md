@@ -3,10 +3,8 @@
     - flask-imp blueprint
 - Imp
     - Introduction
-    - config.x
-- Blueprint
+- ImpBlueprint
     - Introduction
-    - config.x
 - Imp.x
     - init_app, __init__
     - init_session
@@ -16,7 +14,7 @@
     - import_models
     - model
     - model_meta
-- Blueprint.x
+- ImpBlueprint.x
     - __init__
     - init_session
     - import_resources
@@ -24,6 +22,11 @@
     - import_nested_blueprints
     - import_models
     - tmpl
+- flask_imp.config
+    - FlaskConfig
+    - ImpConfig
+    - ImpBlueprintConfig
+    - DatabaseConfig
 - flask_imp.security
     - login_check
     - permission_check
