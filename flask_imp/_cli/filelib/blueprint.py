@@ -1,88 +1,20 @@
-from dataclasses import dataclass
+def blueprint_init_py(url_prefix: str, name: str) -> str:
+    return f"""\
+from flask_imp import ImpBlueprint
+from flask_imp.config import ImpBlueprintConfig
 
-
-@dataclass(frozen=True)
-class BlueprintFileLib:
-    # Format to: NONE
-    init_py = """\
-from flask_imp import Blueprint
-
-bp = Blueprint(__name__)
+bp = Blueprint(__name__, ImpBlueprintConfig(
+    enabled=True,
+    url_prefix="/{url_prefix}",
+    init_session={{ "{name}_session_loaded": True }},
+))
 
 bp.import_resources("routes")
-
-
-@bp.before_app_request
-def before_app_request():
-    bp.init_session()
 """
 
-    # Format to: name, url_prefix
-    config_toml = """\
-ENABLED = "yes"
 
-[SETTINGS]
-URL_PREFIX = "/{url_prefix}"
-#SUBDOMAIN = ""
-#URL_DEFAULTS = {{}}
-STATIC_FOLDER = "static"
-TEMPLATE_FOLDER = "templates"
-STATIC_URL_PATH = "/static"
-#ROOT_PATH = ""
-#CLI_GROUP = ""
-
-[INIT_SESSION]
-#{name}_session = "yes"
-
-# Set ENABLED to true to allow the blueprint
-# to create a database bind, change settings accordingly.
-[DATABASE_BIND]
-ENABLED = false
-DIALECT = "sqlite"
-NAME = "{name}"
-BIND_KEY = "{name}"
-LOCATION = ""
-PORT = ""
-USERNAME = ""
-PASSWORD = ""
-"""
-
-    # Format to: name, url_prefix
-    config_py = """\
-from flask_imp import ImpBlueprintConfig, DatabaseConfig
-
-
-class Config(ImpBlueprintConfig):
-    ENABLED: bool = True
-    URL_PREFIX: str = "/{url_prefix}"
-    # SUBDOMAIN: str = ""
-    # URL_DEFAULTS: dict = {{}}
-    STATIC_FOLDER: str = "static"
-    TEMPLATE_FOLDER: str = "templates"
-    STATIC_URL_PATH: str = "/static"
-    # ROOT_PATH: str = ""
-    # CLI_GROUP: str = ""
-
-    INIT_SESSION: dict = {{
-        "{name}_session": "yes"
-    }}
-
-    DATABASE_BINDS: dict[DatabaseConfig] = {{
-        DatabaseConfig(
-            ENABLED=False,
-            DIALECT="sqlite",
-            NAME="{name}",
-            BIND_KEY="{name}",
-            LOCATION="",
-            PORT=0,
-            USERNAME="",
-            PASSWORD="",
-        )
-    }}
-    """
-
-    # Format to: Name
-    routes_index_py = """\
+def blueprint_routes_index_py():
+    return """\
 from flask import render_template
 
 from .. import bp
@@ -93,8 +25,9 @@ def index():
     return render_template(bp.tmpl("index.html"))
 """
 
-    # Format to: root, name, flask_imp_logo
-    templates_index_html = """\
+
+def blueprint_templates_index_html(name: str, root: str) -> str:
+    return f"""\
 {{% extends '{name}/extends/main.html' %}}
 
 {{% block content %}}
@@ -109,8 +42,11 @@ def index():
 {{% endblock %}}
 """
 
-    # Format to: name, flask_imp_logo, index_html, extends_main_html, index_py, init_py
-    ia_templates_index_html = """\
+
+def blueprint_init_app_templates_index_html(
+        name: str, index_html: str, extends_main_html: str, index_py: str, init_py: str
+):
+    return f"""\
 {{% extends 'www/extends/main.html' %}}
 
 {{% block content %}}
@@ -130,8 +66,11 @@ def index():
 {{% endblock %}}
 """
 
-    # Format to: head_tag
-    templates_extends_main_html = """\
+
+def blueprint_templates_extends_main_html(
+        name: str, head_tag: str
+):
+    return f"""\
 <!doctype html>
 
 <html lang="en">
@@ -148,8 +87,11 @@ def index():
 </html>
 """
 
-    # Format to: header_html, main_html
-    templates_includes_header_html = """\
+
+def blueprint_templates_includes_header_html(
+        header_html: str, main_html: str, static_path: str
+):
+    return f"""\
 <div style="display: flex; flex-direction: row; align-items: center;
             justify-content: start; gap: 2rem; margin-bottom: 2rem;">
     <img style="border-radius: 50%"
@@ -162,8 +104,12 @@ def index():
 </div>
 """
 
-    # Format to: footer_html, main_html
-    templates_includes_footer_html = """\
+
+# Format to: footer_html, main_html
+def blueprint_templates_includes_footer_html(
+        footer_html: str, main_html: str
+):
+    f"""\
 <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
     <div>
         <p>This is the footer, located here: <code>{footer_html}</code></p>

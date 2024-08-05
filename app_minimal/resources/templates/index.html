@@ -1,7 +1,37 @@
-{% extends 'extends/main.html' %}
+<!doctype html>
 
-{% block content %}
-    <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %}Flask-Imp Route: index</title>
+    <base href="{{ request.base_url }}">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <meta name="googlebot" content="noindex">
+    <meta name="ICBM" content="55.86012186235461, -4.252010320043988">
+    <meta name="geo.position" content="55.86012186235461;-4.252010320043988">
+    <meta name="geo.region" content="GB-SCT">
+    <meta name="geo.placename" content="Glasgow">
+    <meta name="DC.title" content="Flask-Imp Route: index"/>
+    <meta name="rating" content="general">
+    <meta name="subject" content="Your document's subject">
+    <meta name="description" content="A description of the page">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/water.css') }}">
+
+</head>
+
+<body>
+<div style="display: flex; flex-direction: row; align-items: center;
+            justify-content: start; gap: 2rem; margin-bottom: 2rem;">
+    <img style="border-radius: 50%"
+         src="{{ url_for('static', filename='img/flask-imp-logo.png') }}" alt="flask-imp logo">
+    <h1 style="font-size: 4rem;">Flask-Imp</h1>
+</div>
+
+<h2 style="margin: 0;">Minimal App</h2>
+
+<div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
     <div>
         <p style="margin-bottom: 0;">
             This template page is located in <code>[app_root]/resources/templates/index.html</code><br/>
@@ -12,4 +42,6 @@
         </p>
     </div>
 </div>
-{% endblock %}
+</body>
+
+</html>

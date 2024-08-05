@@ -1,10 +1,12 @@
 from sqlalchemy import select, update, delete, insert
 
 from app_full.extensions import db
-from flask_imp.auth import authenticate_password
-from flask_imp.auth import encrypt_password
-from flask_imp.auth import generate_private_key
-from flask_imp.auth import generate_salt
+from flask_imp.auth import (
+    authenticate_password,
+    encrypt_password,
+    generate_private_key,
+    generate_salt,
+)
 
 
 class ExampleUserTable(db.Model):

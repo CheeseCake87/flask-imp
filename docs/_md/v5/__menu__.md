@@ -3,9 +3,6 @@
     - flask-imp blueprint
 - Imp
     - Introduction
-- ImpBlueprint
-    - Introduction
-- Imp.x
     - init_app, __init__
     - init_session
     - import_app_resources
@@ -14,7 +11,8 @@
     - import_models
     - model
     - model_meta
-- ImpBlueprint.x
+- ImpBlueprint
+    - Introduction
     - __init__
     - init_session
     - import_resources

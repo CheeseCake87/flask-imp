@@ -1,5 +1,5 @@
 ```
-Menu = ImpBlueprint.x/__init__
+Menu = ImpBlueprint/__init__
 Title = Flask-Imp Blueprint __init__
 ```
 
@@ -14,4 +14,4 @@ Initializes the Flask-Imp Blueprint.
 `dunder_name` should always be set to `__name__`
 
 `config` is an instance of `ImpBlueprintConfig` that will be used to load the Blueprint's configuration. 
-See [flask_imp.config / ImpBlueprintConfig](ImpBlueprintConfig.html) for more information.
+See [flask_imp.config / ImpBlueprintConfig](flask_imp_config-impblueprintconfig.html) for more information.

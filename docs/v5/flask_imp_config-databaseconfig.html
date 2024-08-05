@@ -58,6 +58,36 @@
                             <li><a href="imp-introduction.html">Introduction</a></li>
                         
                     
+                        
+                            <li><a href="imp-init_app-init.html">init_app, __init__</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-init_session.html">init_session</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_app_resources.html">import_app_resources</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_blueprint.html">import_blueprint</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_blueprints.html">import_blueprints</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_models.html">import_models</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-model.html">model</a></li>
+                        
+                    
+                        
+                    
                 </ul>
             
         
@@ -71,54 +101,6 @@
                             <li><a href="impblueprint-introduction.html">Introduction</a></li>
                         
                     
-                </ul>
-            
-        
-            
-                <li><strong>Imp.x</strong></li>
-            
-            
-                <ul>
-                    
-                        
-                            <li><a href="imp_x-init_app-init.html">init_app, __init__</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-init_session.html">init_session</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_app_resources.html">import_app_resources</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_blueprint.html">import_blueprint</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_blueprints.html">import_blueprints</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_models.html">import_models</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-model.html">model</a></li>
-                        
-                    
-                        
-                    
-                </ul>
-            
-        
-            
-                <li><strong>ImpBlueprint.x</strong></li>
-            
-            
-                <ul>
-                    
                         
                             <li><a href="impblueprint-init.html">__init__</a></li>
                         
@@ -126,23 +108,23 @@
                         
                     
                         
-                            <li><a href="impblueprint_x-import_resources.html">import_resources</a></li>
+                            <li><a href="impblueprint-import_resources.html">import_resources</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-import_nested_blueprint.html">import_nested_blueprint</a></li>
+                            <li><a href="impblueprint-import_nested_blueprint.html">import_nested_blueprint</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-import_nested_blueprints.html">import_nested_blueprints</a></li>
+                            <li><a href="impblueprint-import_nested_blueprints.html">import_nested_blueprints</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-import_models.html">import_models</a></li>
+                            <li><a href="impblueprint-import_models.html">import_models</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-tmpl.html">tmpl</a></li>
+                            <li><a href="impblueprint-tmpl.html">tmpl</a></li>
                         
                     
                 </ul>
@@ -264,7 +246,27 @@
 
 <section>
     <h1 style="font-size: 2.6rem; margin: 0;">DatabaseConfig - flask_imp.config</h1>
-    
+    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.config</span> <span class="kn">import</span> <span class="n">DatabaseConfig</span>
+</pre></div>
+<div class="highlight"><pre><span></span><span class="n">DatabaseConfig</span><span class="p">(</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">dialect</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;mysql&quot;</span><span class="p">,</span> <span class="s2">&quot;postgresql&quot;</span><span class="p">,</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">,</span> <span class="s2">&quot;oracle&quot;</span><span class="p">,</span> <span class="s2">&quot;mssql&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;database&quot;</span><span class="p">,</span>
+    <span class="n">bind_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">location</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">sqlite_db_extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.sqlite&quot;</span>
+<span class="p">)</span>
+</pre></div>
+<hr />
+<p>A class that holds a database configuration.</p>
+<p>This configuration is parsed into a database URI and
+used in either the <code>SQLALCHEMY_DATABASE_URI</code> or <code>SQLALCHEMY_BINDS</code> configuration variables.</p>
+
 </section>
 
 </body>
