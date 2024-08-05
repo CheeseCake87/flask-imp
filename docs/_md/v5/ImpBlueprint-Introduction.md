@@ -58,14 +58,14 @@ standard Flask Blueprint configuration, like the ability to enable or disable th
 `ImpBlueprintConfig`'s `init_session` works the same as `ImpConfig`'s `init_session`, this will add the session data to
 the Flask app's session object on initialization of the Flask app.
 
-To see more about configuration see: [flask_imp.config / ImpBlueprintConfig](blueprint-config-x.html)
+To see more about configuration see: [flask_imp.config / ImpBlueprintConfig](flask_imp_config-impblueprintconfig.html)
 
 `import_resources` method will walk one level deep into the `routes` folder, and import all `.py` files as modules.
-For more information see: [Blueprint.x / import_resources](blueprint_x-import_resources.html)
+For more information see: [ImpBlueprint / import_resources](impblueprint-import_resources.html)
 
 `import_models` works the same as `imp.import_models`, it will look for instances of `db.Model` and import them. These
 will also be available in the model lookup method `imp.model`.
-For more information see: [Imp.x / import_models](imp_x-import_models.html)
+For more information see: [Imp / import_models](imp-import_models.html)
 
 `import_nested_blueprints` will do the same as `imp.import_blueprints`, but will register the blueprints found as
 nested to the current blueprint. For example `www.blueprint_one.index`

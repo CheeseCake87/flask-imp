@@ -58,6 +58,36 @@
                             <li><a href="imp-introduction.html">Introduction</a></li>
                         
                     
+                        
+                            <li><a href="imp-init_app-init.html">init_app, __init__</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-init_session.html">init_session</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_app_resources.html">import_app_resources</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_blueprint.html">import_blueprint</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_blueprints.html">import_blueprints</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_models.html">import_models</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-model.html">model</a></li>
+                        
+                    
+                        
+                    
                 </ul>
             
         
@@ -71,54 +101,6 @@
                             <li><a href="impblueprint-introduction.html">Introduction</a></li>
                         
                     
-                </ul>
-            
-        
-            
-                <li><strong>Imp.x</strong></li>
-            
-            
-                <ul>
-                    
-                        
-                            <li><a href="imp_x-init_app-init.html">init_app, __init__</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-init_session.html">init_session</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_app_resources.html">import_app_resources</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_blueprint.html">import_blueprint</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_blueprints.html">import_blueprints</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_models.html">import_models</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-model.html">model</a></li>
-                        
-                    
-                        
-                    
-                </ul>
-            
-        
-            
-                <li><strong>ImpBlueprint.x</strong></li>
-            
-            
-                <ul>
-                    
                         
                             <li><a href="impblueprint-init.html">__init__</a></li>
                         
@@ -126,23 +108,23 @@
                         
                     
                         
-                            <li><a href="impblueprint_x-import_resources.html">import_resources</a></li>
+                            <li><a href="impblueprint-import_resources.html">import_resources</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-import_nested_blueprint.html">import_nested_blueprint</a></li>
+                            <li><a href="impblueprint-import_nested_blueprint.html">import_nested_blueprint</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-import_nested_blueprints.html">import_nested_blueprints</a></li>
+                            <li><a href="impblueprint-import_nested_blueprints.html">import_nested_blueprints</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-import_models.html">import_models</a></li>
+                            <li><a href="impblueprint-import_models.html">import_models</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-tmpl.html">tmpl</a></li>
+                            <li><a href="impblueprint-tmpl.html">tmpl</a></li>
                         
                     
                 </ul>
@@ -309,12 +291,12 @@ importing of models, resources and other nested blueprints.</p>
 standard Flask Blueprint configuration, like the ability to enable or disable the Blueprint.</p>
 <p><code>ImpBlueprintConfig</code>'s <code>init_session</code> works the same as <code>ImpConfig</code>'s <code>init_session</code>, this will add the session data to
 the Flask app's session object on initialization of the Flask app.</p>
-<p>To see more about configuration see: <a href="blueprint-config-x.html">flask_imp.config / ImpBlueprintConfig</a></p>
+<p>To see more about configuration see: <a href="flask_imp_config-impblueprintconfig.html">flask_imp.config / ImpBlueprintConfig</a></p>
 <p><code>import_resources</code> method will walk one level deep into the <code>routes</code> folder, and import all <code>.py</code> files as modules.
-For more information see: <a href="blueprint_x-import_resources.html">Blueprint.x / import_resources</a></p>
+For more information see: <a href="impblueprint-import_resources.html">ImpBlueprint / import_resources</a></p>
 <p><code>import_models</code> works the same as <code>imp.import_models</code>, it will look for instances of <code>db.Model</code> and import them. These
 will also be available in the model lookup method <code>imp.model</code>.
-For more information see: <a href="imp_x-import_models.html">Imp.x / import_models</a></p>
+For more information see: <a href="imp-import_models.html">Imp / import_models</a></p>
 <p><code>import_nested_blueprints</code> will do the same as <code>imp.import_blueprints</code>, but will register the blueprints found as
 nested to the current blueprint. For example <code>www.blueprint_one.index</code></p>
 <p><code>import_nested_blueprint</code> behaves the same as <code>import_nested_blueprints</code>, but will only import a single blueprint.</p>

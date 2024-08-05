@@ -12,17 +12,6 @@ def cli():
 
 @cli.command("blueprint", help="Create a flask-imp blueprint")
 @click.option(
-    "-f",
-    "--folder",
-    nargs=1,
-    default="Current Working Directory",
-    prompt=(
-        f"\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n"
-        f"Folder to create blueprint in"
-    ),
-    help="The from_folder to create the blueprint in, defaults to the current working directory",
-)
-@click.option(
     "-n",
     "--name",
     nargs=1,
@@ -31,25 +20,18 @@ def cli():
     help="The name of the blueprint to create",
 )
 @click.option(
-    "-pyc", "--pyconfig", is_flag=True, default=False, help="Use python config files"
+    "-f",
+    "--folder",
+    nargs=1,
+    default=".",
+    prompt=(
+            f"\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n"
+            f"Folder to create blueprint in"
+    ),
+    help="The from_folder to create the blueprint in, defaults to the current working directory",
 )
-@click.option(
-    "-tc", "--tomlconfig", is_flag=True, default=False, help="Use python config files"
-)
-def add_blueprint(folder, name, pyconfig, tomlconfig):
-    if not pyconfig and not tomlconfig:
-        choice = click.prompt(
-            "What type of config file would you like to use?",
-            default="py",
-            type=click.Choice(["py", "toml"]),
-        )
-
-        if choice == "py":
-            pyconfig = True
-        elif choice == "toml":
-            pyconfig = False
-
-    _add_blueprint(folder, name, pyconfig=pyconfig)
+def add_blueprint(name, folder):
+    _add_blueprint(name=name, folder=folder)
 
 
 @cli.command("init", help="Create a new flask-imp app")
@@ -60,23 +42,17 @@ def add_blueprint(folder, name, pyconfig, tomlconfig):
     default=None,
     help="The name of the app folder that will be created",
 )
-@click.option("-f", "--full", is_flag=True, default=False, help="Create a full app")
 @click.option("-s", "--slim", is_flag=True, default=False, help="Create a slim app")
 @click.option(
     "-m", "--minimal", is_flag=True, default=False, help="Create a minimal app"
 )
-@click.option(
-    "-pyc", "--pyconfig", is_flag=True, default=False, help="Use python config files"
-)
-@click.option(
-    "-tc", "--tomlconfig", is_flag=True, default=False, help="Use python config files"
-)
-def init_new_app(name, full, slim, minimal, pyconfig, tomlconfig):
+@click.option("-f", "--full", is_flag=True, default=False, help="Create a full app")
+def init_new_app(name, full, slim, minimal):
     if not full and not slim and not minimal:
         choice = click.prompt(
             "What type of app would you like to create?",
-            default="full",
-            type=click.Choice(["full", "slim", "minimal"]),
+            default="minimal",
+            type=click.Choice(["minimal", "slim", "full"]),
         )
 
         if choice == "full":
@@ -92,19 +68,4 @@ def init_new_app(name, full, slim, minimal, pyconfig, tomlconfig):
     else:
         set_name = name
 
-    if minimal:
-        slim = True
-
-    if not pyconfig and not tomlconfig:
-        choice = click.prompt(
-            "What type of config file would you like to use?",
-            default="py",
-            type=click.Choice(["py", "toml"]),
-        )
-
-        if choice == "py":
-            pyconfig = True
-        elif choice == "toml":
-            pyconfig = False
-
-    _init_app(set_name, full, slim, minimal, pyconfig)
+    _init_app(set_name, full, slim, minimal)

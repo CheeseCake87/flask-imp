@@ -49,16 +49,6 @@ The default name is 'my_new_blueprint', we will change this to 'admin'
 Name of the blueprint to create [my_new_blueprint]: admin
 ```
 
-Finally, you will be asked what type of configuration file you would like to use:
-
-```text
-~ $ flask-imp blueprint
-...
-What type of config file would you like to use? (py, toml) [py]:
-```
-
-`py` is recommended, as it is more flexible.
-
 After creating your blueprint, the folder structure will look like this:
 
 ```text
@@ -85,23 +75,17 @@ app/
 │       │       │   └── header.html
 │       │       └── index.html
 │       │
-│       ├── __init__.py
-│       └─── config.py
+│       └── __init__.py
 │
 ...
 ```
 
-This is a self-contained blueprint, so it has its own static, templates and routes folders. You can now navigate '
-/admin'
+This is a self-contained blueprint, so it has its own static, templates and routes folders. 
+You can now navigate '/admin'
 
 You can streamline this process by specifying the name of the blueprint, the folder to 
 create it in and the configuration to use, like so:
 
 ```bash
-flask-imp blueprint -n admin -f app/blueprints --pyconfig
+flask-imp blueprint -n admin -f app/blueprints
 ```
-or
-```bash
-flask-imp blueprint -n admin -f app/blueprints --tomlconfig
-```
-for a toml config.

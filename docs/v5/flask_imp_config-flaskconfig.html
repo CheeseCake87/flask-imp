@@ -58,6 +58,36 @@
                             <li><a href="imp-introduction.html">Introduction</a></li>
                         
                     
+                        
+                            <li><a href="imp-init_app-init.html">init_app, __init__</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-init_session.html">init_session</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_app_resources.html">import_app_resources</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_blueprint.html">import_blueprint</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_blueprints.html">import_blueprints</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-import_models.html">import_models</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-model.html">model</a></li>
+                        
+                    
+                        
+                    
                 </ul>
             
         
@@ -71,54 +101,6 @@
                             <li><a href="impblueprint-introduction.html">Introduction</a></li>
                         
                     
-                </ul>
-            
-        
-            
-                <li><strong>Imp.x</strong></li>
-            
-            
-                <ul>
-                    
-                        
-                            <li><a href="imp_x-init_app-init.html">init_app, __init__</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-init_session.html">init_session</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_app_resources.html">import_app_resources</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_blueprint.html">import_blueprint</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_blueprints.html">import_blueprints</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-import_models.html">import_models</a></li>
-                        
-                    
-                        
-                            <li><a href="imp_x-model.html">model</a></li>
-                        
-                    
-                        
-                    
-                </ul>
-            
-        
-            
-                <li><strong>ImpBlueprint.x</strong></li>
-            
-            
-                <ul>
-                    
                         
                             <li><a href="impblueprint-init.html">__init__</a></li>
                         
@@ -126,23 +108,23 @@
                         
                     
                         
-                            <li><a href="impblueprint_x-import_resources.html">import_resources</a></li>
+                            <li><a href="impblueprint-import_resources.html">import_resources</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-import_nested_blueprint.html">import_nested_blueprint</a></li>
+                            <li><a href="impblueprint-import_nested_blueprint.html">import_nested_blueprint</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-import_nested_blueprints.html">import_nested_blueprints</a></li>
+                            <li><a href="impblueprint-import_nested_blueprints.html">import_nested_blueprints</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-import_models.html">import_models</a></li>
+                            <li><a href="impblueprint-import_models.html">import_models</a></li>
                         
                     
                         
-                            <li><a href="impblueprint_x-tmpl.html">tmpl</a></li>
+                            <li><a href="impblueprint-tmpl.html">tmpl</a></li>
                         
                     
                 </ul>
@@ -264,7 +246,52 @@
 
 <section>
     <h1 style="font-size: 2.6rem; margin: 0;">FlaskConfig - flask_imp.config</h1>
-    
+    <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp.config</span> <span class="kn">import</span> <span class="n">FlaskConfig</span>
+</pre></div>
+<div class="highlight"><pre><span></span><span class="n">FlaskConfig</span><span class="p">(</span>
+    <span class="n">debug</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">propagate_exceptions</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">trap_http_exceptions</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">trap_bad_request_errors</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">secret_key</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">session_cookie_name</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">session_cookie_domain</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">session_cookie_path</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">session_cookie_httponly</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">session_cookie_secure</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">session_cookie_samesite</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;Lax&quot;</span><span class="p">,</span> <span class="s2">&quot;Strict&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">permanent_session_lifetime</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">session_refresh_each_request</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">use_x_sendfile</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">send_file_max_age_default</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">error_404_help</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">server_name</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">application_root</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">preferred_url_scheme</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_content_length</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">templates_auto_reload</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">explain_template_loading</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_cookie_size</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">app_instance</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Flask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span>
+</pre></div>
+<hr />
+<p>A class that holds a Flask configuration values.</p>
+<p>You can set the configuration values to the app instance by either passing the app instance to the <code>app_instance</code>
+parameter or by calling the <code>apply_config</code> method on the <code>FlaskConfig</code> instance.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_app</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">FlaskConfig</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">app_instance</span><span class="o">=</span><span class="n">app</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span>
+</pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_app</span><span class="p">():</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">FlaskConfig</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">apply_config</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span>
+</pre></div>
+
 </section>
 
 </body>

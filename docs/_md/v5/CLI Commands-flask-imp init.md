@@ -13,19 +13,19 @@ flask-imp init --help
 
 ## Create a new project
 
-Make sure you are in the virtual environment, and at the root of your 
+Make sure you are in the virtual environment, and at the root of your
 project folder, then run the following command:
 
 ```bash
 flask-imp init
 ```
 
-After running this command, you will be prompted to choose what type of 
+After running this command, you will be prompted to choose what type of
 app you want to deploy:
 
 ```text
 ~ $ flask-imp init
-What type of app would you like to create? (full, slim, minimal) [full]:
+What type of app would you like to create? (minimal, slim, full) [minimal]:
 ```
 
 See below for the differences between the app types.
@@ -38,19 +38,8 @@ After this, you will be prompted to enter a name for your app:
 What would you like to call your app? [app]: 
 ```
 
-'app' is the default name, so if you just press enter, your app will be 
+'app' is the default name, so if you just press enter, your app will be
 called 'app'. You will then see this output:
-
-Next you will be asked what configuration file you would like to use:
-
-```text
-~ $ flask-imp init
-...
-What type of config file would you like to use? (py, toml) [py]:
-```
-
-`py` is recommended, as it is more flexible.
-
 
 ```text
 ~ FILES CREATED WILL LOOP OUT HERE ~
@@ -79,7 +68,7 @@ Run: flask --app new run --debug
 
 ```
 
-As you can see from the output, it gives you instructions on how to start your app, 
+As you can see from the output, it gives you instructions on how to start your app,
 depending on the name you gave it.
 
 You should see a new folder that has been given the name you specified in
@@ -93,37 +82,88 @@ You can also specify a name for your app in the command itself, like so:
 flask-imp init -n my_app
 ```
 
-This will create a new app called 'my_app'.
+This will create a new app called 'my_app'. 
+The default will be a minimal app, this has no blueprints or database models.
 
-You can also deploy a slim app, that will have one blueprint and no models, like so:
+You can also deploy a slim app, that will have one blueprint and no database models, like so:
 
 ```bash
 flask-imp init -n my_app --slim
 ```
 
-You can also deploy a minimal app, that will have no blueprints, models, or extensions, like so:
+You can also deploy a full app that is setup for multiple blueprints and database models, like so:
 
 ```bash
-flask-imp init -n my_app --minimal
-```
-
-This also works for what configuration file you would like to use:
-
-```bash
-flask-imp init -n my_app --pyconfig
-```
-or
-```bash
-flask-imp init -n my_app --tomlconfig
-```
-
-This will create a new minimal app called 'my_app' with a python configuration file.
-
-```bash
-flask-imp init -n my_app --minimal --pyconfig
+flask-imp init -n my_app --full
 ```
 
 ## init Folder structures
+
+### Minimal app (default)
+
+`flask-imp init --minimal`:
+
+```text
+app/
+├── resources
+│   ├── static
+│   │   ├── css
+│   │   │   └── water.css
+│   │   ├── img
+│   │   │   └── flask-imp-logo.png
+│   │   └── favicon.ico
+│   ├── templates
+│   │   └── index.html
+│   └── routes.py
+│
+└── __init__.py
+```
+
+### Slim app
+
+`flask-imp init --slim`:
+
+```text
+app/
+├── extensions
+│   └── __init__.py
+│
+├── resources
+│   ├── cli
+│   │   └── cli.py
+│   ├── error_handlers
+│   │   └── error_handlers.py
+│   ├── static
+│   │   ├── css
+│   │   │   └── water.css
+│   │   ├── img
+│   │   │   └── flask-imp-logo.png
+│   │   └── favicon.ico
+│   └── templates
+│       └── error.html
+│
+├── www
+│   ├── __init__.py
+│   ├── routes
+│   │   └── index.py
+│   ├── static
+│   │   ├── css
+│   │   │   └── water.css
+│   │   ├── img
+│   │   │   └── flask-imp-logo.png
+│   │   └── js
+│   │       └── main.js
+│   └── templates
+│       └── www
+│           ├── extends
+│           │   └── main.html
+│           ├── includes
+│           │   ├── footer.html
+│           │   └── header.html
+│           └── index.html
+│
+└── __init__.py
+```
 
 ### Full app
 
@@ -133,7 +173,6 @@ flask-imp init -n my_app --minimal --pyconfig
 app/
 ├── blueprints
 │   └── www
-│       ├── config.py
 │       ├── __init__.py
 │       ├── routes
 │       │   └── index.py
@@ -170,93 +209,10 @@ app/
 │   ├── static
 │   │   └── favicon.ico
 │   └── templates
-│       ├── errors
-│       │   ├── 400.html
-│       │   ├── 401.html
-│       │   ├── 403.html
-│       │   ├── 404.html
-│       │   ├── 405.html
-│       │   └── 500.html
-│       └── index.html
+│       └── error.html
 │
 ├── models
-│   ├── example_user_table.py
-│   └── __init__.py
+│   └── example_user_table.py
 │
-├── __init__.py
-└── config.py
-```
-
-### Slim app
-
-`flask-imp init --slim`:
-
-```text
-app/
-├── extensions
-│   └── __init__.py
-│
-├── resources
-│   ├── cli
-│   │   └── cli.py
-│   ├── error_handlers
-│   │   └── error_handlers.py
-│   ├── static
-│   │   └── favicon.ico
-│   └── templates
-│       └── errors
-│           ├── 400.html
-│           ├── 401.html
-│           ├── 403.html
-│           ├── 404.html
-│           ├── 405.html
-│           └── 500.html
-│
-├── www
-│   ├── config.py
-│   ├── __init__.py
-│   ├── routes
-│   │   └── index.py
-│   ├── static
-│   │   ├── css
-│   │   │   └── water.css
-│   │   ├── img
-│   │   │   └── flask-imp-logo.png
-│   │   └── js
-│   │       └── main.js
-│   └── templates
-│       └── www
-│           ├── extends
-│           │   └── main.html
-│           ├── includes
-│           │   ├── footer.html
-│           │   └── header.html
-│           └── index.html
-│
-├── __init__.py
-└── config.py
-```
-
-### Minimal app
-
-`flask-imp init --minimal`:
-
-```text
-app/
-├── extensions
-│   └── __init__.py
-│
-├── resources
-│   ├── static
-│   │   ├── css
-│   │   │   └── water.css
-│   │   ├── img
-│   │   │   └── flask-imp-logo.png
-│   │   └── favicon.ico
-│   ├── templates
-│   │   └── index.html
-│   └── routes.py
-│
-├── __init__.py
-└── config.py
+└── __init__.py
 ```

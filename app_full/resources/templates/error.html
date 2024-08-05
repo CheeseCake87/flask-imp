@@ -1,26 +1,12 @@
 <!doctype html>
-
 <html lang="en">
+
 <head>
-    <title>{% block title %}{% endblock %}Flask-Imp Error: {{ error_code }}</title>
-    <base href="{{ request.base_url }}">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="noindex">
-    <meta name="googlebot" content="noindex">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/water.css') }}">
-
+    <title>{{ error_code }}</title>
 </head>
 
 <body>
-<div style="display: flex; flex-direction: row; align-items: center;
-            justify-content: start; gap: 2rem; margin-bottom: 2rem;">
-    <img style="border-radius: 50%"
-         src="{{ url_for('static', filename='img/flask-imp-logo.png') }}" alt="flask-imp logo">
-    <h1 style="font-size: 4rem;">Flask-Imp Error: {{ error_code }}</h1>
-</div>
+<h1>{{ error_code }}</h1>
 <p>{{ error_message }}</p>
 </body>
-
 </html>
