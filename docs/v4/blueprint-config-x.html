@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Flask-Imp Blueprint Config File | Flask-Imp</title>
+    <link rel="stylesheet" href="static/water.css">
+    <link rel="stylesheet" href="static/pygments.emacs-dull.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+    <link rel="manifest" href="static/site.webmanifest">
+    <link rel="mask-icon" href="static/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+
+<aside>
+    <img src="static/Flask-Imp-Medium.png" alt="Flask-Imp Logo" style="margin-top: 20px; width: 50%">
+    <h1>Flask-Imp</h1>
+    <div><small>Version: 4.0.x</small></div>
+    <div><small>Last Updated:</small></div>
+    <div><small>Mon, 13 May 2024</small></div>
+
+    <p><a href="../v3/index.html">Switch to version 3 docs</a></p>
+
+    <h2>Menu</h2>
+    <ul>
+        <li><a href="index.html"><strong>Index</strong></a></li>
+    </ul>
+    <ul>
+        
+            
+                <li><strong>CLI Commands</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_init.html">flask-imp init</a></li>
+                        
+                    
+                        
+                            <li><a href="cli_commands-flask-imp_blueprint.html">flask-imp blueprint</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Imp</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="imp-introduction.html">Introduction</a></li>
+                        
+                    
+                        
+                            <li><a href="imp-config-x.html">config.x</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Blueprint</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="blueprint-introduction.html">Introduction</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint-config-x.html">config.x</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Imp.x</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="imp_x-init_app-init.html">init_app, __init__</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-init_session.html">init_session</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_app_resources.html">import_app_resources</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_blueprint.html">import_blueprint</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_blueprints.html">import_blueprints</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-import_models.html">import_models</a></li>
+                        
+                    
+                        
+                            <li><a href="imp_x-model.html">model</a></li>
+                        
+                    
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>Blueprint.x</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="blueprint-init.html">__init__</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-init_session.html">init_session</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-import_resources.html">import_resources</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-import_nested_blueprint.html">import_nested_blueprint</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-import_nested_blueprints.html">import_nested_blueprints</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-import_models.html">import_models</a></li>
+                        
+                    
+                        
+                            <li><a href="blueprint_x-tmpl.html">tmpl</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>flask_imp.security</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="flask_imp_security-login_check.html">login_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-permission_check.html">permission_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-pass_function_check.html">pass_function_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-api_login_check.html">api_login_check</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_security-include_csrf.html">include_csrf</a></li>
+                        
+                    
+                </ul>
+            
+        
+            
+                <li><strong>flask_imp.auth</strong></li>
+            
+            
+                <ul>
+                    
+                        
+                            <li><a href="flask_imp_auth-encrypt_password.html">encrypt_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-authenticate_password.html">authenticate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_password.html">generate_password</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_salt.html">generate_salt</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_csrf_token.html">generate_csrf_token</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_private_key.html">generate_private_key</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_email_validator.html">generate_email_validator</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_numeric_validator.html">generate_numeric_validator</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-generate_alphanumeric_validator.html">generate_alphanumeric_validator</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-is_email_address_valid.html">is_email_address_valid</a></li>
+                        
+                    
+                        
+                            <li><a href="flask_imp_auth-is_username_valid.html">is_username_valid</a></li>
+                        
+                    
+                </ul>
+            
+        
+    </ul>
+
+    <div style="padding-top: 5px; margin-bottom: 20px;"><small>These docs are generated by a
+        <a href="https://github.com/CheeseCake87/flask-imp/tree/master/gdocs">Flask Static Site Generator</a>
+        built by <a href="https://github.com/CheeseCake87">David Carmichael</a> hosted on GitHub Pages.</small></div>
+</aside>
+
+<section>
+    <h1 style="font-size: 2.6rem; margin: 0;">The Flask-Imp Blueprint Config File</h1>
+    <hr />
+<p><strong>Recommendation:</strong> Try and favour the use of a py file for your
+configuration settings, as this will trigger reloads under
+debug mode.</p>
+<p>Also, the bonus of being able to use Python to programmatically
+set values is nice.</p>
+<hr />
+<p>The Flask-Imp Blueprint loads configuration settings from either a class
+defined in a module or from a toml file.</p>
+<p>This file needs to sit next to the <code>__init__.py</code> file.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">Blueprint</span>
+
+<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>  <span class="c1"># will look for config.toml / config.py w/ Config class</span>
+<span class="c1"># or</span>
+<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="s2">&quot;config.Development&quot;</span><span class="p">)</span>  <span class="c1"># will look for Development class in config.py</span>
+<span class="c1"># or</span>
+<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="s2">&quot;development.toml&quot;</span><span class="p">)</span>  <span class="c1"># will look for development.toml file</span>
+</pre></div>
+<p>For more information about the <code>config</code> parameter see: <a href="Imp-config-x.html">Imp / config.x</a></p>
+<h3>Using environment variables</h3>
+<h4>toml</h4>
+<p>In a toml config, you can set environment variables by using <code>{{ }}</code></p>
+<div class="highlight"><pre><span></span><span class="n">TEST_VALUE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ test_value }}&quot;</span>
+</pre></div>
+<p>You can also set the type of the variable by using <code>:type</code> after the variable name.</p>
+<div class="highlight"><pre><span></span><span class="n">TEST_VALUE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ test_value:int }}&quot;</span>
+</pre></div>
+<p><strong>Supported types are <code>int</code>, <code>float</code>, <code>bool</code>, <code>str</code>.</strong></p>
+<h4>py</h4>
+<p>In a py config, you can set environment variables by using <code>os.getenv</code>.</p>
+<div class="highlight"><pre><span></span><span class="n">TEST_VALUE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TEST_VALUE&quot;</span><span class="p">,</span> <span class="s2">&quot;default_value_here&quot;</span><span class="p">)</span>
+</pre></div>
+<h3>Example <code>config.py</code> configuration file:</h3>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">ImpBlueprintConfig</span><span class="p">,</span> <span class="n">DatabaseConfig</span>
+
+
+<span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">ImpBlueprintConfig</span><span class="p">):</span>
+    <span class="n">ENABLED</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">URL_PREFIX</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+    <span class="c1"># SUBDOMAIN: str = &quot;&quot;</span>
+    <span class="c1"># URL_DEFAULTS: dict = {}</span>
+    <span class="n">STATIC_FOLDER</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;static&quot;</span>
+    <span class="n">TEMPLATE_FOLDER</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;templates&quot;</span>
+    <span class="n">STATIC_URL_PATH</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/static&quot;</span>
+    <span class="c1"># ROOT_PATH: str = &quot;&quot;</span>
+    <span class="c1"># CLI_GROUP: str = &quot;&quot;</span>
+
+    <span class="n">INIT_SESSION</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;www_session&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span>
+    <span class="p">}</span>
+
+    <span class="n">DATABASE_BINDS</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">DatabaseConfig</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">DatabaseConfig</span><span class="p">(</span>
+            <span class="n">ENABLED</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">DIALECT</span><span class="o">=</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span>
+            <span class="n">NAME</span><span class="o">=</span><span class="s2">&quot;www&quot;</span><span class="p">,</span>
+            <span class="n">BIND_KEY</span><span class="o">=</span><span class="s2">&quot;www&quot;</span><span class="p">,</span>
+            <span class="n">LOCATION</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">PORT</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">USERNAME</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">PASSWORD</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+</pre></div>
+<h3>Example <code>config.toml</code> configuration file:</h3>
+<div class="highlight"><pre><span></span><span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;yes&quot;</span>
+
+<span class="k">[SETTINGS]</span>
+<span class="n">URL_PREFIX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span>
+<span class="c1">#SUBDOMAIN = &quot;&quot;</span>
+<span class="c1">#URL_DEFAULTS = {}</span>
+<span class="n">STATIC_FOLDER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;static&quot;</span>
+<span class="n">TEMPLATE_FOLDER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;templates&quot;</span>
+<span class="n">STATIC_URL_PATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/static&quot;</span>
+<span class="c1">#ROOT_PATH = &quot;&quot;</span>
+<span class="c1">#CLI_GROUP = &quot;&quot;</span>
+
+<span class="k">[SESSION]</span>
+<span class="n">www_session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;yes&quot;</span>
+
+<span class="c1"># Set ENABLED to true to allow the blueprint</span>
+<span class="c1"># to create a database bind, change settings accordingly.</span>
+<span class="k">[DATABASE_BIND]</span>
+<span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">DIALECT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sqlite&quot;</span>
+<span class="n">DATABASE_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;www&quot;</span>
+<span class="n">BIND_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;www&quot;</span>
+<span class="n">LOCATION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">USERNAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+</pre></div>
+<p>These config files reflect the args that are passed to a regular Flask Blueprint class,
+with the addition of the ability to enable/disable the Blueprint, set session variables and
+include database binds.</p>
+<p>For more information about the args of a regular Flask Blueprint see:
+<a href="https://flask.palletsprojects.com/en/3.0.x/api/#flask.Blueprint">Flask docs (Blueprint)</a></p>
+<h3>Session Variables</h3>
+<p>You can set the default session variables for the blueprint by setting values in <code>INIT_SESSION</code>, these can be loaded
+using the before_request function in the blueprint.</p>
+<div class="highlight"><pre><span></span><span class="nd">@blueprint</span><span class="o">.</span><span class="n">before_app_request</span>
+<span class="k">def</span> <span class="nf">load_session</span><span class="p">():</span>
+    <span class="n">blueprint</span><span class="o">.</span><span class="n">init_session</span><span class="p">()</span>
+</pre></div>
+<h3>Database Binds</h3>
+<p>You can also allow the blueprint to create a database bind, by setting <code>ENABLED</code> to <code>true</code> in the <code>DATABASE_BIND</code>
+section of the toml file, or by adding to the <code>DATABASE_BINDS</code> set of the <code>Config</code> class.</p>
+<p><strong>Using a py config file will allow you to set multiple database binds for the blueprint.</strong></p>
+<p>This will add to the Flask app's <code>SQLALCHEMY_BINDS</code> config variable, and allows blueprints to be more modular
+with their database connections.</p>
+<p>Including the attribute <code>__bind_key__</code> in the blueprint's model(s) will match the model to the database bind.</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">__bind_key__</span> <span class="o">=</span> <span class="s2">&quot;example&quot;</span>
+    <span class="o">...</span>
+</pre></div>
+
+</section>
+
+</body>
+</html>
