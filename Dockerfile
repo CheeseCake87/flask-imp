@@ -1,11 +1,11 @@
 FROM python:3.11-alpine
 WORKDIR /flask-imp
 COPY app app
-COPY src src
+COPY flask_imp flask_imp
 COPY .env .env
 COPY pyproject.toml pyproject.toml
-COPY requirements.txt requirements.txt
-COPY setup.py setup.py
-RUN pip install -r requirements.txt
-RUN python3 setup.py install
+COPY requirements/development.txt development.txt
+COPY requirements/main.txt main.txt
+RUN pip install -r development.txt
+RUN flit install --symlink
 ENTRYPOINT ["flask", "run", "--debug", "--host=0.0.0.0"]

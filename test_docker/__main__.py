@@ -36,7 +36,6 @@ tags = {
     "flask-imp-python-3-10:latest": "test_docker/Dockerfile_Python_3_10",
     "flask-imp-python-3-11:latest": "test_docker/Dockerfile_Python_3_11",
     "flask-imp-python-3-12:latest": "test_docker/Dockerfile_Python_3_12",
-    "flask-imp-python-3-13:latest": "test_docker/Dockerfile_Python_3_13",
 }
 
 enabled_tags = [
@@ -45,7 +44,6 @@ enabled_tags = [
     "flask-imp-python-3-10:latest",
     "flask-imp-python-3-11:latest",
     "flask-imp-python-3-12:latest",
-    # "flask-imp-python-3-13:latest",
 ]
 
 if __name__ == "__main__":
