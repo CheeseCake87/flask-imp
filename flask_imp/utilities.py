@@ -5,7 +5,9 @@ import sys
 import typing as t
 from pathlib import Path
 
-from flask_imp.protocols import Flask, DatabaseConfig, Imp
+from flask import Flask
+
+from .protocols import DatabaseConfig, Imp
 
 
 class Sprinkles:
@@ -63,17 +65,17 @@ def _partial_database_binds(
 
 
 def build_database_main(
-        flask_app: Flask, app_path: Path, database_main: DatabaseConfig
+        flask_app: Flask, app_instance_path: Path, database_main: DatabaseConfig
 ):
     if database_main:
         if database_main.enabled:
             flask_app.config["SQLALCHEMY_DATABASE_URI"] = build_database_uri(
-                flask_app, app_path, database_main
+                flask_app, app_instance_path, database_main
             )
 
 
 def build_database_binds(
-        flask_app: Flask, app_path: Path, database_binds: t.List[DatabaseConfig]
+        flask_app: Flask, app_instance_path: Path, database_binds: t.List[DatabaseConfig]
 ):
     if database_binds:
         for db in database_binds:
@@ -82,15 +84,14 @@ def build_database_binds(
                     flask_app.config["SQLALCHEMY_BINDS"] = {}
 
                 flask_app.config["SQLALCHEMY_BINDS"][db.bind_key] = build_database_uri(
-                    flask_app, app_path, db
+                    flask_app, app_instance_path, db
                 )
 
 
-def build_database_uri(flask_app: Flask, app_path: Path, db: DatabaseConfig):
+def build_database_uri(flask_app: Flask, app_instance_path: Path, db: DatabaseConfig):
     if db.dialect == "sqlite":
         filepath = (
-                app_path
-                / "instance"
+                app_instance_path
                 / (db.name + flask_app.config.get("SQLITE_DB_EXTENSION", ".sqlite"))
         )
         return f"{db.dialect}:///{filepath}"

@@ -3,350 +3,28 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class AppFileLib:
-    # Format to: secret_key
-    default_config_toml = """\
-# Flask-Imp Config File
-# ------------------------
-# Updates the Flask app config with the variables below.
-# If any variable below does not exist in the standard Flask env
-# vars it is created and will be accessible using
-# app.config. All key names defined below will be
-# capitalised when imported.
-[FLASK]
-#DEBUG = false
-#PROPAGATE_EXCEPTIONS = true
-TRAP_HTTP_EXCEPTIONS = false
-#TRAP_BAD_REQUEST_ERRORS = true
-SECRET_KEY = "{secret_key}"
-SESSION_COOKIE_NAME = "session"
-#SESSION_COOKIE_DOMAIN = "domain-here.com"
-#SESSION_COOKIE_PATH = "/"
-SESSION_COOKIE_HTTPONLY = true
-SESSION_COOKIE_SECURE = false
-SESSION_COOKIE_SAMESITE = "Lax"
-PERMANENT_SESSION_LIFETIME = 3600  # 1 hour
-SESSION_REFRESH_EACH_REQUEST = true
-USE_X_SENDFILE = false
-#SEND_FILE_MAX_AGE_DEFAULT = 43200
-ERROR_404_HELP = true
-#SERVER_NAME = "localhost:5000"
-APPLICATION_ROOT = "/"
-PREFERRED_URL_SCHEME = "http"
-#MAX_CONTENT_LENGTH = 0
-#TEMPLATES_AUTO_RELOAD = true
-EXPLAIN_TEMPLATE_LOADING = false
-MAX_COOKIE_SIZE = 4093
-
-# This will set the default session variables for the app.
-# Anything here will be accessible using session["your_var_name"]
-# or session.get("your_var_name")
-[SESSION]
-logged_in = false
-
-# These settings are specific to the Flask-SQLAlchemy extension.
-# Anything here will be accessible using app.config
-[SQLALCHEMY]
-SQLALCHEMY_ECHO = false
-SQLALCHEMY_TRACK_MODIFICATIONS = false
-SQLALCHEMY_RECORD_QUERIES = false
-# Below are extra settings that Flask-Imp uses but relates to Flask-SQLAlchemy.
-# This sets the file extension for SQLite databases, and where to create the folder
-# that the database will be stored in. true will create the folder on the same level as your
-# app, false will create the folder in the app root.
-SQLITE_DB_EXTENSION = ".sqlite"
-SQLITE_STORE_IN_PARENT = false
-
-# [DATABASE.MAIN] is loaded as SQLALCHEMY_DATABASE_URI
-# Dialets = mysql / postgresql / sqlite / oracle / mssql
-# Uncomment below to generate the SQLALCHEMY_DATABASE_URI.
-[DATABASE.MAIN]
-ENABLED = true
-DIALECT = "sqlite"
-NAME = "database"
-LOCATION = ""
-PORT = ""
-USERNAME = ""
-PASSWORD = ""
-
-# Adding another database is as simple as adding a new section.
-# [DATABASE.ANOTHER] will then be accessible using SQLALCHEMY_BINDS
-# The bind key will be stored as a lowercase value, so "ANOTHER" will
-# be accessible as "another"
-# You can then use the bind key in the model as follows:
-# class MyModel(db.Model):
-#     __bind_key__ = "another"
-#     ...
-
-# Uncomment below to generate and add to SQLALCHEMY_BINDS.
-#[DATABASE.ANOTHER]
-#ENABLED = true
-#DIALECT = "sqlite"
-#NAME = "another"
-#LOCATION = ""
-#PORT = ""
-#USERNAME = ""
-#PASSWORD = ""
-"""
-
-    # Format to: secret_key
-    default_slim_config_toml = """\
-# Flask-Imp Config File
-# ------------------------
-# Updates the Flask app config with the variables below.
-# If any variable below does not exist in the standard Flask env
-# vars it is created and will be accessible using
-# app.config. All key names defined below will be
-# capitalised when imported.
-[FLASK]
-#DEBUG = false
-#PROPAGATE_EXCEPTIONS = true
-TRAP_HTTP_EXCEPTIONS = false
-#TRAP_BAD_REQUEST_ERRORS = true
-SECRET_KEY = "{secret_key}"
-SESSION_COOKIE_NAME = "session"
-#SESSION_COOKIE_DOMAIN = "domain-here.com"
-#SESSION_COOKIE_PATH = "/"
-SESSION_COOKIE_HTTPONLY = true
-SESSION_COOKIE_SECURE = false
-SESSION_COOKIE_SAMESITE = "Lax"
-PERMANENT_SESSION_LIFETIME = 3600  # 1 hour
-SESSION_REFRESH_EACH_REQUEST = true
-USE_X_SENDFILE = false
-#SEND_FILE_MAX_AGE_DEFAULT = 43200
-ERROR_404_HELP = true
-#SERVER_NAME = "localhost:5000"
-APPLICATION_ROOT = "/"
-PREFERRED_URL_SCHEME = "http"
-#MAX_CONTENT_LENGTH = 0
-#TEMPLATES_AUTO_RELOAD = true
-EXPLAIN_TEMPLATE_LOADING = false
-MAX_COOKIE_SIZE = 4093
-
-# This will set the default session variables for the app.
-# Anything here will be accessible using session["your_var_name"]
-# or session.get("your_var_name")
-[SESSION]
-#logged_in = false
-
-# These settings are specific to the Flask-SQLAlchemy extension.
-# Anything here will be accessible using app.config
-[SQLALCHEMY]
-SQLALCHEMY_ECHO = false
-SQLALCHEMY_TRACK_MODIFICATIONS = false
-SQLALCHEMY_RECORD_QUERIES = false
-# Below are extra settings that Flask-Imp uses but relates to Flask-SQLAlchemy.
-# This sets the file extension for SQLite databases, and where to create the folder
-# that the database will be stored in. true will create the folder on the same level as your
-# app, false will create the folder in the app root.
-SQLITE_DB_EXTENSION = ".sqlite"
-SQLITE_STORE_IN_PARENT = false
-
-# [DATABASE.MAIN] is loaded as SQLALCHEMY_DATABASE_URI
-# Dialets = mysql / postgresql / sqlite / oracle / mssql
-# Uncomment below to generate the SQLALCHEMY_DATABASE_URI.
-#[DATABASE.MAIN]
-#ENABLED = true
-#DIALECT = "sqlite"
-#NAME = "database"
-#LOCATION = ""
-#PORT = ""
-#USERNAME = ""
-#PASSWORD = ""
-
-# Adding another database is as simple as adding a new section.
-# [DATABASE.ANOTHER] will then be accessible using SQLALCHEMY_BINDS
-# The bind key will be stored as a lowercase value, so "ANOTHER" will
-# be accessible as "another"
-# You can then use the bind key in the model as follows:
-# class MyModel(db.Model):
-#     __bind_key__ = "another"
-#     ...
-
-# Uncomment below to generate and add to SQLALCHEMY_BINDS.
-#[DATABASE.ANOTHER]
-#ENABLED = true
-#DIALECT = "sqlite"
-#NAME = "another"
-#LOCATION = ""
-#PORT = ""
-#USERNAME = ""
-#PASSWORD = ""
-"""
-
-    default_config_py = """\
-from flask_imp import (
-    FlaskConfig,
-    ImpConfig,
-    DatabaseConfig
-)
-
-
-class Config(ImpConfig):
-    FLASK = FlaskConfig(
-        # DEBUG=False,
-        # PROPAGATE_EXCEPTIONS = True,
-        TRAP_HTTP_EXCEPTIONS=False,
-        # TRAP_BAD_REQUEST_ERRORS = True,
-        SECRET_KEY="{secret_key}",
-        SESSION_COOKIE_NAME="session",
-        # SESSION_COOKIE_DOMAIN = "domain-here.com",
-        # SESSION_COOKIE_PATH = "/",
-        SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SECURE=False,
-        SESSION_COOKIE_SAMESITE="Lax",
-        PERMANENT_SESSION_LIFETIME=3600,  # 1 hour,
-        SESSION_REFRESH_EACH_REQUEST=True,
-        USE_X_SENDFILE=False,
-        # SEND_FILE_MAX_AGE_DEFAULT = 43200,
-        ERROR_404_HELP=True,
-        # SERVER_NAME = "localhost:5000",
-        APPLICATION_ROOT="/",
-        PREFERRED_URL_SCHEME="http",
-        # MAX_CONTENT_LENGTH = 0,
-        # TEMPLATES_AUTO_RELOAD = True,
-        EXPLAIN_TEMPLATE_LOADING=False,
-        MAX_COOKIE_SIZE=4093,
-    )
-
-    # INIT_SESSION = {{
-    #     "logged_in": False,
-    # }}
-
-    # Below are extra settings that Flask-Imp uses but relates to Flask-SQLAlchemy.
-    # This sets the file extension for SQLite databases, and where to create the folder
-    # that the database will be stored in.
-    # True will create the folder on the same level as your
-    # app, False will create the folder in the app root.
-    SQLITE_DB_EXTENSION = ".sqlite"
-    SQLITE_STORE_IN_PARENT = False
-    #
-
-    # SQLAlchemy settings that will be passed to Flask
-    # Any SQLAlchemy setting here will overwrite anything
-    # set in the config above
-    SQLALCHEMY_ECHO = False
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_RECORD_QUERIES = False
-    #
-
-    # Main database settings, this will be turned int the SQLALCHEMY_DATABASE_URI
-    DATABASE_MAIN = DatabaseConfig(
-        ENABLED=True,
-        DIALECT="sqlite",
-        NAME="database",
-        LOCATION="",
-        PORT=0,
-        USERNAME="",
-        PASSWORD="",
-    )
-
-    # Binds are additional databases that can be used in your app
-    # These will be added to the SQLALCHEMY_BINDS dictionary
-    # DATABASE_BINDS = {{
-    #     DatabaseConfig(
-    #         ENABLED=True,
-    #         DIALECT="sqlite",
-    #         NAME="additional_database",
-    #         BIND_KEY="additional_database",
-    #         LOCATION="",
-    #         PORT=0,
-    #         USERNAME="",
-    #         PASSWORD="",
-    #     )
-    # }}
-    """
-
-    default_slim_config_py = """\
-from flask_imp import (
-    FlaskConfig,
-    ImpConfig,
-    DatabaseConfig
-)
-
-
-class Config(ImpConfig):
-    FLASK = FlaskConfig(
-        # DEBUG=False,
-        # PROPAGATE_EXCEPTIONS = True,
-        TRAP_HTTP_EXCEPTIONS=False,
-        # TRAP_BAD_REQUEST_ERRORS = True,
-        SECRET_KEY="{secret_key}",
-        SESSION_COOKIE_NAME="session",
-        # SESSION_COOKIE_DOMAIN = "domain-here.com",
-        # SESSION_COOKIE_PATH = "/",
-        SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SECURE=False,
-        SESSION_COOKIE_SAMESITE="Lax",
-        PERMANENT_SESSION_LIFETIME=3600,  # 1 hour,
-        SESSION_REFRESH_EACH_REQUEST=True,
-        USE_X_SENDFILE=False,
-        # SEND_FILE_MAX_AGE_DEFAULT = 43200,
-        ERROR_404_HELP=True,
-        # SERVER_NAME = "localhost:5000",
-        APPLICATION_ROOT="/",
-        PREFERRED_URL_SCHEME="http",
-        # MAX_CONTENT_LENGTH = 0,
-        # TEMPLATES_AUTO_RELOAD = True,
-        EXPLAIN_TEMPLATE_LOADING=False,
-        MAX_COOKIE_SIZE=4093,
-    )
-
-    # INIT_SESSION = {{
-    #     "logged_in": False,
-    # }}
-
-    # Below are extra settings that Flask-Imp uses but relates to Flask-SQLAlchemy.
-    # This sets the file extension for SQLite databases, and where to create the folder
-    # that the database will be stored in.
-    # True will create the folder on the same level as your
-    # app, False will create the folder in the app root.
-    SQLITE_DB_EXTENSION = ".sqlite"
-    SQLITE_STORE_IN_PARENT = False
-    #
-
-    # SQLAlchemy settings that will be passed to Flask
-    # Any SQLAlchemy setting here will overwrite anything
-    # set in the config above
-    SQLALCHEMY_ECHO = False
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_RECORD_QUERIES = False
-    #
-
-    # Main database settings, this will be turned int the SQLALCHEMY_DATABASE_URI
-    # DATABASE_MAIN = DatabaseConfig(
-    #     ENABLED=True,
-    #     DIALECT="sqlite",
-    #     NAME="main",
-    #     LOCATION="",
-    #     PORT=0,
-    #     USERNAME="",
-    #     PASSWORD="",
-    # )
-
-    # Binds are additional databases that can be used in your app
-    # These will be added to the SQLALCHEMY_BINDS dictionary
-    # DATABASE_BINDS = {{
-    #     DatabaseConfig(
-    #         ENABLED=True,
-    #         DIALECT="sqlite",
-    #         NAME="additional_database",
-    #         BIND_KEY="additional_database",
-    #         LOCATION="",
-    #         PORT=0,
-    #         USERNAME="",
-    #         PASSWORD="",
-    #     )
-    # }}
-        """
-
-    # Format to: app_name
+    # Format to: app_name, secret_key
     init_py = """\
 from flask import Flask
+from flask_imp.config import FlaskConfig, ImpConfig, DatabaseConfig
 from {app_name}.extensions import imp, db
 
+flask_config = FlaskConfig(
+    SECRET_KEY="{secret_key}",
+)
+
+imp_config = ImpConfig(
+    init_session={{"logged_in": False}},
+    database_main=DatabaseConfig(
+        enabled=True,
+        dialect="sqlite",
+    )
+)
 
 def create_app():
     app = Flask(__name__, static_url_path="/")
+    flask_config.apply_config(app)
+    
     imp.init_app(app)
     imp.import_app_resources()
     imp.import_blueprints("blueprints")
@@ -358,11 +36,17 @@ def create_app():
 
     slim_init_py = """\
 from flask import Flask
+from flask_imp.config import FlaskConfig
 from {app_name}.extensions import imp
 
+flask_config = FlaskConfig(
+    SECRET_KEY="{secret_key}",
+)
 
 def create_app():
     app = Flask(__name__, static_url_path="/")
+    flask_config.apply_config(app)
+    
     imp.init_app(app)
     imp.import_app_resources()
     imp.import_blueprint("www")
@@ -372,11 +56,17 @@ def create_app():
 
     minimal_init_py = """\
 from flask import Flask
+from flask_imp.config import FlaskConfig
 from {app_name}.extensions import imp
 
+flask_config = FlaskConfig(
+    SECRET_KEY="{secret_key}",
+)
 
 def create_app():
     app = Flask(__name__, static_url_path="/")
+    flask_config.apply_config(app)
+    
     imp.init_app(app)
     imp.import_app_resources()
 

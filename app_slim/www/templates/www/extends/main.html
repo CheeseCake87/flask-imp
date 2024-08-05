@@ -1,0 +1,36 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %}Flask-Imp Blueprint: www</title>
+    <base href="{{ request.base_url }}">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <meta name="googlebot" content="noindex">
+    <meta name="ICBM" content="55.86012186235461, -4.252010320043988">
+    <meta name="geo.position" content="55.86012186235461;-4.252010320043988">
+    <meta name="geo.region" content="GB-SCT">
+    <meta name="geo.placename" content="Glasgow">
+    <meta name="DC.title" content="Flask-Imp Blueprint: www"/>
+    <meta name="rating" content="general">
+    <meta name="subject" content="Your document's subject">
+    <meta name="description" content="A description of the page">
+
+    <link rel="stylesheet" href="{{ url_for('www.static', filename='css/water.css') }}">
+
+    <script defer src="{{ url_for('www.static', filename='js/main.js') }}"></script>
+
+    <script>
+        // inline script
+    </script>
+
+</head>
+
+<body>
+{% include 'www/includes/header.html' %}
+{% block content %}{% endblock %}
+{% include 'www/includes/footer.html' %}
+</body>
+
+</html>

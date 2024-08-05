@@ -54,7 +54,7 @@ bp.import_nested_blueprint("standalone_nested_blueprint")
 
 @bp.before_app_request
 def before_app_request():
-    bp.init_session()
+    bp._init_session()
 ```
 
 That `config.toml` file is loaded during the `__init__` method of the Blueprint class.

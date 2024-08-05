@@ -3,5 +3,5 @@ from dataclasses import dataclass
 
 @dataclass
 class Config:
-    latest = 'v4'
-    versions = ['v3', 'v4']
+    latest = 'v5'
+    versions = ['v3', 'v4', 'v5']
