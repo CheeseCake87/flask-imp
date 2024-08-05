@@ -6,12 +6,12 @@ Title = Imp.init_app, __init__
 ```python
 def init_app(
     app: Flask,
-    config: t.Union[str, ImpConfig] = os.environ.get("IMP_CONFIG")
+    config: ImpConfig
 ) -> None:
 # -or- 
 Imp(
     app: Flask,
-    config: t.Union[str, ImpConfig] = os.environ.get("IMP_CONFIG")
+    config: ImpConfig
 )
 ```
 
