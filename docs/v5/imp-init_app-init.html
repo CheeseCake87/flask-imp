@@ -258,13 +258,7 @@
 </pre></div>
 <hr />
 <p>Initializes the flask app to work with flask-imp.</p>
-<p>If no <code>config</code> specified, an attempt to read <code>IMP_CONFIG</code> from the environment will be made.</p>
-<p>The config value can be a toml file <code>my_config.toml</code>, for example; or an import string. An example
-of an import string would be <code>config.Config</code> where <code>config</code> is the module and <code>Config</code> is the class.</p>
-<p>If <code>IMP_CONFIG</code> is not in the environment variables, an attempt to load <code>config.toml</code> will be made.</p>
-<p>If <code>config.toml</code> is not found, an attempt to load a class called <code>Config</code> from <code>config.py</code> will be made.
-The Config class must be an instance of <code>ImpConfig</code> <code>from flask_imp import ImpConfig</code>.</p>
-<p>An exception will be raised if none of the above methods are successful.</p>
+<p>See <a href="flask_imp_config-impconfig.html">flask_imp_config-impconfig.md</a> for more information on the <code>ImpConfig</code> class.</p>
 
 </section>
 
