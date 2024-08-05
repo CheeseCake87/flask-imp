@@ -25,8 +25,8 @@ def cli():
     nargs=1,
     default=".",
     prompt=(
-            f"\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n"
-            f"Folder to create blueprint in"
+        f"\n{Sp.WARNING}(Creation is relative to the current working directory){Sp.END}\n"
+        f"Folder to create blueprint in"
     ),
     help="The from_folder to create the blueprint in, defaults to the current working directory",
 )

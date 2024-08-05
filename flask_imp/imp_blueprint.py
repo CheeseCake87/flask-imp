@@ -41,11 +41,7 @@ class ImpBlueprint(Blueprint):
     _models: t.Set = None
     _nested_blueprints: t.Union[t.Set, t.Set[t.Union["ImpBlueprint", Blueprint]]] = None
 
-    def __init__(
-            self,
-            dunder_name: str,
-            config: ImpBlueprintConfig
-    ) -> None:
+    def __init__(self, dunder_name: str, config: ImpBlueprintConfig) -> None:
         """
         Initializes the ImpBlueprint.
 
@@ -67,9 +63,7 @@ class ImpBlueprint(Blueprint):
         self.bp_name = self.location.name
 
         if config is None:
-            raise NoConfigProvided(
-                f"No config was provided for {self.location}"
-            )
+            raise NoConfigProvided(f"No config was provided for {self.location}")
 
         self.config = config
 
@@ -82,7 +76,9 @@ class ImpBlueprint(Blueprint):
         super().__init__(self.bp_name, self.package, **self.config.super_settings())
 
     @_prevent_if_disabled
-    def _process_database_binds(self, database_binds: t.Optional[t.Iterable[DatabaseConfig]] = None) -> None:
+    def _process_database_binds(
+        self, database_binds: t.Optional[t.Iterable[DatabaseConfig]] = None
+    ) -> None:
         """
         Processes the database binds and adds them to the blueprint.
 
@@ -91,10 +87,7 @@ class ImpBlueprint(Blueprint):
         """
         for database_bind in database_binds:
             self._database_binds.add(
-                partial(
-                    _partial_database_binds,
-                    database_bind=database_bind
-                )
+                partial(_partial_database_binds, database_bind=database_bind)
             )
 
     @_prevent_if_disabled

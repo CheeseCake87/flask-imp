@@ -12,11 +12,11 @@ from .helpers import to_snake_case
 
 
 def add_blueprint(
-        name: str = "new_blueprint",
-        folder: str = ".",
-        _init_app: bool = False,
-        _cwd: Optional[Path] = None,
-        _url_prefix: Optional[str] = None,
+    name: str = "new_blueprint",
+    folder: str = ".",
+    _init_app: bool = False,
+    _cwd: Optional[Path] = None,
+    _url_prefix: Optional[str] = None,
 ):
     from .filelib.blueprint import blueprint_init_py
     from .filelib.blueprint import blueprint_routes_index_py
@@ -59,7 +59,9 @@ def add_blueprint(
     files = {
         "root/__init__.py": (
             folders["root"] / "__init__.py",
-            blueprint_init_py(url_prefix=name if not _url_prefix else _url_prefix, name=name),
+            blueprint_init_py(
+                url_prefix=name if not _url_prefix else _url_prefix, name=name
+            ),
         ),
         "routes/index.py": (
             folders["routes"] / "index.py",
@@ -76,9 +78,7 @@ def add_blueprint(
         ),
         "templates/-/index.html": (
             folders["templates"] / "index.html",
-            blueprint_templates_index_html(
-                root=folders["root"], name=name
-            )
+            blueprint_templates_index_html(root=folders["root"], name=name)
             if not _init_app
             else blueprint_init_app_templates_index_html(
                 name=name,

@@ -44,7 +44,7 @@ def blueprint_templates_index_html(name: str, root: str) -> str:
 
 
 def blueprint_init_app_templates_index_html(
-        name: str, index_html: str, extends_main_html: str, index_py: str, init_py: str
+    name: str, index_html: str, extends_main_html: str, index_py: str, init_py: str
 ):
     return f"""\
 {{% extends 'www/extends/main.html' %}}
@@ -67,9 +67,7 @@ def blueprint_init_app_templates_index_html(
 """
 
 
-def blueprint_templates_extends_main_html(
-        name: str, head_tag: str
-):
+def blueprint_templates_extends_main_html(name: str, head_tag: str):
     return f"""\
 <!doctype html>
 
@@ -89,7 +87,7 @@ def blueprint_templates_extends_main_html(
 
 
 def blueprint_templates_includes_header_html(
-        header_html: str, main_html: str, static_path: str
+    header_html: str, main_html: str, static_path: str
 ):
     return f"""\
 <div style="display: flex; flex-direction: row; align-items: center;
@@ -106,9 +104,7 @@ def blueprint_templates_includes_header_html(
 
 
 # Format to: footer_html, main_html
-def blueprint_templates_includes_footer_html(
-        footer_html: str, main_html: str
-):
+def blueprint_templates_includes_footer_html(footer_html: str, main_html: str):
     return f"""\
 <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
     <div>

@@ -24,8 +24,8 @@ def build(folders: dict, files: dict):
     for file, (path, content) in files.items():
         if not path.exists():
             if (
-                    file == "resources/static/favicon.ico"
-                    or file == "resources/static/img/flask-imp-logo.png"
+                file == "resources/static/favicon.ico"
+                or file == "resources/static/img/flask-imp-logo.png"
             ):
                 path.write_bytes(bytes.fromhex(content))
                 continue
@@ -83,7 +83,7 @@ def minimal_app(app_folder: Path):
         ),
         "resources/routes.py": (
             folders["resources"] / "routes.py",
-            resources_minimal_routes_py()
+            resources_minimal_routes_py(),
         ),
     }
 
@@ -232,10 +232,10 @@ def full_app(app_folder: Path):
 
 
 def init_app(
-        name,
-        _full: bool = False,
-        _slim: bool = False,
-        _minimal: bool = False,
+    name,
+    _full: bool = False,
+    _slim: bool = False,
+    _minimal: bool = False,
 ):
     click.echo(f"{Sp.OKGREEN}Creating App: {name}")
 

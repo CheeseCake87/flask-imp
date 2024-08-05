@@ -14,10 +14,10 @@ class ImpConfig:
     IMP_DATABASE_BINDS: t.Optional[t.List[DatabaseConfig]] = None
 
     def __init__(
-            self,
-            init_session: dict = None,
-            database_main: t.Optional[DatabaseConfig] = None,
-            database_binds: t.Optional[t.List[DatabaseConfig]] = None
+        self,
+        init_session: dict = None,
+        database_main: t.Optional[DatabaseConfig] = None,
+        database_binds: t.Optional[t.List[DatabaseConfig]] = None,
     ):
         self.IMP_INIT_SESSION = init_session
         self.IMP_DATABASE_MAIN = database_main
@@ -28,7 +28,6 @@ class ImpConfig:
             self.IMP_DATABASE_BINDS = database_binds
 
     def load_config_from_flask(self, app: Flask):
-
         _init_session = app.config.get("IMP_INIT_SESSION")
         _database_main = app.config.get("IMP_DATABASE_MAIN")
         _database_binds = app.config.get("IMP_DATABASE_BINDS")

@@ -21,18 +21,18 @@ class DatabaseConfig:
     allowed_dialects = ("mysql", "postgresql", "sqlite", "oracle", "mssql")
 
     def __init__(
-            self,
-            enabled: bool = False,
-            dialect: t.Literal[
-                "mysql", "postgresql", "sqlite", "oracle", "mssql"
-            ] = "sqlite",
-            name: str = "database",
-            bind_key: str = "",
-            location: str = "",
-            port: int = 0,
-            username: str = "",
-            password: str = "",
-            sqlite_db_extension: str = ".sqlite",
+        self,
+        enabled: bool = False,
+        dialect: t.Literal[
+            "mysql", "postgresql", "sqlite", "oracle", "mssql"
+        ] = "sqlite",
+        name: str = "database",
+        bind_key: str = "",
+        location: str = "",
+        port: int = 0,
+        username: str = "",
+        password: str = "",
+        sqlite_db_extension: str = ".sqlite",
     ):
         if dialect not in self.allowed_dialects:
             raise ValueError(

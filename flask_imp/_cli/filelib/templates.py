@@ -32,6 +32,7 @@ def templates_minimal_index_html(
 </html>
 """
 
+
 def templates_error_html():
     return """\
 <!doctype html>

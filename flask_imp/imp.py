@@ -26,17 +26,17 @@ class Imp:
     config: ImpConfig
 
     def __init__(
-            self,
-            app: Flask = None,
-            config: ImpConfig = None,
+        self,
+        app: Flask = None,
+        config: ImpConfig = None,
     ) -> None:
         if app is not None:
             self.init_app(app, config)
 
     def init_app(
-            self,
-            app: Flask,
-            config: ImpConfig = None,
+        self,
+        app: Flask,
+        config: ImpConfig = None,
     ) -> None:
         """
         Initializes the app with the flask-imp extension.
@@ -77,12 +77,12 @@ class Imp:
         self.app_instance_path.mkdir(exist_ok=True)
 
     def import_app_resources(
-            self,
-            folder: str = "resources",
-            factories: t.Optional[t.List] = None,
-            static_folder: str = "static",
-            templates_folder: str = "templates",
-            scope_import: t.Optional[t.Dict] = None,
+        self,
+        folder: str = "resources",
+        factories: t.Optional[t.List] = None,
+        static_folder: str = "static",
+        templates_folder: str = "templates",
+        scope_import: t.Optional[t.Dict] = None,
     ) -> None:
         """
         Imports the app resources from the given folder.
@@ -118,7 +118,9 @@ class Imp:
             )
 
         if not resources_folder.is_dir():
-            raise ImportError(f"Resources collection must be a folder, value given: {resources_folder}")
+            raise ImportError(
+                f"Resources collection must be a folder, value given: {resources_folder}"
+            )
 
         self.app.static_folder = (
             app_static_folder.as_posix() if app_static_folder.exists() else None
@@ -268,16 +270,12 @@ class Imp:
     def _apply_sqlalchemy_config(self):
         if "SQLALCHEMY_DATABASE_URI" not in self.app.config:
             build_database_main(
-                self.app,
-                self.app_instance_path,
-                self.config.IMP_DATABASE_MAIN
+                self.app, self.app_instance_path, self.config.IMP_DATABASE_MAIN
             )
 
         if "SQLALCHEMY_BINDS" not in self.app.config:
             build_database_binds(
-                self.app,
-                self.app_instance_path,
-                self.config.IMP_DATABASE_BINDS
+                self.app, self.app_instance_path, self.config.IMP_DATABASE_BINDS
             )
 
     def _import_resource_module(self, module: Path, factories: list):
@@ -293,10 +291,8 @@ class Imp:
             raise ImportError(f"Error when importing {module}: {e}")
 
     def _blueprint_registration(self, blueprint: t.Union[Blueprint, ImpBlueprint]):
-
         if hasattr(blueprint, "config"):
             if blueprint.config.enabled:
-
                 if hasattr(blueprint, "_models"):
                     for partial_model in blueprint._models:  # noqa
                         partial_model(imp_instance=self)
@@ -318,19 +314,16 @@ class Imp:
                 return
 
             else:
-
                 self.app.logger.debug(f"Imp Blueprint [{blueprint.name}] is disabled.")
 
         else:
-
             self.app.register_blueprint(blueprint)
 
     def _nested_blueprint_registration(
-            self,
-            parent: t.Union[Blueprint, ImpBlueprint],
-            child: t.Union[Blueprint, ImpBlueprint],
+        self,
+        parent: t.Union[Blueprint, ImpBlueprint],
+        child: t.Union[Blueprint, ImpBlueprint],
     ):
-
         if hasattr(parent, "config"):
             if not parent.config.enabled:
                 return
@@ -354,11 +347,11 @@ class Imp:
                 return
 
             else:
-
-                self.app.logger.debug(f"Imp Blueprint [{child.name}] is disabled. Parent: [{parent.name}]")
+                self.app.logger.debug(
+                    f"Imp Blueprint [{child.name}] is disabled. Parent: [{parent.name}]"
+                )
 
         else:
-
             parent.register_blueprint(child)
 
     def _process_model(self, path: Path):
@@ -380,8 +373,13 @@ class Imp:
         :return: None
         """
         if self.config.IMP_INIT_SESSION:
+
             @self.app.before_request
             def imp_before_request():
                 session.update(
-                    {k: v for k, v in self.config.IMP_INIT_SESSION.items() if k not in session}
+                    {
+                        k: v
+                        for k, v in self.config.IMP_INIT_SESSION.items()
+                        if k not in session
+                    }
                 )

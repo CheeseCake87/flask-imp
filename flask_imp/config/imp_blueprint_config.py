@@ -32,18 +32,18 @@ class ImpBlueprintConfig:
     )
 
     def __init__(
-            self,
-            enabled: bool = False,
-            url_prefix: str = None,
-            subdomain: str = None,
-            url_defaults: dict = None,
-            static_folder: str = "static",
-            template_folder: str = "templates",
-            static_url_path: str = "/static",
-            root_path: str = None,
-            cli_group: str = None,
-            init_session: dict = None,
-            database_binds: t.Iterable[DatabaseConfig] = None,
+        self,
+        enabled: bool = False,
+        url_prefix: str = None,
+        subdomain: str = None,
+        url_defaults: dict = None,
+        static_folder: str = "static",
+        template_folder: str = "templates",
+        static_url_path: str = "/static",
+        root_path: str = None,
+        cli_group: str = None,
+        init_session: dict = None,
+        database_binds: t.Iterable[DatabaseConfig] = None,
     ):
         self.enabled = enabled
         self.url_prefix = url_prefix
@@ -62,8 +62,4 @@ class ImpBlueprintConfig:
             self.database_binds = database_binds
 
     def super_settings(self) -> dict:
-        return {
-            k: getattr(self, k)
-            for k in self._blueprint_attrs
-            if getattr(self, k)
-        }
+        return {k: getattr(self, k) for k in self._blueprint_attrs if getattr(self, k)}
