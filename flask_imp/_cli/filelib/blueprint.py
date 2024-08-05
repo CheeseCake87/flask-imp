@@ -3,7 +3,7 @@ def blueprint_init_py(url_prefix: str, name: str) -> str:
 from flask_imp import ImpBlueprint
 from flask_imp.config import ImpBlueprintConfig
 
-bp = Blueprint(__name__, ImpBlueprintConfig(
+bp = ImpBlueprint(__name__, ImpBlueprintConfig(
     enabled=True,
     url_prefix="/{url_prefix}",
     init_session={{ "{name}_session_loaded": True }},
@@ -109,7 +109,7 @@ def blueprint_templates_includes_header_html(
 def blueprint_templates_includes_footer_html(
         footer_html: str, main_html: str
 ):
-    f"""\
+    return f"""\
 <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
     <div>
         <p>This is the footer, located here: <code>{footer_html}</code></p>

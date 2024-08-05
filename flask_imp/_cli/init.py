@@ -92,6 +92,7 @@ def minimal_app(app_folder: Path):
 
 def slim_app(app_folder: Path):
     from .filelib.init import init_slim_py
+    from .filelib.extensions import extensions_init_slim_py
     from .filelib.resources import resources_cli_py
     from .filelib.templates import templates_error_html
 
@@ -113,6 +114,10 @@ def slim_app(app_folder: Path):
         "root/__init__.py": (
             folders["root"] / "__init__.py",
             init_slim_py(app_name=app_name, secret_key=os.urandom(24).hex()),
+        ),
+        "extensions/__init__.py": (
+            folders["extensions"] / "__init__.py",
+            extensions_init_slim_py(),
         ),
         "resources/cli/cli.py": (
             folders["resources/cli"] / "cli.py",
@@ -137,12 +142,15 @@ def slim_app(app_folder: Path):
     add_blueprint(
         name="www",
         _init_app=True,
-        _cwd=app_folder
+        _cwd=app_folder,
+        _url_prefix="/",
     )
 
 
 def full_app(app_folder: Path):
     from .filelib.init import init_full_py
+    from .filelib.extensions import extensions_init_full_py
+    from .filelib.models import models_example_user_table_py
     from .filelib.resources import resources_cli_py
     from .filelib.resources import resources_context_processors_py
     from .filelib.resources import resources_filters_py
@@ -173,6 +181,14 @@ def full_app(app_folder: Path):
         "root/__init__.py": (
             folders["root"] / "__init__.py",
             init_full_py(app_name=app_name, secret_key=os.urandom(24).hex()),
+        ),
+        "extensions/__init__.py": (
+            folders["extensions"] / "__init__.py",
+            extensions_init_full_py(),
+        ),
+        "models/example_user_table.py": (
+            folders["models"] / "example_user_table.py",
+            models_example_user_table_py(),
         ),
         "resources/cli/cli.py": (
             folders["resources/cli"] / "cli.py",
@@ -208,8 +224,10 @@ def full_app(app_folder: Path):
 
     add_blueprint(
         name="www",
+        folder="blueprints",
         _init_app=True,
-        _cwd=app_folder
+        _cwd=app_folder,
+        _url_prefix="/",
     )
 
 

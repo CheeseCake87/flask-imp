@@ -23,7 +23,8 @@ def create_app():
     ))
 
     imp.import_app_resources()
-    imp.import_blueprint("www")
+    imp.import_blueprints("blueprints")
+    imp.import_models("models")
 
     db.init_app(app)
 

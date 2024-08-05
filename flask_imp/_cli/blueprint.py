@@ -3,7 +3,7 @@ from typing import Optional
 
 import click
 
-from .filelib import flask_imp_logo
+from .filelib.flask_imp_logo import flask_imp_logo
 from .filelib.head_tag_generator import head_tag_generator
 from .filelib.main_js import main_js
 from .filelib.water_css import water_css
@@ -16,6 +16,7 @@ def add_blueprint(
         folder: str = ".",
         _init_app: bool = False,
         _cwd: Optional[Path] = None,
+        _url_prefix: Optional[str] = None,
 ):
     from .filelib.blueprint import blueprint_init_py
     from .filelib.blueprint import blueprint_routes_index_py
@@ -58,7 +59,7 @@ def add_blueprint(
     files = {
         "root/__init__.py": (
             folders["root"] / "__init__.py",
-            blueprint_init_py(url_prefix=name, name=name),
+            blueprint_init_py(url_prefix=name if not _url_prefix else _url_prefix, name=name),
         ),
         "routes/index.py": (
             folders["routes"] / "index.py",
@@ -126,6 +127,8 @@ def add_blueprint(
                 path.write_bytes(bytes.fromhex(content))
                 continue
 
+            if not content:
+                print(path)
             path.write_text(content, encoding="utf-8")
 
             click.echo(f"{Sp.OKGREEN}Blueprint file: {file}, created{Sp.END}")
