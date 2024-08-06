@@ -29,7 +29,7 @@ def database_population_test():
             password=password,
             salt=salt,
             private_key=Auth.generate_private_key(salt),
-            disabled=False
+            disabled=False,
         )
         db.session.add(new_example_user)
         new_example_user_bind = m_example_user_bind(
@@ -37,22 +37,25 @@ def database_population_test():
             password=password,
             salt=salt,
             private_key=Auth.generate_private_key(salt),
-            disabled=False
+            disabled=False,
         )
         db.session.add(new_example_user_bind)
         db.session.flush()
         new_example_user_rel = m_example_table(
-            user_id=new_example_user.user_id,
-            thing=gen_password
+            user_id=new_example_user.user_id, thing=gen_password
         )
         db.session.add(new_example_user_rel)
         db.session.flush()
         db.session.commit()
 
-        user_in_example_table = imp.model("ExampleTable").get_by_user_id(new_example_user.user_id)
+        user_in_example_table = imp.model("ExampleTable").get_by_user_id(
+            new_example_user.user_id
+        )
 
         if user_in_example_table:
-            return (f"{new_example_user.username} created and {user_in_example_table.thing}"
-                    f"in ExampleTable, and {new_example_user_bind.username} created in ExampleUserBind.")
+            return (
+                f"{new_example_user.username} created and {user_in_example_table.thing}"
+                f"in ExampleTable, and {new_example_user_bind.username} created in ExampleUserBind."
+            )
 
     return "Failed Auto Test, User already exists."

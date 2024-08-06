@@ -6,7 +6,7 @@ def collection(app: object):
         {{ format_price(100.33) }} -> $100.33
         """
 
-        def example__format_price(amount, currency='$'):
-            return '{1}{0:.2f}'.format(amount, currency)
+        def example__format_price(amount, currency="$"):
+            return "{1}{0:.2f}".format(amount, currency)
 
         return dict(format_price=example__format_price)

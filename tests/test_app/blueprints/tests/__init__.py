@@ -1,19 +1,22 @@
 from flask_imp import ImpBlueprint
 from flask_imp.config import ImpBlueprintConfig, DatabaseConfig
 
-bp = ImpBlueprint(__name__, ImpBlueprintConfig(
-    enabled=True,
-    url_prefix="/tests",
-    static_url_path="/tests/static",
-    init_session={"tests_session": True},
-    database_binds=[
-        DatabaseConfig(
-            enabled=False,
-            bind_key="tests_db",
-            name="tests_blueprint",
-        )
-    ],
-))
+bp = ImpBlueprint(
+    __name__,
+    ImpBlueprintConfig(
+        enabled=True,
+        url_prefix="/tests",
+        static_url_path="/tests/static",
+        init_session={"tests_session": True},
+        database_binds=[
+            DatabaseConfig(
+                enabled=False,
+                bind_key="tests_db",
+                name="tests_blueprint",
+            )
+        ],
+    ),
+)
 
 bp.import_resources("routes")
 bp.import_nested_blueprint("nested_test")

@@ -20,22 +20,25 @@ def create_app():
 
     app.config["TEST"] = "Hello, World!"
 
-    imp.init_app(app, ImpConfig(
-        init_session={"logged_in": False},
-        database_main=DatabaseConfig(
-            enabled=True,
-            dialect="sqlite",
-            name=os.getenv("DATABASE_NAME", "my_database"),
-        ),
-        database_binds=[
-            DatabaseConfig(
+    imp.init_app(
+        app,
+        ImpConfig(
+            init_session={"logged_in": False},
+            database_main=DatabaseConfig(
                 enabled=True,
                 dialect="sqlite",
-                name="database_another",
-                bind_key="another",
-            )
-        ]
-    ))
+                name=os.getenv("DATABASE_NAME", "my_database"),
+            ),
+            database_binds=[
+                DatabaseConfig(
+                    enabled=True,
+                    dialect="sqlite",
+                    name="database_another",
+                    bind_key="another",
+                )
+            ],
+        ),
+    )
 
     imp.import_app_resources(factories=["collection"])
     imp.import_blueprint("root_blueprint")
@@ -54,16 +57,10 @@ def create_app():
 
     password = "password"
 
-    encrypted_password = encrypt_password(
-        password, "salt", 512, 1, "start"
-    )
+    encrypted_password = encrypt_password(password, "salt", 512, 1, "start")
 
     print(encrypted_password)
 
-    print(
-        authenticate_password(
-            password, encrypted_password, "salt", 512, 1, "start"
-        )
-    )
+    print(authenticate_password(password, encrypted_password, "salt", 512, 1, "start"))
 
     return app

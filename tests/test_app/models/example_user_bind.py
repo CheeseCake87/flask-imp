@@ -2,7 +2,7 @@ from ..extensions import db
 
 
 class ExampleUserBind(db.Model):
-    __bind_key__ = 'another'
+    __bind_key__ = "another"
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(256), nullable=False)
     password = db.Column(db.String(512), nullable=False)

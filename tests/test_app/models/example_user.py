@@ -12,9 +12,9 @@ class ExampleUser(db.Model):
     disabled = db.Column(db.Boolean)
 
     rel_example_table = relationship(
-        'ExampleTable',
-        lazy='joined',
-        order_by='ExampleTable.thing',
+        "ExampleTable",
+        lazy="joined",
+        order_by="ExampleTable.thing",
     )
 
     @classmethod

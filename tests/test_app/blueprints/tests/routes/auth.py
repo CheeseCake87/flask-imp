@@ -7,9 +7,7 @@ from .. import bp
 def auth_test_password_correct():
     password = "password"
 
-    encrypted_password = encrypt_password(
-        password, "salt", 512, 1, "start"
-    )
+    encrypted_password = encrypt_password(password, "salt", 512, 1, "start")
 
     result = authenticate_password(
         password, encrypted_password, "salt", 512, 1, "start"
@@ -22,13 +20,9 @@ def auth_test_password_correct():
 def auth_test_password_incorrect():
     password = "password"
 
-    encrypted_password = encrypt_password(
-        password, "salt", 512, 1, "start"
-    )
+    encrypted_password = encrypt_password(password, "salt", 512, 1, "start")
 
-    result = authenticate_password(
-        "wrong", encrypted_password, "salt", 512, 1, "start"
-    )
+    result = authenticate_password("wrong", encrypted_password, "salt", 512, 1, "start")
 
     return f"{result}"
 
@@ -37,9 +31,7 @@ def auth_test_password_incorrect():
 def auth_test_password_correct_long():
     password = "password"
 
-    encrypted_password = encrypt_password(
-        password, "salt", 512, 3, "start"
-    )
+    encrypted_password = encrypt_password(password, "salt", 512, 3, "start")
 
     result = authenticate_password(
         password, encrypted_password, "salt", 512, 3, "start"

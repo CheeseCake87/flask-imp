@@ -1,5 +1,5 @@
 def collection(app: object):
-    @app.template_filter('example__num_to_month')
+    @app.template_filter("example__num_to_month")
     def example__num_to_month(num: str) -> str:
         """
         Usage:

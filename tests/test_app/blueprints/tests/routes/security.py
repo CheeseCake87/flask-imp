@@ -10,7 +10,9 @@ def group_routes(rule, **options):
         @functools.wraps(func)
         @bp.route(rule, **options)
         @login_check("logged_in", True, fail_endpoint="tests.login_failed")
-        @permission_check("permissions", ["admin"], fail_endpoint="tests.permission_failed")
+        @permission_check(
+            "permissions", ["admin"], fail_endpoint="tests.permission_failed"
+        )
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
 
@@ -62,9 +64,16 @@ def set_permissions_value():
 
 
 @bp.route("/already-logged-in/bool/with-flash", methods=["GET"])
-@login_check("logged_in", True, pass_endpoint="tests.already_logged_in", message="Already logged in")
+@login_check(
+    "logged_in",
+    True,
+    pass_endpoint="tests.already_logged_in",
+    message="Already logged in",
+)
 def already_logged_in_bool():
-    return render_template(bp.tmpl("security.html"), logged_in_on=session.get("logged_in"))
+    return render_template(
+        bp.tmpl("security.html"), logged_in_on=session.get("logged_in")
+    )
 
 
 @bp.route("/must-be-logged-in/bool", methods=["GET"])
@@ -94,7 +103,9 @@ def must_be_logged_in_int():
 @bp.route("/must-be-logged-in/multi", methods=["GET"])
 @login_check("logged_in", [1, "li", True], "tests.login_failed")
 def must_be_logged_in_multi():
-    return render_template(bp.tmpl("security.html"), logged_in_on=session.get("logged_in"))
+    return render_template(
+        bp.tmpl("security.html"), logged_in_on=session.get("logged_in")
+    )
 
 
 @bp.route("/must-have-permissions/std", methods=["GET"])
@@ -135,11 +146,7 @@ def blank_func(number):
 
 
 @bp.route("/pass-func-check", methods=["GET"])
-@pass_function_check(
-    check_if_number,
-    None,
-    "tests.permission_failed"
-)
+@pass_function_check(check_if_number, None, "tests.permission_failed")
 def pass_function_check_std():
     # Expecting to pass as missing kwargs are ignored
     return "Pass"
@@ -147,10 +154,7 @@ def pass_function_check_std():
 
 @bp.route("/pass-func-check-fail-on-kwargs", methods=["GET"])
 @pass_function_check(
-    check_if_number,
-    None,
-    "tests.permission_failed",
-    fail_on_missing_kwargs=True
+    check_if_number, None, "tests.permission_failed", fail_on_missing_kwargs=True
 )
 def pass_function_check_std_fail_on_kwargs():
     # Expecting to fail with response: will redirect to tests.permission_failed
@@ -158,34 +162,35 @@ def pass_function_check_std_fail_on_kwargs():
 
 
 @bp.route("/pass-func-check-with-url-var-replaced/<number>", methods=["GET"])
-@pass_function_check(
-    check_if_number,
-    {'number': 10},
-    "tests.permission_failed"
-)
+@pass_function_check(check_if_number, {"number": 10}, "tests.permission_failed")
 def pass_function_check_with_url_value(number):
     # Expecting to pass with response: URL value: <number>
     return f"URL value: {number}"
 
 
-@bp.route("/pass-func-check-with-url-var-replaced-and-app-context/<number>", methods=["GET"])
+@bp.route(
+    "/pass-func-check-with-url-var-replaced-and-app-context/<number>", methods=["GET"]
+)
 @pass_function_check(
     check_if_number,
-    {'number': 10, 'session_': session},
+    {"number": 10, "session_": session},
     "tests.permission_failed",
-    with_app_context=True
+    with_app_context=True,
 )
 def pass_function_check_with_url_value_with_ac(number):
     # Expecting to pass with response: URL value: <number>
     return f"URL value: {number}"
 
 
-@bp.route("/pass-func-check-with-url-var-replaced-and-app-context-with-partial/<number>", methods=["GET"])
+@bp.route(
+    "/pass-func-check-with-url-var-replaced-and-app-context-with-partial/<number>",
+    methods=["GET"],
+)
 @pass_function_check(
     check_if_number,
-    {'number': 10, 'tests_session': session},
+    {"number": 10, "tests_session": session},
     "tests.permission_failed",
-    with_app_context=True
+    with_app_context=True,
 )
 def pass_function_check_with_url_value_with_ac_with_partial(number):
     # Expecting to pass with response: URL value: <number>

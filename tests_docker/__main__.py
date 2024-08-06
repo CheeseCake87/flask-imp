@@ -6,7 +6,6 @@ from typing import Optional
 
 
 class DockerCli:
-
     def __init__(self, command: str, cwd_: Optional[Path] = None):
         self.command = command.split(" ")
         self.cwd = cwd_ or Path.cwd()
@@ -58,7 +57,6 @@ if __name__ == "__main__":
                 print(this_log)
                 break
 
-
     def build_docker(tag_, file_):
         with DockerCli(f"build -t {tag_} -f {file_} .") as output_:
             print("=" * 50)
@@ -70,18 +68,17 @@ if __name__ == "__main__":
                 sys.exit(1)
             print("=" * 50)
 
-
     def create_docker(tag_):
-        with DockerCli(f"create --name {tag_.replace(':latest', '')} {tag_}") as output_:
+        with DockerCli(
+            f"create --name {tag_.replace(':latest', '')} {tag_}"
+        ) as output_:
             print(f"create --name {tag_.replace(':latest', '')} {tag_}")
             _ = output_
-
 
     def start_docker(tag_):
         with DockerCli(f"start {tag_}") as output_:
             print(f"start {tag_}")
             _ = output_
-
 
     # build_pool = multiprocessing.Pool()
     #
@@ -102,18 +99,18 @@ if __name__ == "__main__":
 
     for tag, file in tags.items():
         if tag in enabled_tags:
-            create_docker(tag.replace(':latest', ''))
+            create_docker(tag.replace(":latest", ""))
 
     print("Running test environments, please wait...")
 
     for tag, file in tags.items():
         if tag in enabled_tags:
-            start_docker(tag.replace(':latest', ''))
+            start_docker(tag.replace(":latest", ""))
 
     print("Gathering logs, please wait...")
     for tag in tags:
         if tag in enabled_tags:
-            get_logs(tag.replace(':latest', ''))
+            get_logs(tag.replace(":latest", ""))
 
     cleanup_input = input("Do you want to cleanup? (Y/n): ")
 

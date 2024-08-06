@@ -11,16 +11,18 @@ if not instance_folder.exists():
     instance_folder.mkdir()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def app():
     app = create_app()
-    app.config.update({
-        "TESTING": True,
-    })
+    app.config.update(
+        {
+            "TESTING": True,
+        }
+    )
     yield app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def client(app):
     return app.test_client()
 

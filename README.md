@@ -125,7 +125,7 @@ pytest
 ### Run the tests under multiple Python versions using docker.
 
 ```bash
-python3 test_docker
+python3 tests_docker
 ```
 
 ### Info

@@ -1,7 +1,3 @@
-[build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
-
 [project]
 name = "flask-imp"
 description = 'A Flask auto importer that allows your Flask apps to grow big.'
@@ -32,34 +28,16 @@ dependencies = [
     'more-itertools'
 ]
 
-[project.scripts]
-flask-imp = "flask_imp._cli:cli"
-
 [project.urls]
 Documentation = "https://cheesecake87.github.io/flask-imp/"
 Source = "https://github.com/CheeseCake87/flask-imp"
 
-[tool.flit.sdist]
-exclude = [
-    "venv/",
-    ".venv/",
-    ".github/",
-    "_assets/",
-    "app/",
-    "dist/",
-    "docs/",
-    "gdocs/",
-    "test_app/",
-    "test_docker/",
-    "tests/",
-    ".env",
-    ".gitignore",
-    "docker-compose.yaml",
-    "Dockerfile",
-    "requirements_build.txt",
-    "requirements_dev.txt",
-    "requirements_docs.txt",
-]
+[project.scripts]
+flask-imp = "flask_imp._cli:cli"
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
 [tool.pyqwe]
 install = "*:flit install --symlink"
@@ -67,3 +45,20 @@ build = "*:flit build"
 publish = "*shell:export=FLIT_USERNAME=__token__ && flit publish"
 docs = "*:flask --app docs compile"
 docs-watch = "*:flask --app gdocs compile --watch"
+
+[tool.flit.sdist]
+exclude = [
+    ".github",
+    "_assets",
+    "dist",
+    "docs",
+    "tests_docker",
+    ".gitignore",
+    ".env",
+]
+
+[tool.ruff]
+src = ["src"]
+fix = true
+show-fixes = true
+output-format = "full"

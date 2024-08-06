@@ -1,10 +1,13 @@
 from flask_imp import ImpBlueprint
 from flask_imp.config import ImpBlueprintConfig
 
-bp = ImpBlueprint(__name__, ImpBlueprintConfig(
-    enabled=True,
-    url_prefix="/nested-test-one",
-    static_url_path="/nested_test_one/static",
-))
+bp = ImpBlueprint(
+    __name__,
+    ImpBlueprintConfig(
+        enabled=True,
+        url_prefix="/nested-test-one",
+        static_url_path="/nested_test_one/static",
+    ),
+)
 
 bp.import_resources("routes")
