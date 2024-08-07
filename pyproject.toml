@@ -23,7 +23,6 @@ dependencies = [
     'click',
     'Flask',
     'Flask-SQLAlchemy',
-    'toml',
     'more-itertools'
 ]
 
