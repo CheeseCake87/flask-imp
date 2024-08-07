@@ -1,5 +1,5 @@
 # Format to: app_name
-def resources_cli_py():
+def resources_cli_py() -> str:
     return """\
 from flask import current_app as app
 
@@ -10,7 +10,7 @@ def show_config():
 """
 
 
-def resources_context_processors_py():
+def resources_context_processors_py() -> str:
     return """\
 from flask import current_app as app
 
@@ -29,7 +29,7 @@ def example__utility_processor():
 """
 
 
-def resources_error_handlers_py():
+def resources_error_handlers_py() -> str:
     return """\
 from flask import current_app as app
 
@@ -111,7 +111,7 @@ def server_error(e):
 """
 
 
-def resources_filters_py():
+def resources_filters_py() -> str:
     return """\
 from flask import current_app as app
 
@@ -146,7 +146,7 @@ def example__num_to_month(num: str) -> str:
 """
 
 
-def resources_routes_py():
+def resources_routes_py() -> str:
     return """\
 from flask import current_app as app
 
@@ -157,7 +157,7 @@ def example_route():
 """
 
 
-def resources_minimal_routes_py():
+def resources_minimal_routes_py() -> str:
     return """\
 from flask import current_app as app
 from flask import render_template

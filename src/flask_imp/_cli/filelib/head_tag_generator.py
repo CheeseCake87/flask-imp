@@ -1,9 +1,9 @@
-def head_tag_generator(static_endpoint="static", no_js=False):
+def head_tag_generator(static_url_endpoint: str = "static", no_js: bool = False) -> str:
     """Generate the head tag for the HTML template files."""
 
     js = (
         (
-            f"<script defer src=\"{{{{ url_for('{static_endpoint}', "
+            f"<script defer src=\"{{{{ url_for('{static_url_endpoint}', "
             f"filename='js/main.js') }}}}\"></script>"
         )
         if not no_js
@@ -21,7 +21,7 @@ def head_tag_generator(static_endpoint="static", no_js=False):
     <meta name="viewport" content="'width=device-width, initial-scale=1.0'">
     <title>Flask-Imp</title>
     {favicon}
-    <link rel="stylesheet" href="{{{{ url_for('{static_endpoint}', filename='css/water.css') }}}}">
+    <link rel="stylesheet" href="{{{{ url_for('{static_url_endpoint}', filename='css/water.css') }}}}">
     {js}
 
     <script>

@@ -1,4 +1,7 @@
-def collection(app: object):
+from flask import Flask
+
+
+def collection(app: Flask):
     from flask import render_template
 
     @app.errorhandler(400)

@@ -1,4 +1,4 @@
-def init_full_py(app_name, secret_key):
+def init_full_py(app_name: str, secret_key: str) -> str:
     return f"""\
 from flask import Flask
 
@@ -35,7 +35,7 @@ def create_app():
 """
 
 
-def init_slim_py(app_name, secret_key):
+def init_slim_py(app_name: str, secret_key: str) -> str:
     return f"""\
 from flask import Flask
 
@@ -59,7 +59,7 @@ def create_app():
 """
 
 
-def init_minimal_py(secret_key):
+def init_minimal_py(secret_key: str) -> str:
     return f"""\
 from flask import Flask
 

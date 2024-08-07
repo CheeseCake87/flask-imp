@@ -6,7 +6,7 @@ from .init import init_app as _init_app
 
 
 @click.group()
-def cli():
+def cli() -> None:
     pass  # Entry Point
 
 
@@ -30,7 +30,7 @@ def cli():
     ),
     help="The from_folder to create the blueprint in, defaults to the current working directory",
 )
-def add_blueprint(name, folder):
+def add_blueprint(name: str, folder: str) -> None:
     _add_blueprint(name=name, folder=folder)
 
 
@@ -47,7 +47,7 @@ def add_blueprint(name, folder):
     "-m", "--minimal", is_flag=True, default=False, help="Create a minimal app"
 )
 @click.option("-f", "--full", is_flag=True, default=False, help="Create a full app")
-def init_new_app(name, full, slim, minimal):
+def init_new_app(name: str, full: bool, slim: bool, minimal: bool) -> None:
     if not full and not slim and not minimal:
         choice = click.prompt(
             "What type of app would you like to create?",

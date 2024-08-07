@@ -1,4 +1,7 @@
-def collection(app: object):
+from flask import Flask
+
+
+def collection(app: Flask):
     @app.context_processor
     def example__utility_processor():
         """

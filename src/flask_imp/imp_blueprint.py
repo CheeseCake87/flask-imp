@@ -17,14 +17,8 @@ from .utilities import (
     _partial_database_binds,
 )
 
-
-def _prevent_if_disabled(func) -> t.Callable:
-    def decorator(self, *args, **kwargs):
-        if not self.config.enabled:
-            return
-        return func(self, *args, **kwargs)
-
-    return decorator
+ArgT = t.TypeVar("ArgT")
+ReturnT = t.TypeVar("ReturnT")
 
 
 class ImpBlueprint(Blueprint):
@@ -38,8 +32,9 @@ class ImpBlueprint(Blueprint):
     bp_name: str
     package: str
 
-    _models: t.Set = None
-    _nested_blueprints: t.Union[t.Set, t.Set[t.Union["ImpBlueprint", Blueprint]]] = None
+    models: t.Set[t.Any]
+    nested_blueprints: t.Set[t.Union["ImpBlueprint", Blueprint]]
+    database_binds: t.Set[t.Any]
 
     def __init__(self, dunder_name: str, config: ImpBlueprintConfig) -> None:
         """
@@ -49,9 +44,9 @@ class ImpBlueprint(Blueprint):
         :param config: The blueprint's config.
         """
 
-        self._models = set()
-        self._database_binds = set()
-        self._nested_blueprints = set()
+        self.models = set()
+        self.database_binds = set()
+        self.nested_blueprints = set()
 
         self.package = dunder_name
 
@@ -73,11 +68,17 @@ class ImpBlueprint(Blueprint):
         if config.database_binds:
             self._process_database_binds(config.database_binds)
 
-        super().__init__(self.bp_name, self.package, **self.config.super_settings())
+        super().__init__(
+            self.bp_name, self.package, **self.config.flask_blueprint_args()
+        )
 
-    @_prevent_if_disabled
+    def _prevent_if_disabled(self: "ImpBlueprint") -> bool:
+        if not self.config.enabled:
+            return True
+        return False
+
     def _process_database_binds(
-        self, database_binds: t.Optional[t.Iterable[DatabaseConfig]] = None
+        self, database_binds: t.Optional[t.Iterable[DatabaseConfig]]
     ) -> None:
         """
         Processes the database binds and adds them to the blueprint.
@@ -85,12 +86,23 @@ class ImpBlueprint(Blueprint):
         :param config: The blueprint's config.
         :return: None
         """
-        for database_bind in database_binds:
-            self._database_binds.add(
-                partial(_partial_database_binds, database_bind=database_bind)
-            )
+        if self._prevent_if_disabled():
+            return
 
-    @_prevent_if_disabled
+        if database_binds:
+            for database_bind in database_binds:
+                self.database_binds.add(
+                    partial(_partial_database_binds, database_bind=database_bind)
+                )
+
+    def as_flask_blueprint(self) -> Blueprint:
+        """
+        Returns the blueprint as a Flask Blueprint.
+
+        :return: Blueprint
+        """
+        return self
+
     def import_resources(self, folder: str = "routes") -> None:
         """
         Will import all the resources (cli, routes, filters, context_processors...) from the given folder.
@@ -99,6 +111,9 @@ class ImpBlueprint(Blueprint):
         :param folder: Folder to look for resources in. Defaults to "routes". Must be relative.
         :return: None
         """
+
+        if self._prevent_if_disabled():
+            return
 
         resource_path = self.location / folder
         if not resource_path.exists():
@@ -113,8 +128,7 @@ class ImpBlueprint(Blueprint):
                     f"Error when importing {self.package}.{resource}: {e}"
                 )
 
-    @_prevent_if_disabled
-    def import_nested_blueprint(self, blueprint: str) -> None:
+    def import_nested_blueprint(self, blueprint: t.Union[str, Path]) -> None:
         """
         Imports the specified Flask-Imp Blueprint or a standard Flask Blueprint as a nested blueprint,
         under the current blueprint.
@@ -122,20 +136,33 @@ class ImpBlueprint(Blueprint):
         :param blueprint: The blueprint (folder name) to import. Must be relative.
         :return: None
         """
-        if Path(blueprint).is_absolute():
-            potential_bp = Path(blueprint)
+
+        if self._prevent_if_disabled():
+            return
+
+        if isinstance(blueprint, Path):
+            potential_bp = blueprint
         else:
-            potential_bp = Path(self.location / blueprint)
+            if isinstance(blueprint, str):
+                if Path(blueprint).is_absolute():
+                    potential_bp = Path(blueprint)
+                else:
+                    potential_bp = Path(self.location / blueprint)
+            else:
+                raise ValueError("Blueprint must be a string or a Path object")
 
         if potential_bp.exists() and potential_bp.is_dir():
             module = import_module(
                 cast_to_import_str(self.package.split(".")[0], potential_bp)
             )
             for name, potential in getmembers(module):
-                if isinstance(potential, Blueprint):
-                    self._nested_blueprints.add(potential)
+                if isinstance(potential, ImpBlueprint):
+                    self.nested_blueprints.add(potential)
+                    continue
 
-    @_prevent_if_disabled
+                if isinstance(potential, Blueprint):
+                    self.nested_blueprints.add(potential)
+
     def import_nested_blueprints(self, folder: str) -> None:
         """
         Imports all blueprints in the given folder.
@@ -144,15 +171,17 @@ class ImpBlueprint(Blueprint):
         :return: None
         """
 
+        if self._prevent_if_disabled():
+            return
+
         folder_path = Path(self.location / folder)
 
         if not folder_path.exists() or not folder_path.is_dir():
             raise NotADirectoryError(f"{folder_path} is not a directory")
 
         for potential_bp in folder_path.iterdir():
-            self.import_nested_blueprint(f"{potential_bp}")
+            self.import_nested_blueprint(blueprint=potential_bp)
 
-    @_prevent_if_disabled
     def import_models(self, file_or_folder: str) -> None:
         """
         Same actions as `Imp.import_models()`, but scoped to the current blueprint's package.
@@ -160,7 +189,11 @@ class ImpBlueprint(Blueprint):
         :param file_or_folder: The file or folder to import from. Must be relative.
         :return: None
         """
-        self._models.add(
+
+        if self._prevent_if_disabled():
+            return
+
+        self.models.add(
             partial(
                 _partial_models_import,
                 location=self.location,

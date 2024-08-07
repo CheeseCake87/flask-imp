@@ -1,5 +1,6 @@
 [project]
 name = "flask-imp"
+version = "5.1.0"
 description = 'A Flask auto importer that allows your Flask apps to grow big.'
 authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
 readme = "README.md"
@@ -9,7 +10,6 @@ classifiers = [
     'Environment :: Web Environment', 'Intended Audience :: Developers',
     'License :: OSI Approved :: MIT License',
     'Operating System :: OS Independent', 'Programming Language :: Python',
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
@@ -18,8 +18,7 @@ classifiers = [
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Natural Language :: English',
 ]
-requires-python = ">=3.8"
-dynamic = ["version"]
+requires-python = ">=3.9"
 dependencies = [
     'click',
     'Flask',
@@ -50,12 +49,26 @@ docs-watch = "*:flask --app gdocs compile --watch"
 exclude = [
     ".github",
     "_assets",
+    "app",
+    "instance",
     "dist",
     "docs",
     "tests_docker",
     ".gitignore",
     ".env",
 ]
+
+[tool.mypy]
+python_version = "3.9"
+files = ["src/flask_imp"]
+show_error_codes = true
+pretty = true
+strict = true
+
+[tool.pyright]
+pythonVersion = "3.9"
+include = ["src/flask_imp"]
+typeCheckingMode = "basic"
 
 [tool.ruff]
 src = ["src"]

@@ -1,4 +1,7 @@
-def collection(app: object):
+from flask import Flask
+
+
+def collection(app: Flask):
     @app.template_filter("example__num_to_month")
     def example__num_to_month(num: str) -> str:
         """

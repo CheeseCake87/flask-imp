@@ -2,24 +2,27 @@ import typing as t
 from dataclasses import dataclass
 
 from flask import Flask
-
 from flask_imp.config import DatabaseConfig
 
 
 @dataclass
 class ImpConfig:
-    IMP_INIT_SESSION: t.Optional[dict] = None
+    IMP_INIT_SESSION: t.Optional[t.Dict[str, t.Any]]
 
-    IMP_DATABASE_MAIN: t.Optional[DatabaseConfig] = None
-    IMP_DATABASE_BINDS: t.Optional[t.List[DatabaseConfig]] = None
+    IMP_DATABASE_MAIN: t.Optional[DatabaseConfig]
+    IMP_DATABASE_BINDS: t.Optional[t.List[DatabaseConfig]]
 
     def __init__(
         self,
-        init_session: dict = None,
+        init_session: t.Optional[t.Dict[str, t.Any]] = None,
         database_main: t.Optional[DatabaseConfig] = None,
         database_binds: t.Optional[t.List[DatabaseConfig]] = None,
     ):
-        self.IMP_INIT_SESSION = init_session
+        if not init_session:
+            self.IMP_INIT_SESSION = {}
+        else:
+            self.IMP_INIT_SESSION = init_session
+
         self.IMP_DATABASE_MAIN = database_main
 
         if database_binds is None:
@@ -27,7 +30,7 @@ class ImpConfig:
         else:
             self.IMP_DATABASE_BINDS = database_binds
 
-    def load_config_from_flask(self, app: Flask):
+    def load_config_from_flask(self, app: Flask) -> None:
         _init_session = app.config.get("IMP_INIT_SESSION")
         _database_main = app.config.get("IMP_DATABASE_MAIN")
         _database_binds = app.config.get("IMP_DATABASE_BINDS")

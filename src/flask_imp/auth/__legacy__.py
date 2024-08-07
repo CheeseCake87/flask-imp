@@ -16,7 +16,6 @@ from .is_username_valid import is_username_valid
 
 
 def auth_password(
-    cls,
     input_password: str,
     database_password: str,
     database_salt: str,
@@ -24,7 +23,7 @@ def auth_password(
     pepper_length: int = 1,
 ) -> bool:
     """Legacy method, use authenticate_password instead"""
-    return cls.authenticate_password(
+    return authenticate_password(
         input_password, database_password, database_salt, encrypt, pepper_length
     )
 

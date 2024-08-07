@@ -23,5 +23,5 @@ bp.import_nested_blueprint("nested_test")
 bp.import_nested_blueprints("group_of_nested")
 bp.import_models("models")
 
-print(":::-- tests nested bps", bp._nested_blueprints)
+print(":::-- tests nested bps", bp.nested_blueprints)
 print(":::-- tests config id", id(bp.config))

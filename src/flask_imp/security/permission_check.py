@@ -18,7 +18,7 @@ def permission_check(
     endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
     message: t.Optional[str] = None,
     message_category: str = "message",
-):
+) -> t.Callable[..., t.Any]:
     """
     A decorator that checks if the specified session key exists and its value(s) match the specified value(s).
 
@@ -51,12 +51,14 @@ def permission_check(
     :return: The decorated function, or abort(403).
     """
 
-    def permission_check_wrapper(func):
+    def permission_check_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
         @wraps(func)
-        def inner(*args, **kwargs):
+        def inner(*args: t.Any, **kwargs: t.Any) -> t.Any:
             skey = session.get(session_key)
 
-            def setup_flash(_message, _message_category):
+            def setup_flash(
+                _message: t.Optional[str], _message_category: t.Optional[str]
+            ) -> None:
                 if _message:
                     partial_flash = partial(flash, _message)
                     if _message_category:
@@ -72,7 +74,16 @@ def permission_check(
 
             if fail_endpoint:
                 if endpoint_kwargs:
-                    return redirect(url_for(fail_endpoint, **endpoint_kwargs))
+                    return redirect(
+                        url_for(
+                            fail_endpoint,
+                            _anchor=None,
+                            _method=None,
+                            _scheme=None,
+                            _external=None,
+                            **endpoint_kwargs,
+                        )
+                    )
 
                 return redirect(url_for(fail_endpoint))
 

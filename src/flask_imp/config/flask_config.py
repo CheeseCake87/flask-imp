@@ -108,7 +108,7 @@ class FlaskConfig:
         if app_instance is not None:
             self.apply_config(app_instance)
 
-    def apply_config(self, app):
+    def apply_config(self, app: Flask) -> None:
         if not hasattr(app, "config"):
             raise ValueError("app must have a config attribute")
 
@@ -117,7 +117,7 @@ class FlaskConfig:
             if value is not None:
                 app.config[attr] = value
 
-    def as_dict(self) -> dict:
+    def as_dict(self) -> t.Dict[str, t.Any]:
         return {
             k: getattr(self, k) for k in self._flask_config_keys if getattr(self, k)
         }

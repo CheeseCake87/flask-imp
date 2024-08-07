@@ -1,51 +1,42 @@
+from __future__ import annotations
+
 import typing as t
 from pathlib import Path
+
+from flask import Flask, Blueprint
 
 ImpBlueprintSelf = t.TypeVar("ImpBlueprintSelf", bound="ImpBlueprint")
 
 
 @t.runtime_checkable
-class Blueprint(t.Protocol):
-    root_path: str
-
-
-@t.runtime_checkable
 class ImpBlueprint(t.Protocol):
-    bp_name: str
-    enabled: bool
-    config: t.Any
-    package: str
+    config: "ImpBlueprintConfig"
+
     location: Path
+    bp_name: str
+    package: str
 
-    _models: t.Set
-    _nested_blueprints: t.Union[t.Set, t.Set[t.Any]]
+    models: t.Set[t.Any]
+    nested_blueprints: t.Set[t.Union["ImpBlueprint", Blueprint]]
+    database_binds: t.Set[t.Any]
 
-    def register_blueprint(self, blueprint: Blueprint): ...
+    def _prevent_if_disabled(self: "ImpBlueprint") -> bool: ...
 
-    def _register(self, app: "Flask", options: dict) -> None: ...
+    def _process_database_binds(
+        self, database_binds: t.Optional[t.Iterable[DatabaseConfig]]
+    ) -> None: ...
 
-    def load_config(self, imp_instance) -> None: ...
+    def as_flask_blueprint(self) -> Blueprint: ...
 
-    def super_settings(self) -> dict: ...
+    def import_resources(self, folder: str = "routes") -> None: ...
 
+    def import_nested_blueprint(self, blueprint: str) -> None: ...
 
-@t.runtime_checkable
-class Flask(t.Protocol):
-    name: str
-    root_path: str
-    extensions: dict
-    config: dict
-    static_folder: t.Optional[str]
-    template_folder: t.Optional[str]
+    def import_nested_blueprints(self, folder: str) -> None: ...
 
-    logger: t.Any
+    def import_models(self, file_or_folder: str) -> None: ...
 
-    app_context: t.Any
-
-    def register_blueprint(self, blueprint: t.Union[Blueprint, ImpBlueprint]): ...
-
-    @property
-    def before_request(self): ...
+    def tmpl(self, template: str) -> str: ...
 
 
 @t.runtime_checkable
@@ -83,36 +74,11 @@ class FlaskConfig(t.Protocol):
     EXPLAIN_TEMPLATE_LOADING: t.Optional[bool]
     MAX_COOKIE_SIZE: t.Optional[int]
 
-    def set_using_args(
-        self,
-        debug: t.Optional[bool] = None,
-        propagate_exceptions: t.Optional[bool] = None,
-        trap_http_exceptions: t.Optional[bool] = None,
-        trap_bad_request_errors: t.Optional[bool] = None,
-        secret_key: t.Optional[str] = None,
-        session_cookie_name: t.Optional[str] = None,
-        session_cookie_domain: t.Optional[str] = None,
-        session_cookie_path: t.Optional[str] = None,
-        session_cookie_httponly: t.Optional[bool] = None,
-        session_cookie_secure: t.Optional[bool] = None,
-        session_cookie_samesite: t.Optional[t.Literal["Lax", "Strict"]] = None,
-        permanent_session_lifetime: t.Optional[int] = None,
-        session_refresh_each_request: t.Optional[bool] = None,
-        use_x_sendfile: t.Optional[bool] = None,
-        send_file_max_age_default: t.Optional[int] = None,
-        error_404_help: t.Optional[bool] = None,
-        server_name: t.Optional[str] = None,
-        application_root: t.Optional[str] = None,
-        preferred_url_scheme: t.Optional[str] = None,
-        max_content_length: t.Optional[int] = None,
-        templates_auto_reload: t.Optional[bool] = None,
-        explain_template_loading: t.Optional[bool] = None,
-        max_cookie_size: t.Optional[int] = None,
-    ): ...
+    _flask_config_keys: t.Set[str]
 
-    def _get_attr_values(self) -> t.Set[t.Tuple[str, t.Union[bool, str, int]]]: ...
+    def apply_config(self, app: Flask) -> None: ...
 
-    def attrs(self) -> t.Set[t.Tuple[str, t.Union[bool, str, int]]]: ...
+    def as_dict(self) -> t.Dict[str, t.Any]: ...
 
 
 @t.runtime_checkable
@@ -120,22 +86,22 @@ class DatabaseConfig(t.Protocol):
     enabled: bool
     dialect: t.Literal["mysql", "postgresql", "sqlite", "oracle", "mssql"]
     name: str
-    bind_key: str
+    bind_key: t.Optional[str]
     location: str
     port: int
     username: str
     password: str
 
-    def __init__(self): ...
+    def __init__(self) -> None: ...
 
-    def as_dict(self) -> dict: ...
+    def as_dict(self) -> t.Dict[str, t.Union[str, int]]: ...
 
 
 @t.runtime_checkable
 class ImpConfig(t.Protocol):
     FLASK: FlaskConfig
 
-    INIT_SESSION: t.Optional[dict]
+    INIT_SESSION: t.Optional[t.Dict[str, t.Any]]
 
     SQLALCHEMY_ECHO: t.Optional[bool]
     SQLALCHEMY_TRACK_MODIFICATIONS: t.Optional[bool]
@@ -145,25 +111,27 @@ class ImpConfig(t.Protocol):
     SQLITE_STORE_IN_PARENT: t.Optional[bool]
 
     DATABASE_MAIN: t.Optional[DatabaseConfig]
-    DATABASE_BINDS: t.Optional[t.Set[DatabaseConfig]]
+    DATABASE_BINDS: t.Optional[t.List[DatabaseConfig]]
 
-    def __call__(self, *args, **kwargs): ...
+    def __call__(self, *args: t.Any, **kwargs: t.Any) -> t.Any: ...
 
 
 @t.runtime_checkable
 class ImpBlueprintConfig(t.Protocol):
-    ENABLED: bool
-    URL_PREFIX: str
-    SUBDOMAIN: str
-    URL_DEFAULTS: dict
-    STATIC_FOLDER: str
-    TEMPLATE_FOLDER: str
-    STATIC_URL_PATH: str
-    ROOT_PATH: str
-    CLI_GROUP: str
+    enabled: t.Optional[bool]
+    url_prefix: t.Optional[str]
+    subdomain: t.Optional[str]
+    url_default: t.Optional[t.Dict[str, t.Any]]
+    static_folder: t.Optional[str]
+    template_folder: t.Optional[str]
+    static_url_path: t.Optional[str]
+    root_path: t.Optional[str]
+    cli_group: t.Optional[str]
 
-    INIT_SESSION: dict
+    init_session: t.Optional[t.Dict[str, t.Any]]
 
-    DATABASE_BINDS: t.Optional[t.Set[DatabaseConfig]]
+    database_binds: t.Optional[t.Iterable[DatabaseConfig]]
 
-    def __call__(self, *args, **kwargs): ...
+    _blueprint_attrs: t.Set[str]
+
+    def flask_blueprint_args(self) -> t.Dict[str, t.Any]: ...

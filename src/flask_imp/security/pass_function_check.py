@@ -9,8 +9,8 @@ from flask import url_for
 
 
 def pass_function_check(
-    function: t.Callable,
-    predefined_args: t.Optional[t.Dict] = None,
+    function: t.Callable[..., t.Any],
+    predefined_args: t.Optional[t.Dict[str, t.Any]] = None,
     fail_endpoint: t.Optional[str] = None,
     pass_endpoint: t.Optional[str] = None,
     endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
@@ -18,7 +18,7 @@ def pass_function_check(
     message_category: str = "message",
     fail_on_missing_kwargs: bool = False,
     with_app_context: bool = False,
-):
+) -> t.Callable[..., t.Any]:
     """
     A decorator that takes the result of a function and checks if it is True or False.
 
@@ -144,10 +144,12 @@ def pass_function_check(
     from flask import current_app
     from flask.sessions import SessionMixin
 
-    def pass_function_wrapper(func):
+    def pass_function_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
         @wraps(func)
-        def inner(*args, **kwargs):
-            def setup_flash(_message, _message_category):
+        def inner(*args: t.Any, **kwargs: t.Any) -> t.Any:
+            def setup_flash(
+                _message: t.Optional[str], _message_category: t.Optional[str]
+            ) -> None:
                 if _message:
                     partial_flash = partial(flash, _message)
                     if _message_category:
@@ -186,7 +188,16 @@ def pass_function_check(
                     setup_flash(message, message_category)
 
                     if endpoint_kwargs:
-                        return redirect(url_for(pass_endpoint, **endpoint_kwargs))
+                        return redirect(
+                            url_for(
+                                pass_endpoint,
+                                _anchor=None,
+                                _method=None,
+                                _scheme=None,
+                                _external=None,
+                                **endpoint_kwargs,
+                            )
+                        )
 
                     return redirect(url_for(pass_endpoint))
 
@@ -196,7 +207,16 @@ def pass_function_check(
                 setup_flash(message, message_category)
 
                 if endpoint_kwargs:
-                    return redirect(url_for(fail_endpoint, **endpoint_kwargs))
+                    return redirect(
+                        url_for(
+                            fail_endpoint,
+                            _anchor=None,
+                            _method=None,
+                            _scheme=None,
+                            _external=None,
+                            **endpoint_kwargs,
+                        )
+                    )
 
                 return redirect(url_for(fail_endpoint))
 

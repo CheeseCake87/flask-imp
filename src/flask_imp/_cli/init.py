@@ -1,4 +1,5 @@
 import os
+import typing as t
 from pathlib import Path
 
 import click
@@ -11,7 +12,7 @@ from .filelib.water_css import water_css
 from .helpers import Sprinkles as Sp
 
 
-def build(folders: dict, files: dict):
+def build(folders: t.Dict[str, t.Any], files: t.Dict[str, t.Any]) -> None:
     for folder, path in folders.items():
         if not path.exists():
             path.mkdir(parents=True)
@@ -37,7 +38,7 @@ def build(folders: dict, files: dict):
             click.echo(f"{Sp.WARNING}App file already exists: {file}, skipping{Sp.END}")
 
 
-def minimal_app(app_folder: Path):
+def minimal_app(app_folder: Path) -> None:
     from .filelib.init import init_minimal_py
     from .filelib.templates import templates_minimal_index_html
     from .filelib.resources import resources_minimal_routes_py
@@ -90,7 +91,7 @@ def minimal_app(app_folder: Path):
     build(folders, files)
 
 
-def slim_app(app_folder: Path):
+def slim_app(app_folder: Path) -> None:
     from .filelib.init import init_slim_py
     from .filelib.extensions import extensions_init_slim_py
     from .filelib.resources import resources_cli_py
@@ -147,7 +148,7 @@ def slim_app(app_folder: Path):
     )
 
 
-def full_app(app_folder: Path):
+def full_app(app_folder: Path) -> None:
     from .filelib.init import init_full_py
     from .filelib.extensions import extensions_init_full_py
     from .filelib.models import models_example_user_table_py
@@ -188,7 +189,7 @@ def full_app(app_folder: Path):
         ),
         "models/example_user_table.py": (
             folders["models"] / "example_user_table.py",
-            models_example_user_table_py(),
+            models_example_user_table_py(app_name=app_name),
         ),
         "resources/cli/cli.py": (
             folders["resources/cli"] / "cli.py",
@@ -232,11 +233,11 @@ def full_app(app_folder: Path):
 
 
 def init_app(
-    name,
+    name: str,
     _full: bool = False,
     _slim: bool = False,
     _minimal: bool = False,
-):
+) -> None:
     click.echo(f"{Sp.OKGREEN}Creating App: {name}")
 
     cwd = Path.cwd()

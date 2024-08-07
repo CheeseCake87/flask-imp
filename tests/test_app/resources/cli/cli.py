@@ -1,7 +1,9 @@
 from importlib import import_module
 
+from flask import Flask
 
-def collection(app: object):
+
+def collection(app: Flask):
     @app.cli.command("add-example-user")
     def add_example_user():
         from ...models.example_table import ExampleTable

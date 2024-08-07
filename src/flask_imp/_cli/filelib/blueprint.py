@@ -1,3 +1,7 @@
+import typing as t
+from pathlib import Path
+
+
 def blueprint_init_py(url_prefix: str, name: str) -> str:
     return f"""\
 from flask_imp import ImpBlueprint
@@ -13,7 +17,7 @@ bp.import_resources("routes")
 """
 
 
-def blueprint_routes_index_py():
+def blueprint_routes_index_py() -> str:
     return """\
 from flask import render_template
 
@@ -26,14 +30,14 @@ def index():
 """
 
 
-def blueprint_templates_index_html(name: str, root: str) -> str:
+def blueprint_templates_index_html(blueprint_name: str, root: Path) -> str:
     return f"""\
-{{% extends '{name}/extends/main.html' %}}
+{{% extends '{blueprint_name}/extends/main.html' %}}
 
 {{% block content %}}
     <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
         <div>
-            <h2 style="margin: 0;">Blueprint: {name}</h2>
+            <h2 style="margin: 0;">Blueprint: {blueprint_name}</h2>
             <h3>Here's your new blueprint.</h3>
             <p>Located here: <code>{root}</code></p>
             <p style="margin-bottom: 0;">Remember to double-check the config.toml file.</p>
@@ -44,15 +48,19 @@ def blueprint_templates_index_html(name: str, root: str) -> str:
 
 
 def blueprint_init_app_templates_index_html(
-    name: str, index_html: str, extends_main_html: str, index_py: str, init_py: str
-):
+    blueprint_name: str,
+    index_html: Path,
+    extends_main_html: Path,
+    index_py: Path,
+    init_py: Path,
+) -> str:
     return f"""\
 {{% extends 'www/extends/main.html' %}}
 
 {{% block content %}}
 <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
     <div>
-        <h2 style="margin: 0;">Blueprint: {name}</h2>
+        <h2 style="margin: 0;">Blueprint: {blueprint_name}</h2>
         <h3>This is the index route of the included example blueprint.</h3>
         <p style="margin-bottom: 0;">
             This template page is located in <code>{index_html}</code><br/>
@@ -67,7 +75,7 @@ def blueprint_init_app_templates_index_html(
 """
 
 
-def blueprint_templates_extends_main_html(name: str, head_tag: str):
+def blueprint_templates_extends_main_html(name: str, head_tag: str) -> str:
     return f"""\
 <!doctype html>
 
@@ -87,13 +95,13 @@ def blueprint_templates_extends_main_html(name: str, head_tag: str):
 
 
 def blueprint_templates_includes_header_html(
-    header_html: str, main_html: str, static_path: str
-):
+    header_html: Path, main_html: Path, static_url_endpoint: str
+) -> str:
     return f"""\
 <div style="display: flex; flex-direction: row; align-items: center;
             justify-content: start; gap: 2rem; margin-bottom: 2rem;">
     <img style="border-radius: 50%"
-         src="{{{{ url_for('{static_path}', filename='img/flask-imp-logo.png') }}}}" alt="flask-imp logo">
+         src="{{{{ url_for('{static_url_endpoint}', filename='img/flask-imp-logo.png') }}}}" alt="flask-imp logo">
     <h1 style="font-size: 4rem;">Flask-Imp</h1>
 </div>
 <div style="margin-bottom: 2rem;">
@@ -104,7 +112,7 @@ def blueprint_templates_includes_header_html(
 
 
 # Format to: footer_html, main_html
-def blueprint_templates_includes_footer_html(footer_html: str, main_html: str):
+def blueprint_templates_includes_footer_html(footer_html: Path, main_html: Path) -> str:
     return f"""\
 <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
     <div>

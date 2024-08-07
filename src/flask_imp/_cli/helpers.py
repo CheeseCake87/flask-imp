@@ -1,7 +1,7 @@
 import re
 
 
-def to_snake_case(string):
+def to_snake_case(string: str) -> str:
     """
     Thank you openai
     """

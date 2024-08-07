@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+import typing as t
 
 import click
 
@@ -15,9 +15,9 @@ def add_blueprint(
     name: str = "new_blueprint",
     folder: str = ".",
     _init_app: bool = False,
-    _cwd: Optional[Path] = None,
-    _url_prefix: Optional[str] = None,
-):
+    _cwd: t.Optional[Path] = None,
+    _url_prefix: t.Optional[str] = None,
+) -> None:
     from .filelib.blueprint import blueprint_init_py
     from .filelib.blueprint import blueprint_routes_index_py
     from .filelib.blueprint import blueprint_templates_index_html
@@ -44,7 +44,7 @@ def add_blueprint(
     else:
         root_folder = cwd / folder / name
 
-    folders = {
+    folders: t.Dict[str, Path] = {
         "root": root_folder,
         "routes": root_folder / "routes",
         "static": root_folder / "static",
@@ -56,7 +56,7 @@ def add_blueprint(
         "templates/includes": root_folder / "templates" / name / "includes",
     }
 
-    files = {
+    files: t.Dict[str, t.Tuple[Path, t.Any]] = {
         "root/__init__.py": (
             folders["root"] / "__init__.py",
             blueprint_init_py(
@@ -78,10 +78,10 @@ def add_blueprint(
         ),
         "templates/-/index.html": (
             folders["templates"] / "index.html",
-            blueprint_templates_index_html(root=folders["root"], name=name)
+            blueprint_templates_index_html(root=folders["root"], blueprint_name=name)
             if not _init_app
             else blueprint_init_app_templates_index_html(
-                name=name,
+                blueprint_name=name,
                 index_html=folders["templates"] / "index.html",
                 extends_main_html=folders["templates/extends"] / "main.html",
                 index_py=folders["routes"] / "index.py",
@@ -100,7 +100,7 @@ def add_blueprint(
             blueprint_templates_includes_header_html(
                 header_html=folders["templates/includes"] / "header.html",
                 main_html=folders["templates/extends"] / "main.html",
-                static_path=f"{name}.static",
+                static_url_endpoint=f"{name}.static",
             ),
         ),
         "templates/-/includes/footer.html": (

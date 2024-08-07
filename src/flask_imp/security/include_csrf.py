@@ -1,5 +1,5 @@
 from functools import wraps
-
+import typing as t
 from flask import abort
 from flask import request
 from flask import session
@@ -9,7 +9,7 @@ from flask_imp.auth import generate_csrf_token
 
 def include_csrf(
     session_key: str = "csrf", form_key: str = "csrf", abort_code: int = 401
-):
+) -> t.Callable[..., t.Any]:
     """
     A decorator that handles CSRF protection.
 
@@ -48,9 +48,9 @@ def include_csrf(
     :return: The decorated function, or abort(abort_code).
     """
 
-    def include_csrf_wrapper(func):
+    def include_csrf_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
         @wraps(func)
-        def inner(*args, **kwargs):
+        def inner(*args: t.Any, **kwargs: t.Any) -> t.Any:
             if request.method == "GET":
                 session[session_key] = generate_csrf_token()
 

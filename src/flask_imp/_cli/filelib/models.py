@@ -1,9 +1,9 @@
 # Format to: None
-def models_example_user_table_py():
-    return """\
+def models_example_user_table_py(app_name: str) -> str:
+    return f"""\
 from sqlalchemy import select, update, delete, insert
 
-from app_full.extensions import db
+from {app_name}.extensions import db
 from flask_imp.auth import (
     authenticate_password,
     encrypt_password,

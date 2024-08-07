@@ -2,16 +2,16 @@ import typing as t
 from hashlib import sha256, sha512
 
 
-def _pps(pepper_, pass_, salt_) -> str:
+def _pps(pepper_: str, pass_: str, salt_: str) -> str:
     return pepper_ + pass_ + salt_
 
 
-def _ppe(pepper_, pass_, salt_) -> str:
+def _ppe(pepper_: str, pass_: str, salt_: str) -> str:
     return pass_ + pepper_ + salt_
 
 
 def _guess_block(
-    guesses: set,
+    guesses: t.Set[str],
     input_password: str,
     database_password: str,
     database_salt: str,

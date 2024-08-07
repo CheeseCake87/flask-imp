@@ -1,7 +1,7 @@
+from flask_imp.utilities import class_field
 from sqlalchemy import ForeignKey
 
 from ..extensions import db
-from flask_imp.utilities import class_field
 
 
 def example_function():
@@ -20,6 +20,18 @@ class ExampleTable(db.Model):
     @classmethod
     def get_by_user_id(cls, user_id):
         return cls.query.filter_by(user_id=user_id).first()
+
+    @classmethod
+    def delete(cls, user_id):
+        pass
+
+    @classmethod
+    def update(cls, user_id, **kwargs):
+        pass
+
+    @classmethod
+    def add(cls, **kwargs):
+        pass
 
 
 class ExampleTableOne(db.Model):

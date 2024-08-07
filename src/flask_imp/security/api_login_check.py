@@ -10,7 +10,7 @@ def api_login_check(
     session_key: str,
     values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
     fail_json: t.Optional[t.Dict[str, t.Any]] = None,
-):
+) -> t.Callable[..., t.Any]:
     """
     A decorator that is used to secure API routes that return JSON responses.
 
@@ -50,9 +50,9 @@ def api_login_check(
     :return: The decorated function, or a JSON response.
     """
 
-    def api_login_check_wrapper(func):
+    def api_login_check_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
         @wraps(func)
-        def inner(*args, **kwargs):
+        def inner(*args: t.Any, **kwargs: t.Any) -> t.Any:
             skey = session.get(session_key)
             if skey:
                 if _check_against_values_allowed(skey, values_allowed):

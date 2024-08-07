@@ -8,7 +8,7 @@ from flask import Flask, Blueprint, session
 from flask_sqlalchemy.model import DefaultMeta
 
 from .config import ImpConfig
-from .protocols import ImpBlueprint
+from .imp_blueprint import ImpBlueprint
 from .registeries import ModelRegistry
 from .utilities import cast_to_import_str, build_database_main, build_database_binds
 
@@ -27,8 +27,8 @@ class Imp:
 
     def __init__(
         self,
-        app: Flask = None,
-        config: ImpConfig = None,
+        app: t.Optional[Flask] = None,
+        config: t.Optional[ImpConfig] = None,
     ) -> None:
         if app is not None:
             self.init_app(app, config)
@@ -36,7 +36,7 @@ class Imp:
     def init_app(
         self,
         app: Flask,
-        config: ImpConfig = None,
+        config: t.Optional[ImpConfig] = None,
     ) -> None:
         """
         Initializes the app with the flask-imp extension.
@@ -79,10 +79,10 @@ class Imp:
     def import_app_resources(
         self,
         folder: str = "resources",
-        factories: t.Optional[t.List] = None,
+        factories: t.Optional[t.List[str]] = None,
         static_folder: str = "static",
         templates_folder: str = "templates",
-        scope_import: t.Optional[t.Dict] = None,
+        scope_import: t.Optional[t.Dict[str, t.Union[t.List[str], str]]] = None,
     ) -> None:
         """
         Imports the app resources from the given folder.
@@ -189,8 +189,12 @@ class Imp:
         if blueprint_path.exists() and blueprint_path.is_dir():
             module = import_module(cast_to_import_str(self.app_name, blueprint_path))
             for name, potential_blueprint in getmembers(module):
+                if isinstance(potential_blueprint, ImpBlueprint):
+                    self._imp_blueprint_registration(potential_blueprint)
+                    continue
+
                 if isinstance(potential_blueprint, Blueprint):
-                    self._blueprint_registration(potential_blueprint)
+                    self._flask_blueprint_registration(potential_blueprint)
 
     def import_blueprints(self, folder: str) -> None:
         """
@@ -233,7 +237,7 @@ class Imp:
             ]:
                 self._process_model(model_file)
 
-    def model(self, class_: str) -> DefaultMeta:
+    def model(self, class_: str) -> t.Union[DefaultMeta, t.Any]:
         """
         Returns the model class for the given ORM class name.
 
@@ -242,7 +246,7 @@ class Imp:
         """
         return self.model_registry.class_(class_)
 
-    def model_meta(self, class_: t.Union[str, DefaultMeta]) -> dict:
+    def model_meta(self, class_: t.Union[str, DefaultMeta]) -> t.Dict[str, t.Any]:
         """
         Returns meta information for the given ORM class name.
 
@@ -250,7 +254,7 @@ class Imp:
         :return: dict of meta-information.
         """
 
-        def check_for_table_name(model_):
+        def check_for_table_name(model_: DefaultMeta) -> None:
             if not hasattr(model_, "__tablename__"):
                 raise AttributeError(f"{model_} is not a valid model")
 
@@ -267,7 +271,7 @@ class Imp:
             "table_name": class_.__tablename__,
         }
 
-    def _apply_sqlalchemy_config(self):
+    def _apply_sqlalchemy_config(self) -> None:
         if "SQLALCHEMY_DATABASE_URI" not in self.app.config:
             build_database_main(
                 self.app, self.app_instance_path, self.config.IMP_DATABASE_MAIN
@@ -275,10 +279,14 @@ class Imp:
 
         if "SQLALCHEMY_BINDS" not in self.app.config:
             build_database_binds(
-                self.app, self.app_instance_path, self.config.IMP_DATABASE_BINDS
+                flask_app=self.app,
+                app_instance_path=self.app_instance_path,
+                database_binds=self.config.IMP_DATABASE_BINDS
+                if self.config.IMP_DATABASE_BINDS
+                else None,
             )
 
-    def _import_resource_module(self, module: Path, factories: list):
+    def _import_resource_module(self, module: Path, factories: t.List[str]) -> None:
         try:
             with self.app.app_context():
                 file_module = import_module(cast_to_import_str(self.app_name, module))
@@ -290,71 +298,74 @@ class Imp:
         except ImportError as e:
             raise ImportError(f"Error when importing {module}: {e}")
 
-    def _blueprint_registration(self, blueprint: t.Union[Blueprint, ImpBlueprint]):
-        if hasattr(blueprint, "config"):
-            if blueprint.config.enabled:
-                if hasattr(blueprint, "_models"):
-                    for partial_model in blueprint._models:  # noqa
-                        partial_model(imp_instance=self)
+    def _imp_blueprint_registration(self, imp_blueprint: ImpBlueprint) -> None:
+        if not imp_blueprint.config.enabled:
+            self.app.logger.debug(
+                f"Imp Blueprint [{imp_blueprint.bp_name}] is disabled."
+            )
+            return
 
-                if hasattr(blueprint, "_database_binds"):
-                    for partial_database_bind in blueprint._database_binds:  # noqa
-                        partial_database_bind(imp_instance=self)
+        for partial_model in imp_blueprint.models:  # noqa
+            partial_model(imp_instance=self)
 
-                if hasattr(blueprint, "_nested_blueprints"):
-                    for nested_blueprint in blueprint._nested_blueprints:  # noqa
-                        self._nested_blueprint_registration(blueprint, nested_blueprint)
+        for partial_database_bind in imp_blueprint.database_binds:
+            partial_database_bind(imp_instance=self)
 
-                if hasattr(blueprint, "init_session"):
-                    if blueprint.init_session:
-                        self.config.IMP_INIT_SESSION.update(blueprint.init_session)
+        for nested_blueprint in imp_blueprint.nested_blueprints:
+            if isinstance(nested_blueprint, ImpBlueprint):
+                self._nested_imp_blueprint_registration(imp_blueprint, nested_blueprint)
 
-                self.app.register_blueprint(blueprint)
-
-                return
-
-            else:
-                self.app.logger.debug(f"Imp Blueprint [{blueprint.name}] is disabled.")
-
-        else:
-            self.app.register_blueprint(blueprint)
-
-    def _nested_blueprint_registration(
-        self,
-        parent: t.Union[Blueprint, ImpBlueprint],
-        child: t.Union[Blueprint, ImpBlueprint],
-    ):
-        if hasattr(parent, "config"):
-            if not parent.config.enabled:
-                return
-
-        if hasattr(child, "config"):
-            if child.config.enabled:
-                parent.register_blueprint(child)  # noqa
-
-                if hasattr(child, "_models"):
-                    for partial_model in child._models:  # noqa
-                        partial_model(imp_instance=self)
-
-                if hasattr(child, "_database_binds"):
-                    for partial_database_bind in child._database_binds:  # noqa
-                        partial_database_bind(imp_instance=self)
-
-                if hasattr(child, "init_session"):
-                    if child.init_session:
-                        self.config.IMP_INIT_SESSION.update(child.init_session)
-
-                return
-
-            else:
-                self.app.logger.debug(
-                    f"Imp Blueprint [{child.name}] is disabled. Parent: [{parent.name}]"
+            elif isinstance(nested_blueprint, Blueprint):
+                self._nested_flask_blueprint_registration(
+                    nested_blueprint, nested_blueprint
                 )
 
-        else:
-            parent.register_blueprint(child)
+        if imp_blueprint.config.init_session:
+            self.config.IMP_INIT_SESSION.update(
+                imp_blueprint.config.init_session
+            ) if isinstance(self.config.IMP_INIT_SESSION, dict) else None
 
-    def _process_model(self, path: Path):
+        self._flask_blueprint_registration(imp_blueprint)
+
+    def _nested_imp_blueprint_registration(
+        self,
+        parent: ImpBlueprint,
+        child: ImpBlueprint,
+    ) -> None:
+        if not parent.config.enabled:
+            return
+
+        if not child.config.enabled:
+            self.app.logger.debug(
+                f"Imp Blueprint [{child.bp_name}] is disabled. Parent: [{parent.bp_name}]"
+            )
+            return
+
+        parent.register_blueprint(child)
+
+        for partial_model in child.models:
+            partial_model(imp_instance=self)
+
+        for partial_database_bind in child.database_binds:  # noqa
+            partial_database_bind(imp_instance=self)
+
+        if child.config.init_session:
+            if self.config.IMP_INIT_SESSION is None:
+                self.config.IMP_INIT_SESSION = {}
+
+            self.config.IMP_INIT_SESSION.update(child.config.init_session)
+
+    def _flask_blueprint_registration(self, blueprint: Blueprint) -> None:
+        self.app.register_blueprint(blueprint)
+
+    @staticmethod
+    def _nested_flask_blueprint_registration(
+        parent: Blueprint,
+        child: Blueprint,
+    ) -> None:
+        parent.register_blueprint(blueprint=child)
+
+    def _process_model(self, path: Path) -> None:
         """
         Picks apart the model from_file and builds a registry of the models found.
         """
@@ -372,14 +383,9 @@ class Imp:
         """
         :return: None
         """
-        if self.config.IMP_INIT_SESSION:
+        if isinstance(self.config.IMP_INIT_SESSION, dict):
+            _: t.Dict[str, t.Any] = self.config.IMP_INIT_SESSION
 
             @self.app.before_request
-            def imp_before_request():
-                session.update(
-                    {
-                        k: v
-                        for k, v in self.config.IMP_INIT_SESSION.items()
-                        if k not in session
-                    }
-                )
+            def imp_before_request() -> None:
+                session.update({k: v for k, v in _.items() if k not in session})

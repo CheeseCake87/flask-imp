@@ -25,10 +25,10 @@ class Sprinkles:
 _toml_suffix = (".toml", ".tml")
 
 
-def deprecated(message: str):
-    def func_wrapper(func):
+def deprecated(message: str) -> t.Callable[[t.Any], t.Any]:
+    def func_wrapper(func: t.Any) -> t.Any:
         @functools.wraps(func)
-        def proc_function(*args, **kwargs):
+        def proc_function(*args: t.Any, **kwargs: t.Any) -> t.Any:
             logging.warning(
                 f"{Sprinkles.FAIL}Function deprecated: {message}{Sprinkles.END}"
             )
@@ -50,7 +50,7 @@ def _partial_models_import(
 
 def _partial_database_binds(
     imp_instance: Imp,
-    database_bind: DatabaseConfig,
+    database_bind: t.Union[t.Any, DatabaseConfig],
 ) -> None:
     if "SQLALCHEMY_BINDS" in imp_instance.app.config:
         imp_instance.app.config["SQLALCHEMY_BINDS"][database_bind.bind_key] = (
@@ -65,8 +65,10 @@ def _partial_database_binds(
 
 
 def build_database_main(
-    flask_app: Flask, app_instance_path: Path, database_main: DatabaseConfig
-):
+    flask_app: Flask,
+    app_instance_path: Path,
+    database_main: t.Optional[DatabaseConfig] = None,
+) -> None:
     if database_main:
         if database_main.enabled:
             flask_app.config["SQLALCHEMY_DATABASE_URI"] = build_database_uri(
@@ -75,8 +77,10 @@ def build_database_main(
 
 
 def build_database_binds(
-    flask_app: Flask, app_instance_path: Path, database_binds: t.List[DatabaseConfig]
-):
+    flask_app: Flask,
+    app_instance_path: Path,
+    database_binds: t.Optional[t.Iterable[DatabaseConfig]] = None,
+) -> None:
     if database_binds:
         for db in database_binds:
             if db.enabled:
@@ -88,7 +92,9 @@ def build_database_binds(
                 )
 
 
-def build_database_uri(flask_app: Flask, app_instance_path: Path, db: DatabaseConfig):
+def build_database_uri(
+    flask_app: Flask, app_instance_path: Path, db: DatabaseConfig
+) -> str:
     if db.dialect == "sqlite":
         filepath = app_instance_path / (
             db.name + flask_app.config.get("SQLITE_DB_EXTENSION", ".sqlite")

@@ -8,7 +8,7 @@ class DatabaseConfig:
 
     enabled: bool = False
     dialect: t.Literal["mysql", "postgresql", "sqlite", "oracle", "mssql"] = "sqlite"
-    bind_key: str = None
+    bind_key: t.Optional[str] = None
     name: str = "database"
     location: str = ""
     port: int = 0
@@ -50,7 +50,7 @@ class DatabaseConfig:
 
         self.sqlite_db_extension = sqlite_db_extension
 
-    def as_dict(self) -> dict:
+    def as_dict(self) -> t.Dict[str, t.Any]:
         return {
             "enabled": self.enabled,
             "dialect": self.dialect,
