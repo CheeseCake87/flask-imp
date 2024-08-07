@@ -101,13 +101,19 @@ python -m venv venv
 ### Install the requirements.
 
 ```bash
-pip install -r requirements/development.txt
+pip install -r requirements/dev.txt
 ```
 
 ### Install the local version of Flask-Imp.
 
 ```bash
 flit install
+```
+
+### Create a new app.
+
+```bash
+flask-imp init --name app --full
 ```
 
 ### Run the included Flask app.
@@ -130,13 +136,11 @@ python3 tests_docker
 
 ### Info
 
-The Flask app is located in the `app` folder.
-
 The tests are located in the `tests` folder.
 
 The test Flask app is located in the `tests/test_app` folder. 
 
-The tests are linked to the tests blueprint located at `test_app/blueprints/tests`.
+The tests are linked to the `tests` blueprint located at `tests/test_app/blueprints/tests`.
 
 ### Building the docs.
 
