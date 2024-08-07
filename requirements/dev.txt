@@ -8,10 +8,22 @@ blinker==1.8.2
     # via
     #   -r tests.txt
     #   flask
+certifi==2024.7.4
+    # via
+    #   -r build.txt
+    #   requests
+charset-normalizer==3.3.2
+    # via
+    #   -r build.txt
+    #   requests
 click==8.1.7
     # via
     #   -r tests.txt
     #   flask
+docutils==0.21.2
+    # via
+    #   -r build.txt
+    #   flit
 exceptiongroup==1.2.2
     # via
     #   -r tests.txt
@@ -23,6 +35,16 @@ flask==3.0.3
     #   flask-sqlalchemy
 flask-sqlalchemy==3.1.1
     # via -r tests.txt
+flit==3.9.0
+    # via -r build.txt
+flit-core==3.9.0
+    # via
+    #   -r build.txt
+    #   flit
+idna==3.7
+    # via
+    #   -r build.txt
+    #   requests
 importlib-metadata==8.2.0
     # via
     #   -r tests.txt
@@ -79,6 +101,10 @@ pytest==8.3.2
     #   -r typing.txt
 pytz==2024.1
     # via -r docs.txt
+requests==2.32.3
+    # via
+    #   -r build.txt
+    #   flit
 ruff==0.5.6
     # via -r dev.in
 sqlalchemy==2.0.32
@@ -91,12 +117,20 @@ tomli==2.0.1
     #   -r typing.txt
     #   mypy
     #   pytest
+tomli-w==1.0.0
+    # via
+    #   -r build.txt
+    #   flit
 typing-extensions==4.12.2
     # via
     #   -r tests.txt
     #   -r typing.txt
     #   mypy
     #   sqlalchemy
+urllib3==2.2.2
+    # via
+    #   -r build.txt
+    #   requests
 werkzeug==3.0.3
     # via
     #   -r tests.txt
