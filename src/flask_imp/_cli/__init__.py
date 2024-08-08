@@ -25,14 +25,11 @@ def cli() -> None:
     "--folder",
     nargs=1,
     default=".",
-    prompt=(
-        f"Folder {Sp.WARNING}(relative to CWD){Sp.END}"
-    ),
+    prompt=(f"Folder {Sp.WARNING}(relative to CWD){Sp.END}"),
     help="The folder to create the blueprint in, creation is relative to the current working directory.",
 )
 def add_blueprint(name: str, folder: str) -> None:
     _add_blueprint(name=name, folder=folder)
-
 
 
 @cli.command("api-blueprint", help="Create a flask-imp api blueprint")
@@ -49,9 +46,7 @@ def add_blueprint(name: str, folder: str) -> None:
     "--folder",
     nargs=1,
     default=".",
-    prompt=(
-        f"Folder {Sp.WARNING}(relative to CWD){Sp.END}"
-    ),
+    prompt=(f"Folder {Sp.WARNING}(relative to CWD){Sp.END}"),
     help="The folder to create the api blueprint in, creation is relative to the current working directory.",
 )
 def add_api_blueprint(name: str, folder: str) -> None:
