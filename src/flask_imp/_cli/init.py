@@ -95,6 +95,7 @@ def slim_app(app_folder: Path) -> None:
     from .filelib.init import init_slim_py
     from .filelib.extensions import extensions_init_slim_py
     from .filelib.resources import resources_cli_py
+    from .filelib.resources import resources_error_handlers_py
     from .filelib.templates import templates_error_html
 
     app_name = app_folder.name
@@ -126,7 +127,7 @@ def slim_app(app_folder: Path) -> None:
         ),
         "resources/error_handlers/error_handlers.py": (
             folders["resources/error_handlers"] / "error_handlers.py",
-            resources_cli_py(),
+            resources_error_handlers_py(),
         ),
         "resources/static/favicon.ico": (
             folders["resources/static"] / "favicon.ico",
@@ -153,6 +154,7 @@ def full_app(app_folder: Path) -> None:
     from .filelib.extensions import extensions_init_full_py
     from .filelib.models import models_example_user_table_py
     from .filelib.resources import resources_cli_py
+    from .filelib.resources import resources_error_handlers_py
     from .filelib.resources import resources_context_processors_py
     from .filelib.resources import resources_filters_py
     from .filelib.resources import resources_routes_py
@@ -201,7 +203,7 @@ def full_app(app_folder: Path) -> None:
         ),
         "resources/error_handlers/error_handlers.py": (
             folders["resources/error_handlers"] / "error_handlers.py",
-            resources_cli_py(),
+            resources_error_handlers_py(),
         ),
         "resources/filters/filters.py": (
             folders["resources/filters"] / "filters.py",
