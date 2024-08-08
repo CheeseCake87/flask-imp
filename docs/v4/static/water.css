@@ -662,7 +662,7 @@ time {
 }
 
 pre {
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 pre > code {

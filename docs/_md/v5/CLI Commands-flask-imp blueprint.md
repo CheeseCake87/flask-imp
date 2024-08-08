@@ -6,14 +6,24 @@ Title = Generate a Flask-Imp Blueprint
 Flask-Imp has its own type of blueprint. It can read some configuration from a toml file and has some extra methods for
 auto importing.
 
+You have the option to generate a regular template rendering blueprint, or a API blueprint that returns a JSON response.
+
 ```bash
 flask-imp blueprint --help
+```
+or
+```bash
+flask-imp api-blueprint --help
 ```
 
 To generate a Flask-Imp blueprint, run the following command:
 
 ```bash
 flask-imp blueprint
+```
+or 
+```bash
+flask-imp api-blueprint
 ```
 
 After running this command, you will be prompted to enter the location of where you want to create your blueprint:

@@ -20,7 +20,7 @@
     <h1>Flask-Imp</h1>
     <div><small>Version: 5.0.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Tue, 06 Aug 2024</small></div>
+    <div><small>Thu, 08 Aug 2024</small></div>
 
     <p><a href="../v4/index.html">Switch to version 4 docs</a></p>
     <p><a href="../v3/index.html">Switch to version 3 docs</a></p>
@@ -248,10 +248,17 @@
     <h1 style="font-size: 2.6rem; margin: 0;">Generate a Flask-Imp Blueprint</h1>
     <p>Flask-Imp has its own type of blueprint. It can read some configuration from a toml file and has some extra methods for
 auto importing.</p>
+<p>You have the option to generate a regular template rendering blueprint, or a API blueprint that returns a JSON response.</p>
 <div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>blueprint<span class="w"> </span>--help
+</pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>api-blueprint<span class="w"> </span>--help
 </pre></div>
 <p>To generate a Flask-Imp blueprint, run the following command:</p>
 <div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>blueprint
+</pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span>flask-imp<span class="w"> </span>api-blueprint
 </pre></div>
 <p>After running this command, you will be prompted to enter the location of where you want to create your blueprint:</p>
 <div class="highlight"><pre><span></span>~ $ flask-imp blueprint
