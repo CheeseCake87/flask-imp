@@ -1,5 +1,4 @@
 import os
-import typing as t
 from pathlib import Path
 
 import click
@@ -10,32 +9,7 @@ from .filelib.flask_imp_logo import flask_imp_logo
 from .filelib.head_tag_generator import head_tag_generator
 from .filelib.water_css import water_css
 from .helpers import Sprinkles as Sp
-
-
-def build(folders: t.Dict[str, t.Any], files: t.Dict[str, t.Any]) -> None:
-    for folder, path in folders.items():
-        if not path.exists():
-            path.mkdir(parents=True)
-            click.echo(f"{Sp.OKGREEN}App folder: {folder}, created{Sp.END}")
-        else:
-            click.echo(
-                f"{Sp.WARNING}App folder already exists: {folder}, skipping{Sp.END}"
-            )
-
-    for file, (path, content) in files.items():
-        if not path.exists():
-            if (
-                file == "resources/static/favicon.ico"
-                or file == "resources/static/img/flask-imp-logo.png"
-            ):
-                path.write_bytes(bytes.fromhex(content))
-                continue
-
-            path.write_text(content, encoding="utf-8")
-
-            click.echo(f"{Sp.OKGREEN}App file: {file}, created{Sp.END}")
-        else:
-            click.echo(f"{Sp.WARNING}App file already exists: {file}, skipping{Sp.END}")
+from .helpers import build
 
 
 def minimal_app(app_folder: Path) -> None:

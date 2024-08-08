@@ -1,4 +1,7 @@
 import re
+import typing as t
+
+import click
 
 
 def to_snake_case(string: str) -> str:
@@ -24,3 +27,40 @@ class Sprinkles:
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
     END = "\033[0m"
+
+
+def build(
+    folders: t.Dict[str, t.Any], files: t.Dict[str, t.Any], building: str = "App"
+) -> None:
+    write_bytes: t.List[str] = [
+        "resources/static/favicon.ico",
+        "resources/static/img/flask-imp-logo.png",
+        "static/img/flask-imp-logo.png",
+    ]
+
+    for folder, path in folders.items():
+        if not path.exists():
+            path.mkdir(parents=True)
+            click.echo(
+                f"{Sprinkles.OKGREEN}{building} folder: {folder}, created{Sprinkles.END}"
+            )
+        else:
+            click.echo(
+                f"{Sprinkles.WARNING}{building} folder already exists: {folder}, skipping{Sprinkles.END}"
+            )
+
+    for file, (path, content) in files.items():
+        if not path.exists():
+            if file in write_bytes:
+                path.write_bytes(bytes.fromhex(content))
+                continue
+
+            path.write_text(content, encoding="utf-8")
+
+            click.echo(
+                f"{Sprinkles.OKGREEN}{building} file: {file}, created{Sprinkles.END}"
+            )
+        else:
+            click.echo(
+                f"{Sprinkles.WARNING}{building} file already exists: {file}, skipping{Sprinkles.END}"
+            )

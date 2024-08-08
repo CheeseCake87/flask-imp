@@ -9,6 +9,56 @@ from .filelib.main_js import main_js
 from .filelib.water_css import water_css
 from .helpers import Sprinkles as Sp
 from .helpers import to_snake_case
+from .helpers import build
+
+
+def add_api_blueprint(
+    name: str = "new_api_blueprint",
+    folder: str = ".",
+    _init_app: bool = False,
+    _cwd: t.Optional[Path] = None,
+    _url_prefix: t.Optional[str] = None,
+) -> None:
+    from .filelib.api_blueprint import api_blueprint_init_py
+    from .filelib.api_blueprint import api_blueprint_routes_index_py
+
+    click.echo(f"{Sp.OKGREEN}Creating API Blueprint: {name}")
+
+    if _cwd:
+        cwd = _cwd
+    else:
+        cwd = Path.cwd()
+
+    if not cwd.exists():
+        click.echo(f"{Sp.FAIL}{folder} does not exist.{Sp.END}")
+        return
+
+    name = to_snake_case(name)
+
+    if folder == ".":
+        root_folder = cwd / name
+    else:
+        root_folder = cwd / folder / name
+
+    folders: t.Dict[str, Path] = {
+        "root": root_folder,
+        "routes": root_folder / "routes",
+    }
+
+    files: t.Dict[str, t.Tuple[Path, t.Any]] = {
+        "root/__init__.py": (
+            folders["root"] / "__init__.py",
+            api_blueprint_init_py(
+                url_prefix=name if not _url_prefix else _url_prefix, name=name
+            ),
+        ),
+        "routes/index.py": (
+            folders["routes"] / "index.py",
+            api_blueprint_routes_index_py(),
+        ),
+    }
+
+    build(folders, files, building="API Blueprint")
 
 
 def add_blueprint(
@@ -112,29 +162,4 @@ def add_blueprint(
         ),
     }
 
-    for folder, path in folders.items():
-        if not path.exists():
-            path.mkdir(parents=True)
-            click.echo(f"{Sp.OKGREEN}Blueprint folder: {folder}, created{Sp.END}")
-        else:
-            click.echo(
-                f"{Sp.WARNING}Blueprint folder already exists: {folder}, skipping{Sp.END}"
-            )
-
-    for file, (path, content) in files.items():
-        if not path.exists():
-            if file == "static/img/flask-imp-logo.png":
-                path.write_bytes(bytes.fromhex(content))
-                continue
-
-            if not content:
-                print(path)
-            path.write_text(content, encoding="utf-8")
-
-            click.echo(f"{Sp.OKGREEN}Blueprint file: {file}, created{Sp.END}")
-        else:
-            click.echo(
-                f"{Sp.WARNING}Blueprint file already exists: {file}, skipping{Sp.END}"
-            )
-
-    click.echo(f"{Sp.OKGREEN}Blueprint created: {folders['root']}{Sp.END}")
+    build(folders, files, building="Blueprint")

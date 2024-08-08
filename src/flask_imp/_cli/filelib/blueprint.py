@@ -9,7 +9,7 @@ from flask_imp.config import ImpBlueprintConfig
 bp = ImpBlueprint(__name__, ImpBlueprintConfig(
     enabled=True,
     url_prefix="/{url_prefix}",
-    init_session={{ "{name}_session_loaded": True }},
+    init_session={{"{name}_session_loaded": True}},
 ))
 
 bp.import_resources("routes")
