@@ -3,8 +3,8 @@ Menu = CLI Commands/flask-imp blueprint
 Title = Generate a Flask-Imp Blueprint
 ```
 
-Flask-Imp has its own type of blueprint. It can read some configuration from a toml file and has some extra methods for
-auto importing.
+Flask-Imp has its own type of blueprint. It comes with some methods to auto import routes, and models etc... see
+[ImpBlueprint / Introduction](impblueprint-introduction.html) for more information.
 
 You have the option to generate a regular template rendering blueprint, or a API blueprint that returns a JSON response.
 
