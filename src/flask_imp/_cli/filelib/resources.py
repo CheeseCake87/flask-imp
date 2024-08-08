@@ -1,4 +1,3 @@
-# Format to: app_name
 def resources_cli_py() -> str:
     return """\
 from flask import current_app as app

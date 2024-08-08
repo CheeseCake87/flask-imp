@@ -1,4 +1,3 @@
-# Format to: head_tag, static_path, index_py, index_html, init_py
 def templates_minimal_index_html(
     head_tag: str, static_path: str, index_py: str, index_html: str, init_py: str
 ) -> str:

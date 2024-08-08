@@ -1,4 +1,3 @@
-# Format to: None
 def models_example_user_table_py(app_name: str) -> str:
     return f"""\
 from sqlalchemy import select, update, delete, insert

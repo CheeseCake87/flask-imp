@@ -1,4 +1,3 @@
-import typing as t
 from pathlib import Path
 
 
@@ -111,7 +110,6 @@ def blueprint_templates_includes_header_html(
 """
 
 
-# Format to: footer_html, main_html
 def blueprint_templates_includes_footer_html(footer_html: Path, main_html: Path) -> str:
     return f"""\
 <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
