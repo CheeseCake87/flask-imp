@@ -9,9 +9,13 @@ from flask_imp.config import ImpConfig
 
 ```python
 ImpConfig(
-    init_session: dict = None,
-    database_main: t.Optional[DatabaseConfig] = None,
-    database_binds: t.Optional[list[DatabaseConfig]] = None
+    init_session: t.Optional[t.Dict[str, t.Any]] = None,
+    database_main: t.Optional[
+        t.Union[DatabaseConfig, SQLiteDatabaseConfig, SQLDatabaseConfig]
+    ] = None,
+    database_binds: t.Optional[
+        t.List[t.Union[DatabaseConfig, SQLiteDatabaseConfig, SQLDatabaseConfig]]
+    ] = None,
 )
 ```
 
@@ -23,9 +27,7 @@ that the application will use.
 ```python
 imp_config = ImpConfig(
     init_session={"key": "value"},
-    database_main=DatabaseConfig(
-        enabled=True,
-        dialect="sqlite",
+    database_main=SQLiteDatabaseConfig(
         name="test1",
     ),
     database_binds=[
