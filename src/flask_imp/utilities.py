@@ -6,8 +6,9 @@ import typing as t
 from pathlib import Path
 
 from flask import Flask
+from flask_imp.config import DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig
 
-from .protocols import DatabaseConfig, Imp
+from .protocols import Imp
 
 
 class Sprinkles:
@@ -39,6 +40,24 @@ def deprecated(message: str) -> t.Callable[[t.Any], t.Any]:
     return func_wrapper
 
 
+def _database_instance_uri(
+    instance_path: Path,
+    database: t.Union[DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig],
+) -> t.Tuple[bool, str, t.Optional[str]]:
+    if isinstance(database, SQLDatabaseConfig):
+        return database.enabled, database.uri(), database.bind_key
+
+    if isinstance(database, SQLiteDatabaseConfig):
+        return database.enabled, database.uri(instance_path), database.bind_key
+
+    if isinstance(database, DatabaseConfig):
+        return database.enabled, database.uri(instance_path), database.bind_key
+
+    raise TypeError(
+        f"Database instance {database} is not a valid database configuration"
+    )
+
+
 def _partial_models_import(
     location: Path,
     file_or_folder: str,
@@ -50,62 +69,51 @@ def _partial_models_import(
 
 def _partial_database_binds(
     imp_instance: Imp,
-    database_bind: t.Union[t.Any, DatabaseConfig],
+    database_bind: t.Union[
+        t.Any, DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig
+    ],
 ) -> None:
-    if "SQLALCHEMY_BINDS" in imp_instance.app.config:
-        imp_instance.app.config["SQLALCHEMY_BINDS"][database_bind.bind_key] = (
-            build_database_uri(imp_instance.app, imp_instance.app_path, database_bind)
-        )
-    else:
-        imp_instance.app.config["SQLALCHEMY_BINDS"] = {
-            database_bind.bind_key: build_database_uri(
-                imp_instance.app, imp_instance.app_path, database_bind
-            )
-        }
+    enabled, uri, bind_key = _database_instance_uri(
+        imp_instance.app_path, database_bind
+    )
+
+    if enabled:
+        if "SQLALCHEMY_BINDS" in imp_instance.app.config:
+            imp_instance.app.config["SQLALCHEMY_BINDS"][bind_key] = uri
+        else:
+            imp_instance.app.config["SQLALCHEMY_BINDS"] = {bind_key: uri}
 
 
 def build_database_main(
     flask_app: Flask,
     app_instance_path: Path,
-    database_main: t.Optional[DatabaseConfig] = None,
+    database_main: t.Optional[
+        t.Union[DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig]
+    ] = None,
 ) -> None:
     if database_main:
-        if database_main.enabled:
-            flask_app.config["SQLALCHEMY_DATABASE_URI"] = build_database_uri(
-                flask_app, app_instance_path, database_main
-            )
+        enabled, uri, _ = _database_instance_uri(app_instance_path, database_main)
+
+        if enabled:
+            flask_app.config["SQLALCHEMY_DATABASE_URI"] = uri
 
 
 def build_database_binds(
     flask_app: Flask,
     app_instance_path: Path,
-    database_binds: t.Optional[t.Iterable[DatabaseConfig]] = None,
+    database_binds: t.Optional[
+        t.Iterable[t.Union[DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig]]
+    ] = None,
 ) -> None:
     if database_binds:
-        for db in database_binds:
-            if db.enabled:
-                if "SQLALCHEMY_BINDS" not in flask_app.config:
-                    flask_app.config["SQLALCHEMY_BINDS"] = {}
+        for database in database_binds:
+            enabled, uri, bind_key = _database_instance_uri(app_instance_path, database)
 
-                flask_app.config["SQLALCHEMY_BINDS"][db.bind_key] = build_database_uri(
-                    flask_app, app_instance_path, db
-                )
-
-
-def build_database_uri(
-    flask_app: Flask, app_instance_path: Path, db: DatabaseConfig
-) -> str:
-    if db.dialect == "sqlite":
-        filepath = app_instance_path / (
-            db.name + flask_app.config.get("SQLITE_DB_EXTENSION", ".sqlite")
-        )
-        return f"{db.dialect}:///{filepath}"
-
-    return (
-        f"{db.dialect}://{db.username}:"
-        f"{db.password}@{db.location}:"
-        f"{db.port}/{db.name}"
-    )
+            if enabled:
+                if "SQLALCHEMY_BINDS" in flask_app.config:
+                    flask_app.config["SQLALCHEMY_BINDS"][bind_key] = uri
+                else:
+                    flask_app.config["SQLALCHEMY_BINDS"] = {bind_key: uri}
 
 
 def cast_to_import_str(app_name: str, folder_path: Path) -> str:

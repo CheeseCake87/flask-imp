@@ -28,6 +28,8 @@ class FlaskConfig:
     EXPLAIN_TEMPLATE_LOADING: t.Optional[bool]
     MAX_COOKIE_SIZE: t.Optional[int]
 
+    _additional: t.Dict[str, t.Any]
+
     _flask_config_keys = {
         "DEBUG",
         "PROPAGATE_EXCEPTIONS",
@@ -80,7 +82,16 @@ class FlaskConfig:
         explain_template_loading: t.Optional[bool] = None,
         max_cookie_size: t.Optional[int] = None,
         app_instance: t.Optional["Flask"] = None,
-    ):
+        additional: t.Optional[t.Dict[str, t.Any]] = None,
+    ) -> None:
+        """
+        Flask configuration class modeled after the Flask documentation.
+
+        Additional config values can be set by passing them as a dict or using the set_additional method.
+
+        All key arguments are converted to uppercase and added to the Flask app.config dictionary.
+        e.g. session_cookie_name -> app.config["SESSION_COOKIE_NAME"]
+        """
         self.DEBUG = debug
         self.PROPAGATE_EXCEPTIONS = propagate_exceptions
         self.TRAP_HTTP_EXCEPTIONS = trap_http_exceptions
@@ -104,20 +115,48 @@ class FlaskConfig:
         self.TEMPLATES_AUTO_RELOAD = templates_auto_reload
         self.EXPLAIN_TEMPLATE_LOADING = explain_template_loading
         self.MAX_COOKIE_SIZE = max_cookie_size
+        self._additional = additional or {}
 
         if app_instance is not None:
-            self.apply_config(app_instance)
+            self.init_app(app_instance)
+
+    def set_additional(self, _auto_uppercase: bool = True, **kwargs: t.Any) -> None:
+        """
+        Set additional config values that are not part of the FlaskConfig class.
+        Keys are converted to uppercase.
+        """
+        if kwargs:
+            self._additional.update(
+                {
+                    k.upper()
+                    if isinstance(k, str)
+                    else k
+                    if _auto_uppercase
+                    else k and k.upper() not in self._flask_config_keys: v
+                    for k, v in kwargs.items()
+                }
+            )
+
+    def init_app(self, app: Flask) -> None:
+        if not isinstance(app, Flask):
+            raise TypeError("The app that was passed in is not an instance of Flask")
+        self.apply_config(app)
 
     def apply_config(self, app: Flask) -> None:
-        if not hasattr(app, "config"):
-            raise ValueError("app must have a config attribute")
+        if not isinstance(app, Flask):
+            raise TypeError("The app that was passed in is not an instance of Flask")
 
-        for attr in self._flask_config_keys:
-            value = getattr(self, attr)
-            if value is not None:
-                app.config[attr] = value
+        app.config.update(
+            {
+                **{k: v for k, v in self.as_dict().items() if v is not None},
+                **{k.upper(): v for k, v in self._additional.items()},
+            }
+        )
 
     def as_dict(self) -> t.Dict[str, t.Any]:
         return {
-            k: getattr(self, k) for k in self._flask_config_keys if getattr(self, k)
+            **{
+                k: getattr(self, k) for k in self._flask_config_keys if getattr(self, k)
+            },
+            **self._additional,
         }

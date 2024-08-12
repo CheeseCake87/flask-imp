@@ -43,6 +43,7 @@ class ImpBlueprint(t.Protocol):
 class Imp(t.Protocol):
     app: Flask
     config: t.Any
+    app_instance_path: Path
     app_path: Path
 
     def import_models(self, path: str) -> None: ...
@@ -85,16 +86,60 @@ class FlaskConfig(t.Protocol):
 class DatabaseConfig(t.Protocol):
     enabled: bool
     dialect: t.Literal["mysql", "postgresql", "sqlite", "oracle", "mssql"]
-    name: str
     bind_key: t.Optional[str]
+    name: str
     location: str
     port: int
     username: str
     password: str
 
-    def __init__(self) -> None: ...
+    sqlite_db_extension: str
+    sqlite_store_in_parent: bool
 
-    def as_dict(self) -> t.Dict[str, t.Union[str, int]]: ...
+    allowed_dialects: t.Tuple[str, ...]
+
+    def __init__(self, **kwargs: t.Any): ...
+
+    def as_dict(self) -> t.Dict[str, t.Any]: ...
+
+    def uri(self, app_instance_path: Path) -> str: ...
+
+
+@t.runtime_checkable
+class SQLiteDatabaseConfig(t.Protocol):
+    enabled: bool
+    bind_key: t.Optional[str]
+    name: str
+    location: str
+
+    sqlite_db_extension: str
+    sqlite_store_in_parent: bool
+
+    def __init__(self, **kwargs: t.Any): ...
+
+    def as_dict(self) -> t.Dict[str, t.Any]: ...
+
+    def uri(self, app_instance_path: Path) -> str: ...
+
+
+@t.runtime_checkable
+class SQLDatabaseConfig(t.Protocol):
+    enabled: bool
+    dialect: t.Literal["mysql", "postgresql", "oracle", "mssql"]
+    bind_key: t.Optional[str]
+    name: str
+    location: str
+    port: int
+    username: str
+    password: str
+
+    allowed_dialects: t.Tuple[str, ...]
+
+    def __init__(self, **kwargs: t.Any): ...
+
+    def as_dict(self) -> t.Dict[str, t.Any]: ...
+
+    def uri(self, app_instance_path: Path) -> str: ...
 
 
 @t.runtime_checkable

@@ -1,63 +1,47 @@
 import typing as t
-from pathlib import Path
 
 
-class DatabaseConfig:
-    enabled: bool
-    dialect: t.Literal["mysql", "postgresql", "sqlite", "oracle", "mssql"]
-    bind_key: t.Optional[str]
-    name: str
-    location: str
-    port: int
-    username: str
-    password: str
+class SQLDatabaseConfig:
+    enabled: bool = False
+    dialect: t.Literal["mysql", "postgresql", "oracle", "mssql"]
+    bind_key: t.Optional[str] = None
+    name: str = "database"
+    location: str = ""
+    port: int = 0
+    username: str = ""
+    password: str = ""
 
-    sqlite_db_extension: str
-
-    allowed_dialects: t.Tuple[str, ...] = (
-        "mysql",
-        "postgresql",
-        "sqlite",
-        "oracle",
-        "mssql",
-    )
+    allowed_dialects: t.Tuple[str, ...] = ("mysql", "postgresql", "oracle", "mssql")
 
     def __init__(
         self,
+        dialect: t.Literal["mysql", "postgresql", "oracle", "mssql"],
         enabled: bool = True,
-        dialect: t.Literal[
-            "mysql", "postgresql", "sqlite", "oracle", "mssql"
-        ] = "sqlite",
         name: str = "database",
         bind_key: str = "",
         location: str = "",
         port: int = 0,
         username: str = "",
         password: str = "",
-        sqlite_db_extension: str = ".sqlite",
     ):
         """
-        Database configuration
+        SQL database configuration
 
-        Allowed dialects: mysql, postgresql, sqlite, oracle, mssql
-
-        sqlite database will be stored in the app instance path.
+        Allowed dialects: mysql, postgresql, oracle, mssql
         """
         if dialect not in self.allowed_dialects:
             raise ValueError(
                 f"Database dialect must be one of: {', '.join(self.allowed_dialects)}"
             )
 
-        self.enabled = enabled
         self.dialect = dialect
+        self.enabled = enabled
         self.name = name
         self.bind_key = bind_key
         self.location = location
         self.port = port
         self.username = username
         self.password = password
-
-        self.sqlite_db_extension = sqlite_db_extension
 
     def as_dict(self) -> t.Dict[str, t.Any]:
         return {
@@ -69,14 +53,9 @@ class DatabaseConfig:
             "port": self.port,
             "username": self.username,
             "password": self.password,
-            "sqlite_db_extension": self.sqlite_db_extension,
         }
 
-    def uri(self, app_instance_path: Path) -> str:
-        if self.dialect == "sqlite":
-            filepath = app_instance_path / (self.name + self.sqlite_db_extension)
-            return f"{self.dialect}:///{filepath}"
-
+    def uri(self) -> str:
         return (
             f"{self.dialect}://{self.username}:"
             f"{self.password}@{self.location}:"
