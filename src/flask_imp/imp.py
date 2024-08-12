@@ -69,7 +69,6 @@ class Imp:
             self.config = config
         else:
             self.config = ImpConfig()
-            self.config.load_config_from_flask(app)
 
         self._apply_sqlalchemy_config()
         self._init_session()

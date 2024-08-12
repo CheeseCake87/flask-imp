@@ -3,7 +3,12 @@ import os
 from flask import Flask
 
 from flask_imp.auth import encrypt_password, authenticate_password
-from flask_imp.config import FlaskConfig, ImpConfig, DatabaseConfig
+from flask_imp.config import (
+    FlaskConfig,
+    ImpConfig,
+    DatabaseConfig,
+    SQLiteDatabaseConfig,
+)
 from .extensions import db
 from .extensions import imp
 
@@ -24,14 +29,11 @@ def create_app():
         app,
         ImpConfig(
             init_session={"logged_in": False},
-            database_main=DatabaseConfig(
-                enabled=True,
-                dialect="sqlite",
+            database_main=SQLiteDatabaseConfig(
                 name=os.getenv("DATABASE_NAME", "my_database"),
             ),
             database_binds=[
                 DatabaseConfig(
-                    enabled=True,
                     dialect="sqlite",
                     name="database_another",
                     bind_key="another",
