@@ -1,6 +1,6 @@
 [project]
 name = "flask-imp"
-version = "5.2.1"
+version = "5.2.2"
 description = 'A Flask auto importer that allows your Flask apps to grow big.'
 authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
 readme = "README.md"
@@ -39,8 +39,6 @@ build-backend = "flit_core.buildapi"
 
 [tool.pyqwe]
 install = "*:flit install --symlink"
-build = "*:flit build"
-publish = "*shell:export=FLIT_USERNAME=__token__ && flit publish"
 docs = "*:flask --app docs compile"
 docs-watch = "*:flask --app gdocs compile --watch"
 
