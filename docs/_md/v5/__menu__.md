@@ -25,6 +25,8 @@
     - ImpConfig
     - ImpBlueprintConfig
     - DatabaseConfig
+    - SQLDatabaseConfig
+    - SQLiteDatabaseConfig
 - flask_imp.security
     - login_check
     - permission_check
