@@ -32,3 +32,5 @@ class ImpConfig:
 
         if database_binds:
             self.IMP_DATABASE_BINDS = database_binds
+        else:
+            self.IMP_DATABASE_BINDS = []
