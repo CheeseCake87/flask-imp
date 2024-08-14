@@ -54,7 +54,7 @@ def api_login_check(
         @wraps(func)
         def inner(*args: t.Any, **kwargs: t.Any) -> t.Any:
             skey = session.get(session_key)
-            if skey:
+            if skey is not None:
                 if _check_against_values_allowed(skey, values_allowed):
                     return func(*args, **kwargs)
             else:
