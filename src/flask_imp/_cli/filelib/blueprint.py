@@ -9,6 +9,8 @@ from flask_imp.config import ImpBlueprintConfig
 bp = ImpBlueprint(__name__, ImpBlueprintConfig(
     enabled=True,
     url_prefix="/{url_prefix}",
+    static_folder="static",
+    template_folder="templates",
     init_session={{"{name}_session_loaded": True}},
 ))
 
