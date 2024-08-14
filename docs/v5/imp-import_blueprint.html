@@ -20,7 +20,7 @@
     <h1>Flask-Imp</h1>
     <div><small>Version: 5.3.x</small></div>
     <div><small>Last Updated:</small></div>
-    <div><small>Mon, 12 Aug 2024</small></div>
+    <div><small>Wed, 14 Aug 2024</small></div>
 
     <p><a href="../v4/index.html">Switch to version 4 docs</a></p>
     <p><a href="../v3/index.html">Switch to version 3 docs</a></p>
@@ -281,8 +281,7 @@
 
     <span class="k">return</span> <span class="n">app</span>
 </pre></div>
-<p>Flask-Imp Blueprints have the ability to import configuration from a toml file, import resources, and initialize session
-variables.</p>
+<p>Flask-Imp Blueprints have the ability to auto import resources, and initialize session variables.</p>
 <p>For more information on how Flask-Imp Blueprints work, see the <a href="impblueprint-introduction.html">ImpBlueprint / Introduction</a></p>
 <h5>Example of 'my_blueprint' as a Flask-Imp Blueprint:</h5>
 <div class="highlight"><pre><span></span>app
@@ -300,16 +299,22 @@ variables.</p>
 └── ...
 </pre></div>
 <p>File: <code>__init__.py</code></p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">Blueprint</span>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_imp</span> <span class="kn">import</span> <span class="n">ImpBlueprint</span>
+<span class="kn">from</span> <span class="nn">flask_imp.config</span> <span class="kn">import</span> <span class="n">ImpBlueprintConfig</span>
 
-<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">bp</span> <span class="o">=</span> <span class="n">ImpBlueprint</span><span class="p">(</span>
+    <span class="vm">__name__</span><span class="p">,</span>
+    <span class="n">ImpBlueprintConfig</span><span class="p">(</span>
+        <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">url_prefix</span><span class="o">=</span><span class="s2">&quot;/my-blueprint&quot;</span><span class="p">,</span>
+        <span class="n">static_folder</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span>
+        <span class="n">template_folder</span><span class="o">=</span><span class="s2">&quot;templates&quot;</span><span class="p">,</span>
+        <span class="n">static_url_path</span><span class="o">=</span><span class="s2">&quot;/static/my_blueprint&quot;</span><span class="p">,</span>
+        <span class="n">init_session</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;my_blueprint&quot;</span><span class="p">:</span> <span class="s2">&quot;session_value&quot;</span><span class="p">},</span>
+    <span class="p">),</span>
+<span class="p">)</span>
 
 <span class="n">bp</span><span class="o">.</span><span class="n">import_resources</span><span class="p">(</span><span class="s2">&quot;routes&quot;</span><span class="p">)</span>
-
-
-<span class="nd">@bp</span><span class="o">.</span><span class="n">before_app_request</span>
-<span class="k">def</span> <span class="nf">before_app_request</span><span class="p">():</span>
-    <span class="n">bp</span><span class="o">.</span><span class="n">_init_session</span><span class="p">()</span>
 </pre></div>
 <p>File: <code>routes / index.py</code></p>
 <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">bp</span>

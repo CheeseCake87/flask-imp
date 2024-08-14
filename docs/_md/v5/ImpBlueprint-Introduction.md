@@ -43,6 +43,8 @@ from flask_imp.config import ImpBlueprintConfig
 bp = ImpBlueprint(__name__, ImpBlueprintConfig(
     enabled=True,
     url_prefix="/www",
+    static_folder="static",
+    template_folder="templates",
     init_session={"logged_in": False},
 ))
 

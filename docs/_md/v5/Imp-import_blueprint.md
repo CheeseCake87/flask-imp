@@ -40,8 +40,7 @@ def create_app():
     return app
 ```
 
-Flask-Imp Blueprints have the ability to import configuration from a toml file, import resources, and initialize session
-variables.
+Flask-Imp Blueprints have the ability to auto import resources, and initialize session variables.
 
 For more information on how Flask-Imp Blueprints work, see the [ImpBlueprint / Introduction](impblueprint-introduction.html)
 
@@ -66,16 +65,22 @@ app
 File: `__init__.py`
 
 ```python
-from flask_imp import Blueprint
+from flask_imp import ImpBlueprint
+from flask_imp.config import ImpBlueprintConfig
 
-bp = Blueprint(__name__)
+bp = ImpBlueprint(
+    __name__,
+    ImpBlueprintConfig(
+        enabled=True,
+        url_prefix="/my-blueprint",
+        static_folder="static",
+        template_folder="templates",
+        static_url_path="/static/my_blueprint",
+        init_session={"my_blueprint": "session_value"},
+    ),
+)
 
 bp.import_resources("routes")
-
-
-@bp.before_app_request
-def before_app_request():
-    bp._init_session()
 ```
 
 File: `routes / index.py`
