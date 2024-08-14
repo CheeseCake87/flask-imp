@@ -57,9 +57,8 @@ def api_login_check(
             if skey is not None:
                 if _check_against_values_allowed(skey, values_allowed):
                     return func(*args, **kwargs)
-            else:
-                if fail_json:
-                    return fail_json or {"error": "You are not logged in."}
+
+            return fail_json
 
         return inner
 
