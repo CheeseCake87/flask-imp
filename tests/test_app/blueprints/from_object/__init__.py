@@ -5,6 +5,7 @@ bp = ImpBlueprint(
     __name__,
     ImpBlueprintConfig(
         enabled=True,
+        template_folder="templates",
     ),
 )
 

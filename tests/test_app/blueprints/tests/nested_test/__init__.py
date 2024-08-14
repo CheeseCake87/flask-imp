@@ -6,7 +6,7 @@ bp = ImpBlueprint(
     ImpBlueprintConfig(
         enabled=True,
         url_prefix="/nested-test",
-        static_url_path="/nested_test/static",
+        template_folder="templates",
         database_binds=[
             DatabaseConfig(
                 enabled=False,

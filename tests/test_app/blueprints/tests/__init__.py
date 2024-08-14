@@ -6,6 +6,8 @@ bp = ImpBlueprint(
     ImpBlueprintConfig(
         enabled=True,
         url_prefix="/tests",
+        template_folder="templates",
+        static_folder="static",
         static_url_path="/tests/static",
         init_session={"tests_session": True},
         database_binds=[
