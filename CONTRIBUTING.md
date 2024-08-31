@@ -110,5 +110,5 @@ flask --app docs compile
 You can set it to watch for changes and automatically recompile the docs by adding the `--watch` flag.
 
 ```bash
-flask --app gdocs compile --watch
+flask --app docs compile --watch
 ```
