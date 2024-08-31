@@ -120,8 +120,14 @@ def cast_to_import_str(app_name: str, folder_path: Path) -> str:
     """
     Takes the folder path and converts it to a string that can be imported
     """
+
+    # to work with namespace packages
+    if "." in app_name:
+        app_name = app_name.split(".")[:1][0]
+
     folder_parts = folder_path.parts
-    parts = folder_parts[folder_parts.index(app_name) :]
+    parts = folder_parts[folder_parts.index(app_name):]
+
     if sys.version_info.major == 3:
         if sys.version_info.minor < 9:
             return ".".join(parts).replace(".py", "")
