@@ -1,12 +1,14 @@
 import click
 
-from .blueprint import add_blueprint as _add_blueprint
+from .. import __version__
 from .blueprint import add_api_blueprint as _add_api_blueprint
+from .blueprint import add_blueprint as _add_blueprint
 from .helpers import Sprinkles as Sp
 from .init import init_app as _init_app
 
 
 @click.group()
+@click.version_option(__version__)
 def cli() -> None:
     pass  # Entry Point
 
