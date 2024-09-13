@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from ..helpers import strip_leading_slash
+
 
 def blueprint_init_py(url_prefix: str, name: str) -> str:
     return f"""\
@@ -8,7 +10,7 @@ from flask_imp.config import ImpBlueprintConfig
 
 bp = ImpBlueprint(__name__, ImpBlueprintConfig(
     enabled=True,
-    url_prefix="/{url_prefix}",
+    url_prefix="/{strip_leading_slash(url_prefix)}",
     static_folder="static",
     template_folder="templates",
     init_session={{"{name}_session_loaded": True}},

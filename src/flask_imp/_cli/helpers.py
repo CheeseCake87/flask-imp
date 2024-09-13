@@ -4,6 +4,12 @@ import typing as t
 import click
 
 
+def strip_leading_slash(url_prefix: str) -> str:
+    if url_prefix.startswith("/"):
+        return url_prefix[1:]
+    return url_prefix
+
+
 def to_snake_case(string: str) -> str:
     """
     Thank you openai
