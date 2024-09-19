@@ -1,6 +1,4 @@
-from ._legacy import Auth
 from ._authenticate_password import authenticate_password
-from ._dataclasses import PasswordGeneration
 from ._encrypt_password import encrypt_password
 from ._generate_alphanumeric_validator import generate_alphanumeric_validator
 from ._generate_csrf_token import generate_csrf_token
@@ -13,7 +11,6 @@ from ._is_email_address_valid import is_email_address_valid
 from ._is_username_valid import is_username_valid
 
 __all__ = [
-    "PasswordGeneration",
     "is_email_address_valid",
     "is_username_valid",
     "generate_csrf_token",
@@ -25,5 +22,4 @@ __all__ = [
     "encrypt_password",
     "authenticate_password",
     "generate_password",
-    "Auth",
 ]

@@ -1,5 +1,5 @@
 from test_app import imp, db
-from flask_imp import Auth
+from flask_imp.auth import generate_salt, generate_password, encrypt_password, generate_private_key
 from .. import bp
 
 
@@ -20,15 +20,15 @@ def database_population_test():
     m_example_table = imp.model("ExampleTable")
 
     if not m_example_user.get_by_id(1):
-        salt = Auth.generate_salt()
-        gen_password = Auth.generate_password("animals")
-        password = Auth.sha_password(gen_password, salt)
+        salt = generate_salt()
+        gen_password = generate_password("animals")
+        password = encrypt_password(gen_password, salt)
 
         new_example_user = m_example_user(
             username="David",
             password=password,
             salt=salt,
-            private_key=Auth.generate_private_key(salt),
+            private_key=generate_private_key(salt),
             disabled=False,
         )
         db.session.add(new_example_user)
@@ -36,7 +36,7 @@ def database_population_test():
             username="David",
             password=password,
             salt=salt,
-            private_key=Auth.generate_private_key(salt),
+            private_key=generate_private_key(salt),
             disabled=False,
         )
         db.session.add(new_example_user_bind)
