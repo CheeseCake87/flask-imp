@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ImpBlueprintConfig:
-    from .database_config import DatabaseConfig
+    from ._database_config import DatabaseConfig
 
     enabled: t.Optional[bool] = None
     url_prefix: t.Optional[str] = None

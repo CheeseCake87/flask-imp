@@ -5,7 +5,7 @@ from string import ascii_letters
 
 from more_itertools import batched
 
-from .__private_funcs__ import _guess_block
+from ._private_funcs import _guess_block
 
 
 def authenticate_password(

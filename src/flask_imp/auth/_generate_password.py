@@ -1,7 +1,7 @@
 from random import choice
 
-from .dataclasses import PasswordGeneration
-from .generate_numeric_validator import generate_numeric_validator
+from ._dataclasses import PasswordGeneration
+from ._generate_numeric_validator import generate_numeric_validator
 
 
 def generate_password(style: str = "mixed", length: int = 3) -> str:

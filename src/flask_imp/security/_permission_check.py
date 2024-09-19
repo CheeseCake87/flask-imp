@@ -8,7 +8,7 @@ from flask import redirect
 from flask import session
 from flask import url_for
 
-from .__private_funcs__ import _check_against_values_allowed
+from ._private_funcs import _check_against_values_allowed
 
 
 def permission_check(

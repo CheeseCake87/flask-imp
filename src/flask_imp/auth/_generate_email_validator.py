@@ -1,4 +1,4 @@
-from .generate_alphanumeric_validator import generate_alphanumeric_validator
+from ._generate_alphanumeric_validator import generate_alphanumeric_validator
 
 
 def generate_email_validator() -> str:

@@ -3,7 +3,7 @@ from functools import wraps
 
 from flask import session
 
-from .__private_funcs__ import _check_against_values_allowed
+from ._private_funcs import _check_against_values_allowed
 
 
 def api_login_check(

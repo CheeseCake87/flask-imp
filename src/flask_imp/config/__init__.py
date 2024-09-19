@@ -1,9 +1,9 @@
-from .database_config import DatabaseConfig
-from .sql_database_config import SQLDatabaseConfig
-from .sqlite_database_config import SQLiteDatabaseConfig
-from .flask_config import FlaskConfig
-from .imp_blueprint_config import ImpBlueprintConfig
-from .imp_config import ImpConfig
+from ._database_config import DatabaseConfig
+from ._sql_database_config import SQLDatabaseConfig
+from ._sqlite_database_config import SQLiteDatabaseConfig
+from ._flask_config import FlaskConfig
+from ._imp_blueprint_config import ImpBlueprintConfig
+from ._imp_config import ImpConfig
 
 __all__ = [
     "FlaskConfig",

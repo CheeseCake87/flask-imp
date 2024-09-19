@@ -3,7 +3,7 @@ from hashlib import sha256, sha512
 from random import choice
 from string import ascii_letters
 
-from .__private_funcs__ import _pps, _ppe
+from ._private_funcs import _pps, _ppe
 
 
 def encrypt_password(

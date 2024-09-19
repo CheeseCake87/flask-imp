@@ -8,7 +8,7 @@ from pathlib import Path
 from flask import Flask
 from flask_imp.config import DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig
 
-from .protocols import Imp
+from ._protocols import Imp
 
 
 class Sprinkles:

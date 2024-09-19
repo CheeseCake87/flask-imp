@@ -9,8 +9,8 @@ from flask import Blueprint
 
 from .config import DatabaseConfig
 from .config import ImpBlueprintConfig
-from .exceptions import NoConfigProvided
-from .utilities import (
+from ._exceptions import NoConfigProvided
+from ._utilities import (
     cast_to_import_str,
     slug,
     _partial_models_import,

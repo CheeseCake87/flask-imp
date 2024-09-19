@@ -8,9 +8,9 @@ from flask import Flask, Blueprint, session
 from flask_sqlalchemy.model import DefaultMeta
 
 from .config import ImpConfig
-from .imp_blueprint import ImpBlueprint
-from .registeries import ModelRegistry
-from .utilities import cast_to_import_str, build_database_main, build_database_binds
+from ._imp_blueprint import ImpBlueprint
+from ._registries import ModelRegistry
+from ._utilities import cast_to_import_str, build_database_main, build_database_binds
 
 
 class Imp:
