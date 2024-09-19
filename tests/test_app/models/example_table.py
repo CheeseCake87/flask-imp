@@ -1,4 +1,3 @@
-from flask_imp.utilities import class_field
 from sqlalchemy import ForeignKey
 
 from ..extensions import db
@@ -10,7 +9,7 @@ def example_function():
 
 class ExampleTable(db.Model):
     example_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, ForeignKey(class_field("ExampleUser", "user_id")))
+    user_id = db.Column(db.Integer, ForeignKey("example_user.user_id"))
     thing = db.Column(db.String(256), nullable=False)
 
     @classmethod
@@ -36,5 +35,5 @@ class ExampleTable(db.Model):
 
 class ExampleTableOne(db.Model):
     example_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, ForeignKey(class_field("ExampleUser", "user_id")))
+    user_id = db.Column(db.Integer, ForeignKey("example_user.user_id"))
     thing = db.Column(db.String(256), nullable=False)
