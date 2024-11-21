@@ -4,6 +4,10 @@ from flask import Flask
 
 
 class FlaskConfig:
+    """
+    Flask configuration class modeled after the Flask documentation.
+    """
+
     DEBUG: t.Optional[bool]
     PROPAGATE_EXCEPTIONS: t.Optional[bool]
     TRAP_HTTP_EXCEPTIONS: t.Optional[bool]
@@ -81,7 +85,7 @@ class FlaskConfig:
         templates_auto_reload: t.Optional[bool] = None,
         explain_template_loading: t.Optional[bool] = None,
         max_cookie_size: t.Optional[int] = None,
-        app_instance: t.Optional["Flask"] = None,
+        app_instance: t.Optional[Flask] = None,
         additional: t.Optional[t.Dict[str, t.Any]] = None,
     ) -> None:
         """
@@ -138,11 +142,17 @@ class FlaskConfig:
             )
 
     def init_app(self, app: Flask) -> None:
+        """
+        Attach the configuration class to the Flask app instance.
+        """
         if not isinstance(app, Flask):
             raise TypeError("The app that was passed in is not an instance of Flask")
         self.apply_config(app)
 
     def apply_config(self, app: Flask) -> None:
+        """
+        Apply the configuration to the Flask app instance.
+        """
         if not isinstance(app, Flask):
             raise TypeError("The app that was passed in is not an instance of Flask")
 
@@ -154,6 +164,9 @@ class FlaskConfig:
         )
 
     def as_dict(self) -> t.Dict[str, t.Any]:
+        """
+        Return the configuration as a dictionary.
+        """
         return {
             **{
                 k: getattr(self, k) for k in self._flask_config_keys if getattr(self, k)

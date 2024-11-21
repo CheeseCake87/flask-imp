@@ -7,6 +7,10 @@ def _check_against_values_allowed(
 ) -> bool:
     """
     Checks if the session value matches the values allowed. Used by login_check and permission_check.
+
+    :param session_value: the value to check
+    :param values_allowed: the value(s) to check against
+    :return: True if the session value matches the values allowed, False otherwise
     """
     if isinstance(values_allowed, list):
         if isinstance(session_value, list):

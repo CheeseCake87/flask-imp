@@ -11,7 +11,7 @@ bp = ImpBlueprint(
             DatabaseConfig(
                 enabled=False,
                 bind_key="nested_test_db",
-                name="nested_test_database",
+                database_name="nested_test_database",
             )
         ],
     ),

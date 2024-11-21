@@ -19,50 +19,46 @@ def login_check(
     endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
     message: t.Optional[str] = None,
     message_category: str = "message",
+    abort_status: int = 403,
 ) -> t.Callable[..., t.Any]:
     """
     A decorator that checks if the specified session key exists and contains the specified value.
 
-    :raw-html:`<br />`
-
-    **Example of a route that requires a user to be logged in:**
-
-    :raw-html:`<br />`
-
-    .. code-block::
+    Example of a route that requires a user to be logged in::
 
         @bp.route("/admin", methods=["GET"])
-        @login_check('logged_in', True, fail_endpoint='blueprint.login_page', message="Login needed")
+        @login_check(
+            'logged_in',
+            True,
+            fail_endpoint='blueprint.login_page',
+            message="Login needed"
+        )
         def admin_page():
             ...
 
-    :raw-html:`<br />`
-
-    **Example of a route that if the user is already logged in, redirects to the specified endpoint:**
-
-    :raw-html:`<br />`
-
-    .. code-block::
+    Example of a route that if the user is already logged in, redirects to the specified endpoint::
 
         @bp.route("/login-page", methods=["GET"])
-        @login_check('logged_in', True, pass_endpoint='blueprint.admin_page', message="Already logged in")
+        @login_check(
+            'logged_in',
+            True,
+            pass_endpoint='blueprint.admin_page',
+            message="Already logged in"
+        )
         def login_page():
             ...
 
-    :raw-html:`<br />`
-
-    -----
-
-    :param session_key: The session key to check for.
-    :param values_allowed: A list of or singular value(s) that the session key must contain.
-    :param fail_endpoint: The endpoint to redirect to if the session key does not exist or
-                          match the pass_value.
-    :param pass_endpoint: The endpoint to redirect to if the session key passes.
-                          Used to redirect away from login pages, if already logged in.
-    :param endpoint_kwargs: A dictionary of keyword arguments to pass to the redirect endpoint.
-    :param message: If a message is specified, a flash message is shown.
-    :param message_category: The category of the flash message.
-    :return: The decorated function, or abort(403).
+    :param session_key: the session key to check for
+    :param values_allowed: a list of or singular value(s) that the session key must contain
+    :param fail_endpoint: the endpoint to redirect to if the session key does not exist or
+                          match the pass_value
+    :param pass_endpoint: the endpoint to redirect to if the session key passes
+                          Used to redirect away from login pages, if already logged in
+    :param endpoint_kwargs: a dictionary of keyword arguments to pass to the redirect endpoint
+    :param message: a message to add to flask.flash()
+    :param message_category: the category of the flash message
+    :param abort_status: the status code to abort with if the session key does not exist or match the pass_value
+    :return: the decorated function, or abort(abort_code) response
     """
 
     def login_check_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
@@ -140,7 +136,7 @@ def login_check(
 
                 return func(*args, **kwargs)
 
-            return abort(403)
+            return abort(abort_status)
 
         return inner
 

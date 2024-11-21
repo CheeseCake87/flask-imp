@@ -1,14 +1,15 @@
-import functools
-import logging
+from __future__ import annotations
+
 import re
 import sys
 import typing as t
 from pathlib import Path
 
-from flask import Flask
 from flask_imp.config import DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig
 
-from ._protocols import Imp
+if t.TYPE_CHECKING:
+    from ._imp import Imp
+    from flask import Flask
 
 
 class Sprinkles:
@@ -21,23 +22,6 @@ class Sprinkles:
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
     END = "\033[0m"
-
-
-_toml_suffix = (".toml", ".tml")
-
-
-def deprecated(message: str) -> t.Callable[[t.Any], t.Any]:
-    def func_wrapper(func: t.Any) -> t.Any:
-        @functools.wraps(func)
-        def proc_function(*args: t.Any, **kwargs: t.Any) -> t.Any:
-            logging.warning(
-                f"{Sprinkles.FAIL}Function deprecated: {message}{Sprinkles.END}"
-            )
-            return func(*args, **kwargs)
-
-        return proc_function
-
-    return func_wrapper
 
 
 def _database_instance_uri(

@@ -16,31 +16,17 @@ def encrypt_password(
     """
     Takes the plain password, applies a pepper, salts it, then produces a digested sha512 or sha256 if specified.
 
-    :raw-html:`<br />`
-
-    Can set the encryption level to 256 or 512, defaults to 512.
-
-    Can set the pepper length, defaults to 1. Max is 3.
-
-    Can set the pepper position, "start" or "end", defaults to "end".
-
-    :raw-html:`<br />`
+    - Can set the encryption level to 256 or 512, defaults to 512.
+    - Can set the pepper length, defaults to 1. Max is 3.
+    - Can set the pepper position, "start" or "end", defaults to "end".
 
     For use in password hashing.
 
-    :raw-html:`<br />`
+    You must inform the authenticate_password function of:
 
-    .. Note::
-
-        You must inform the authenticate_password function of the pepper length used to hash the password.
-
-        You must inform the authenticate_password function of the position of the pepper used to hash the password.
-
-        You must inform the authenticate_password function of the encryption level used to hash the password.
-
-    :raw-html:`<br />`
-
-    -----
+    - the pepper length used to hash the password.
+    - the position of the pepper used to hash the password.
+    - the encryption level used to hash the password.
 
     :param password: str - plain password
     :param salt: str - salt

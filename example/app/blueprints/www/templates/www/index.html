@@ -1,0 +1,17 @@
+{% extends 'www/extends/main.html' %}
+
+{% block content %}
+<div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
+    <div>
+        <h2 style="margin: 0;">Blueprint: www</h2>
+        <h3>This is the index route of the included example blueprint.</h3>
+        <p style="margin-bottom: 0;">
+            This template page is located in <code>/Users/david/PycharmProjects/flask-imp/app/blueprints/www/templates/www/index.html</code><br/>
+            it extends from <code>/Users/david/PycharmProjects/flask-imp/app/blueprints/www/templates/www/extends/main.html</code><br/>
+            with its route defined in <code>/Users/david/PycharmProjects/flask-imp/app/blueprints/www/routes/index.py</code><br/><br/>
+            It's being imported by <code>bp.import_resources("routes")</code>
+            in the <code>/Users/david/PycharmProjects/flask-imp/app/blueprints/www/__init__.py</code> file.
+        </p>
+    </div>
+</div>
+{% endblock %}

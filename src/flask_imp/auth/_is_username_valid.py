@@ -9,63 +9,25 @@ def is_username_valid(
     """
     Checks if a username is valid.
 
-    :raw-html:`<br />`
-
     Valid usernames can only include letters,
     numbers, ., -, and _ but cannot begin or end with
     the last three mentioned.
 
-    :raw-html:`<br />`
+    Example use::
 
+        is_username_valid("username", allowed=["all"])
 
-    **Example use:**
+        Passes: username, user.name, user-name, user_name
+        Fails: _user_name
 
-    :raw-html:`<br />`
+        is_username_valid("username", allowed=["dot", "dash"])
 
-    .. code-block::
+        Passes: username, user.name, user-name, user-name.name
+        Fails: user_name, _user_name, .user.name
 
-            is_username_valid("username", allowed=["all"])
-
-    :raw-html:`<br />`
-
-    **Output:**
-
-    .. code-block::
-
-        username : WILL PASS : True
-        user.name : WILL PASS : True
-        user-name : WILL PASS : True
-        user_name : WILL PASS : True
-        _user_name : WILL PASS : False
-
-
-    :raw-html:`<br />`
-
-    .. code-block::
-
-            is_username_valid("username", allowed=["dot", "dash"])
-
-    :raw-html:`<br />`
-
-    **Output:**
-
-    .. code-block::
-
-        username : WILL PASS : True
-        user.name : WILL PASS : True
-        user-name : WILL PASS : True
-        user-name.name : WILL PASS : True
-        user_name : WILL PASS : False
-        _user_name : WILL PASS : False
-        .user.name : WILL PASS : False
-
-    :raw-html:`<br />`
-
-    -----
-
-    :param username: str
-    :param allowed: list - ["all", "dot", "dash", "under"] - defaults to ["all"]
-    :return bool:
+    :param username: username to validate
+    :param allowed: ["all", "dot", "dash", "under"] - defaults to ["all"]
+    :return: True if username is valid, False otherwise
     """
 
     if not username[0].isalnum() or not username[-1].isalnum():

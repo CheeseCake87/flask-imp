@@ -18,37 +18,29 @@ def permission_check(
     endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
     message: t.Optional[str] = None,
     message_category: str = "message",
+    abort_status: int = 403,
 ) -> t.Callable[..., t.Any]:
     """
     A decorator that checks if the specified session key exists and its value(s) match the specified value(s).
 
-    :raw-html:`<br />`
-
-    **Example:**
-
-    :raw-html:`<br />`
-
-    .. code-block::
+    *Example*::
 
         @bp.route("/admin-page", methods=["GET"])
-        @login_check('logged_in', True, 'blueprint.login_page')  # can be mixed with login_check
+        @login_check('logged_in', True, 'blueprint.login_page')
         @permission_check('permissions', ['admin'], fail_endpoint='www.index', message="Failed message")
         def admin_page():
             ...
 
-    :raw-html:`<br />`
-
-    -----
-
-    :param session_key: The session key to check for.
-    :param values_allowed: A list of or singular value(s) that the session key must contain.
-    :param fail_endpoint: The endpoint to redirect to if the
+    :param session_key: the session key to check for
+    :param values_allowed: a list of or singular value(s) that the session key must contain
+    :param fail_endpoint: the endpoint to redirect to if the
                           session key does not exist or does not contain the
-                          specified values.
-    :param endpoint_kwargs: A dictionary of keyword arguments to pass to the redirect endpoint.
-    :param message: If a message is specified, a flash message is shown.
-    :param message_category: The category of the flash message.
-    :return: The decorated function, or abort(403).
+                          specified values
+    :param endpoint_kwargs: a dictionary of keyword arguments to pass to the redirect endpoint
+    :param message: if a message is specified, a flash message is shown
+    :param message_category: the category of the flash message
+    :param abort_status: the status code to abort with if the session key does not exist or match the pass_value
+    :return: The decorated function, or abort(abort_status) response
     """
 
     def permission_check_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
@@ -87,7 +79,7 @@ def permission_check(
 
                 return redirect(url_for(fail_endpoint))
 
-            return abort(403)
+            return abort(abort_status)
 
         return inner
 
