@@ -175,7 +175,6 @@ def pass_function_check_with_url_value(number):
     check_if_number,
     {"number": 10, "session_": session},
     "tests.permission_failed",
-    with_app_context=True,
 )
 def pass_function_check_with_url_value_with_ac(number):
     # Expecting to pass with response: URL value: <number>
@@ -190,7 +189,6 @@ def pass_function_check_with_url_value_with_ac(number):
     check_if_number,
     {"number": 10, "tests_session": session},
     "tests.permission_failed",
-    with_app_context=True,
 )
 def pass_function_check_with_url_value_with_ac_with_partial(number):
     # Expecting to pass with response: URL value: <number>

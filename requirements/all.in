@@ -1,0 +1,20 @@
+# style and type checking
+ruff
+pre-commit
+
+# build
+tox
+flit
+
+# docs
+furo
+myst-parser
+sphinx
+sphinxcontrib-log-cabinet
+
+# tests
+Flask
+Flask-SQLAlchemy
+mypy
+pyright
+pytest

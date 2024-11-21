@@ -14,7 +14,7 @@ bp = ImpBlueprint(
             DatabaseConfig(
                 enabled=False,
                 bind_key="tests_db",
-                name="tests_blueprint",
+                database_name="tests_blueprint",
             )
         ],
     ),

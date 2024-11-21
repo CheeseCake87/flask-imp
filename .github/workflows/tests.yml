@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths-ignore:
-      - 'docs/**'
+      - '../../archive_docs/**'
       - '*.md'
   pull_request:
     branches:
       - main
       - '*.x'
     paths-ignore:
-      - 'docs/**'
+      - '../../archive_docs/**'
       - '*.md'
 
 jobs:

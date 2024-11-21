@@ -1,5 +1,5 @@
-from pathlib import Path
 import typing as t
+from pathlib import Path
 
 import click
 
@@ -8,8 +8,8 @@ from .filelib.head_tag_generator import head_tag_generator
 from .filelib.main_js import main_js
 from .filelib.water_css import water_css
 from .helpers import Sprinkles as Sp
-from .helpers import to_snake_case
 from .helpers import build
+from .helpers import to_snake_case
 
 
 def add_api_blueprint(

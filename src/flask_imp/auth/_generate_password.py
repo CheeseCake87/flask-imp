@@ -1,49 +1,33 @@
 from random import choice
+from typing import Literal
 
 from ._dataclasses import PasswordGeneration
 from ._generate_numeric_validator import generate_numeric_validator
 
 
-def generate_password(style: str = "mixed", length: int = 3) -> str:
+def generate_password(
+    style: Literal["animals", "colors", "mixed"] = "mixed", length: int = 3
+) -> str:
     """
     Generates a plain text password based on choice of style and length.
-    2 random numbers are appended to the end of every generated password.
 
-    :raw-html:`<br />`
+    (length) of random numbers are appended to the end of every generated password.
 
     style options: "animals", "colors", "mixed" - defaults to "mixed"
 
-    :raw-html:`<br />`
-
-    **Example use:**
-
-    .. code-block::
-
-        generate_password(style="animals", length=3)
-
-    :raw-html:`<br />`
-
-    **Output:**
-
-    Cat-Goat-Pig12
-
-    :raw-html:`<br />`
-
-    -----
-
-    :param style: str - "animals", "colors", "mixed" - defaults to "mixed"
-    :param length: int - how many words are chosen - defaults to 3
-    :return: str - a generated plain text password
+    :param style: "animals", "colors", "mixed" - defaults to "mixed"
+    :param length: the number of words joined - defaults to 3
+    :return: a generated password
     """
     if style == "animals":
         return "-".join(
             [choice(PasswordGeneration.animals) for _ in range(length)]
-        ) + str(generate_numeric_validator(length=2))
+        ) + str(generate_numeric_validator(length=length))
 
     if style == "colors":
         return "-".join(
             [choice(PasswordGeneration.colors) for _ in range(length)]
-        ) + str(generate_numeric_validator(length=2))
+        ) + str(generate_numeric_validator(length=length))
 
     if style == "mixed":
         return "-".join(
@@ -51,6 +35,6 @@ def generate_password(style: str = "mixed", length: int = 3) -> str:
                 choice([*PasswordGeneration.animals, *PasswordGeneration.colors])
                 for _ in range(length)
             ]
-        ) + str(generate_numeric_validator(length=2))
+        ) + str(generate_numeric_validator(length=length))
 
     raise ValueError(f"Invalid style passed in {style}")

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing as t
 from functools import partial
 from importlib import import_module
@@ -7,8 +9,6 @@ from pathlib import Path
 
 from flask import Blueprint
 
-from .config import DatabaseConfig
-from .config import ImpBlueprintConfig
 from ._exceptions import NoConfigProvided
 from ._utilities import (
     cast_to_import_str,
@@ -17,8 +17,11 @@ from ._utilities import (
     _partial_database_binds,
 )
 
-ArgT = t.TypeVar("ArgT")
-ReturnT = t.TypeVar("ReturnT")
+if t.TYPE_CHECKING:
+    from .config import DatabaseConfig
+    from .config import SQLiteDatabaseConfig
+    from .config import SQLDatabaseConfig
+    from .config import ImpBlueprintConfig
 
 
 class ImpBlueprint(Blueprint):
@@ -41,7 +44,7 @@ class ImpBlueprint(Blueprint):
         Initializes the ImpBlueprint.
 
         :param dunder_name: __name__
-        :param config: The blueprint's config.
+        :param config: the blueprint's config.
         """
 
         self.models = set()
@@ -73,17 +76,24 @@ class ImpBlueprint(Blueprint):
         )
 
     def _prevent_if_disabled(self: "ImpBlueprint") -> bool:
+        """
+        A helper function that will prevent the blueprint from
+        doing anything if it is disabled.
+        """
         if not self.config.enabled:
             return True
         return False
 
     def _process_database_binds(
-        self, database_binds: t.Optional[t.Iterable[DatabaseConfig]]
+        self,
+        database_binds: t.Optional[
+            t.Iterable[t.Union[DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig]]
+        ],
     ) -> None:
         """
-        Processes the database binds and adds them to the blueprint.
+        Processes any database binds and add them to the blueprint.
 
-        :param config: The blueprint's config.
+        :param database_binds: the database binds to process.
         :return: None
         """
         if self._prevent_if_disabled():
@@ -108,8 +118,7 @@ class ImpBlueprint(Blueprint):
         Will import all the resources (cli, routes, filters, context_processors...) from the given folder.
         Given folder must be relative to the blueprint (in the same folder as the __init__.py file).
 
-        :param folder: Folder to look for resources in. Defaults to "routes". Must be relative.
-        :return: None
+        :param folder: the folder to look for resources in. Defaults to "routes". Must be relative
         """
 
         if self._prevent_if_disabled():
@@ -133,8 +142,7 @@ class ImpBlueprint(Blueprint):
         Imports the specified Flask-Imp Blueprint or a standard Flask Blueprint as a nested blueprint,
         under the current blueprint.
 
-        :param blueprint: The blueprint (folder name) to import. Must be relative.
-        :return: None
+        :param blueprint: the blueprint (folder name) to import. Must be relative
         """
 
         if self._prevent_if_disabled():
@@ -167,8 +175,7 @@ class ImpBlueprint(Blueprint):
         """
         Imports all blueprints in the given folder.
 
-        :param folder: Folder to look for nested blueprints in.
-        :return: None
+        :param folder: the folder to look for nested blueprints in.
         """
 
         if self._prevent_if_disabled():
@@ -186,8 +193,7 @@ class ImpBlueprint(Blueprint):
         """
         Same actions as `Imp.import_models()`, but scoped to the current blueprint's package.
 
-        :param file_or_folder: The file or folder to import from. Must be relative.
-        :return: None
+        :param file_or_folder: the file or folder to import from. Must be relative
         """
 
         if self._prevent_if_disabled():
@@ -204,10 +210,10 @@ class ImpBlueprint(Blueprint):
     def tmpl(self, template: str) -> str:
         """
         Pushes the blueprint name to the template name.
-        This saves time in having to type out the blueprint name when rendering a
-        template file from the blueprint's template folder.
 
-        :param template: The template name to push the blueprint name to.
-        :return: str - The template name with the blueprint name pushed to it.
+        This is useful if you ever want to change the name of the blueprint.
+
+        :param template: the template name to push the blueprint name to
+        :return: the template name with the blueprint name pushed to it
         """
         return f"{self.name}/{template}"

@@ -7,14 +7,6 @@ def generate_email_validator() -> str:
     generate a random alphanumeric value for the specific use of
     validating accounts via email.
 
-    :raw-html:`<br />`
-
-    See `generate_alphanumeric_validator` for more information.
-
-    :raw-html:`<br />`
-
-    -----
-
-    :return: str - alphanumeric of length 8
+    :return: alphanumeric of length 8
     """
     return str(generate_alphanumeric_validator(length=8))

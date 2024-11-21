@@ -1,9 +1,9 @@
-from functools import wraps
 import typing as t
+from functools import wraps
+
 from flask import abort
 from flask import request
 from flask import session
-
 from flask_imp.auth import generate_csrf_token
 
 
@@ -13,22 +13,17 @@ def include_csrf(
     """
     A decorator that handles CSRF protection.
 
-    :raw-html:`<br />`
-
     On a **GET** request, a CSRF token is generated and stored in the session key
     specified by the session_key parameter.
 
     On a **POST** request, the form_key specified is checked against the session_key
     specified.
 
-    :raw-html:`<br />`
+    If they match, the request is allowed to continue.
 
-    | If they match, the request is allowed to continue.
-    | If no match, the response will be abort(abort_code), default 401.
+    If no match, the response will be aborted, flask.abort(abort_code), default 401.
 
-    :raw-html:`<br />`
-
-    .. code-block::
+    Example of a route that requires CSRF protection::
 
         @bp.route("/admin", methods=["GET", "POST"])
         @include_csrf(session_key="csrf", form_key="csrf")
@@ -38,14 +33,10 @@ def include_csrf(
             # Then add <input type="hidden" name="csrf" value="{{ csrf }}"> to the form.
             return render_template("admin.html", csrf=session.get("csrf"))
 
-    :raw-html:`<br />`
-
-    -----
-
-    :param session_key: The session key to store the CSRF token in.
-    :param form_key: The form key to check against the session key.
-    :param abort_code: The abort code to use if the CSRF check fails.
-    :return: The decorated function, or abort(abort_code).
+    :param session_key: session key to store the CSRF token in.
+    :param form_key: form key to check against the session key.
+    :param abort_code: abort code to use if the CSRF check fails.
+    :return: decorated function, or abort(abort_code) response.
     """
 
     def include_csrf_wrapper(func: t.Any) -> t.Callable[..., t.Any]:

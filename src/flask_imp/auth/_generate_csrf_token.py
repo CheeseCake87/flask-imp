@@ -6,15 +6,9 @@ def generate_csrf_token() -> str:
     """
     Generates a SHA1 using the current date and time.
 
-    :raw-html:`<br />`
-
     For use in Cross-Site Request Forgery.
 
-    :raw-html:`<br />`
-
-    -----
-
-    :return: str - sha1
+    :return: sha1 hash of the current date and time
     """
     sha = sha1()
     sha.update(str(datetime.now()).encode("utf-8"))

@@ -30,12 +30,12 @@ def create_app():
         ImpConfig(
             init_session={"logged_in": False},
             database_main=SQLiteDatabaseConfig(
-                name=os.getenv("DATABASE_NAME", "my_database"),
+                database_name=os.getenv("DATABASE_NAME", "my_database"),
             ),
             database_binds=[
                 DatabaseConfig(
                     dialect="sqlite",
-                    name="database_another",
+                    database_name="database_another",
                     bind_key="another",
                 )
             ],

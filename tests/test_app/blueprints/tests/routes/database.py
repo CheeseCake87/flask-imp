@@ -1,5 +1,10 @@
 from test_app import imp, db
-from flask_imp.auth import generate_salt, generate_password, encrypt_password, generate_private_key
+from flask_imp.auth import (
+    generate_salt,
+    generate_password,
+    encrypt_password,
+    generate_private_key,
+)
 from .. import bp
 
 

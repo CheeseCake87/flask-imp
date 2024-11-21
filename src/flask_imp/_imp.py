@@ -7,10 +7,10 @@ from pathlib import Path
 from flask import Flask, Blueprint, session
 from flask_sqlalchemy.model import DefaultMeta
 
-from .config import ImpConfig
 from ._imp_blueprint import ImpBlueprint
 from ._registries import ModelRegistry
 from ._utilities import cast_to_import_str, build_database_main, build_database_binds
+from .config import ImpConfig
 
 
 class Imp:
@@ -41,9 +41,8 @@ class Imp:
         """
         Initializes the app with the flask-imp extension.
 
-        :param app: The flask app to initialize.
-        :param config: The config to use
-        :return: None
+        :param app: the flask app to initialize
+        :param config: the ImpConfig to use
         """
 
         if app is None:
@@ -86,11 +85,11 @@ class Imp:
         """
         Imports the app resources from the given folder.
 
-        :param folder: The folder to import from, must be relative.
-        :param factories: A list of function names to call with the app instance.
-        :param static_folder: The name of the static folder (if not found will be set to None)
-        :param templates_folder: The name of the templates folder (if not found will be set to None)
-        :param scope_import: A dict of files to import e.g. {"folder_name": "*"}.
+        :param folder: the folder to import from, must be relative
+        :param factories: a list of function names to call with the app instance
+        :param static_folder: the name of the static folder (if not found will be set to None)
+        :param templates_folder: the name of the templates folder (if not found will be set to None)
+        :param scope_import: a dict of files to import e.g. {"folder_name": "*"}
         :return: None
         """
 
@@ -176,8 +175,7 @@ class Imp:
         """
         Import a blueprint from the given package.
 
-        :param blueprint: The blueprint (folder name) to import. Must be relative.
-        :return: None
+        :param blueprint: the blueprint (folder name) to import. Must be relative
         """
 
         if Path(blueprint).is_absolute():
@@ -199,8 +197,7 @@ class Imp:
         """
         Import all blueprints from the given folder.
 
-        :param folder: The folder to import from. Must be relative.
-        :return: None
+        :param folder: The folder to import from. Must be relative
         """
 
         folder_path = Path(self.app_path / folder)
@@ -218,8 +215,7 @@ class Imp:
         """
         Import all models from the given file or folder.
 
-        :param file_or_folder: The file or folder to import from. Must be relative.
-        :return: None
+        :param file_or_folder: The file or folder to import from. Must be relative
         """
 
         if Path(file_or_folder).is_absolute():
@@ -240,8 +236,8 @@ class Imp:
         """
         Returns the model class for the given ORM class name.
 
-        :param class_: The class name of the model to return.
-        :return: The model class [DefaultMeta].
+        :param class_: The class name of the model to return
+        :return: The model class [DefaultMeta]
         """
         return self.model_registry.class_(class_)
 
@@ -249,8 +245,8 @@ class Imp:
         """
         Returns meta information for the given ORM class name.
 
-        :param class_: The class name of the model to return [Class Instance | Name of class as String].
-        :return: dict of meta-information.
+        :param class_: the class name of the model to return [Class Instance | Name of class as String]
+        :return: dict of meta-information
         """
 
         def check_for_table_name(model_: DefaultMeta) -> None:
@@ -379,9 +375,6 @@ class Imp:
             raise ImportError(f"Error when importing {import_string}: {e}")
 
     def _init_session(self) -> None:
-        """
-        :return: None
-        """
         if isinstance(self.config.IMP_INIT_SESSION, dict):
             _: t.Dict[str, t.Any] = self.config.IMP_INIT_SESSION
 
