@@ -28,7 +28,7 @@ A decorator that is used to secure API routes that return JSON responses.
 
 `fail_json` JSON that is returned on failure. `{"error": "You are not logged in."}` by default.
 
-##### Example:
+*Example:*
 
 ```python
 @bp.route("/api/resource", methods=["GET"])

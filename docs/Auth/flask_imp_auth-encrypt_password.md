@@ -34,7 +34,7 @@ Can set the pepper position, "start" or "end", defaults to "end".
 - You must inform the authenticate_password function of the position of the pepper used to hash the password.
 - You must inform the authenticate_password function of the encryption level used to hash the password.
 
-#### Encryption Scenario:
+**Encryption Scenario:**
 
 ```
 Plain password: "password"

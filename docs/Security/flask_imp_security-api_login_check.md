@@ -33,7 +33,7 @@ A decorator that is used to secure API routes that return JSON responses.
 
 `fail_status` The status code to return on failure. `401` by default.
 
-##### Example:
+*Example:*
 
 ```python
 @bp.route("/api/resource", methods=["GET"])
@@ -42,7 +42,7 @@ def api_page():
     ...
 ```
 
-##### Example of defined fail_json:
+**Example of defined fail_json:**
 
 ```python
 @bp.route("/api/resource", methods=["GET"])

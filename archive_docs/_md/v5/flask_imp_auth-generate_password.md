@@ -19,7 +19,7 @@ The Default length is 3.
 
 Style options: "animals", "colors", "mixed" - defaults to "mixed"
 
-##### Example:
+*Example:*
 
 ```python
 generate_password(style="animals", length=3)  # >>> 'Cat-Goat-Pig12'

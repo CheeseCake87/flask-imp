@@ -16,7 +16,7 @@ The Default length is 4.
 
 For use in password hashing and storage of passwords in the database.
 
-##### Example:
+*Example:*
 
 ```python
 generate_salt()  # >>> '*!$%'

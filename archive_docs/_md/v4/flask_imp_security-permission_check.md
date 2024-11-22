@@ -36,19 +36,19 @@ A decorator that checks if the specified session key exists and its value(s) mat
 
 `message_category` The category of the flash message.
 
-##### Example:
+*Example:*
 
 ```python
 @bp.route("/admin-page", methods=["GET"])
 @login_check(
-    'logged_in', 
-    True, 
+    'logged_in',
+    True,
     'blueprint.login_page'
 )  # can be mixed with login_check
 @permission_check(
-    'permissions', 
-    ['admin'], 
-    fail_endpoint='www.index', 
+    'permissions',
+    ['admin'],
+    fail_endpoint='www.index',
     message="Failed message"
 )
 def admin_page():

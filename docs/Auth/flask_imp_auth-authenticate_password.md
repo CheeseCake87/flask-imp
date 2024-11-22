@@ -38,7 +38,7 @@ If you are using socketio, you must set use_multiprocessing to False (default).
 - You must know the position of the pepper used to hash the password.
 - You must know the encryption level used to hash the password.
 
-#### Authentication Scenario:
+**Authentication Scenario:**
 
 ```
 Plain password: "password"

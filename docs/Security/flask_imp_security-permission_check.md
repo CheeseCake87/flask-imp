@@ -41,7 +41,7 @@ A decorator that checks if the specified session key exists and its value(s) mat
 
 `abort_status` The status code to return if the check fails.
 
-##### Example:
+*Example:*
 
 ```python
 @bp.route("/admin-page", methods=["GET"])

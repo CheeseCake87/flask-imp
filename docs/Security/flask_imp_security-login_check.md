@@ -42,7 +42,7 @@ A decorator that checks if the specified session key exists and contains the spe
 
 `abort_status` The status code to return if the check fails.
 
-##### Example of a route that requires a user to be logged in:
+**Example of a route that requires a user to be logged in:**
 
 ```python
 @bp.route("/admin", methods=["GET"])
@@ -56,7 +56,7 @@ def admin_page():
     ...
 ```
 
-##### Example of a route that if the user is already logged in, redirects to the specified endpoint:
+**Example of a route that if the user is already logged in, redirects to the specified endpoint:**
 
 ```python
 @bp.route("/login-page", methods=["GET"])
