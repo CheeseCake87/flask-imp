@@ -1,9 +1,10 @@
-# style and type checking
+tox
+
+# style + checks
 ruff
 pre-commit
 
 # build
-tox
 flit
 
 # docs
@@ -12,7 +13,7 @@ myst-parser
 sphinx
 sphinxcontrib-log-cabinet
 
-# tests
+# typing + tests
 Flask
 Flask-SQLAlchemy
 mypy
