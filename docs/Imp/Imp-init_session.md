@@ -43,3 +43,4 @@ def logout():
     imp._init_session()
     return redirect(url_for('index'))
 ```
+

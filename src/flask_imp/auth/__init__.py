@@ -2,17 +2,18 @@
 This module contains the authentication utilities for a Flask application.
 
 Functions:
-- authenticate_password: Authenticates a password against a hashed password.
-- encrypt_password: Encrypts a password with a salt and pepper.
-- generate_alphanumeric_validator: Generates a validator for alphanumeric strings.
-- generate_csrf_token: Generates a CSRF token.
-- generate_email_validator: Generates a validator for email addresses.
-- generate_numeric_validator: Generates a validator for numeric strings.
-- generate_password: Generates a password.
-- generate_private_key: Generates a private key.
-- generate_salt: Generates a salt.
-- is_email_address_valid: Validates an email address.
-- is_username_valid: Validates a username.
+
+    - authenticate_password: Authenticates a password against a hashed password.
+    - encrypt_password: Encrypts a password with a salt and pepper.
+    - generate_alphanumeric_validator: Generates a validator for alphanumeric strings.
+    - generate_csrf_token: Generates a CSRF token.
+    - generate_email_validator: Generates a validator for email addresses.
+    - generate_numeric_validator: Generates a validator for numeric strings.
+    - generate_password: Generates a password.
+    - generate_private_key: Generates a private key.
+    - generate_salt: Generates a salt.
+    - is_email_address_valid: Validates an email address.
+    - is_username_valid: Validates a username.
 """
 
 from ._authenticate_password import authenticate_password

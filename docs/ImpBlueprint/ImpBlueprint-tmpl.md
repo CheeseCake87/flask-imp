@@ -39,3 +39,4 @@ def index():
 ```
 
 `bp.tmpl("index.html")` will output `"my_blueprint/index.html"`.
+

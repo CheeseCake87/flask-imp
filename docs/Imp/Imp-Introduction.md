@@ -67,23 +67,24 @@ This happens before the request is processed.
 `ImpConfig` also has the ability to set `SQLALCHEMY_DATABASE_URI` and `SQLALCHEMY_BINDS`
 
 For more information about the configuration setting see
-[flask_imp_config-impconfig.md](flask_imp_config-impconfig.md).
+[flask_imp_config-impconfig](../Config/flask_imp_config-impconfig.md).
 
 `import_app_resources` will walk one level deep into the `resources` folder, and import
 all `.py` files as modules.
 It will also check for the existence of a `static` and `templates` folder, and register them with the Flask app.
 
 There is a couple of options for `import_app_resources` to control what
-is imported, see: [Imp / import_app_resources](imp-import_app_resources.md)
+is imported, see: [Imp / import_app_resources](../Imp/Imp-import_app_resources.md)
 
 `import_models` will import all Model classes from the specified file or folder. It will also place each model found
 into a lookup table that you can access via `imp.model`
 
 See more about how import_models and the lookup
-here: [Imp / import_models](imp-import_models.md) and [Imp / model](imp-model.md)
+here: [Imp / import_models](../Imp/Imp-import_models.md) and [Imp / model](../Imp/Imp-model.md)
 
 `import_blueprints` expects a folder that contains many Blueprint as Python packages.
 It will check each blueprint folder's `__init__.py` file for an instance of a Flask Blueprint or a
 Flask-Imp Blueprint. That instant will then be registered with the Flask app.
 
-See more about how importing blueprints work here: [ImpBlueprint / Introduction](impblueprint-introduction.md)
+See more about how importing blueprints work here: [ImpBlueprint / Introduction](../ImpBlueprint/ImpBlueprint-Introduction.md)
+

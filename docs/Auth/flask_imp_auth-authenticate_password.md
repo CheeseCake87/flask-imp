@@ -20,7 +20,7 @@ authenticate_password(
 
 For use in password hashing.
 
-To be used alongside the [flask_imp.auth / encrypt_password](flask_imp_auth-encrypt_password.md) function.
+To be used alongside the [flask_imp.auth / encrypt_password](../Auth/flask_imp_auth-encrypt_password.md) function.
 
 Takes the plain input password, the stored hashed password along with the stored salt
 and will try every possible combination of pepper values to find a match.
@@ -58,3 +58,4 @@ authenticate_password(
     database_salt
 )  # >>> True
 ```
+

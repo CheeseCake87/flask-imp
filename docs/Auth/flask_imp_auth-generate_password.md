@@ -21,3 +21,4 @@ Style options: "animals", "colors", "mixed" - defaults to "mixed"
 ```python
 generate_password(style="animals", length=3)  # >>> 'Cat-Goat-Pig12'
 ```
+

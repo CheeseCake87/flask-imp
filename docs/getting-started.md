@@ -22,7 +22,7 @@ Run the following command to create a minimal Flask-Imp project.
 flask-imp init -n app --minimal
 ```
 
-See [CLI Commands / flask-imp init](cli_commands-flask-imp_init.html) for more information.
+See [CLI Commands / flask-imp init](CLI_Commands/CLI_Commands-flask-imp_init.md) for more information.
 
 ### The minimal structure
 

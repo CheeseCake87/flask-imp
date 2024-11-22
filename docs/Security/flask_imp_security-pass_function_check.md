@@ -11,15 +11,15 @@ from flask_imp.security import pass_function_check
 
 ```python
 def pass_function_check(
-    function: t.Callable,
-    predefined_args: t.Optional[t.Dict] = None,
+    function: t.Callable[..., t.Any],
+    predefined_args: t.Optional[t.Dict[str, t.Any]] = None,
     fail_endpoint: t.Optional[str] = None,
     pass_endpoint: t.Optional[str] = None,
     endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
     message: t.Optional[str] = None,
     message_category: str = "message",
     fail_on_missing_kwargs: bool = False,
-    with_app_context: bool = False,
+    abort_status: int = 403,
 )
 ```
 
@@ -36,81 +36,28 @@ make sure your functions argument(s) name(s) match the name(s) of the URL variab
 ```python
 def check_if_number(value):
     if isinstance(value, int):
-        return True
+        if value > 10:
+            return True
     return False
 
-@bp.route("/admin-page/<int:value>", methods=["GET"])
-@login_check('logged_in', True, 'blueprint.login_page')  # can be mixed with login_check
+# This will check if the URL variable 'value' is an integer and greater than 10
+@bp.route("/number/<int:value>", methods=["GET"])
 @pass_function_check(
     check_if_number,
-    predefined_args=None,
-    fail_endpoint='www.index',
+    fail_endpoint="wrong_number",
     message="Failed message"
 )
-def admin_page():
+def number():
     ...
 
-@bp.route("/admin-page/<int:value>", methods=["GET"])
-@login_check('logged_in', True, 'blueprint.login_page')  # can be mixed with login_check
+# This will check if an environment variable 'value' is an integer and greater than 10
+@bp.route("/number", methods=["GET"])
 @pass_function_check(
     check_if_number,
-    predefined_args={'value': 10},
-    fail_endpoint='www.index',
-    message="Failed message"
-)
-def admin_page_overwrite():
-    ...
-```
-
-**Advanced use case:**
-
-Here's an example of accessing flask.session from within the passed in function. including the
-`with_app_context` parameter, the function will be called with `app_context()`.
-
-```python
-from flask import current_app
-from flask import session
-
-...
-
-def check_if_number(number=1, session_=None):
-    if session_:
-        print(session_)
-    try:
-        int(number)
-        return True
-    except ValueError:
-        return False
-
-@bp.route("/pass-func-check-with-url-var/<number>", methods=["GET"])
-@pass_function_check(
-    check_if_number,
-    predefined_args={'number': 10, 'session_': session},
+    predefined_args={"value": os.getenv("NUMBER")},
     fail_endpoint="www.index",
-    with_app_context=True
+    message="Failed message"
 )
-def admin_page_overwrite_with_session():
+def number():
     ...
 ```
-
-If you pass in a predefined arg that has the same key name as a session variable that exists, the value
-of that predefined arg will be replaced with the session variable value.
-
-```python
-session['car'] = 'Toyota'
-...
-def check_function(car):
-    if car == 'Toyota':
-        return True
-    return False
-...
-@bp.route("/pass-func-check-with-url-var/<number>", methods=["GET"])
-@pass_function_check(
-    check_function,
-    predefined_args={'car': session},
-    ...
-
-```
-
-This will pass, as pass_function_check will replace the value of the predefined arg 'car' with the value
-of the session variable 'car'.

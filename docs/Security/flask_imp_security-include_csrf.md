@@ -48,3 +48,4 @@ Form key:
 ```html
 <input type="hidden" name="csrf" value="{{ csrf }}">
 ```
+

@@ -8,9 +8,9 @@ import_models(folder: str = "models") -> None
 
 Will import all the models from the given folder relative to the Blueprint's root directory.
 
-Works the same as [Imp / import_models](imp-import_models.md) but relative to the Blueprint root.
+Works the same as [Imp / import_models](../Imp/Imp-import_models.md) but relative to the Blueprint root.
 
-Blueprint models will also be available in the [Imp / model](imp-model.md) lookup.
+Blueprint models will also be available in the [Imp / model](../Imp/Imp-model.md) lookup.
 
 ```text
 my_blueprint/
@@ -80,6 +80,7 @@ class Animals(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     species = db.Column(db.String(64), index=True, unique=True)
 ```
+
 
 
 

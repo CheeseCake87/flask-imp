@@ -9,7 +9,7 @@ import_models(file_or_folder: str) -> None
 Imports all the models from the given file or folder relative to the Flask app root.
 
 Each Model that is imported will be available in the `imp.model` lookup method.
-See [Imp / model](imp-model.md) for more information.
+See [Imp / model](../Imp/Imp-model.md) for more information.
 
 ##### Example of importing models from a file
 
@@ -78,3 +78,4 @@ def create_app():
     imp.import_models("models")
     ...
 ```
+

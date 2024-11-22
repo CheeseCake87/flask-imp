@@ -8,7 +8,7 @@ import_nested_blueprints(self, folder: str) -> None
 
 Will import all the Blueprints from the given folder relative to the Blueprint's root directory.
 
-Uses [Blueprint / import_nested_blueprint](blueprint-import_nested_blueprint.md) to import blueprints from
+Uses [Blueprint / import_nested_blueprint](../ImpBlueprint/ImpBlueprint-import_nested_blueprint.md) to import blueprints from
 the specified folder.
 
 Blueprints that are imported this way will be scoped to the parent Blueprint that imported them.
@@ -55,3 +55,4 @@ bp = ImpBlueprint(__name__, ImpBlueprintConfig(
 bp.import_resources("routes")
 bp.import_nested_blueprints("nested_blueprints")
 ```
+

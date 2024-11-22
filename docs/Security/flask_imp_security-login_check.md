@@ -17,7 +17,8 @@ login_check(
     pass_endpoint: t.Optional[str] = None,
     endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
     message: t.Optional[str] = None,
-    message_category: str = "message"
+    message_category: str = "message",
+    abort_status: int = 403,
 )
 ```
 
@@ -38,6 +39,8 @@ A decorator that checks if the specified session key exists and contains the spe
 `message` If a message is specified, a flash message is shown.
 
 `message_category` The category of the flash message.
+
+`abort_status` The status code to return if the check fails.
 
 ##### Example of a route that requires a user to be logged in:
 
@@ -66,3 +69,4 @@ def admin_page():
 def login_page():
     ...
 ```
+

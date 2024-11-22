@@ -1,3 +1,8 @@
+```{image} logo.svg
+:alt: Flask-Imp Logo
+:width: 200px
+```
+
 # Flask-Imp
 
 ![tests](https://github.com/CheeseCake87/flask-imp/actions/workflows/tests.yml/badge.svg)
@@ -8,46 +13,48 @@
 
 ## What is Flask-Imp?
 
-Flask-Imp's main purpose is to help simplify the importing of blueprints, resources, and models. It has a few extra
+Flask-Imp's main purpose is to help simplify the importing of blueprints, resources, and
+models. It has a few extra
 features built in to help with securing pages and password authentication.
-
-### Install Flask-Imp
 
 ```bash
 pip install flask-imp
 ```
 
-### Generate a Flask app
 
-```bash
-flask-imp init
-```
 
 ```{toctree}
-:hidden:
+:maxdepth: 1
 
 getting-started.md
-```
-
-```{toctree}
-:hidden:
-
-API/index
+Imp/Imp-Introduction.md
+ImpBlueprint/ImpBlueprint-Introduction.md
 ```
 
 ```{toctree}
 :caption: CLI Commands
-:hidden:
+:maxdepth: 1
 
-CLI Commands/CLI Commands-flask-imp init.md
-CLI Commands/CLI Commands-flask-imp blueprint.md
+CLI_Commands/CLI_Commands-flask-imp_init.md
+CLI_Commands/CLI_Commands-flask-imp_blueprint.md
+```
+
+```{toctree}
+:caption: config
+:maxdepth: 1
+
+Config/flask_imp_config-flaskconfig.md
+Config/flask_imp_config-impconfig.md
+Config/flask_imp_config-impblueprintconfig.md
+Config/flask_imp_config-databaseconfig.md
+Config/flask_imp_config-sqldatabaseconfig.md
+Config/flask_imp_config-sqlitedatabaseconfig.md
 ```
 
 ```{toctree}
 :caption: Imp
-:hidden:
+:maxdepth: 1
 
-Imp/Imp-Introduction.md
 Imp/Imp-init_app-init.md
 Imp/Imp-init_session.md
 Imp/Imp-import_app_resources.md
@@ -59,9 +66,8 @@ Imp/Imp-model.md
 
 ```{toctree}
 :caption: ImpBlueprint
-:hidden:
+:maxdepth: 1
 
-ImpBlueprint/ImpBlueprint-Introduction.md
 ImpBlueprint/ImpBlueprint-init.md
 ImpBlueprint/ImpBlueprint-import_resources.md
 ImpBlueprint/ImpBlueprint-import_nested_blueprint.md
@@ -71,20 +77,8 @@ ImpBlueprint/ImpBlueprint-tmpl.md
 ```
 
 ```{toctree}
-:caption: config
-:hidden:
-
-Configs/flask_imp_config-flaskconfig.md
-Configs/flask_imp_config-impconfig.md
-Configs/flask_imp_config-impblueprintconfig.md
-Configs/flask_imp_config-databaseconfig.md
-Configs/flask_imp_config-sqldatabaseconfig.md
-Configs/flask_imp_config-sqlitedatabaseconfig.md
-```
-
-```{toctree}
 :caption: auth
-:hidden:
+:maxdepth: 1
 
 Auth/flask_imp_auth-authenticate_password.md
 Auth/flask_imp_auth-encrypt_password.md
@@ -101,7 +95,7 @@ Auth/flask_imp_auth-is_username_valid.md
 
 ```{toctree}
 :caption: security
-:hidden:
+:maxdepth: 1
 
 Security/flask_imp_security-include_csrf.md
 Security/flask_imp_security-login_check.md
@@ -110,3 +104,8 @@ Security/flask_imp_security-permission_check.md
 Security/flask_imp_security-pass_function_check.md
 ```
 
+```{toctree}
+:caption: API
+
+API/index
+```

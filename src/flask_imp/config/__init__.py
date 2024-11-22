@@ -1,12 +1,15 @@
 """
 This module contains the configuration classes for the Flask Imp:
 
-- FlaskConfig: The configuration class for the Flask application.
-- ImpConfig: The configuration class for the Flask Imp.
-- ImpBlueprintConfig: The configuration class for the Flask Blueprint.
-- DatabaseConfig: The base class for database configurations.
-- SQLDatabaseConfig: The base class for SQL database configurations.
-- SQLiteDatabaseConfig: The base class for SQLite database configurations.
+Classes:
+
+    - FlaskConfig: The configuration class for the Flask application.
+    - ImpConfig: The configuration class for the Flask Imp.
+    - ImpBlueprintConfig: The configuration class for the Flask Blueprint.
+    - DatabaseConfig: The base class for database configurations.
+    - SQLDatabaseConfig: The base class for SQL database configurations.
+    - SQLiteDatabaseConfig: The base class for SQLite database configurations.
+
 """
 
 from ._database_config import DatabaseConfig

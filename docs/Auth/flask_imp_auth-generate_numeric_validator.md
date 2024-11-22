@@ -22,3 +22,4 @@ For use in MFA email, or unique filename generation.
 ```python
 generate_numeric_validator(4)  # >>> 1234
 ```
+

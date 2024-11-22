@@ -101,3 +101,4 @@ and `resources/routes.py`
 
 `folders_to_import=["template_filters", "context_processors"]` => will import all files in the folders
 `resources/template_filters/*.py` and `resources/context_processors/*.py`
+

@@ -14,7 +14,8 @@ from flask_imp.security import api_login_check
 api_login_check(
     session_key: str,
     values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
-    fail_json: t.Optional[t.Dict[str, t.Any]] = None
+    fail_json: t.Optional[t.Dict[str, t.Any]] = None,
+    fail_status: int = 401,
 )
 ```
 
@@ -29,6 +30,8 @@ A decorator that is used to secure API routes that return JSON responses.
 `values_allowed` A list of or singular value(s) that the session key must contain.
 
 `fail_json` JSON that is returned on failure. `{"error": "You are not logged in."}` by default.
+
+`fail_status` The status code to return on failure. `401` by default.
 
 ##### Example:
 
@@ -47,3 +50,4 @@ def api_page():
 def api_page():
     ...
 ```
+
