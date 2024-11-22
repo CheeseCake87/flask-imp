@@ -4,7 +4,7 @@ version = "5.4.0"
 description = 'A Flask auto importer that allows your Flask apps to grow big.'
 authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
 readme = "README.md"
-license = { file = "LICENSE" }
+license = { file = "LICENSE.txt" }
 classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment', 'Intended Audience :: Developers',
