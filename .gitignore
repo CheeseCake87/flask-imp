@@ -10,3 +10,4 @@ htmlcov/
 docs/_build/
 tests/instance/
 example/instance/
+_tool.py
