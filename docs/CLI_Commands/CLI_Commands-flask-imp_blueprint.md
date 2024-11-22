@@ -1,7 +1,7 @@
 # Generate a Flask-Imp Blueprint
 
 Flask-Imp has its own type of blueprint. It comes with some methods to auto import routes, and models etc... see
-[ImpBlueprint-Introduction.md](ImpBlueprint-Introduction.md) for more information.
+[ImpBlueprint-Introduction](../ImpBlueprint/ImpBlueprint-Introduction.md) for more information.
 
 You have the option to generate a regular template rendering blueprint, or a API blueprint that returns a JSON response.
 
@@ -96,3 +96,4 @@ create it in and the configuration to use, like so:
 ```bash
 flask-imp blueprint -n admin -f app/blueprints
 ```
+

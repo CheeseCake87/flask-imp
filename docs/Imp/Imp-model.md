@@ -52,3 +52,4 @@ class Boats(db.Model):
             db.select(cls)
         ).scalars().all()
 ```
+

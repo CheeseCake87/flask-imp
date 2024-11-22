@@ -18,7 +18,7 @@ encrypt_password(
 
 For use in password hashing.
 
-To be used alongside the [flask_imp.auth / authenticate_password](flask_imp_auth-authenticate_password.md) function.
+To be used alongside the [flask_imp.auth / authenticate_password](../Auth/flask_imp_auth-authenticate_password.md) function.
 
 Takes the plain password, applies a pepper, salts it, then produces a digested sha512 or sha256 if specified.
 
@@ -47,4 +47,5 @@ Pepper position: "end"
 2. Salt is added to the end of the peppered password: "passwordA^%$*"
 3. Password is hashed: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0..."
 4. Salt and hashed password are then stored in the database.
+
 

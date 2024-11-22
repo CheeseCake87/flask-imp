@@ -52,3 +52,4 @@ from .. import bp
 def user_dashboard():
     return render_template(bp.tmpl("user_dashboard.html"))
 ```
+

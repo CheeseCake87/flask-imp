@@ -32,3 +32,4 @@ The `enabled` argument is used to enable or disable the blueprint. This is usefu
 
 `database_binds` is a list of `DatabaseConfig` instances that are used to create `SQLALCHEMY_BINDS` configuration
 variables. Again this is useful for feature flags, or for creating multiple databases per blueprint.
+

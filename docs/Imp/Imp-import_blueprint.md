@@ -39,7 +39,7 @@ def create_app():
 
 Flask-Imp Blueprints have the ability to auto import resources, and initialize session variables.
 
-For more information on how Flask-Imp Blueprints work, see the [ImpBlueprint / Introduction](impblueprint-introduction.md)
+For more information on how Flask-Imp Blueprints work, see the [ImpBlueprint / Introduction](../ImpBlueprint/ImpBlueprint-Introduction.md)
 
 ##### Example of 'my_blueprint' as a Flask-Imp Blueprint:
 
@@ -116,3 +116,4 @@ def index():
 
 Both of the above examples will work with `imp.import_blueprint("my_blueprint")`, they will be registered
 with the Flask app, and will be accessible via `url_for("my_blueprint.index")`.
+

@@ -54,3 +54,4 @@ def create_app():
     config.apply_config(app)
     return app
 ```
+

@@ -16,4 +16,5 @@ Imp(
 
 Initializes the flask app to work with flask-imp.
 
-See [flask_imp_config-impconfig.md](flask_imp_config-impconfig.md) for more information on the `ImpConfig` class.
+See [flask_imp_config-impconfig](../Config/flask_imp_config-impconfig.md) for more information on the `ImpConfig` class.
+

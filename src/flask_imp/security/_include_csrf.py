@@ -8,7 +8,7 @@ from flask_imp.auth import generate_csrf_token
 
 
 def include_csrf(
-    session_key: str = "csrf", form_key: str = "csrf", abort_code: int = 401
+    session_key: str = "csrf", form_key: str = "csrf", abort_status: int = 401
 ) -> t.Callable[..., t.Any]:
     """
     A decorator that handles CSRF protection.
@@ -35,7 +35,7 @@ def include_csrf(
 
     :param session_key: session key to store the CSRF token in.
     :param form_key: form key to check against the session key.
-    :param abort_code: abort code to use if the CSRF check fails.
+    :param abort_status: abort status code to use if the CSRF check fails.
     :return: decorated function, or abort(abort_code) response.
     """
 
@@ -52,13 +52,13 @@ def include_csrf(
                 _form_key = request.form.get(form_key)
 
                 if _form_key is None:
-                    return abort(abort_code)
+                    return abort(abort_status)
 
                 if _session_key is None:
-                    return abort(abort_code)
+                    return abort(abort_status)
 
                 if _session_key != _form_key:
-                    return abort(abort_code)
+                    return abort(abort_status)
 
             return func(*args, **kwargs)
 

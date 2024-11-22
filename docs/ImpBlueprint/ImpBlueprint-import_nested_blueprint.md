@@ -8,7 +8,7 @@ import_nested_blueprint(self, blueprint: str) -> None
 
 Import a specified Flask-Imp or standard Flask Blueprint relative to the Blueprint root.
 
-Works the same as [Imp / import_blueprint](imp-import_blueprint.md) but relative to the Blueprint root.
+Works the same as [Imp / import_blueprint](../Imp/Imp-import_blueprint.md) but relative to the Blueprint root.
 
 Blueprints that are imported this way will be scoped to the parent Blueprint that imported them.
 
@@ -73,3 +73,4 @@ from .. import bp
 def index():
     return render_template(bp.tmpl("index.html"))
 ```
+

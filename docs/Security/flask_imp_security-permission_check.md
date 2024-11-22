@@ -16,7 +16,8 @@ permission_check(
     fail_endpoint: t.Optional[str] = None,
     endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
     message: t.Optional[str] = None,
-    message_category: str = "message"
+    message_category: str = "message",
+    abort_status: int = 403,
 )
 ```
 
@@ -38,6 +39,8 @@ A decorator that checks if the specified session key exists and its value(s) mat
 
 `message_category` The category of the flash message.
 
+`abort_status` The status code to return if the check fails.
+
 ##### Example:
 
 ```python
@@ -56,4 +59,5 @@ A decorator that checks if the specified session key exists and its value(s) mat
 def admin_page():
     ...
 ```
+
 

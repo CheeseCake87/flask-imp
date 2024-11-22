@@ -44,4 +44,5 @@ def create_app():
 ```
 
 This will import all Blueprints from the `blueprints` folder using the `Imp.import_blueprint` method.
-See [Imp / import_blueprint](imp-import_blueprint.md) for more information.
+See [Imp / import_blueprint](../Imp/Imp-import_blueprint.md) for more information.
+
