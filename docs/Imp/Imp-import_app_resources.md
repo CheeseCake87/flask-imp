@@ -24,7 +24,7 @@ Routes, context processors, cli, etc.
 If no static and or template folder is found, the static and or template folder will be set to None in the Flask app
 config.
 
-#### Small example of usage:
+**Small example of usage:**
 
 ```python
 imp.import_app_resources(folder="resources")
@@ -61,7 +61,7 @@ def index():
     return render_template("index.html")
 ```
 
-#### How factories work
+## How factories work
 
 Factories are functions that are called when importing the app resources. Here's an example:
 
@@ -83,7 +83,7 @@ def development_cli(app):
         print("dev cli command")
 ```
 
-#### Scoping imports
+## Scoping imports
 
 By default, all files and folders will be imported.
 

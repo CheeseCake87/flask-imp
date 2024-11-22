@@ -18,7 +18,7 @@ Is not completely RFC 5322 compliant, but it is good enough for most use cases.
 
 Here are examples of mistakes that it will not catch:
 
-##### Valid but fails:
+**Valid but fails:**
 
 ```text
 email@[123.123.123.123]
@@ -27,14 +27,14 @@ very.unusual.“@”.unusual.com@example.com
 very.“(),:;<>[]”.VERY.“very@\\ "very”.unusual@strange.example.com
 ```
 
-##### Invalid but passes:
+**Invalid but passes:**
 
 ```text
 email@example.com (Joe Smith)
 email@111.222.333.44444
 ```
 
-##### Example:
+*Example:*
 
 ```python
 is_email_address_valid('hello@example.com')  # >>> True

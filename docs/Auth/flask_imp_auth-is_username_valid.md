@@ -19,7 +19,7 @@ Valid usernames can only include letters,
 numbers, ., -, and _ but cannot begin or end with
 the last three mentioned.
 
-##### Example "all":
+**Example "all":**
 
 ```python
 is_username_valid("username", allowed=["all"])
@@ -35,7 +35,7 @@ user_name : WILL PASS : True
 _user_name : WILL PASS : False
 ```
 
-##### Example "dot", "dash":
+**Example "dot", "dash":**
 
 ```python
 

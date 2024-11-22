@@ -41,7 +41,7 @@ Flask-Imp Blueprints have the ability to auto import resources, and initialize s
 
 For more information on how Flask-Imp Blueprints work, see the [ImpBlueprint / Introduction](../ImpBlueprint/ImpBlueprint-Introduction.md)
 
-##### Example of 'my_blueprint' as a Flask-Imp Blueprint:
+**Example of 'my_blueprint' as a Flask-Imp Blueprint:**
 
 ```text
 app
@@ -91,7 +91,7 @@ def index():
     return "regular_blueprint"
 ```
 
-##### Example of 'my_blueprint' as a standard Flask Blueprint:
+**Example of 'my_blueprint' as a standard Flask Blueprint:**
 
 ```text
 app

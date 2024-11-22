@@ -11,7 +11,7 @@ Imports all the models from the given file or folder relative to the Flask app r
 Each Model that is imported will be available in the `imp.model` lookup method.
 See [Imp / model](../Imp/Imp-model.md) for more information.
 
-##### Example of importing models from a file
+*Example of importing models from a file*
 
 ```text
 app
@@ -57,7 +57,7 @@ class User(db.Model):
     attribute = db.Column(db.String(255))
 ```
 
-##### Example of importing models from a folder
+*Example of importing models from a folder*
 
 ```text
 app

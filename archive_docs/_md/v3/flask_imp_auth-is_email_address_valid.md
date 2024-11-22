@@ -37,7 +37,7 @@ email@example.com (Joe Smith)
 email@111.222.333.44444
 ```
 
-##### Example:
+*Example:*
 
 ```python
 is_email_address_valid('hello@example.com')  # >>> True
