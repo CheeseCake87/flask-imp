@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/CheeseCake87/Flask-Imp/master/_assets/Flask-Imp-Small.png)
+![](https://raw.githubusercontent.com/CheeseCake87/flask-imp/refs/heads/main/_assets/Flask-Imp-Small.png)
 # Flask-Imp
 
 ![tests](https://github.com/CheeseCake87/flask-imp/actions/workflows/tests.yml/badge.svg)
