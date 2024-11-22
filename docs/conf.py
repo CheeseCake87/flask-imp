@@ -37,7 +37,7 @@ myst_heading_anchors = 2
 
 html_theme = "furo"
 html_css_files = ["theme.css"]
-html_logo = 'logo.svg'
+html_logo = 'logo-small.png'
 html_copy_source = False
 html_theme_options = {
     "source_repository": "https://github.com/CheeseCake87/flask-imp",
