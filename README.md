@@ -18,7 +18,23 @@ It has a few extra features built in to help with securing pages and password au
 
 ## Getting Started
 
-### Setup.
+**Install in a [virtual environment](#set-up-your-environment)**
+
+### Install Flask-Imp
+
+```bash
+pip install flask-imp
+```
+
+### Generate a Flask app
+
+```bash
+flask-imp init
+```
+
+---
+
+### Set up your environment
 
 Create a new project folder and navigate to it.
 
@@ -29,8 +45,6 @@ cd /path/to/project-folder
 # Windows
 cd C:\path\to\project-folder
 ```
-
-### Create a virtual environment and activate it.
 
 **Linux / MacOS**
 
@@ -50,16 +64,4 @@ python -m venv venv
 
 ```bash
 .\venv\Scripts\activate
-```
-
-### Install Flask-Imp
-
-```bash
-pip install flask-imp
-```
-
-### Create a new project.
-
-```bash
-flask-imp init
 ```
