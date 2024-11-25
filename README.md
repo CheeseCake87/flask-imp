@@ -14,7 +14,7 @@ It has a few extra features built in to help with securing pages and password au
 
 ## Documentation
 
-[[https://cheesecake87.github.io/flask-imp/](https://cheesecake87.github.io/flask-imp/)](https://flask-imp.readthedocs.io/en/stable/)
+[https://flask-imp.readthedocs.io/en/stable/](https://flask-imp.readthedocs.io/en/stable/)
 
 ## Getting Started
 
