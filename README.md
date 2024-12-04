@@ -12,7 +12,7 @@ It has a few extra features built in to help with securing pages and password au
 
 ## Documentation
 
-[https://flask-imp.readthedocs.io/en/stable/](https://flask-imp.readthedocs.io/en/stable/)
+[https://flask-imp.readthedocs.io/en/latest/](https://flask-imp.readthedocs.io/en/latest/)
 
 ## Getting Started
 
