@@ -43,7 +43,6 @@ def blueprint_templates_index_html(blueprint_name: str, root: Path) -> str:
             <h2 style="margin: 0;">Blueprint: {blueprint_name}</h2>
             <h3>Here's your new blueprint.</h3>
             <p>Located here: <code>{root}</code></p>
-            <p style="margin-bottom: 0;">Remember to double-check the config.toml file.</p>
         </div>
     </div>
 {{% endblock %}}
