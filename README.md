@@ -1,10 +1,8 @@
-![](https://raw.githubusercontent.com/CheeseCake87/flask-imp/refs/heads/main/_assets/Flask-Imp-Small.png)
-# Flask-Imp
+# Flask-Imp 👹
 
 ![tests](https://github.com/CheeseCake87/flask-imp/actions/workflows/tests.yml/badge.svg)
 [![PyPI version](https://img.shields.io/pypi/v/flask-imp)](https://pypi.org/project/flask-imp/)
 [![License](https://img.shields.io/github/license/CheeseCake87/flask-imp)](https://raw.githubusercontent.com/CheeseCake87/flask-imp/master/LICENSE)
-![Downloads](https://static.pepy.tech/badge/flask-imp)
 ![black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
 ## What is Flask-Imp?
