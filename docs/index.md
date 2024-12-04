@@ -1,4 +1,4 @@
-# Flask-Imp 👹
+# Flask-Imp 🧚
 
 ![tests](https://github.com/CheeseCake87/flask-imp/actions/workflows/tests.yml/badge.svg)
 [![PyPI version](https://img.shields.io/pypi/v/flask-imp)](https://pypi.org/project/flask-imp/)
