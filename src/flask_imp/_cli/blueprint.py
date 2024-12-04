@@ -3,7 +3,6 @@ from pathlib import Path
 
 import click
 
-from .filelib.flask_imp_logo import flask_imp_logo
 from .filelib.head_tag_generator import head_tag_generator
 from .filelib.main_js import main_js
 from .filelib.water_css import water_css
@@ -117,10 +116,6 @@ def add_blueprint(
             folders["routes"] / "index.py",
             blueprint_routes_index_py(),
         ),
-        "static/img/flask-imp-logo.png": (
-            folders["static/img"] / "flask-imp-logo.png",
-            flask_imp_logo,
-        ),
         "static/water.css": (folders["static/css"] / "water.css", water_css),
         "static/main.js": (
             folders["static/js"] / "main.js",
@@ -150,7 +145,6 @@ def add_blueprint(
             blueprint_templates_includes_header_html(
                 header_html=folders["templates/includes"] / "header.html",
                 main_html=folders["templates/extends"] / "main.html",
-                static_url_endpoint=f"{name}.static",
             ),
         ),
         "templates/-/includes/footer.html": (

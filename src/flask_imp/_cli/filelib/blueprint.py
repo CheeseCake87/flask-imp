@@ -97,15 +97,11 @@ def blueprint_templates_extends_main_html(name: str, head_tag: str) -> str:
 """
 
 
-def blueprint_templates_includes_header_html(
-    header_html: Path, main_html: Path, static_url_endpoint: str
-) -> str:
+def blueprint_templates_includes_header_html(header_html: Path, main_html: Path) -> str:
     return f"""\
 <div style="display: flex; flex-direction: row; align-items: center;
             justify-content: start; gap: 2rem; margin-bottom: 2rem;">
-    <img style="border-radius: 50%"
-         src="{{{{ url_for('{static_url_endpoint}', filename='img/flask-imp-logo.png') }}}}" alt="flask-imp logo">
-    <h1 style="font-size: 4rem;">Flask-Imp</h1>
+    <h1 style="font-size: 4rem;">Flask-Imp 🧚</h1>
 </div>
 <div style="margin-bottom: 2rem;">
     <p>This is the header, located here: <code>{header_html}</code></p>

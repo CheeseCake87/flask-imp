@@ -38,11 +38,7 @@ class Sprinkles:
 def build(
     folders: t.Dict[str, t.Any], files: t.Dict[str, t.Any], building: str = "App"
 ) -> None:
-    write_bytes: t.List[str] = [
-        "resources/static/favicon.ico",
-        "resources/static/img/flask-imp-logo.png",
-        "static/img/flask-imp-logo.png",
-    ]
+    # write_bytes: t.List[str] = []
 
     for folder, path in folders.items():
         if not path.exists():
@@ -57,9 +53,10 @@ def build(
 
     for file, (path, content) in files.items():
         if not path.exists():
-            if file in write_bytes:
-                path.write_bytes(bytes.fromhex(content))
-                continue
+            # write files in bytes (this was old code, keeping it for reference)
+            # if file in write_bytes:
+            #     path.write_bytes(bytes.fromhex(content))
+            #     continue
 
             path.write_text(content, encoding="utf-8")
 

@@ -1,5 +1,5 @@
 def templates_minimal_index_html(
-    head_tag: str, static_path: str, index_py: str, index_html: str, init_py: str
+    head_tag: str, index_py: str, index_html: str, init_py: str
 ) -> str:
     return f"""\
 <!doctype html>
@@ -12,9 +12,7 @@ def templates_minimal_index_html(
 <body>
 <div style="display: flex; flex-direction: row; align-items: center;
             justify-content: start; gap: 2rem; margin-bottom: 2rem;">
-    <img style="border-radius: 50%"
-         src="{{{{ url_for('{static_path}', filename='img/flask-imp-logo.png') }}}}" alt="flask-imp logo">
-    <h1 style="font-size: 4rem;">Flask-Imp</h1>
+    <h1 style="font-size: 4rem;">Flask-Imp 🧚</h1>
 </div>
 <div style="display: flex; flex-direction: row; align-items: center; gap: 2rem; margin-bottom: 2rem;">
     <div>

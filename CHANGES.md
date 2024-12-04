@@ -1,3 +1,14 @@
+## Version 5.5.1
+
+---
+
+Released 2024-12-04
+
+- switched logo for emoji
+- fixed `initial-scale` value in generated templates
+- updated example app
+
+
 ## Version 5.5.0
 
 ---

@@ -4,8 +4,6 @@ from pathlib import Path
 import click
 
 from .blueprint import add_blueprint
-from .filelib.favicon import favicon
-from .filelib.flask_imp_logo import flask_imp_logo
 from .filelib.head_tag_generator import head_tag_generator
 from .filelib.water_css import water_css
 from .helpers import Sprinkles as Sp
@@ -32,17 +30,9 @@ def minimal_app(app_folder: Path) -> None:
             folders["root"] / "__init__.py",
             init_minimal_py(secret_key=os.urandom(24).hex()),
         ),
-        "resources/static/favicon.ico": (
-            folders["resources/static"] / "favicon.ico",
-            favicon,
-        ),
         "resources/static/css/main.css": (
             folders["resources/static/css"] / "water.css",
             water_css,
-        ),
-        "resources/static/img/flask-imp-logo.png": (
-            folders["resources/static/img"] / "flask-imp-logo.png",
-            flask_imp_logo,
         ),
         "resources/templates/index.html": (
             folders["resources/templates"] / "index.html",
@@ -50,7 +40,6 @@ def minimal_app(app_folder: Path) -> None:
                 head_tag=head_tag_generator(
                     no_js=True,
                 ),
-                static_path="static",
                 index_py=str(folders["resources"] / "index.py"),
                 index_html=str(folders["resources/templates"] / "index.html"),
                 init_py=str(folders["root"] / "__init__.py"),
@@ -102,10 +91,6 @@ def slim_app(app_folder: Path) -> None:
         "resources/error_handlers/error_handlers.py": (
             folders["resources/error_handlers"] / "error_handlers.py",
             resources_error_handlers_py(),
-        ),
-        "resources/static/favicon.ico": (
-            folders["resources/static"] / "favicon.ico",
-            favicon,
         ),
         "resources/templates/error.html": (
             folders["resources/templates"] / "error.html",
@@ -186,10 +171,6 @@ def full_app(app_folder: Path) -> None:
         "resources/routes/routes.py": (
             folders["resources/routes"] / "routes.py",
             resources_routes_py(),
-        ),
-        "resources/static/favicon.ico": (
-            folders["resources/static"] / "favicon.ico",
-            favicon,
         ),
         "resources/templates/error.html": (
             folders["resources/templates"] / "error.html",
