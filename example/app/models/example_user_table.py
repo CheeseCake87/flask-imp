@@ -1,6 +1,6 @@
 from sqlalchemy import select, update, delete, insert
 
-from app.extensions import db
+from ..extensions import db
 from flask_imp.auth import (
     authenticate_password,
     encrypt_password,
