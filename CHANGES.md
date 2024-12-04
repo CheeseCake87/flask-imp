@@ -5,6 +5,7 @@
 Unreleased
 
 - remove old reminder to check old settings file
+- update classifiers in pyproject.toml
 
 ## Version 5.5.1
 
