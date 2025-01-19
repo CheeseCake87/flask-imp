@@ -171,6 +171,9 @@ class Imp:
                             if py_file_in_item.name in scope_import[item.name]:
                                 self._import_resource_module(py_file_in_item, factories)
 
+    def register_imp_blueprint(self, imp_blueprint: ImpBlueprint) -> None:
+        self._imp_blueprint_registration(imp_blueprint)
+
     def import_blueprint(self, blueprint: str) -> None:
         """
         Import a blueprint from the given package.
