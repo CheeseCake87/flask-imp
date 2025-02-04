@@ -17,10 +17,15 @@ from ._login_check import login_check
 from ._pass_function_check import pass_function_check
 from ._permission_check import permission_check
 
+from ._api_checkpoint import api_checkpoint
+from ._checkpoint import checkpoint
+
 __all__ = [
     "api_login_check",
     "include_csrf",
     "login_check",
     "pass_function_check",
     "permission_check",
+    "api_checkpoint",
+    "checkpoint",
 ]
