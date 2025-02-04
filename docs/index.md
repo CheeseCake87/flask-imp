@@ -54,7 +54,7 @@ Imp/Imp-init_session.md
 Imp/Imp-import_app_resources.md
 Imp/Imp-import_blueprint.md
 Imp/Imp-import_blueprints.md
-Imp/Imp-Imp-register_imp_blueprint.md
+Imp/Imp-register_imp_blueprint.md
 Imp/Imp-import_models.md
 Imp/Imp-model.md
 ```
