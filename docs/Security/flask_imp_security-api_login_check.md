@@ -21,6 +21,10 @@ api_login_check(
 
 `@api_login_check(...)`
 
+**Marked for deprecation**
+
+Use `@api_checkpoint(...)` instead.
+
 ---
 
 A decorator that is used to secure API routes that return JSON responses.

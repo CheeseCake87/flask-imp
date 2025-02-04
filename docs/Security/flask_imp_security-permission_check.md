@@ -23,6 +23,10 @@ permission_check(
 
 `@permission_check(...)`
 
+**Marked for deprecation**
+
+Use `@checkpoint(...)` instead.
+
 ---
 
 A decorator that checks if the specified session key exists and its value(s) match the specified value(s).

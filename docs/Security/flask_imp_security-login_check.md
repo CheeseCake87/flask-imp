@@ -24,6 +24,10 @@ login_check(
 
 `@login_check(...)`
 
+**Marked for deprecation**
+
+Use `@checkpoint(...)` instead.
+
 ---
 
 A decorator that checks if the specified session key exists and contains the specified value.

@@ -54,6 +54,7 @@ Imp/Imp-init_session.md
 Imp/Imp-import_app_resources.md
 Imp/Imp-import_blueprint.md
 Imp/Imp-import_blueprints.md
+Imp/Imp-Imp-register_imp_blueprint.md
 Imp/Imp-import_models.md
 Imp/Imp-model.md
 ```
@@ -91,6 +92,8 @@ Auth/flask_imp_auth-is_username_valid.md
 :caption: security
 :maxdepth: 1
 
+Security/flask_imp_security-checkpoint.md
+Security/flask_imp_security-api_checkpoint.md
 Security/flask_imp_security-include_csrf.md
 Security/flask_imp_security-login_check.md
 Security/flask_imp_security-api_login_check.md
