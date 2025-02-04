@@ -172,13 +172,19 @@ class Imp:
                                 self._import_resource_module(py_file_in_item, factories)
 
     def register_imp_blueprint(self, imp_blueprint: ImpBlueprint) -> None:
+        """
+        Manually register a ImpBlueprint.
+
+        :param imp_blueprint: the manually imported ImpBlueprint
+        """
         self._imp_blueprint_registration(imp_blueprint)
 
-    def import_blueprint(self, blueprint: str) -> None:
+    def import_blueprint(self, blueprint: str, package: t.Optional[str] = None) -> None:
         """
         Import a blueprint from the given package.
 
-        :param blueprint: the blueprint (folder name) to import. Must be relative
+        :param blueprint: the blueprint (folder name) to import.
+        :param package: the relative package to import from.
         """
 
         if Path(blueprint).is_absolute():
@@ -187,7 +193,11 @@ class Imp:
             blueprint_path = Path(self.app_path / blueprint)
 
         if blueprint_path.exists() and blueprint_path.is_dir():
-            module = import_module(cast_to_import_str(self.app_name, blueprint_path))
+            module = import_module(
+                cast_to_import_str(
+                    package if package else self.app_name, blueprint_path
+                )
+            )
             for name, potential_blueprint in getmembers(module):
                 if isinstance(potential_blueprint, ImpBlueprint):
                     self._imp_blueprint_registration(potential_blueprint)
@@ -196,11 +206,12 @@ class Imp:
                 if isinstance(potential_blueprint, Blueprint):
                     self._flask_blueprint_registration(potential_blueprint)
 
-    def import_blueprints(self, folder: str) -> None:
+    def import_blueprints(self, folder: str, package: t.Optional[str] = None) -> None:
         """
         Import all blueprints from the given folder.
 
         :param folder: The folder to import from. Must be relative
+        :param package: the relative package to import from.
         """
 
         folder_path = Path(self.app_path / folder)
@@ -212,7 +223,7 @@ class Imp:
             raise ImportError(f"Blueprints must be a folder {folder_path}")
 
         for potential_bp in folder_path.iterdir():
-            self.import_blueprint(f"{potential_bp}")
+            self.import_blueprint(f"{potential_bp}", package)
 
     def import_models(self, file_or_folder: str) -> None:
         """
