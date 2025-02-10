@@ -6,6 +6,15 @@ Unreleased
 
 - ...
 
+## Version 5.7.0
+
+---
+
+Released 2025-02-10
+
+- add new method: `FlaskConfig.as_object`
+- refactored _flask_config.py
+
 ## Version 5.6.0
 
 ---
