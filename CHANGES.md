@@ -1,9 +1,20 @@
-## Version 5.5.1
+## Version x.x.x
 
 ---
 
 Unreleased
 
+- ...
+
+## Version 5.6.0
+
+---
+
+Released 2025-02-04
+
+- New method added to register ImpBlueprints
+- Addition of two new decorators @checkpoint and @api_checkpoint these will eventually
+  replace login_check, api_login_check and permission_check
 - remove old reminder to check old settings file
 - update classifiers in pyproject.toml
 
