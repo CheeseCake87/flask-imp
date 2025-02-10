@@ -48,10 +48,19 @@ def create_app():
 ```
 or
 ```python
+flask_config = FlaskConfig(debug=True)
+
 def create_app():
     app = Flask(__name__)
-    config = FlaskConfig(debug=True)
-    config.apply_config(app)
+    flask_config.apply_config(app)
     return app
 ```
+or
+```python
+flask_config = FlaskConfig(debug=True)
 
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(flask_config.as_object())
+    return app
+```
