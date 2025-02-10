@@ -3,6 +3,10 @@ import typing as t
 from flask import Flask
 
 
+class FlaskConfigObject:
+    pass
+
+
 class FlaskConfig:
     """
     Flask configuration class modeled after the Flask documentation.
@@ -124,22 +128,16 @@ class FlaskConfig:
         if app_instance is not None:
             self.init_app(app_instance)
 
-    def set_additional(self, _auto_uppercase: bool = True, **kwargs: t.Any) -> None:
+    def set_additional(self, **kwargs: t.Any) -> None:
         """
-        Set additional config values that are not part of the FlaskConfig class.
+        Set additional config values.
         Keys are converted to uppercase.
         """
         if kwargs:
-            self._additional.update(
-                {
-                    k.upper()
-                    if isinstance(k, str)
-                    else k
-                    if _auto_uppercase
-                    else k and k.upper() not in self._flask_config_keys: v
-                    for k, v in kwargs.items()
-                }
-            )
+            for k, v in kwargs.items():
+                if k.upper() in self._flask_config_keys:
+                    continue
+                self._additional[k.upper()] = v
 
     def init_app(self, app: Flask) -> None:
         """
@@ -156,20 +154,33 @@ class FlaskConfig:
         if not isinstance(app, Flask):
             raise TypeError("The app that was passed in is not an instance of Flask")
 
-        app.config.update(
-            {
-                **{k: v for k, v in self.as_dict().items() if v is not None},
-                **{k.upper(): v for k, v in self._additional.items()},
-            }
-        )
+        app.config.from_object(self.as_object())
 
     def as_dict(self) -> t.Dict[str, t.Any]:
         """
         Return the configuration as a dictionary.
         """
-        return {
-            **{
-                k: getattr(self, k) for k in self._flask_config_keys if getattr(self, k)
-            },
-            **self._additional,
-        }
+        dict_build = {}
+        for attr in self._flask_config_keys:
+            if hasattr(self, attr):
+                this_attr = getattr(self, attr)
+
+                if this_attr:  # if has value , add it
+                    dict_build[attr] = this_attr
+
+        for k, v in self._additional.items():
+            if k.startswith("_"):
+                continue
+
+            if k.upper() not in self._flask_config_keys:
+                dict_build[k.upper()] = v
+
+        return dict_build
+
+    def as_object(self) -> FlaskConfigObject:
+        config_object = FlaskConfigObject()
+
+        for k, v in self.as_dict().items():
+            setattr(config_object, k, v)
+
+        return config_object
