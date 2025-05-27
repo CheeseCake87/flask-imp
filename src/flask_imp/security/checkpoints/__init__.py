@@ -97,3 +97,6 @@ class SessionCheckpoint:
         self.fail_status = fail_status
         self.message = message
         self.message_category = message_category
+
+
+__all__ = ["AuthorizationBearerCheckpoint", "SessionCheckpoint"]
