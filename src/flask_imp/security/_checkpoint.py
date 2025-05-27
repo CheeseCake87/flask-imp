@@ -5,33 +5,38 @@ from functools import wraps
 from flask import abort
 from flask import flash
 from flask import redirect
+from flask import request
 from flask import session
 from flask import url_for
 
+from ._checkpoints import (
+    AuthorizationBearerCheckpoint,
+    SessionCheckpoint,
+)
 from ._private_funcs import _check_against_values_allowed
 
 
 def checkpoint(
-    session_key: str,
-    values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
-    fail_endpoint: t.Optional[str] = None,
-    pass_endpoint: t.Optional[str] = None,
-    endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
-    message: t.Optional[str] = None,
-    message_category: str = "message",
-    abort_status: int = 403,
+    checkpoint_: SessionCheckpoint | AuthorizationBearerCheckpoint,
 ) -> t.Callable[..., t.Any]:
     """
-    A decorator that checks if the specified session key exists and contains the specified value.
+    A decorator that checks the specified Checkpoint class.
+
+    NOTE: If the incoming request is JSON and no fail_json or endpoints
+    are set, the decorator will return the following JSON on failure:
+
+        {"error": "Unauthorized"}
 
     Example of a route that requires a user to be logged in::
 
         @bp.route("/admin", methods=["GET"])
         @checkpoint(
-            'logged_in',
-            True,
-            fail_endpoint='blueprint.login_page',
-            message="Login needed"
+            SessionCheckpoint(
+                'logged_in',
+                True,
+                fail_endpoint='blueprint.login_page',
+                message="Login needed"
+            )
         )
         def admin_page():
             ...
@@ -40,10 +45,12 @@ def checkpoint(
 
         @bp.route("/login-page", methods=["GET"])
         @checkpoint(
-            'logged_in',
-            True,
-            pass_endpoint='blueprint.admin_page',
-            message="Already logged in"
+            SessionCheckpoint(
+                'logged_in',
+                True,
+                pass_endpoint='blueprint.admin_page',
+                message="Already logged in"
+            )
         )
         def login_page():
             ...
@@ -52,37 +59,52 @@ def checkpoint(
 
         @bp.route("/admin", methods=["GET"])
         @checkpoint(
-            'logged_in',
-            True,
-            fail_endpoint='blueprint.login_page',
-            message="Login needed"
+            SessionCheckpoint(
+                'logged_in',
+                True,
+                fail_endpoint='blueprint.login_page',
+                message="Login needed"
+            )
         )
         @checkpoint(
-            'user_type',
-            'admin',
-            fail_endpoint='blueprint.index',
-            message="You need to be an admin to access this page"
+            SessionCheckpoint(
+                'user_type',
+                'admin',
+                fail_endpoint='blueprint.index',
+                message="You need to be an admin to access this page"
+            )
         )
         def admin_page():
             ...
 
-    :param session_key: the session key to check for
-    :param values_allowed: a list of or singular value(s) that the session key must contain
-    :param fail_endpoint: the endpoint to redirect to if the session key does not exist or
-                          match the pass_value
-    :param pass_endpoint: the endpoint to redirect to if the session key passes
-                          Used to redirect away from login pages, if already logged in
-    :param endpoint_kwargs: a dictionary of keyword arguments to pass to the redirect endpoint
-    :param message: a message to add to flask.flash()
-    :param message_category: the category of the flash message
-    :param abort_status: the status code to abort with if the session key does not exist or match the pass_value
-    :return: the decorated function, or abort(abort_code) response
+    You can also supply your own failed return JSON::
+
+        @bp.route("/api/resource", methods=["GET"])
+        @checkpoint(
+            SessionCheckpoint(
+                'logged_in',
+                True,
+                fail_json={"error": "You are not logged in."}
+            )
+        def api_page():
+            ...
+
+    **Note:** Using this on a API route will require you to include credentials on the request.
+
+    Here's an example using JavaScript fetch()::
+
+        fetch("/api/resource", {
+            method: "GET",
+            credentials: "include"
+        })
+
+    :return: the decorated function, or abort(fail_status), or redirect, or fail_json response
     """
 
     def checkpoint_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
         @wraps(func)
         def inner(*args: t.Any, **kwargs: t.Any) -> t.Any:
-            skey = session.get(session_key)
+            passing = False
 
             def setup_flash(
                 _message: t.Optional[str], _message_category: t.Optional[str]
@@ -94,67 +116,68 @@ def checkpoint(
                     else:
                         partial_flash()
 
-            if skey is None:
-                if fail_endpoint:
-                    setup_flash(message, message_category)
+            if isinstance(checkpoint_, SessionCheckpoint):
+                skey = session.get(checkpoint_.session_key)
+                if skey is not None:
+                    if _check_against_values_allowed(skey, checkpoint_.values_allowed):
+                        passing = True
 
-                    if endpoint_kwargs:
-                        return redirect(
-                            url_for(
-                                fail_endpoint,
-                                _anchor=None,
-                                _method=None,
-                                _scheme=None,
-                                _external=None,
-                                **endpoint_kwargs,
-                            )
-                        )
+            if isinstance(checkpoint_, AuthorizationBearerCheckpoint):
+                auth = request.authorization
+                if auth.type == "bearer" and auth.token == checkpoint_.token:
+                    passing = True
 
-                    return redirect(url_for(fail_endpoint))
+            if passing:
+                if not checkpoint_.fail_json:
+                    if checkpoint_.pass_endpoint:
+                        setup_flash(checkpoint_.message, checkpoint_.message_category)
 
-                return func(*args, **kwargs)
-
-            if skey is not None:
-                if _check_against_values_allowed(skey, values_allowed):
-                    if pass_endpoint:
-                        setup_flash(message, message_category)
-
-                        if endpoint_kwargs:
+                        if checkpoint_.endpoint_kwargs:
                             return redirect(
                                 url_for(
-                                    pass_endpoint,
+                                    checkpoint_.pass_endpoint,
                                     _anchor=None,
                                     _method=None,
                                     _scheme=None,
                                     _external=None,
-                                    **endpoint_kwargs,
+                                    **checkpoint_.endpoint_kwargs,
                                 )
                             )
 
-                        return redirect(url_for(pass_endpoint))
-
-                    return func(*args, **kwargs)
-
-                if fail_endpoint:
-                    setup_flash(message, message_category)
-
-                    if endpoint_kwargs:
-                        return redirect(
-                            url_for(
-                                fail_endpoint,
-                                _anchor=None,
-                                _method=None,
-                                _scheme=None,
-                                _external=None,
-                                **endpoint_kwargs,
-                            )
-                        )
-
-                    return redirect(url_for(fail_endpoint))
+                        return redirect(url_for(checkpoint_.pass_endpoint))
 
                 return func(*args, **kwargs)
 
-            return abort(abort_status)
+            # Must have failed to get here
+
+            # If fail_json, return the fail_json
+            if checkpoint_.fail_json:
+                return checkpoint_.fail_json, checkpoint_.fail_status
+
+            # If fail_endpoint is set, redirect to it
+            if checkpoint_.fail_endpoint:
+                setup_flash(checkpoint_.message, checkpoint_.message_category)
+
+                if checkpoint_.endpoint_kwargs:
+                    return redirect(
+                        url_for(
+                            checkpoint_.fail_endpoint,
+                            _anchor=None,
+                            _method=None,
+                            _scheme=None,
+                            _external=None,
+                            **checkpoint_.endpoint_kwargs,
+                        )
+                    )
+
+                return redirect(url_for(checkpoint_.fail_endpoint))
+
+            # if the request is JSON, return JSON
+            if request.is_json:
+                return {"error": "Unauthorized"}, checkpoint_.fail_status
+
+            # Otherwise, abort with the specified status code
+            return abort(checkpoint_.fail_status)
 
         return inner
 
