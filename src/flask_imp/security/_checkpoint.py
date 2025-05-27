@@ -9,11 +9,11 @@ from flask import request
 from flask import session
 from flask import url_for
 
-from ._checkpoints import (
+from ._private_funcs import _check_against_values_allowed
+from .checkpoints import (
     AuthorizationBearerCheckpoint,
     SessionCheckpoint,
 )
-from ._private_funcs import _check_against_values_allowed
 
 
 def checkpoint(
@@ -124,8 +124,9 @@ def checkpoint(
 
             if isinstance(checkpoint_, AuthorizationBearerCheckpoint):
                 auth = request.authorization
-                if auth.type == "bearer" and auth.token == checkpoint_.token:
-                    passing = True
+                if auth:
+                    if auth.type == "bearer" and auth.token == checkpoint_.token:
+                        passing = True
 
             if passing:
                 if not checkpoint_.fail_json:
