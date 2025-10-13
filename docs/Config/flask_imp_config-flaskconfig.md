@@ -42,7 +42,11 @@ parameter or by calling the `apply_config` method on the `FlaskConfig` instance.
 
 ```python
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates"
+    )
     FlaskConfig(debug=True, app_instance=app)
     return app
 ```
@@ -51,7 +55,11 @@ or
 flask_config = FlaskConfig(debug=True)
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates"
+    )
     flask_config.apply_config(app)
     return app
 ```
@@ -60,7 +68,11 @@ or
 flask_config = FlaskConfig(debug=True)
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates"
+    )
     app.config.from_object(flask_config.as_object())
     return app
 ```

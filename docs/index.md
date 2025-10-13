@@ -51,7 +51,7 @@ Config/flask_imp_config-sqlitedatabaseconfig.md
 
 Imp/Imp-init_app-init.md
 Imp/Imp-init_session.md
-Imp/Imp-import_app_resources.md
+Imp/Imp-import_resources.md
 Imp/Imp-import_blueprint.md
 Imp/Imp-import_blueprints.md
 Imp/Imp-register_imp_blueprint.md

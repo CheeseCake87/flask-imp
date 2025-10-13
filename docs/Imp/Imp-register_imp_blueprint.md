@@ -30,7 +30,11 @@ DO_IMPORT = True
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates"
+    )
     imp.init_app(app)
 
     if DO_IMPORT:

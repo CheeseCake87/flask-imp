@@ -105,15 +105,16 @@ flask-imp init -n my_app --full
 ```text
 app/
 ├── resources
-│   ├── static
-│   │   ├── css
-│   │   │   └── water.css
-│   │   ├── img
-│   │   │   └── flask-imp-logo.png
-│   │   └── favicon.ico
-│   ├── templates
-│   │   └── index.html
 │   └── routes.py
+│
+├── static
+│   ├── css
+│   │   └── water.css
+│   ├── img
+│   │   └── flask-imp-logo.png
+│   └── favicon.ico
+├── templates
+│   └── index.html
 │
 └── __init__.py
 ```
@@ -130,16 +131,8 @@ app/
 ├── resources
 │   ├── cli
 │   │   └── cli.py
-│   ├── error_handlers
-│   │   └── error_handlers.py
-│   ├── static
-│   │   ├── css
-│   │   │   └── water.css
-│   │   ├── img
-│   │   │   └── flask-imp-logo.png
-│   │   └── favicon.ico
-│   └── templates
-│       └── error.html
+│   └── error_handlers
+│       └── error_handlers.py
 │
 ├── www
 │   ├── __init__.py
@@ -160,6 +153,15 @@ app/
 │           │   ├── footer.html
 │           │   └── header.html
 │           └── index.html
+│
+├── static
+│   ├── css
+│   │   └── water.css
+│   ├── img
+│   │   └── flask-imp-logo.png
+│   └── favicon.ico
+├── templates
+│   └── index.html
 │
 └── __init__.py
 ```
@@ -203,15 +205,16 @@ app/
 │   │   └── error_handlers.py
 │   ├── filters
 │   │   └── filters.py
-│   ├── routes
-│   │   └── routes.py
-│   ├── static
-│   │   └── favicon.ico
-│   └── templates
-│       └── error.html
+│   └── routes
+│       └── routes.py
 │
 ├── models
 │   └── example_user_table.py
+│
+├── static
+│   └── favicon.ico
+├── templates
+│   └── error.html
 │
 └── __init__.py
 ```

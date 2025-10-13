@@ -16,10 +16,10 @@ app/
 │   └── www/...
 ├── resources/
 │   ├── filters/...
-│   ├── context_processors/...
-│   ├── static/...
-│   └── templates/...
+│   └── context_processors/...
 ├── models/...
+├── static/...
+├── templates/...
 └── __init__.py
 ```
 
@@ -36,7 +36,11 @@ imp = Imp()
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates"
+    )
     FlaskConfig(
         secret_key="super_secret_key",
         app_instance=app,
@@ -45,7 +49,7 @@ def create_app():
     imp.init_app(app, config=ImpConfig(
         init_session={"logged_in": False},
     ))
-    imp.import_app_resources("resources")
+    imp.import_resources("resources")
     imp.import_models("models")
     imp.import_blueprints("blueprints")
 
@@ -69,12 +73,12 @@ This happens before the request is processed.
 For more information about the configuration setting see
 [flask_imp_config-impconfig](../Config/flask_imp_config-impconfig.md).
 
-`import_app_resources` will walk one level deep into the `resources` folder, and import
-all `.py` files as modules.
-It will also check for the existence of a `static` and `templates` folder, and register them with the Flask app.
+`import_resources` will walk one level deep into the `resources` folder, and import
+all `.py` files as modules. It will search the imports for a function called `include`
+and pass the app as the first argument.
 
-There is a couple of options for `import_app_resources` to control what
-is imported, see: [Imp / import_app_resources](../Imp/Imp-import_app_resources.md)
+There is a couple of options for `import_resources` to control what
+is imported, see: [Imp / import_resources](../Imp/Imp-import_resources.md)
 
 `import_models` will import all Model classes from the specified file or folder. It will also place each model found
 into a lookup table that you can access via `imp.model`

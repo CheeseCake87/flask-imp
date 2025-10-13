@@ -58,7 +58,7 @@ def create_app():
 
     imp.init_app(app, ImpConfig())
 
-    imp.import_app_resources()
+    imp.import_resources()
     # Takes argument 'folder' default folder is 'resources'
 
     return app
@@ -67,13 +67,13 @@ def create_app():
 File: `app/resources/routes.py`
 
 ```python
-from flask import current_app as app
+from flask import Flask
 from flask import render_template
 
-
-@app.route("/")
-def index():
-    return render_template("index.html")
+def include(app: Flask):
+    @app.route("/")
+    def index():
+        return render_template("index.html")
 ```
 
 File: `app/resources/templates/index.html`
