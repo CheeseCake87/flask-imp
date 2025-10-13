@@ -35,7 +35,11 @@ imp = Imp()
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates"
+    )
     imp.init_app(app)
 
     imp.import_blueprints("blueprints")

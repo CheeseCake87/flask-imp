@@ -37,12 +37,15 @@ imp = Imp()
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates"
+    )
     imp.init_app(app)
-    db.init_app(app)  # must be below imp.init_app
-
     imp.import_blueprint("my_blueprint")
     imp.import_models("users_model.py")
+    db.init_app(app)  # must be below imp.import_models
 
     return app
 ```

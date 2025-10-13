@@ -39,7 +39,11 @@ imp_config = ImpConfig(
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder="static",
+        template_folder="templates"
+    )
     FlaskConfig(debug=True, app_instance=app)
     imp.init_app(app, imp_config)
     ...
