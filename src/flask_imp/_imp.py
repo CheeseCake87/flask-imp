@@ -74,102 +74,62 @@ class Imp:
 
         self.app_instance_path.mkdir(exist_ok=True)
 
-    def import_app_resources(
+    def import_resources(
         self,
         folder: str = "resources",
         factories: t.Optional[t.List[str]] = None,
-        static_folder: str = "static",
-        templates_folder: str = "templates",
-        scope_import: t.Optional[t.Dict[str, t.Union[t.List[str], str]]] = None,
+        scope_import: t.Optional[
+            t.Dict[str, t.Union[t.List[t.Optional[str]], t.Optional[str]]]
+        ] = None,
     ) -> None:
         """
-        Imports the app resources from the given folder.
+        Imports app resources from the given folder. Sub folders at one level deep are supported.
 
         :param folder: the folder to import from, must be relative
-        :param factories: a list of function names to call with the app instance
-        :param static_folder: the name of the static folder (if not found will be set to None)
-        :param templates_folder: the name of the templates folder (if not found will be set to None)
+        :param factories: a list of function names to call with the app instance, defaults to ["include"]
         :param scope_import: a dict of files to import e.g. {"folder_name": "*"}
         :return: None
         """
 
-        # Check if the app resources have already been imported
-        if self.app_resources_imported:
-            raise ImportError("The app resources can only be imported once.")
-
-        self.app_resources_imported = True
-
         # Set defaults
         if factories is None:
-            factories = []
+            factories = ["include"]
         if scope_import is None:
             scope_import = {"*": ["*"]}
 
         # Build folders
         resources_folder = self.app_path / folder
-        app_static_folder = resources_folder / static_folder
-        app_templates_folder = resources_folder / templates_folder
 
         if not resources_folder.exists():
-            raise ImportError(
-                f"Cannot find resources collection folder at: {resources_folder}"
-            )
+            raise ImportError(f"Cannot find resources location at: {resources_folder}")
 
         if not resources_folder.is_dir():
             raise ImportError(
-                f"Resources collection must be a folder, value given: {resources_folder}"
+                f"Resources location must be a folder, value given: {resources_folder}"
             )
-
-        self.app.static_folder = (
-            app_static_folder.as_posix() if app_static_folder.exists() else None
-        )
-        self.app.template_folder = (
-            app_templates_folder.as_posix() if app_templates_folder.exists() else None
-        )
-
-        skip_folders = (
-            "static",
-            "templates",
-        )
 
         for item in resources_folder.iterdir():
             if item.name.startswith("__"):
                 continue
 
             if item.is_file() and item.suffix == ".py":
-                if "*" in scope_import:
-                    if "*" in scope_import["*"]:
-                        self._import_resource_module(item, factories)
-                    else:
-                        if item.name in scope_import["*"]:
-                            self._import_resource_module(item, factories)
-
-                if "." in scope_import:
-                    if "*" in scope_import["."]:
-                        self._import_resource_module(item, factories)
-                    else:
-                        if item.name in scope_import["."]:
-                            self._import_resource_module(item, factories)
+                # found module
+                self._handle_module_import(item, factories, scope_import)
 
             if item.is_dir():
-                # skip the static and templates folders
-                if item.name in skip_folders:
-                    continue
-
+                # found dir
                 for py_file_in_item in item.glob("*.py"):
+                    # loop over dir
                     if "*" in scope_import:
-                        if "*" in scope_import["*"]:
-                            self._import_resource_module(py_file_in_item, factories)
-                        else:
-                            if py_file_in_item.name in scope_import["*"]:
-                                self._import_resource_module(py_file_in_item, factories)
+                        self._handle_module_import(
+                            py_file_in_item, factories, scope_import
+                        )
+                        continue
 
-                    if item.name in scope_import:
-                        if "*" in scope_import[item.name]:
-                            self._import_resource_module(py_file_in_item, factories)
-                        else:
-                            if py_file_in_item.name in scope_import[item.name]:
-                                self._import_resource_module(py_file_in_item, factories)
+                    if item in scope_import:
+                        self._handle_module_import(
+                            py_file_in_item, factories, scope_import
+                        )
 
     def register_imp_blueprint(self, imp_blueprint: ImpBlueprint) -> None:
         """
@@ -295,17 +255,46 @@ class Imp:
                 else None,
             )
 
+    def _handle_module_import(
+        self,
+        module: Path,
+        factories: list[str],
+        scope_import: t.Dict[str, t.Union[t.List[str], str]],
+    ) -> None:
+        if module.is_dir():
+            # skip if module is a folder
+            return
+
+        if "*" in scope_import:
+            # import from all FOLDERS set
+            if "*" in scope_import["*"]:
+                # import from all FILES set, disregard name
+                self._import_resource_module(module, factories)
+            else:
+                if module.name in scope_import["*"]:
+                    # import all FILES NOT set, check if name in import
+                    self._import_resource_module(module, factories)
+
+        if "." in scope_import:
+            # Import from root of folder
+            if "*" in scope_import["."]:
+                # import from all FILES set, disregard name
+                self._import_resource_module(module, factories)
+            else:
+                # import all FILES NOT set, check if name in import
+                if module.name in scope_import["."]:
+                    self._import_resource_module(module, factories)
+
     def _import_resource_module(self, module: Path, factories: t.List[str]) -> None:
         try:
             with self.app.app_context():
                 file_module = import_module(cast_to_import_str(self.app_name, module))
-
-                for instance_factory in factories:
-                    if hasattr(file_module, instance_factory):
-                        getattr(file_module, instance_factory)(self.app)
-
         except ImportError as e:
             raise ImportError(f"Error when importing {module}: {e}")
+
+        for instance_factory in factories:
+            if hasattr(file_module, instance_factory):
+                getattr(file_module, instance_factory)(self.app)
 
     def _imp_blueprint_registration(self, imp_blueprint: ImpBlueprint) -> None:
         if not imp_blueprint.config.enabled:
