@@ -18,7 +18,12 @@ os.environ["DATABASE_NAME"] = "my_database"
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_url_path="/static",
+        static_folder="static",
+        template_folder="templates",
+    )
     FlaskConfig(
         secret_key=os.getenv("CONFIG_SECRET_KEY"),
     ).apply_config(app)
@@ -42,7 +47,7 @@ def create_app():
         ),
     )
 
-    imp.import_app_resources(factories=["collection"])
+    imp.import_resources(factories=["collection"])
     imp.import_blueprint("root_blueprint")
     imp.import_blueprints("blueprints")
     imp.import_models("models")
