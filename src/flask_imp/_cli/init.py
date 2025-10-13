@@ -19,10 +19,9 @@ def minimal_app(app_folder: Path) -> None:
     folders = {
         "root": app_folder,
         "resources": app_folder / "resources",
-        "resources/static": app_folder / "resources" / "static",
-        "resources/static/css": app_folder / "resources" / "static" / "css",
-        "resources/static/img": app_folder / "resources" / "static" / "img",
-        "resources/templates": app_folder / "resources" / "templates",
+        "static": app_folder / "static",
+        "static/css": app_folder / "static" / "css",
+        "templates": app_folder / "templates",
     }
 
     files = {
@@ -30,18 +29,18 @@ def minimal_app(app_folder: Path) -> None:
             folders["root"] / "__init__.py",
             init_minimal_py(secret_key=os.urandom(24).hex()),
         ),
-        "resources/static/css/main.css": (
-            folders["resources/static/css"] / "water.css",
+        "static/css/main.css": (
+            folders["static/css"] / "water.css",
             water_css,
         ),
-        "resources/templates/index.html": (
-            folders["resources/templates"] / "index.html",
+        "templates/index.html": (
+            folders["templates"] / "index.html",
             templates_minimal_index_html(
                 head_tag=head_tag_generator(
                     no_js=True,
                 ),
-                index_py=str(folders["resources"] / "index.py"),
-                index_html=str(folders["resources/templates"] / "index.html"),
+                index_py=str(folders["resources"] / "routes.py"),
+                index_html=str(folders["templates"] / "index.html"),
                 init_py=str(folders["root"] / "__init__.py"),
             ),
         ),
@@ -69,10 +68,8 @@ def slim_app(app_folder: Path) -> None:
         "resources": app_folder / "resources",
         "resources/cli": app_folder / "resources" / "cli",
         "resources/error_handlers": app_folder / "resources" / "error_handlers",
-        "resources/static": app_folder / "resources" / "static",
-        "resources/static/css": app_folder / "resources" / "static" / "css",
-        "resources/static/img": app_folder / "resources" / "static" / "img",
-        "resources/templates": app_folder / "resources" / "templates",
+        "static": app_folder / "static",
+        "templates": app_folder / "templates",
     }
 
     files = {
@@ -92,8 +89,8 @@ def slim_app(app_folder: Path) -> None:
             folders["resources/error_handlers"] / "error_handlers.py",
             resources_error_handlers_py(),
         ),
-        "resources/templates/error.html": (
-            folders["resources/templates"] / "error.html",
+        "templates/error.html": (
+            folders["templates"] / "error.html",
             templates_error_html(),
         ),
     }
@@ -133,10 +130,8 @@ def full_app(app_folder: Path) -> None:
         "resources/error_handlers": app_folder / "resources" / "error_handlers",
         "resources/filters": app_folder / "resources" / "filters",
         "resources/routes": app_folder / "resources" / "routes",
-        "resources/static": app_folder / "resources" / "static",
-        "resources/static/css": app_folder / "resources" / "static" / "css",
-        "resources/static/img": app_folder / "resources" / "static" / "img",
-        "resources/templates": app_folder / "resources" / "templates",
+        "static": app_folder / "static",
+        "templates": app_folder / "templates",
     }
 
     files = {
@@ -172,8 +167,8 @@ def full_app(app_folder: Path) -> None:
             folders["resources/routes"] / "routes.py",
             resources_routes_py(),
         ),
-        "resources/templates/error.html": (
-            folders["resources/templates"] / "error.html",
+        "templates/error.html": (
+            folders["templates"] / "error.html",
             templates_error_html(),
         ),
     }

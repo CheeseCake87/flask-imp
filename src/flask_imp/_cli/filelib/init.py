@@ -7,7 +7,12 @@ from flask_imp.config import ImpConfig, FlaskConfig, DatabaseConfig
 
 
 def create_app():
-    app = Flask(__name__, static_url_path="/")
+    app = Flask(
+        __name__,
+        static_url_path="/",
+        static_folder="static",
+        template_folder="templates",
+    )
 
     FlaskConfig(
         secret_key="{secret_key}",
@@ -22,7 +27,7 @@ def create_app():
         )
     ))
 
-    imp.import_app_resources()
+    imp.import_resources()
     imp.import_blueprints("blueprints")
     imp.import_models("models")
 
@@ -44,7 +49,12 @@ from flask_imp.config import ImpConfig, FlaskConfig
 
 
 def create_app():
-    app = Flask(__name__, static_url_path="/")
+    app = Flask(
+        __name__,
+        static_url_path="/",
+        static_folder="static",
+        template_folder="templates",
+    )
 
     FlaskConfig(
         secret_key="{secret_key}",
@@ -52,7 +62,7 @@ def create_app():
     )
 
     imp.init_app(app, ImpConfig())
-    imp.import_app_resources()
+    imp.import_resources()
     imp.import_blueprint("www")
 
     return app
@@ -68,7 +78,12 @@ from flask_imp.config import ImpConfig, FlaskConfig
 
 
 def create_app():
-    app = Flask(__name__, static_url_path="/")
+    app = Flask(
+        __name__,
+        static_url_path="/",
+        static_folder="static",
+        template_folder="templates",
+    )
 
     FlaskConfig(
         secret_key="{secret_key}",
@@ -76,7 +91,7 @@ def create_app():
     )
 
     imp = Imp(app, ImpConfig())
-    imp.import_app_resources()
+    imp.import_resources()
 
     return app
 """
