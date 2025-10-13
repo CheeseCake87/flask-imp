@@ -97,7 +97,6 @@ def add_blueprint(
         "root": root_folder,
         "routes": root_folder / "routes",
         "static": root_folder / "static",
-        "static/img": root_folder / "static" / "img",
         "static/css": root_folder / "static" / "css",
         "static/js": root_folder / "static" / "js",
         "templates": root_folder / "templates" / name,

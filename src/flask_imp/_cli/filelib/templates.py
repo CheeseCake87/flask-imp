@@ -19,7 +19,7 @@ def templates_minimal_index_html(
         <p style="margin-bottom: 0;">
             This template page is located in <code>{index_html}</code><br/>
             with its route defined in <code>{index_py}</code><br/><br/>
-            It's being imported by <code>app.import_app_resources()</code>
+            It's being imported by <code>app.import_resources()</code>
             in the <code>{init_py}</code> file.
         </p>
     </div>
