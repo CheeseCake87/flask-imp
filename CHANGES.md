@@ -4,7 +4,41 @@
 
 Unreleased
 
-- ...
+- x
+
+## Version 6.0.0-beta.3
+
+---
+
+Unreleased
+
+- Replaced import_app_resources with import_resources and made it more scoped towards
+  importing and setting up factories. Static and template folder setting moved back to
+  being set in the Flask object creation.
+- Update CLI init command to reflect method replacement.
+- Update Docs to reflect method replacement.
+- Actually return `ImpBlueprint.as_flask_blueprint` as a Flask Blueprint
+- fix `pass_function_check` checkpoint
+- add `APIKeyCheckpoint`
+- refactor all checkpoints
+- add `utilities.lazy_url_for`
+
+## Version 6.0.0-beta.2
+
+---
+
+Released 2025-05-27
+
+- bug fixes
+- move checkpoints to package
+
+## Version 6.0.0-beta.1
+
+---
+
+Released 2025-05-27
+
+- Simplify `flask_imp.security.checkpoint` decorator by adding checkpoint types.
 
 ## Version 5.7.0
 
