@@ -5,15 +5,13 @@ from functools import wraps
 from flask import abort
 from flask import flash
 from flask import redirect
-from flask import url_for
 
 
 def pass_function_check(
     function: t.Callable[..., t.Any],
     predefined_args: t.Optional[t.Dict[str, t.Any]] = None,
-    fail_endpoint: t.Optional[str] = None,
-    pass_endpoint: t.Optional[str] = None,
-    endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
+    pass_url: t.Optional[t.Union[str | partial]] = None,
+    fail_url: t.Optional[t.Union[str | partial]] = None,
     message: t.Optional[str] = None,
     message_category: str = "message",
     fail_on_missing_kwargs: bool = False,
@@ -41,7 +39,7 @@ def pass_function_check(
         @bp.route("/number/<int:value>", methods=["GET"])
         @pass_function_check(
             check_if_number,
-            fail_endpoint="wrong_number",
+            fail_url=lazy_url_for("wrong_number"),
             message="Failed message"
         )
         def number():
@@ -53,7 +51,7 @@ def pass_function_check(
         @pass_function_check(
             check_if_number,
             predefined_args={"value": os.getenv("NUMBER")},
-            fail_endpoint="www.index",
+            fail_url=lazy_url_for("www.index"),
             message="Failed message"
         )
         def number():
@@ -64,11 +62,8 @@ def pass_function_check(
                             function. Any keys that match any URL
                             variables will overwrite the URL variable
                             specified in @route
-    :param fail_endpoint: the endpoint to redirect to if the
-                          session key does not exist or does not contain the
-                          specified values
-    :param pass_endpoint: the endpoint to redirect to if the function check passes
-    :param endpoint_kwargs: a dictionary of keyword arguments to pass to the redirect endpoint
+    :param pass_url: the url to redirect to if the function passes
+    :param fail_url: the url to redirect to if the function fails
     :param message: if a message is specified, a flash message is shown
     :param message_category: the category of the flash message
     :param fail_on_missing_kwargs: if any of the required arguments for the passed in function are missing
@@ -77,7 +72,6 @@ def pass_function_check(
     :return: the decorated function, or abort(abort_status) response
     """
     import inspect
-    from flask import current_app
     from flask.sessions import SessionMixin
 
     def pass_function_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
@@ -101,13 +95,11 @@ def pass_function_check(
 
                 for key, value in passed_in_kwargs.items():
                     if isinstance(value, SessionMixin):
-                        with current_app.app_context():
-                            if key in value:
-                                passed_in_kwargs[key] = value.get(key)
+                        if key in value:
+                            passed_in_kwargs[key] = value.get(key)
 
             try:
-                with current_app.app_context():
-                    func_result = True if function(**passed_in_kwargs) else False
+                func_result = True if function(**passed_in_kwargs) else False
 
             except TypeError:
                 if fail_on_missing_kwargs:
@@ -116,41 +108,29 @@ def pass_function_check(
                     return func(*args, **kwargs)
 
             if func_result:
-                if pass_endpoint:
+                if pass_url:
                     setup_flash(message, message_category)
 
-                    if endpoint_kwargs:
-                        return redirect(
-                            url_for(
-                                pass_endpoint,
-                                _anchor=None,
-                                _method=None,
-                                _scheme=None,
-                                _external=None,
-                                **endpoint_kwargs,
-                            )
-                        )
+                    if isinstance(pass_url, str):
+                        return redirect(pass_url)
 
-                    return redirect(url_for(pass_endpoint))
+                    if isinstance(pass_url, partial):
+                        return redirect(pass_url())
+
+                    raise TypeError("Pass URL must either be a string or a partial")
 
                 return func(*args, **kwargs)
 
-            if fail_endpoint:
+            if fail_url:
                 setup_flash(message, message_category)
 
-                if endpoint_kwargs:
-                    return redirect(
-                        url_for(
-                            fail_endpoint,
-                            _anchor=None,
-                            _method=None,
-                            _scheme=None,
-                            _external=None,
-                            **endpoint_kwargs,
-                        )
-                    )
+                if isinstance(fail_url, str):
+                    return redirect(fail_url)
 
-                return redirect(url_for(fail_endpoint))
+                if isinstance(fail_url, partial):
+                    return redirect(fail_url())
+
+                raise TypeError("Pass URL must either be a string or a partial")
 
             return abort(abort_status)
 
