@@ -111,7 +111,18 @@ class ImpBlueprint(Blueprint):
 
         :return: Blueprint
         """
-        return self
+        return Blueprint(
+            self.bp_name,
+            self.package,
+            static_folder=self.config.static_folder,
+            static_url_path=self.config.static_url_path,
+            template_folder=self.config.template_folder,
+            url_prefix=self.config.url_prefix,
+            subdomain=self.config.subdomain,
+            url_defaults=self.config.url_defaults,
+            root_path=self.config.root_path,
+            cli_group=self.config.cli_group,
+        )
 
     def import_resources(self, folder: str = "routes") -> None:
         """
@@ -134,7 +145,7 @@ class ImpBlueprint(Blueprint):
                 import_module(f"{self.package}.{folder}.{resource.stem}")
             except ImportError as e:
                 raise ImportError(
-                    f"Error when importing {self.package}.{resource}: {e}"
+                    f"Error when importing {self.package}.{resource.stem}: {e}"
                 )
 
     def import_nested_blueprint(self, blueprint: t.Union[str, Path]) -> None:
