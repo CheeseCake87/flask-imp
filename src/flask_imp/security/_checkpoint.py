@@ -6,19 +6,26 @@ from flask import abort
 from flask import flash
 from flask import redirect
 from flask import request
-from flask import session
-from flask import url_for
 
-from ._private_funcs import _check_against_values_allowed
 from .checkpoints import (
-    AuthorizationBearerCheckpoint,
+    APIKeyCheckpoint,
+    BearerCheckpoint,
     SessionCheckpoint,
 )
 
+AnyCheckpoint = t.Union[APIKeyCheckpoint, BearerCheckpoint, SessionCheckpoint]
 
-def checkpoint(
-    checkpoint_: SessionCheckpoint | AuthorizationBearerCheckpoint,
-) -> t.Callable[..., t.Any]:
+
+def _setup_flash(_message: t.Optional[str], _message_category: t.Optional[str]) -> None:
+    if _message:
+        partial_flash = partial(flash, _message)
+        if _message_category:
+            partial_flash(_message_category)
+        else:
+            partial_flash()
+
+
+def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
     """
     A decorator that checks the specified Checkpoint class.
 
@@ -34,7 +41,7 @@ def checkpoint(
             SessionCheckpoint(
                 'logged_in',
                 True,
-                fail_endpoint='blueprint.login_page',
+                fail_url=lazy_url_for('blueprint.login_page'),
                 message="Login needed"
             )
         )
@@ -48,7 +55,7 @@ def checkpoint(
             SessionCheckpoint(
                 'logged_in',
                 True,
-                pass_endpoint='blueprint.admin_page',
+                pass_url=lazy_url_for('blueprint.admin_page'),
                 message="Already logged in"
             )
         )
@@ -62,7 +69,7 @@ def checkpoint(
             SessionCheckpoint(
                 'logged_in',
                 True,
-                fail_endpoint='blueprint.login_page',
+                fail_url=lazy_url_for('blueprint.login_page'),
                 message="Login needed"
             )
         )
@@ -70,7 +77,7 @@ def checkpoint(
             SessionCheckpoint(
                 'user_type',
                 'admin',
-                fail_endpoint='blueprint.index',
+                fail_url=lazy_url_for('blueprint.index'),
                 message="You need to be an admin to access this page"
             )
         )
@@ -104,74 +111,43 @@ def checkpoint(
     def checkpoint_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
         @wraps(func)
         def inner(*args: t.Any, **kwargs: t.Any) -> t.Any:
-            passing = False
+            if not isinstance(checkpoint_, AnyCheckpoint):
+                raise TypeError("Must be an instance of a Checkpoint")
 
-            def setup_flash(
-                _message: t.Optional[str], _message_category: t.Optional[str]
-            ) -> None:
-                if _message:
-                    partial_flash = partial(flash, _message)
-                    if _message_category:
-                        partial_flash(_message_category)
-                    else:
-                        partial_flash()
-
-            if isinstance(checkpoint_, SessionCheckpoint):
-                skey = session.get(checkpoint_.session_key)
-                if skey is not None:
-                    if _check_against_values_allowed(skey, checkpoint_.values_allowed):
-                        passing = True
-
-            if isinstance(checkpoint_, AuthorizationBearerCheckpoint):
-                auth = request.authorization
-                if auth:
-                    if auth.type == "bearer" and auth.token == checkpoint_.token:
-                        passing = True
-
-            if passing:
+            if checkpoint_.pass_():
                 if not checkpoint_.fail_json:
-                    if checkpoint_.pass_endpoint:
-                        setup_flash(checkpoint_.message, checkpoint_.message_category)
+                    if checkpoint_.pass_url:
+                        _setup_flash(checkpoint_.message, checkpoint_.message_category)
 
-                        if checkpoint_.endpoint_kwargs:
-                            return redirect(
-                                url_for(
-                                    checkpoint_.pass_endpoint,
-                                    _anchor=None,
-                                    _method=None,
-                                    _scheme=None,
-                                    _external=None,
-                                    **checkpoint_.endpoint_kwargs,
-                                )
-                            )
+                        if isinstance(checkpoint_.pass_url, str):
+                            return redirect(checkpoint_.pass_url)
 
-                        return redirect(url_for(checkpoint_.pass_endpoint))
+                        if isinstance(checkpoint_.pass_url, partial):
+                            return redirect(checkpoint_.pass_url())
+
+                        raise TypeError("Pass URL must either be a string or a partial")
 
                 return func(*args, **kwargs)
 
+            #
             # Must have failed to get here
+            #
 
             # If fail_json, return the fail_json
             if checkpoint_.fail_json:
                 return checkpoint_.fail_json, checkpoint_.fail_status
 
             # If fail_endpoint is set, redirect to it
-            if checkpoint_.fail_endpoint:
-                setup_flash(checkpoint_.message, checkpoint_.message_category)
+            if checkpoint_.fail_url:
+                _setup_flash(checkpoint_.message, checkpoint_.message_category)
 
-                if checkpoint_.endpoint_kwargs:
-                    return redirect(
-                        url_for(
-                            checkpoint_.fail_endpoint,
-                            _anchor=None,
-                            _method=None,
-                            _scheme=None,
-                            _external=None,
-                            **checkpoint_.endpoint_kwargs,
-                        )
-                    )
+                if isinstance(checkpoint_.fail_url, str):
+                    return redirect(checkpoint_.fail_url)
 
-                return redirect(url_for(checkpoint_.fail_endpoint))
+                if isinstance(checkpoint_.fail_url, partial):
+                    return redirect(checkpoint_.fail_url())
+
+                raise TypeError("Fail URL must either be a string or a partial")
 
             # if the request is JSON, return JSON
             if request.is_json:
