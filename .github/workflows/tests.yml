@@ -33,15 +33,15 @@ jobs:
           - { name: 'PyPy', python: 'pypy-3.10', os: ubuntu-latest }
     steps:
       - uses: actions/checkout@v5
-      - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v5
+
+      - name: Install uv and set the Python version
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python }}
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
+
       - name: Install package
         run: |
-          flit install
+          uv sync --locked --all-extras --dev
       - name: Test with pytest
         run: |
           pytest
