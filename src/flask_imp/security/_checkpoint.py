@@ -7,6 +7,7 @@ from flask import redirect
 from flask import request
 
 from ._checkpoints import (
+    BaseCheckpoint,
     APIKeyCheckpoint,
     BearerCheckpoint,
     SessionCheckpoint,
@@ -103,7 +104,7 @@ def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
     def checkpoint_wrapper(func: t.Any) -> t.Callable[..., t.Any]:
         @wraps(func)
         def inner(*args: t.Any, **kwargs: t.Any) -> t.Any:
-            if not isinstance(checkpoint_, AnyCheckpoint):
+            if not isinstance(checkpoint_, BaseCheckpoint):
                 raise TypeError("Must be an instance of a Checkpoint")
 
             if checkpoint_.pass_():
