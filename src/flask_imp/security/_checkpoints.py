@@ -19,7 +19,6 @@ Bearer:
 """
 
 import typing as t
-from functools import partial
 
 from flask import request
 from flask import session
@@ -32,8 +31,8 @@ class BaseCheckpoint:
     Must never be instantiated directly.
     """
 
-    pass_url: t.Optional[t.Union[str | partial]] = None
-    fail_url: t.Optional[t.Union[str | partial]] = None
+    pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None
+    fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None
     fail_json: t.Optional[t.Dict[str, t.Any]] = None
     fail_status: int = 403
     message: t.Optional[str] = None
@@ -41,10 +40,10 @@ class BaseCheckpoint:
 
     def action(
         self,
-        fail_url: t.Optional[t.Union[str | partial]] = None,
+        fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
         fail_json: t.Optional[t.Dict[str, t.Any]] = None,
         fail_status: int = 403,
-        pass_url: t.Optional[t.Union[str | partial]] = None,
+        pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
         message: t.Optional[str] = None,
         message_category: str = "message",
     ) -> t.Any:
@@ -81,7 +80,7 @@ class BaseCheckpoint:
 
         return self
 
-    def pass_(self):
+    def pass_(self) -> bool:
         raise NotImplementedError()
 
 
@@ -110,7 +109,7 @@ class APIKeyCheckpoint(BaseCheckpoint):
         self.type_ = type_
         self.header_or_param = header_or_param
 
-    def pass_(self):
+    def pass_(self) -> bool:
         if self.type_ == "header":
             if header_value := request.headers.get(self.header_or_param):
                 if header_value == self.key:
@@ -140,7 +139,7 @@ class BearerCheckpoint(BaseCheckpoint):
         """
         self.token = token
 
-    def pass_(self):
+    def pass_(self) -> bool:
         if auth := request.authorization:
             if auth.type == "bearer" and auth.token == self.token:
                 return True

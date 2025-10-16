@@ -83,9 +83,7 @@ class Imp:
         self,
         folder: str = "resources",
         factories: t.Optional[t.Union[t.List[str], str]] = "include",
-        scope_import: t.Optional[
-            t.Dict[str, t.Union[t.List[t.Optional[str]], t.Optional[str]]]
-        ] = None,
+        scope_import: t.Optional[t.Dict[str, t.Union[t.List[str], str]]] = None,
     ) -> None:
         """
         Will import resources (cli, routes, filters, context_processors...)
