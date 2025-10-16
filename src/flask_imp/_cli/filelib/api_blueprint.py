@@ -12,16 +12,16 @@ bp = ImpBlueprint(__name__, ImpBlueprintConfig(
     init_session={{"{name}_session_loaded": True}},
 ))
 
-bp.import_resources("routes")
+bp.import_resources()
 """
 
 
-def api_blueprint_routes_index_py() -> str:
+def api_blueprint_resources_index_py() -> str:
     return """\
-from .. import bp
+from flask_imp import ImpBlueprint
 
-
-@bp.route("/", methods=["GET"])
-def index():
-    return {"message": "Hello, World!"}
+def include(bp: ImpBlueprint):
+    @bp.route("/", methods=["GET"])
+    def index():
+        return {"message": "Hello, World!"}
 """
