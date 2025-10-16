@@ -46,7 +46,7 @@ class BaseCheckpoint:
         pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
         message: t.Optional[str] = None,
         message_category: str = "message",
-    ) -> t.Any:
+    ) -> "BaseCheckpoint":
         """
         Set the actions to take for this checkpoint.
 
