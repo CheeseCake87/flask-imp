@@ -41,7 +41,7 @@ jobs:
 
       - name: Install package
         run: |
-          uv sync --locked --all-extras --dev
+          uv sync --all-extras --dev
       - name: Test with pytest
         run: |
           uv run pytest
