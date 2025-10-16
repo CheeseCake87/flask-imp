@@ -12,16 +12,18 @@ Unreleased
 
 Unreleased
 
-- Replaced import_app_resources with import_resources and made it more scoped towards
+- Replaced `import_app_resources` with `import_resources` and made it more scoped towards
   importing and setting up factories. Static and template folder setting moved back to
   being set in the Flask object creation.
 - Update CLI init command to reflect method replacement.
-- Update Docs to reflect method replacement.
+- Update Docs to reflect method `import_app_resources` replacement.
 - Actually return `ImpBlueprint.as_flask_blueprint` as a Flask Blueprint
-- fix `pass_function_check` checkpoint
+- replace `pass_function_check` with `checkpoint_callable`
 - add `APIKeyCheckpoint`
-- refactor all checkpoints
+- refactor all checkpoint args
 - add `utilities.lazy_url_for`
+- add `utilities.lazy_session_get`
+- update overall docs
 
 ## Version 6.0.0-beta.2
 
