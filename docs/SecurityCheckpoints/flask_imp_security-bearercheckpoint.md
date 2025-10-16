@@ -8,12 +8,12 @@ from flask_imp.security import BearerCheckpoint
 BearerCheckpoint(
     token: str,
 ).action(
-    fail_url: t.Optional[t.Union[str | partial]] = None,
+    fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     fail_json: t.Optional[t.Dict[str, t.Any]] = None,
     fail_status: int = 403,
-    pass_url: t.Optional[t.Union[str | partial]] = None,
+    pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     message: t.Optional[str] = None,
-    message_category: str = "message"
+    message_category: str = "message",
 )
 ```
 

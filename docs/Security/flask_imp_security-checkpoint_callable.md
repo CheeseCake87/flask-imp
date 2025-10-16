@@ -9,10 +9,10 @@ def checkpoint_callable(
     callable_: t.Callable[..., t.Any],
     predefined_args: t.Optional[t.Dict[str, t.Any]] = None,
     include_url_args: bool = False,
-    fail_url: t.Optional[t.Union[str | partial]] = None,
+    fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     fail_json: t.Optional[t.Dict[str, t.Any]] = None,
     fail_status: int = 403,
-    pass_url: t.Optional[t.Union[str | partial]] = None,
+    pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     message: t.Optional[str] = None,
     message_category: str = "message",
 )
