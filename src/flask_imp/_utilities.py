@@ -3,13 +3,16 @@ from __future__ import annotations
 import re
 import sys
 import typing as t
+from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
+
+from flask import Flask, flash
 
 from flask_imp.config import DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig
 
 if t.TYPE_CHECKING:
     from ._imp import Imp
-    from flask import Flask
 
 
 class Sprinkles:
@@ -24,10 +27,62 @@ class Sprinkles:
     END = "\033[0m"
 
 
-def _database_instance_uri(
+@dataclass
+class LazySession:
+    key: str
+    default: t.Any
+
+
+def setup_flash(_message: t.Optional[str], _message_category: t.Optional[str]) -> None:
+    """
+    !! Private function !!
+
+    Sets up flask flash messaging for use in the checkpoint decorator.
+    """
+    if _message:
+        partial_flash = partial(flash, _message)
+        if _message_category:
+            partial_flash(_message_category)
+        else:
+            partial_flash()
+
+
+def check_against_values_allowed(
+    session_value: t.Union[t.List[str], str, int, bool],
+    values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
+) -> bool:
+    """
+    !! Private function !!
+    Checks if the session value matches the values allowed. Used by checkpoint.
+
+    :param session_value: the value to check
+    :param values_allowed: the value(s) to check against
+    :return: True if the session value matches the values allowed, False otherwise
+    """
+    if isinstance(values_allowed, list):
+        if isinstance(session_value, list):
+            for value in session_value:
+                if value in values_allowed:
+                    return True
+            return False
+
+        if session_value in values_allowed:
+            return True
+        return False
+
+    if session_value == values_allowed:
+        return True
+
+    return False
+
+
+def database_instance_uri(
     instance_path: Path,
     database: t.Union[DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig],
 ) -> t.Tuple[bool, str, t.Optional[str]]:
+    """
+    !! Private function !!
+    """
     if isinstance(database, SQLDatabaseConfig):
         return database.enabled, database.uri(), database.bind_key
 
@@ -42,24 +97,29 @@ def _database_instance_uri(
     )
 
 
-def _partial_models_import(
+def partial_models_import(
     location: Path,
     file_or_folder: str,
     imp_instance: Imp,
 ) -> None:
+    """
+    !! Private function !!
+    """
+
     file_or_folder_path = Path(location / file_or_folder)
     imp_instance.import_models(f"{file_or_folder_path}")
 
 
-def _partial_database_binds(
+def partial_database_binds(
     imp_instance: Imp,
     database_bind: t.Union[
         t.Any, DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig
     ],
 ) -> None:
-    enabled, uri, bind_key = _database_instance_uri(
-        imp_instance.app_path, database_bind
-    )
+    """
+    !! Private function !!
+    """
+    enabled, uri, bind_key = database_instance_uri(imp_instance.app_path, database_bind)
 
     if enabled:
         if "SQLALCHEMY_BINDS" in imp_instance.app.config:
@@ -75,8 +135,11 @@ def build_database_main(
         t.Union[DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig]
     ] = None,
 ) -> None:
+    """
+    !! Private function !!
+    """
     if database_main:
-        enabled, uri, _ = _database_instance_uri(app_instance_path, database_main)
+        enabled, uri, _ = database_instance_uri(app_instance_path, database_main)
 
         if enabled:
             flask_app.config["SQLALCHEMY_DATABASE_URI"] = uri
@@ -89,9 +152,12 @@ def build_database_binds(
         t.Iterable[t.Union[DatabaseConfig, SQLDatabaseConfig, SQLiteDatabaseConfig]]
     ] = None,
 ) -> None:
+    """
+    !! Private function !!
+    """
     if database_binds:
         for database in database_binds:
-            enabled, uri, bind_key = _database_instance_uri(app_instance_path, database)
+            enabled, uri, bind_key = database_instance_uri(app_instance_path, database)
 
             if enabled:
                 if "SQLALCHEMY_BINDS" in flask_app.config:
@@ -102,6 +168,8 @@ def build_database_binds(
 
 def cast_to_import_str(app_name: str, folder_path: Path) -> str:
     """
+    !! Private function !!
+
     Takes the folder path and converts it to a string that can be imported
     """
 
@@ -121,6 +189,8 @@ def cast_to_import_str(app_name: str, folder_path: Path) -> str:
 
 def snake(value: str) -> str:
     """
+    !! Private function !!
+
     Switches name of the class CamelCase to snake_case
     """
     s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", value)
@@ -129,6 +199,8 @@ def snake(value: str) -> str:
 
 def slug(value: str) -> str:
     """
+    !! Private function !!
+
     Switches name of the class CamelCase to slug-case
     """
     value = value.replace("_", "-")
@@ -138,6 +210,8 @@ def slug(value: str) -> str:
 
 def class_field(class_: str, field: str) -> str:
     """
+    !! Private function !!
+
     Switches name of the class CamelCase to snake_case and tacks on the field name
 
     Used for SQLAlchemy foreign key assignments
@@ -149,6 +223,8 @@ def class_field(class_: str, field: str) -> str:
 
 def cast_to_bool(value: t.Union[str, bool, None]) -> bool:
     """
+    !! Private function !!
+
     Casts an array of truly string values to a boolean. Used for config files.
     """
     if value is None:
@@ -171,6 +247,8 @@ def cast_to_bool(value: t.Union[str, bool, None]) -> bool:
 
 def cast_to_int(value: t.Union[str, int, float, bool, None]) -> int:
     """
+    !! Private function !!
+
     Casts string, float, and bool to int
     """
 
@@ -202,6 +280,8 @@ def cast_to_int(value: t.Union[str, int, float, bool, None]) -> int:
 
 def cast_to_float(value: t.Union[str, int, float, bool, None]) -> float:
     """
+    !! Private function !!
+
     Casts string, int, and bool to float
     """
 
