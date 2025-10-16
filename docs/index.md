@@ -1,10 +1,5 @@
 # Flask-Imp 🧚
 
-![tests](https://github.com/CheeseCake87/flask-imp/actions/workflows/tests.yml/badge.svg)
-[![PyPI version](https://img.shields.io/pypi/v/flask-imp)](https://pypi.org/project/flask-imp/)
-[![License](https://img.shields.io/github/license/CheeseCake87/flask-imp)](https://raw.githubusercontent.com/CheeseCake87/flask-imp/master/LICENSE)
-![black](https://img.shields.io/badge/code%20style-black-000000.svg)
-
 ## What is Flask-Imp?
 
 Flask-Imp's main purpose is to help simplify the importing of blueprints, resources, and
