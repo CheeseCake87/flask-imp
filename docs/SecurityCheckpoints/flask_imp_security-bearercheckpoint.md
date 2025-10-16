@@ -45,8 +45,11 @@ If fail_json is provided, passing to endpoints will be disabled.
 **Examples:**
 
 ```python
+BEARER_REQ = BearerCheckpoint("hello,world").action(fail_json={"error": "token"})
+
+
 @bp.route("/admin", methods=["GET"])
-@checkpoint(BearerCheckpoint("hello,world").action(fail_json={"error": "token"}))
+@checkpoint(BEARER_REQ)
 def admin_page():
     ...
 ```

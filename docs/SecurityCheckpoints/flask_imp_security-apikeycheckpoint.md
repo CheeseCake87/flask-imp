@@ -54,8 +54,10 @@ This will look for the `x-api-key` key in the request header, and match it to th
 of `hello`:
 
 ```python
+API_KEY_HEADER = APIKeyCheckpoint("hello")
+
 @bp.route("/admin", methods=["GET"])
-@checkpoint(APIKeyCheckpoint("hello"))
+@checkpoint(API_KEY_HEADER)
 def admin_page():
     ...
 ```
@@ -65,17 +67,21 @@ This will do the same check as above but look in the url params instead:
 `https://example.com/admin?x-api-key=hello`
 
 ```python
+API_KEY_QUERY_PARAM = APIKeyCheckpoint("hello", type_="query_param")
+
 @bp.route("/admin", methods=["GET"])
-@checkpoint(APIKeyCheckpoint("hello", type_="query_param"))
+@checkpoint(API_KEY_QUERY_PARAM)
 def admin_page():
     ...
 ```
 
-This will send the failed check to a specific url:
+This will send JSON if the key is invalid:
 
 ```python
+API_KEY_HEADER = APIKeyCheckpoint("hello").action(fail_json={"error": "invalid key"})
+
 @bp.route("/admin", methods=["GET"])
-@checkpoint(APIKeyCheckpoint("hello").action(lazy_url_for("login")))
+@checkpoint(API_KEY_HEADER)
 def admin_page():
     ...
 ```
