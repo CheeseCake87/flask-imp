@@ -21,6 +21,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "flit>=3.12.0",
     "furo>=2025.9.25",
     "mypy>=1.18.2",
     "myst-parser>=3.0.1",
