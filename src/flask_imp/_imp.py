@@ -9,7 +9,12 @@ from flask_sqlalchemy.model import DefaultMeta
 
 from ._imp_blueprint import ImpBlueprint
 from ._registries import ModelRegistry
-from ._utilities import cast_to_import_str, build_database_main, build_database_binds
+from ._utilities import (
+    cast_to_import_str,
+    build_database_main,
+    build_database_binds,
+    process_folder_file_scope,
+)
 from .config import ImpConfig
 
 
@@ -77,18 +82,56 @@ class Imp:
     def import_resources(
         self,
         folder: str = "resources",
-        factories: t.Optional[t.List[str]] = None,
+        factories: t.Optional[t.Union[t.List[str], str]] = "include",
         scope_import: t.Optional[
             t.Dict[str, t.Union[t.List[t.Optional[str]], t.Optional[str]]]
         ] = None,
     ) -> None:
         """
-        Imports app resources from the given folder. Sub folders at one level deep are supported.
+        Will import resources (cli, routes, filters, context_processors...)
+        from the given folder under the defined factory/factories.
 
-        Providing a list of factories will overwrite the default factory of "include",
-        to keep the include factory, add it to the list you provide.
+        The given folder must be relative to the root of the app.
 
-        Routes, context processors, cli, etc.
+        *Example factories*::
+
+            # If `import_resources(..., factories="production")`
+            # `production` will be included, `development` will be skipped.
+
+            def production(app):
+                @app.route("/")
+                def index():
+                    ...
+
+            def development(app):
+                @app.route("/")
+                def new():
+                    ...
+
+            # If `import_resources(..., factories=["production", "development"])`
+            # both `production` and `development` will be included.
+
+        `scope_import` is used to import only specific files from a folder. It expects
+        a dict where the keys are folder names and the values are lists of file names
+        to import.
+
+        `scope_import` defaults to {"*": ["*"]} - this will import all folders `{"*":`
+        and all files `: ["*"]}` in those folders.
+
+        "*" : All folders / All Files
+        "." : Root of the Resources Folder
+
+        *Example scoping*::
+
+            # will only import files "file_name_1" and "file_name_2"
+            # from folder "folder_name":
+
+            {"folder_name": ["file_name_1", "file_name_2"]}
+
+            # will only import files "file_name_1" and "file_name_2" from the root of the
+            # resources folder:
+
+            {".": ["file_name_1", "file_name_2"]}
 
         :param folder: the folder to import from, must be relative
         :param factories: a list of function names to call with the app instance, defaults to ["include"]
@@ -98,43 +141,50 @@ class Imp:
 
         # Set defaults
         if factories is None:
-            factories = ["include"]
+            factories = []
+        else:
+            if isinstance(factories, str):
+                factories = [factories]
+
         if scope_import is None:
             scope_import = {"*": ["*"]}
 
-        # Build folders
-        resources_folder = self.app_path / folder
+        resource_folder = self.app_path / folder
 
-        if not resources_folder.exists():
-            raise ImportError(f"Cannot find resources location at: {resources_folder}")
+        if not resource_folder.exists():
+            raise ImportError(f"Cannot find resources location at: {resource_folder}")
 
-        if not resources_folder.is_dir():
+        if not resource_folder.is_dir():
             raise ImportError(
-                f"Resources location must be a folder, value given: {resources_folder}"
+                f"Resources location must be a folder, value given: {resource_folder}"
             )
 
-        for item in resources_folder.iterdir():
-            if item.name.startswith("__"):
-                continue
+        module_paths_to_import: t.List[Path] = process_folder_file_scope(
+            resource_folder, scope_import
+        )
 
-            if item.is_file() and item.suffix == ".py":
-                # found module
-                self._handle_module_import(item, factories, scope_import)
+        imported_modules: set[t.Any] = set()
 
-            if item.is_dir():
-                # found dir
-                for py_file_in_item in item.glob("*.py"):
-                    # loop over dir
-                    if "*" in scope_import:
-                        self._handle_module_import(
-                            py_file_in_item, factories, scope_import
-                        )
-                        continue
+        for module_path in module_paths_to_import:
+            cast_import = cast_to_import_str(self.app.import_name, module_path)
 
-                    if item in scope_import:
-                        self._handle_module_import(
-                            py_file_in_item, factories, scope_import
-                        )
+            try:
+                # attempt to import the module
+                module = import_module(cast_import)
+
+                # add the module to the set of imported modules
+                imported_modules.add(module)
+            except ImportError as e:
+                raise ImportError(f"Error when importing {cast_import}: {e}")
+
+        # check if each module has any valid factories, if so, pass the blueprint
+        for instance_factory in factories:
+            for stored_module in imported_modules:
+                if hasattr(stored_module, instance_factory):
+                    getattr(stored_module, instance_factory)(self.app)
+
+        # clear the set of imported modules
+        imported_modules.clear()
 
     def register_imp_blueprint(self, imp_blueprint: ImpBlueprint) -> None:
         """
@@ -259,47 +309,6 @@ class Imp:
                 if self.config.IMP_DATABASE_BINDS
                 else None,
             )
-
-    def _handle_module_import(
-        self,
-        module: Path,
-        factories: list[str],
-        scope_import: t.Dict[str, t.Union[t.List[str], str]],
-    ) -> None:
-        if module.is_dir():
-            # skip if module is a folder
-            return
-
-        if "*" in scope_import:
-            # import from all FOLDERS set
-            if "*" in scope_import["*"]:
-                # import from all FILES set, disregard name
-                self._import_resource_module(module, factories)
-            else:
-                if module.name in scope_import["*"]:
-                    # import all FILES NOT set, check if name in import
-                    self._import_resource_module(module, factories)
-
-        if "." in scope_import:
-            # Import from root of folder
-            if "*" in scope_import["."]:
-                # import from all FILES set, disregard name
-                self._import_resource_module(module, factories)
-            else:
-                # import all FILES NOT set, check if name in import
-                if module.name in scope_import["."]:
-                    self._import_resource_module(module, factories)
-
-    def _import_resource_module(self, module: Path, factories: t.List[str]) -> None:
-        try:
-            with self.app.app_context():
-                file_module = import_module(cast_to_import_str(self.app_name, module))
-        except ImportError as e:
-            raise ImportError(f"Error when importing {module}: {e}")
-
-        for instance_factory in factories:
-            if hasattr(file_module, instance_factory):
-                getattr(file_module, instance_factory)(self.app)
 
     def _imp_blueprint_registration(self, imp_blueprint: ImpBlueprint) -> None:
         if not imp_blueprint.config.enabled:

@@ -309,3 +309,74 @@ def cast_to_float(value: t.Union[str, int, float, bool, None]) -> float:
         return 0.0
 
     raise TypeError(f"Cannot cast {value} to float")
+
+
+def process_scope(path: Path, scope: t.Union[t.List[str], str]) -> t.List[Path]:
+    if isinstance(scope, str):
+        if path.is_file():
+            if path.name == scope and path.suffix == ".py" or scope == "*":
+                return [path]
+
+        if path.is_dir():
+            return [
+                resource
+                for resource in path.iterdir()
+                if resource.name == scope
+                or scope == "*"
+                and resource.is_file()
+                and resource.suffix == ".py"
+            ]
+
+    result: list[Path] = []
+
+    if path.is_file():
+        if path.name in scope and path.suffix == ".py" or "*" in scope:
+            return [path]
+
+        return []
+
+    if path.is_dir():
+        for resource in path.iterdir():
+            if resource.name.startswith("__"):
+                continue
+
+            if (
+                resource.name in scope
+                or "*" in scope
+                and resource.is_file()
+                and resource.suffix == ".py"
+            ):
+                result.append(resource)
+
+    return result
+
+
+def process_folder_file_scope(
+    resources_fof: Path, scope_import: t.Dict[str, t.Union[t.List[str], str]]
+) -> t.List[Path]:
+    """
+    Processes folder and file scope for import operations.
+    """
+
+    result: list[Path] = []
+
+    if "." in scope_import.keys():  # root folder
+        if root_folder_scopes := process_scope(resources_fof, scope_import["."]):
+            result.extend(root_folder_scopes)
+
+    if "*" in scope_import.keys():  # all folders
+        for resource in resources_fof.iterdir():
+            if resource in result:
+                continue
+
+            if all_folders_scopes := process_scope(resource, scope_import["*"]):
+                result.extend(all_folders_scopes)
+
+    else:
+        for resource in resources_fof.iterdir():
+            if resource.name in scope_import.keys():
+                if named_scopes := process_scope(resource, scope_import[resource.name]):
+                    result.extend(named_scopes)
+
+    # clear duplicates
+    return list(set(result))

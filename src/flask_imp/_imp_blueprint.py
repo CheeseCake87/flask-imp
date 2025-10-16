@@ -15,6 +15,7 @@ from ._utilities import (
     slug,
     partial_models_import,
     partial_database_binds,
+    process_folder_file_scope,
 )
 
 if t.TYPE_CHECKING:
@@ -124,29 +125,116 @@ class ImpBlueprint(Blueprint):
             cli_group=self.config.cli_group,
         )
 
-    def import_resources(self, folder: str = "routes") -> None:
+    def import_resources(
+        self,
+        folder: str = "resources",
+        factories: t.Optional[t.Union[t.List[str], str]] = "include",
+        scope_import: t.Optional[t.Dict[str, t.Union[t.List[str], str]]] = None,
+    ) -> None:
         """
-        Will import all the resources (cli, routes, filters, context_processors...) from the given folder.
-        Given folder must be relative to the blueprint (in the same folder as the __init__.py file).
+        Will import resources (cli, routes, filters, context_processors...)
+        from the given folder under the defined factory/factories.
 
-        :param folder: the folder to look for resources in. Defaults to "routes". Must be relative
+        The given folder must be relative to the root of the blueprint.
+
+        *Example factories*::
+
+            # If `import_resources(..., factories="production")`
+            # `production` will be included, `development` will be skipped.
+
+            def production(app):
+                @app.route("/")
+                def index():
+                    ...
+
+            def development(app):
+                @app.route("/")
+                def new():
+                    ...
+
+            # If `import_resources(..., factories=["production", "development"])`
+            # both `production` and `development` will be included.
+
+        `scope_import` is used to import only specific files from a folder. It expects
+        a dict where the keys are folder names and the values are lists of file names
+        to import.
+
+        `scope_import` defaults to {"*": ["*"]} - this will import all folders `{"*":`
+        and all files `: ["*"]}` in those folders.
+
+        "*" : All folders / All Files
+        "." : Root of the Resources Folder
+
+        *Example scoping*::
+
+            # will only import files "file_name_1" and "file_name_2"
+            # from folder "folder_name":
+
+            {"folder_name": ["file_name_1", "file_name_2"]}
+
+            # will only import files "file_name_1" and "file_name_2" from the root of the
+            # resources folder:
+
+            {".": ["file_name_1", "file_name_2"]}
+
+
+        :param folder: the folder to import from - must be relative
+        :param factories: a list of or single function name(s) to pass the
+                          blueprint instance to and call. Defaults to "include"
+        :param scope_import: a dict of files to import e.g. {"folder_name": "*"}
+        :return: None
         """
 
         if self._prevent_if_disabled():
             return
 
-        resource_path = self.location / folder
-        if not resource_path.exists():
-            raise NotADirectoryError(f"{resource_path} is not a directory")
+        # Set defaults
+        if factories is None:
+            factories = []
+        else:
+            if isinstance(factories, str):
+                factories = [factories]
 
-        resources = resource_path.glob("*.py")
-        for resource in resources:
+        if scope_import is None:
+            scope_import = {"*": ["*"]}
+
+        resource_folder = self.location / folder
+
+        if not resource_folder.exists():
+            raise ImportError(f"Cannot find resources location at: {resource_folder}")
+
+        if not resource_folder.is_dir():
+            raise ImportError(
+                f"Resources location must be a folder, value given: {resource_folder}"
+            )
+
+        module_paths_to_import: t.List[Path] = process_folder_file_scope(
+            resource_folder, scope_import
+        )
+
+        imported_modules: set[t.Any] = set()
+
+        for module_path in module_paths_to_import:
             try:
-                import_module(f"{self.package}.{folder}.{resource.stem}")
+                # attempt to import the module
+                module = import_module(
+                    f"{self.package}.{module_path.parent.name}.{module_path.stem}"
+                )
+                # add the module to the set of imported modules
+                imported_modules.add(module)
             except ImportError as e:
                 raise ImportError(
-                    f"Error when importing {self.package}.{resource.stem}: {e}"
+                    f"Error when importing {self.package}.{module_path.parent.name}.{module_path.stem}: {e}"
                 )
+
+        # check if each module has any valid factories, if so, pass the blueprint
+        for instance_factory in factories:
+            for stored_module in imported_modules:
+                if hasattr(stored_module, instance_factory):
+                    getattr(stored_module, instance_factory)(self)
+
+        # clear the set of imported modules
+        imported_modules.clear()
 
     def import_nested_blueprint(self, blueprint: t.Union[str, Path]) -> None:
         """
