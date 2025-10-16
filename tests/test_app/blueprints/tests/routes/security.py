@@ -1,7 +1,7 @@
 import functools
 from flask import render_template, session
 
-from flask_imp.security import login_check, permission_check, pass_function_check
+from flask_imp.security import checkpoint_callable
 from .. import bp
 
 
@@ -9,10 +9,6 @@ def group_routes(rule, **options):
     def decorator(func):
         @functools.wraps(func)
         @bp.route(rule, **options)
-        @login_check("logged_in", True, fail_endpoint="tests.login_failed")
-        @permission_check(
-            "permissions", ["admin"], fail_endpoint="tests.permission_failed"
-        )
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
 
@@ -146,14 +142,14 @@ def blank_func(number):
 
 
 @bp.route("/pass-func-check", methods=["GET"])
-@pass_function_check(check_if_number, None, "tests.permission_failed")
+@checkpoint_callable(check_if_number, None, "tests.permission_failed")
 def pass_function_check_std():
     # Expecting to pass as missing kwargs are ignored
     return "Pass"
 
 
 @bp.route("/pass-func-check-fail-on-kwargs", methods=["GET"])
-@pass_function_check(
+@checkpoint_callable(
     check_if_number, None, "tests.permission_failed", fail_on_missing_kwargs=True
 )
 def pass_function_check_std_fail_on_kwargs():
@@ -162,7 +158,7 @@ def pass_function_check_std_fail_on_kwargs():
 
 
 @bp.route("/pass-func-check-with-url-var-replaced/<number>", methods=["GET"])
-@pass_function_check(check_if_number, {"number": 10}, "tests.permission_failed")
+@checkpoint_callable(check_if_number, {"number": 10}, "tests.permission_failed")
 def pass_function_check_with_url_value(number):
     # Expecting to pass with response: URL value: <number>
     return f"URL value: {number}"
@@ -171,7 +167,7 @@ def pass_function_check_with_url_value(number):
 @bp.route(
     "/pass-func-check-with-url-var-replaced-and-app-context/<number>", methods=["GET"]
 )
-@pass_function_check(
+@checkpoint_callable(
     check_if_number,
     {"number": 10, "session_": session},
     "tests.permission_failed",
@@ -185,7 +181,7 @@ def pass_function_check_with_url_value_with_ac(number):
     "/pass-func-check-with-url-var-replaced-and-app-context-with-partial/<number>",
     methods=["GET"],
 )
-@pass_function_check(
+@checkpoint_callable(
     check_if_number,
     {"number": 10, "tests_session": session},
     "tests.permission_failed",
