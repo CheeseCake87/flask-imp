@@ -6,6 +6,14 @@ Unreleased
 
 - x
 
+## Version 6.0.0
+
+---
+
+Released 2025-10-16
+
+- beta-3 + beta-2 + beta-1
+
 ## Version 6.0.0-beta.3
 
 ---
