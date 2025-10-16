@@ -1,8 +1,5 @@
-import os
-
 from flask import Flask
 
-from flask_imp.auth import encrypt_password, authenticate_password
 from flask_imp.config import (
     FlaskConfig,
     ImpConfig,
@@ -11,10 +8,6 @@ from flask_imp.config import (
 )
 from .extensions import db
 from .extensions import imp
-
-os.environ["CONFIG_SECRET_KEY"] = "inserted_from_environment"
-os.environ["DB_USERNAME"] = "database_username"
-os.environ["DATABASE_NAME"] = "my_database"
 
 
 def create_app():
@@ -25,7 +18,7 @@ def create_app():
         template_folder="templates",
     )
     FlaskConfig(
-        secret_key=os.getenv("CONFIG_SECRET_KEY"),
+        secret_key="0000",
     ).apply_config(app)
 
     app.config["TEST"] = "Hello, World!"
@@ -35,7 +28,7 @@ def create_app():
         ImpConfig(
             init_session={"logged_in": False},
             database_main=SQLiteDatabaseConfig(
-                database_name=os.getenv("DATABASE_NAME", "my_database"),
+                database_name="my_database",
             ),
             database_binds=[
                 DatabaseConfig(
@@ -54,20 +47,7 @@ def create_app():
 
     db.init_app(app)
 
-    for key, value in app.config.items():
-        print(f"{key}: {value}")
-
     with app.app_context():
         db.create_all()
-
-    print(app.config["TEST"])
-
-    password = "password"
-
-    encrypted_password = encrypt_password(password, "salt", 512, 1, "start")
-
-    print(encrypted_password)
-
-    print(authenticate_password(password, encrypted_password, "salt", 512, 1, "start"))
 
     return app

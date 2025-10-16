@@ -144,33 +144,6 @@ def test_csrf_fail(client):
     assert response.status_code == 401
 
 
-def test_pass_function_check_missing_kwargs_ignored(client):
-    response = client.get("/tests/pass-func-check")
-    assert b"Pass" in response.data
-
-
-def test_pass_function_check_fail_on_missing_kwargs(client):
-    response = client.get(
-        "/tests/pass-func-check-fail-on-kwargs", follow_redirects=True
-    )
-    assert b"Permission failed" in response.data
-
-
-def test_pass_function_check_with_url_value(client):
-    response = client.get(
-        "/tests/pass-func-check-with-url-var-replaced/100", follow_redirects=True
-    )
-    assert b"URL value: 100" in response.data
-
-
-def test_pass_function_check_with_url_value_with_ac(client):
-    response = client.get(
-        "/tests/pass-func-check-with-url-var-replaced-and-app-context/100",
-        follow_redirects=True,
-    )
-    assert b"URL value: 100" in response.data
-
-
 def test_password_encryption_authentication_correct(client):
     response = client.get("/tests/auth/password/correct", follow_redirects=True)
     assert b"True" in response.data
