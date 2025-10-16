@@ -1,6 +1,6 @@
 [project]
 name = "flask-imp"
-version = "6.0.0b3"
+version = "6.0.0"
 description = 'A Flask auto importer that allows your Flask apps to grow big.'
 authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
 readme = "README.md"
