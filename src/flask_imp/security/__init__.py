@@ -3,20 +3,36 @@ This module contains the security utilities for a Flask application.
 
 Functions:
 
-    - api_login_check: Checks if the user is logged in for an API request using sessions.
-    - include_csrf: Includes a CSRF token in a GET response, and checks it during a POST request.
-    - login_check: Checks if the user is logged in using sessions.
-    - permission_check: Checks if the user has the required permissions using sessions.
+    - include_csrf: Includes a CSRF token in a GET response, and checks it during a
+                    POST request.
+    - checkpoint: Checks if the passed in Checkpoint passes or fails.
     - pass_function_check: Checks is a function you give passes before hitting a route.
+
+Classes:
+
+    - APIKeyCheckpoint: A checkpoint focused around checking the header or query param
+                        for a valid token.
+    - BearerCheckpoint: A checkpoint focused around working with the Bearer tokens.
+    - SessionCheckpoint: A checkpoint focused around working with Flask's session.
 
 """
 
 from ._include_csrf import include_csrf
-from ._pass_function_check import pass_function_check
+from ._checkpoint_callable import checkpoint_callable
 from ._checkpoint import checkpoint
+
+from ._checkpoints import BaseCheckpoint
+from ._checkpoints import APIKeyCheckpoint
+from ._checkpoints import BearerCheckpoint
+from ._checkpoints import SessionCheckpoint
 
 __all__ = [
     "include_csrf",
-    "pass_function_check",
+    "checkpoint_callable",
     "checkpoint",
+    # Checkpoints
+    "BaseCheckpoint",
+    "APIKeyCheckpoint",
+    "BearerCheckpoint",
+    "SessionCheckpoint",
 ]
