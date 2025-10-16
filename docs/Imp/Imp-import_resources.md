@@ -12,9 +12,18 @@ def import_resources(
 
 ---
 
-Import app resources from the specified folder.
+Imports app resources from the given folder. Sub folders at one level deep are supported.
+
+Providing a list of factories will overwrite the default factory of "include",
+to keep the include factory, add it to the list you provide.
 
 Routes, context processors, cli, etc.
+
+`folder` The folder to import from, must be relative.
+
+`factories` A list of function names to call with the app instance, defaults to `["include"]`.
+
+`scope_import` A dict of files to import e.g. `{"folder_name": "*"}`.
 
 **Small example of usage:**
 
