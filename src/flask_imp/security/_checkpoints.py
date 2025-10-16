@@ -58,8 +58,10 @@ class BaseCheckpoint:
 
             from flask_imp.utilities import lazy_url_for
 
+            CHECKPOINT = ...(...).action(pass_url=lazy_url_for(endpoint))
+
             @app.get("/protected")
-            @checkpoint(...(..., pass_url=lazy_url_for(endpoint)))
+            @checkpoint(CHECKPOINT)
             ..
 
         ---
