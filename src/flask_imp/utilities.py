@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any
+from typing import Any, Optional
 
 from flask import url_for
 
@@ -9,10 +9,10 @@ from ._utilities import LazySession
 def lazy_url_for(
     endpoint: str,
     *,
-    _anchor: str | None = None,
-    _method: str | None = None,
-    _scheme: str | None = None,
-    _external: bool | None = None,
+    _anchor: Optional[str] = None,
+    _method: Optional[str] = None,
+    _scheme: Optional[str] = None,
+    _external: Optional[bool] = None,
     **values: Any,
 ) -> partial[str]:
     """
@@ -57,7 +57,7 @@ def lazy_url_for(
     )
 
 
-def lazy_session_get(key, default=None) -> LazySession:
+def lazy_session_get(key: str, default: Any = None) -> LazySession:
     """
     Indented for use in checkpoint decorators.
 
