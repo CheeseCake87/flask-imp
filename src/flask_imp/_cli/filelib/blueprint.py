@@ -8,6 +8,7 @@ def blueprint_init_py(url_prefix: str, name: str) -> str:
 from flask_imp import ImpBlueprint
 from flask_imp.config import ImpBlueprintConfig
 
+
 bp = ImpBlueprint(__name__, ImpBlueprintConfig(
     enabled=True,
     url_prefix="/{strip_leading_slash(url_prefix)}",
@@ -16,20 +17,20 @@ bp = ImpBlueprint(__name__, ImpBlueprintConfig(
     init_session={{"{name}_session_loaded": True}},
 ))
 
-bp.import_resources("routes")
+bp.import_resources("resources")
 """
 
 
-def blueprint_routes_index_py() -> str:
+def blueprint_resources_index_py() -> str:
     return """\
 from flask import render_template
+from flask_imp import ImpBlueprint
 
-from .. import bp
 
-
-@bp.route("/", methods=["GET"])
-def index():
-    return render_template(bp.tmpl("index.html"))
+def include(bp: ImpBlueprint):
+    @bp.route("/", methods=["GET"])
+    def index():
+        return render_template(bp.tmpl("index.html"))
 """
 
 

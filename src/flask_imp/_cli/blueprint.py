@@ -19,7 +19,7 @@ def add_api_blueprint(
     _url_prefix: t.Optional[str] = None,
 ) -> None:
     from .filelib.api_blueprint import api_blueprint_init_py
-    from .filelib.api_blueprint import api_blueprint_routes_index_py
+    from .filelib.api_blueprint import api_blueprint_resources_index_py
 
     click.echo(f"{Sp.OKGREEN}Creating API Blueprint: {name}")
 
@@ -41,7 +41,7 @@ def add_api_blueprint(
 
     folders: t.Dict[str, Path] = {
         "root": root_folder,
-        "routes": root_folder / "routes",
+        "resources": root_folder / "resources",
     }
 
     files: t.Dict[str, t.Tuple[Path, t.Any]] = {
@@ -51,9 +51,9 @@ def add_api_blueprint(
                 url_prefix=name if not _url_prefix else _url_prefix, name=name
             ),
         ),
-        "routes/index.py": (
-            folders["routes"] / "index.py",
-            api_blueprint_routes_index_py(),
+        "resources/index.py": (
+            folders["resources"] / "index.py",
+            api_blueprint_resources_index_py(),
         ),
     }
 
@@ -68,7 +68,7 @@ def add_blueprint(
     _url_prefix: t.Optional[str] = None,
 ) -> None:
     from .filelib.blueprint import blueprint_init_py
-    from .filelib.blueprint import blueprint_routes_index_py
+    from .filelib.blueprint import blueprint_resources_index_py
     from .filelib.blueprint import blueprint_templates_index_html
     from .filelib.blueprint import blueprint_init_app_templates_index_html
     from .filelib.blueprint import blueprint_templates_extends_main_html
@@ -95,7 +95,7 @@ def add_blueprint(
 
     folders: t.Dict[str, Path] = {
         "root": root_folder,
-        "routes": root_folder / "routes",
+        "resources": root_folder / "resources",
         "static": root_folder / "static",
         "static/css": root_folder / "static" / "css",
         "static/js": root_folder / "static" / "js",
@@ -111,9 +111,9 @@ def add_blueprint(
                 url_prefix=name if not _url_prefix else _url_prefix, name=name
             ),
         ),
-        "routes/index.py": (
-            folders["routes"] / "index.py",
-            blueprint_routes_index_py(),
+        "resources/index.py": (
+            folders["resources"] / "index.py",
+            blueprint_resources_index_py(),
         ),
         "static/water.css": (folders["static/css"] / "water.css", water_css),
         "static/main.js": (
@@ -128,7 +128,7 @@ def add_blueprint(
                 blueprint_name=name,
                 index_html=folders["templates"] / "index.html",
                 extends_main_html=folders["templates/extends"] / "main.html",
-                index_py=folders["routes"] / "index.py",
+                index_py=folders["resources"] / "index.py",
                 init_py=folders["root"] / "__init__.py",
             ),
         ),
