@@ -19,6 +19,33 @@ dependencies = [
     'more-itertools'
 ]
 
+[dependency-groups]
+dev = [
+    "furo>=2025.9.25",
+    "mypy>=1.18.2",
+    "myst-parser>=3.0.1",
+    "pre-commit>=4.3.0",
+    "pyqwe>=3.1.1",
+    "pytest>=8.4.2",
+    "ruff>=0.14.0",
+    "sphinx>=7.4.7",
+    "tox>=4.30.3",
+    "tox-uv>=1.28.1",
+]
+docs = [
+    "sphinx>=7.4.7",
+]
+lint = [
+    "ruff>=0.14.0",
+]
+test = [
+    "pytest>=8.4.2",
+]
+typing = [
+    "mypy>=1.18.2",
+    "pyright>=1.1.406",
+]
+
 [project.urls]
 Documentation = "https://cheesecake87.github.io/flask-imp/"
 Source = "https://github.com/CheeseCake87/flask-imp"
@@ -29,12 +56,6 @@ flask-imp = "flask_imp._cli:cli"
 [build-system]
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
-
-[tool.pyqwe]
-build = "*:flit build"
-install = "*:flit install --symlink"
-docs = "*:flask --app docs compile"
-docs-watch = "*:flask --app gdocs compile --watch"
 
 [tool.flit.sdist]
 exclude = [
@@ -68,62 +89,11 @@ fix = true
 show-fixes = true
 output-format = "full"
 
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-; DROPPED 3.9
-envlist =
-    py3{13,12,11,10}
-    style
-    typing
-    docs
-skip_missing_interpreters = true
-
-[testenv]
-package = wheel
-wheel_build_env = .pkg
-constrain_package_deps = true
-use_frozen_constraints = true
-deps = -r requirements/tests.txt
-commands = pytest -v --tb=short --basetemp={envtmpdir} {posargs}
-
-[testenv:style]
-deps = pre-commit
-skip_install = true
-commands = pre-commit run --all-files
-
-[testenv:typing]
-deps = -r requirements/typing.txt
-commands =
-    mypy
-    pyright
-    pyright --verifytypes flask_imp --ignoreexternal
-
-[testenv:docs]
-deps = -r requirements/docs.txt
-commands = sphinx-build -E -W -b dirhtml docs docs/_build/dirhtml
-
-[testenv:update-actions]
-labels = update
-deps = gha-update
-skip_install = true
-commands = gha-update
-
-[testenv:update-pre_commit]
-labels = update
-deps = pre-commit
-skip_install = true
-commands = pre-commit autoupdate -j4
-
-[testenv:update-requirements]
-labels = update
-deps = pip-tools
-skip_install = true
-change_dir = requirements
-commands =
-    pip-compile build.in -q {posargs:-U}
-    pip-compile docs.in -q {posargs:-U}
-    pip-compile tests.in -q {posargs:-U}
-    pip-compile typing.in -q {posargs:-U}
-    pip-compile dev.in -q {posargs:-U}
-"""
+[tool.pyqwe]
+build = "*:flit build"
+install = "*:flit install --symlink"
+docs = [
+    "*:sphinx-build -E -W -b dirhtml docs docs/_build/dirhtml",
+    "*:echo docs: http://localhost:8080/",
+    "*(docs/_build/dirhtml):python3 -m http.server 8080"
+]
