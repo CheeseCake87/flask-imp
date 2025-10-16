@@ -85,6 +85,11 @@ class Imp:
         """
         Imports app resources from the given folder. Sub folders at one level deep are supported.
 
+        Providing a list of factories will overwrite the default factory of "include",
+        to keep the include factory, add it to the list you provide.
+
+        Routes, context processors, cli, etc.
+
         :param folder: the folder to import from, must be relative
         :param factories: a list of function names to call with the app instance, defaults to ["include"]
         :param scope_import: a dict of files to import e.g. {"folder_name": "*"}
