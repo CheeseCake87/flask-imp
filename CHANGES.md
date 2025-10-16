@@ -13,8 +13,9 @@ Unreleased
 Unreleased
 
 - Replaced `import_app_resources` with `import_resources` and made it more scoped towards
-  importing and setting up factories. Static and template folder setting moved back to
+  importing and setting up factories. Static and template folder settings moved back to
   being set in the Flask object creation.
+- factories are now mandatory when using `import_resources`
 - Update CLI init command to reflect method replacement.
 - Update Docs to reflect method `import_app_resources` replacement.
 - Actually return `ImpBlueprint.as_flask_blueprint` as a Flask Blueprint
