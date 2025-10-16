@@ -3,26 +3,17 @@ from functools import partial
 from functools import wraps
 
 from flask import abort
-from flask import flash
 from flask import redirect
 from flask import request
 
-from .checkpoints import (
+from ._checkpoints import (
     APIKeyCheckpoint,
     BearerCheckpoint,
     SessionCheckpoint,
 )
+from .._utilities import setup_flash
 
 AnyCheckpoint = t.Union[APIKeyCheckpoint, BearerCheckpoint, SessionCheckpoint]
-
-
-def _setup_flash(_message: t.Optional[str], _message_category: t.Optional[str]) -> None:
-    if _message:
-        partial_flash = partial(flash, _message)
-        if _message_category:
-            partial_flash(_message_category)
-        else:
-            partial_flash()
 
 
 def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
@@ -105,6 +96,7 @@ def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
             credentials: "include"
         })
 
+    :param checkpoint_: the checkpoint class to pass or fail
     :return: the decorated function, or abort(fail_status), or redirect, or fail_json response
     """
 
@@ -117,7 +109,7 @@ def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
             if checkpoint_.pass_():
                 if not checkpoint_.fail_json:
                     if checkpoint_.pass_url:
-                        _setup_flash(checkpoint_.message, checkpoint_.message_category)
+                        setup_flash(checkpoint_.message, checkpoint_.message_category)
 
                         if isinstance(checkpoint_.pass_url, str):
                             return redirect(checkpoint_.pass_url)
@@ -137,9 +129,9 @@ def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
             if checkpoint_.fail_json:
                 return checkpoint_.fail_json, checkpoint_.fail_status
 
-            # If fail_endpoint is set, redirect to it
+            # If fail_url is set, redirect to it
             if checkpoint_.fail_url:
-                _setup_flash(checkpoint_.message, checkpoint_.message_category)
+                setup_flash(checkpoint_.message, checkpoint_.message_category)
 
                 if isinstance(checkpoint_.fail_url, str):
                     return redirect(checkpoint_.fail_url)
