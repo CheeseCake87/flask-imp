@@ -3,29 +3,28 @@
 ```python
 def import_resources(
     folder: str = "resources",
-    factories: t.Optional[t.List[str]] = None,
+    factories: t.Optional[t.List[str], str] = "include",
     scope_import: t.Optional[
-        t.Dict[str, t.Union[t.List[t.Optional[str]], t.Optional[str]]]
-    ] = None,
+        t.Dict[str, t.Union[t.List[str], str]]
+    ] = None
 ) -> None:
 ```
 
 ---
 
-Imports app resources from the given folder. Sub folders at one level deep are supported.
+Will import all the resources (cli, routes, filters, context_processors...)
+from the given folder wrapped by the defined factory/factories.
 
-Providing a list of factories will overwrite the default factory of "include",
-to keep the include factory, add it to the list you provide.
+The given folder must be relative to the root of the app.
 
-Routes, context processors, cli, etc.
+`folder` the folder to import from - must be relative
 
-`folder` The folder to import from, must be relative.
+`factories` a list of or single function name(s) to pass the app
+instance to and call. Defaults to "include"
 
-`factories` A list of function names to call with the app instance, defaults to `["include"]`.
+`scope_import` a dict of files to import e.g. `{"folder_name": "*"}`
 
-`scope_import` A dict of files to import e.g. `{"folder_name": "*"}`.
-
-**Small example of usage:**
+**Examples:**
 
 ```python
 imp.import_resources(folder="resources")
@@ -59,25 +58,49 @@ def include(app: Flask):
 
 ## How factories work
 
-Factories are functions that are called when importing the app resources. Here's an example:
+Factories are the names of functions that are called when importing the resource.
+The default factory is `include`, Here's an example of changing the default:
 
 ```python
 imp.import_resources(
     folder="resources",
-    factories=["development_cli"]
+    factories="development"
 )
 ```
 
-`["development_cli"]` => `development_cli(app)` function will be called, and the current app will be passed in.
+`"development"` => `development(app)` function will be called, and the current app will be passed in.
 
 File: `app_fac.py`
 
 ```python
-def development_cli(app: Flask):
+def development(app: Flask):
     @app.cli.command("dev")
     def dev():
         print("dev cli command")
 ```
+
+A list of factories can be passed in:
+
+```python
+imp.import_resources(
+    folder="resources",
+    factories=["development", "production"]
+)
+```
+
+```python
+def development(app: Flask):
+    @app.cli.command("dev")
+    def dev():
+        print("dev cli command")
+
+def production(app: Flask):
+    @app.cli.command("create-db")
+    def prod():
+        print("create-db cli command")
+```
+
+This feature can be useful to feature flag certain resources.
 
 ## Scoping imports
 
