@@ -13,8 +13,8 @@ from ._exceptions import NoConfigProvided
 from ._utilities import (
     cast_to_import_str,
     slug,
-    _partial_models_import,
-    _partial_database_binds,
+    partial_models_import,
+    partial_database_binds,
 )
 
 if t.TYPE_CHECKING:
@@ -102,7 +102,7 @@ class ImpBlueprint(Blueprint):
         if database_binds:
             for database_bind in database_binds:
                 self.database_binds.add(
-                    partial(_partial_database_binds, database_bind=database_bind)
+                    partial(partial_database_binds, database_bind=database_bind)
                 )
 
     def as_flask_blueprint(self) -> Blueprint:
@@ -212,7 +212,7 @@ class ImpBlueprint(Blueprint):
 
         self.models.add(
             partial(
-                _partial_models_import,
+                partial_models_import,
                 location=self.location,
                 file_or_folder=file_or_folder,
             )
