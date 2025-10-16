@@ -6,7 +6,7 @@ Functions:
     - include_csrf: Includes a CSRF token in a GET response, and checks it during a
                     POST request.
     - checkpoint: Checks if the passed in Checkpoint passes or fails.
-    - pass_function_check: Checks is a function you give passes before hitting a route.
+    - checkpoint_callable: Checks if a function you give passes.
 
 Classes:
 
