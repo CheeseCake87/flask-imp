@@ -10,6 +10,3 @@ bp = ImpBlueprint(
 )
 
 bp.import_resources("routes")
-
-print(":::-- from_object nested bps", bp.nested_blueprints)
-print(":::-- from_object config id", id(bp.config))

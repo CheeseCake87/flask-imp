@@ -3,10 +3,6 @@ from sqlalchemy import ForeignKey
 from ..extensions import db
 
 
-def example_function():
-    print("example_function printed this message")
-
-
 class ExampleTable(db.Model):
     example_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, ForeignKey("example_user.user_id"))
