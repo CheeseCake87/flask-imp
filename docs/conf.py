@@ -9,7 +9,7 @@
 project = "Flask-Imp"
 copyright = "2024, David Carmichael"
 author = "David Carmichael"
-release = "6.0.0"
+release = "6.0.0-beta.3"
 
 # General --------------------------------------------------------------
 
