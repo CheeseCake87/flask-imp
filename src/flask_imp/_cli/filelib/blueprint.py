@@ -17,7 +17,7 @@ bp = ImpBlueprint(__name__, ImpBlueprintConfig(
     init_session={{"{name}_session_loaded": True}},
 ))
 
-bp.import_resources("resources")
+bp.import_resources()
 """
 
 
