@@ -22,8 +22,6 @@ Run the following command to create a minimal Flask-Imp project.
 flask-imp init -n app --minimal
 ```
 
-See [CLI Commands / flask-imp init](CLI_Commands/CLI_Commands-flask-imp_init.md) for more information.
-
 ### The minimal structure
 
 #### Folder Structure
@@ -91,7 +89,59 @@ File: `app/resources/templates/index.html`
 </html>
 ```
 
+**For more examples see: [CLI Commands / flask-imp init](CLI_Commands/CLI_Commands-flask-imp_init.md)**
+
 ---
+
+## Securing Routes
+
+Use the `checkpoint` decorator to secure routes, here's an example:
+
+Update the `app/resources/routes.py` file with the following code:
+
+```python
+from flask import Flask
+from flask import render_template
+from flask import url_for
+from flask import redirect
+from flask import session
+from flask_imp.security import checkpoint, SessionCheckpoint
+from flask_imp.utilities import lazy_url_for
+
+LOGIN_REQUIRED = SessionCheckpoint(
+    session_key="logged_in",
+    values_allowed=True,
+).action(
+    fail_url=lazy_url_for("login_required")
+)
+
+
+def include(app: Flask):
+    @app.route("/")
+    def index():
+        return render_template("index.html")
+
+    @app.route("/protected")
+    @checkpoint(LOGIN_REQUIRED)
+    def protected():
+        return "You are logged in!"
+
+    @app.route("/login-required")
+    def login_required():
+        return "You need to login first!"
+
+    @app.route("/login")
+    def login():
+        session["logged_in"] = True
+        return redirect(url_for("protected"))
+
+    @app.route("/logout")
+    def logout():
+        session["logged_in"] = False
+        return redirect(url_for("index"))
+```
+
+**See more at: [Security / checkpoint](Security/flask_imp_security-checkpoint.md)**
 
 ## Setup a Virtual Environment
 
