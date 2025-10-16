@@ -1,24 +1,12 @@
 # checkpoint
 
-```
-Menu = flask_imp.security/checkpoint
-Title = checkpoint
-```
-
 ```python
 from flask_imp.security import checkpoint
 ```
 
 ```python
 checkpoint(
-    session_key: str,
-    values_allowed: t.Union[t.List[t.Union[str, int, bool]], str, int, bool],
-    fail_endpoint: t.Optional[str] = None,
-    pass_endpoint: t.Optional[str] = None,
-    endpoint_kwargs: t.Optional[t.Dict[str, t.Union[str, int]]] = None,
-    message: t.Optional[str] = None,
-    message_category: str = "message",
-    abort_status: int = 403,
+    checkpoint_: t.Union[APIKeyCheckpoint, BearerCheckpoint, SessionCheckpoint]
 )
 ```
 
@@ -26,32 +14,44 @@ checkpoint(
 
 ---
 
-A decorator that checks if the specified session key exists and contains the specified value.
+A decorator that checks if the specified checkpoint will pass or fail.
 
-`session_key` The session key to check for.
-
-`values_allowed` A list of or singular value(s) that the session key must contain.
-
-`fail_endpoint` The endpoint to redirect to if the session key does not exist or does not contain the specified values.
-
-`endpoint_kwargs` A dictionary of keyword arguments to pass to the redirect endpoint.
-
-`message` If a message is specified, a flash message is shown.
-
-`message_category` The category of the flash message.
-
-`abort_status` The status code to return if the check fails.
+`checkpoint_` The checkpoint class to pass or fail.
 
 **Example of a route that requires a user to be logged in:**
 
 ```python
+from flask_imp.security import checkpoint, SessionCheckpoint
+from flask_imp.utilities import lazy_url_for
+
+...
+
 @bp.route("/admin", methods=["GET"])
 @checkpoint(
-    'logged_in',
-    True,
-    fail_endpoint='blueprint.login_page',
-    message="Login needed"
+    SessionCheckpoint(
+        session_key="logged_in",
+        values_allowed=True,
+    ).action(
+        fail_url=lazy_url_for("login")  # If logged_in is False, this will trigger
+    )
 )
+def admin_page():
+    ...
+```
+
+Setting the checkpoint can be done outside the decorator, which looks a little cleaner:
+
+```python
+check_login = SessionCheckpoint(
+    session_key="logged_in",
+    values_allowed=True,
+).action(
+    fail_url=lazy_url_for("login")
+)
+
+
+@bp.route("/admin", methods=["GET"])
+@checkpoint(check_login)
 def admin_page():
     ...
 ```
@@ -60,18 +60,20 @@ def admin_page():
 
 ```python
 @bp.route("/admin", methods=["GET"])
-@checkpoint(
-    'logged_in',
-    True,
-    fail_endpoint='blueprint.login_page',
-    message="Login needed"
-)
-@checkpoint(
-    'user_type',
-    'admin',
-    fail_endpoint='blueprint.index',
+@checkpoint(SessionCheckpoint(
+    session_key="logged_in",
+    values_allowed=True,
+).action(
+    fail_url=lazy_url_for("blueprint.login_page"),
+    message="Login needed"  # This will set Flask's flash message
+))
+@checkpoint(SessionCheckpoint(
+    session_key="user_type",
+    values_allowed="admin",
+).action(
+    fail_url=lazy_url_for("blueprint.index"),
     message="You need to be an admin to access this page"
-)
+))
 def admin_page():
     ...
 ```
@@ -80,12 +82,13 @@ def admin_page():
 
 ```python
 @bp.route("/login-page", methods=["GET"])
-@checkpoint(
-    'logged_in',
-    True,
+@checkpoint(SessionCheckpoint(
+    session_key='logged_in',
+    values_allowed=True,
+).action(
     pass_endpoint='blueprint.admin_page',
     message="Already logged in"
-)
+))
 def login_page():
     ...
 ```
