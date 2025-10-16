@@ -10,7 +10,7 @@ Unreleased
 
 ---
 
-Unreleased
+Released 2025-10-16
 
 - Replaced `import_app_resources` with `import_resources` and made it more scoped towards
   importing and setting up factories. Static and template folder settings moved back to
