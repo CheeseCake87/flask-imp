@@ -312,6 +312,12 @@ def cast_to_float(value: t.Union[str, int, float, bool, None]) -> float:
 
 
 def process_scope(path: Path, scope: t.Union[t.List[str], str]) -> t.List[Path]:
+    if path.is_dir():
+        if path.name.startswith(
+            "."
+        ):  # if path is dir, don't process if it's a hidden folder
+            return []
+
     if isinstance(scope, str):
         if path.is_file():
             if path.name == scope and path.suffix == ".py" or scope == "*":
@@ -337,9 +343,15 @@ def process_scope(path: Path, scope: t.Union[t.List[str], str]) -> t.List[Path]:
 
     if path.is_dir():
         for resource in path.iterdir():
+            # don't process hidden files
+            if resource.name.startswith("."):
+                continue
+
+            # don't process dunder files
             if resource.name.startswith("__"):
                 continue
 
+            # only store files that end in .py
             if (
                 resource.name in scope
                 or "*" in scope
