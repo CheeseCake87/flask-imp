@@ -215,6 +215,11 @@ class ImpBlueprint(Blueprint):
         imported_modules: set[t.Any] = set()
 
         for module_path in module_paths_to_import:
+            if module_path.name.startswith(".") or module_path.name.startswith(
+                "__"
+            ):  # skip hidden files / folders
+                continue
+
             try:
                 # attempt to import the module
                 module = import_module(

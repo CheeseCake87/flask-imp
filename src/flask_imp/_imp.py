@@ -164,6 +164,11 @@ class Imp:
         imported_modules: set[t.Any] = set()
 
         for module_path in module_paths_to_import:
+            if module_path.name.startswith(".") or module_path.name.startswith(
+                "__"
+            ):  # skip hidden files / folders
+                continue
+
             cast_import = cast_to_import_str(self.app.import_name, module_path)
 
             try:
