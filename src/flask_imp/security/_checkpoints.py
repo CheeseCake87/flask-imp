@@ -168,9 +168,9 @@ class SessionCheckpoint(BaseCheckpoint):
         self.values_allowed = values_allowed
 
     def pass_(self) -> bool:
-        if skey := session.get(self.session_key):
-            if check_against_values_allowed(skey, self.values_allowed):
-                return True
+        value = session.get(self.session_key)
+        if check_against_values_allowed(value, self.values_allowed):
+            return True
 
         return False
 
