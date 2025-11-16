@@ -6,6 +6,31 @@ Unreleased
 
 - x
 
+## Version 6.0.3
+
+---
+
+Released 2025-11-16
+
+- fix to 'SessionCheckpoint' value checker
+
+## Version 6.0.2
+
+---
+
+Released 2025-10-21
+
+- further fixes to prevent the import of hidden and dunder files and folders
+
+## Version 6.0.1
+
+---
+
+Released 2025-10-21
+
+- fix to prevent hidden files and folders being imported, this is files that start with
+  `.` for example `.cli.py` and folders that start with `.` for example `.DS_Store`
+
 ## Version 6.0.0
 
 ---
@@ -20,7 +45,8 @@ Released 2025-10-16
 
 Released 2025-10-16
 
-- Replaced `import_app_resources` with `import_resources` and made it more scoped towards
+- Replaced `import_app_resources` with
+  `import_resources` and made it more scoped towards
   importing and setting up factories. Static and template folder settings moved back to
   being set in the Flask object creation.
 - factories are now mandatory when using `import_resources`
