@@ -108,11 +108,8 @@ app/
 │   └── routes.py
 │
 ├── static
-│   ├── css
-│   │   └── water.css
-│   ├── img
-│   │   └── flask-imp-logo.png
-│   └── favicon.ico
+│   └── css
+│       └── water.css
 ├── templates
 │   └── index.html
 │
@@ -135,33 +132,26 @@ app/
 │       └── error_handlers.py
 │
 ├── www
-│   ├── __init__.py
-│   ├── routes
+│   ├── resources
 │   │   └── index.py
 │   ├── static
 │   │   ├── css
 │   │   │   └── water.css
-│   │   ├── img
-│   │   │   └── flask-imp-logo.png
 │   │   └── js
 │   │       └── main.js
-│   └── templates
-│       └── www
-│           ├── extends
-│           │   └── main.html
-│           ├── includes
-│           │   ├── footer.html
-│           │   └── header.html
-│           └── index.html
+│   ├── templates
+│   │   └── www
+│   │       ├── extends
+│   │       │   └── main.html
+│   │       ├── includes
+│   │       │   ├── footer.html
+│   │       │   └── header.html
+│   │       └── index.html
+│   └── __init__.py
 │
 ├── static
-│   ├── css
-│   │   └── water.css
-│   ├── img
-│   │   └── flask-imp-logo.png
-│   └── favicon.ico
 ├── templates
-│   └── index.html
+│   └── error.html
 │
 └── __init__.py
 ```
@@ -174,27 +164,28 @@ app/
 app/
 ├── blueprints
 │   └── www
-│       ├── __init__.py
-│       ├── routes
+│       ├── resources
 │       │   └── index.py
 │       ├── static
 │       │   ├── css
 │       │   │   └── water.css
-│       │   ├── img
-│       │   │   └── flask-imp-logo.png
 │       │   └── js
 │       │       └── main.js
-│       └── templates
-│           └── www
-│               ├── extends
-│               │   └── main.html
-│               ├── includes
-│               │   ├── footer.html
-│               │   └── header.html
-│               └── index.html
+│       ├── templates
+│       │   └── www
+│       │       ├── extends
+│       │       │   └── main.html
+│       │       ├── includes
+│       │       │   ├── footer.html
+│       │       │   └── header.html
+│       │       └── index.html
+│       └── __init__.py
 │
 ├── extensions
 │   └── __init__.py
+│
+├── models
+│   └── example_user_table.py
 │
 ├── resources
 │   ├── cli
@@ -208,14 +199,9 @@ app/
 │   └── routes
 │       └── routes.py
 │
-├── models
-│   └── example_user_table.py
-│
 ├── static
-│   └── favicon.ico
 ├── templates
 │   └── error.html
 │
 └── __init__.py
 ```
-

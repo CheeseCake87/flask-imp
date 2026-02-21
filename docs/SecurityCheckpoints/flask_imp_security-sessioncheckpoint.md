@@ -11,6 +11,7 @@ SessionCheckpoint(
 ).action(
     fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     fail_json: t.Optional[t.Dict[str, t.Any]] = None,
+    fail_response: t.Optional[Response] = None,
     fail_status: int = 403,
     pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     message: t.Optional[str] = None,
@@ -33,6 +34,8 @@ A checkpoint that checks if the specified session key exists and its value(s) ma
 `fail_url` The url to redirect to if the key value fails.
 
 `fail_json` JSON that is returned on failure.
+
+`fail_response` A Flask Response to return on failure.
 
 `fail_status` The status code to return if the check fails, defaults to `403`.
 

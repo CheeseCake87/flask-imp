@@ -28,11 +28,15 @@ flask-imp init -n app --minimal
 
 ```text
 app/
-├── resources/
-│   ├── static/...
-│   ├── templates/
-│   │   └── index.html
-│   └── index.py
+├── resources
+│   └── routes.py
+│
+├── static
+│   └── css
+│       └── water.css
+├── templates
+│   └── index.html
+│
 └── __init__.py
 ```
 
@@ -42,22 +46,24 @@ File: `app/__init__.py`
 from flask import Flask
 
 from flask_imp import Imp
-from flask_imp.config import FlaskConfig, ImpConfig
-
-imp = Imp()
+from flask_imp.config import ImpConfig, FlaskConfig
 
 
 def create_app():
-    app = Flask(__name__, static_url_path="/")
+    app = Flask(
+        __name__,
+        static_url_path="/",
+        static_folder="static",
+        template_folder="templates",
+    )
+
     FlaskConfig(
-        secret_key="secret_key",
+        secret_key="69df8ab38c5fd03d63a84115f4b4e9558ac2354c07dbefc4",
         app_instance=app
     )
 
-    imp.init_app(app, ImpConfig())
-
+    imp = Imp(app, ImpConfig())
     imp.import_resources()
-    # Takes argument 'folder' default folder is 'resources'
 
     return app
 ```
@@ -68,24 +74,19 @@ File: `app/resources/routes.py`
 from flask import Flask
 from flask import render_template
 
+
 def include(app: Flask):
     @app.route("/")
     def index():
         return render_template("index.html")
+
 ```
 
-File: `app/resources/templates/index.html`
+File: `app/templates/index.html`
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Flask-Imp</title>
-</head>
-<body>
-<h1>Flask-Imp</h1>
-</body>
+<!--HTML HERE-->
 </html>
 ```
 

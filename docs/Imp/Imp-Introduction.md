@@ -3,7 +3,7 @@
 Flask-Imp is a Flask extension that provides auto import methods for various Flask resources. It will import models,
 blueprints, and other resources. It uses the importlib module to achieve this.
 
-Flask-Imp favors the application factory pattern as a project structure, and is opinionated towards using
+Flask-Imp favors the application factory pattern as a project structure and is opinionated towards using
 Blueprints. However, you can use Flask-Imp without using Blueprints.
 
 Here's an example of a standard Flask-Imp project structure:
