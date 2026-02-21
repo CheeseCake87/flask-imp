@@ -3,7 +3,9 @@ from functools import partial
 from functools import wraps
 from inspect import signature
 
-from flask import abort, session
+from flask import abort
+from flask import session
+from flask import Response
 from flask import redirect
 
 from .._utilities import setup_flash, LazySession
@@ -15,6 +17,7 @@ def checkpoint_callable(
     include_url_args: bool = False,
     fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     fail_json: t.Optional[t.Dict[str, t.Any]] = None,
+    fail_response: t.Optional[Response] = None,
     fail_status: int = 403,
     pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     message: t.Optional[str] = None,
@@ -90,6 +93,7 @@ def checkpoint_callable(
     :param include_url_args: load the url variables into the callable's arguments as __url_vars__
     :param fail_url: the url to redirect to if the callable fails
     :param fail_json: JSON that is returned on failure
+    :param fail_response: a Flask Response to return on failure
     :param fail_status: the status code to abort with if the callable check fails
     :param pass_url: the url to redirect to if the callable passes
     :param message: if a message is specified, a flash message is shown
@@ -136,6 +140,10 @@ def checkpoint_callable(
             #
             # Must have failed to get here
             #
+
+            # If a fail Flask Response is set, return it
+            if fail_response:
+                return fail_response
 
             # If fail_json, return the fail_json
             if fail_json:
