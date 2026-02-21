@@ -14,7 +14,9 @@ from ._checkpoints import (
 )
 from .._utilities import setup_flash
 
-AnyCheckpoint = t.Union[APIKeyCheckpoint, BearerCheckpoint, SessionCheckpoint]
+AnyCheckpoint = t.Union[
+    BaseCheckpoint, APIKeyCheckpoint, BearerCheckpoint, SessionCheckpoint
+]
 
 
 def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
