@@ -4,6 +4,10 @@ Unreleased
 
 - x
 
+## Version 6.1.2
+
+- switch checkpoint type checking to protocol matching
+
 ## Version 6.1.1
 
 - checkpoint bug fix, docs fix, bump version

@@ -8,18 +8,12 @@ from flask import request
 
 from ._checkpoints import (
     BaseCheckpoint,
-    APIKeyCheckpoint,
-    BearerCheckpoint,
-    SessionCheckpoint,
 )
+from ._protocol import ValidCheckpoint
 from .._utilities import setup_flash
 
-AnyCheckpoint = t.Union[
-    BaseCheckpoint, APIKeyCheckpoint, BearerCheckpoint, SessionCheckpoint
-]
 
-
-def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
+def checkpoint(checkpoint_: ValidCheckpoint) -> t.Callable[..., t.Any]:
     """
     A decorator that checks the specified Checkpoint class.
 
