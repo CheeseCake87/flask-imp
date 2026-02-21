@@ -4,6 +4,10 @@ Unreleased
 
 - x
 
+## Version 6.1.3
+
+- adjust fail_response to accept a callable to avoid out of context error
+
 ## Version 6.1.2
 
 - switch checkpoint type checking to protocol matching
