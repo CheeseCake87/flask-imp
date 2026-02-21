@@ -24,7 +24,7 @@ MyCheckpoint(
 ).action(
     fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     fail_json: t.Optional[t.Dict[str, t.Any]] = None,
-    fail_response: t.Optional[Response] = None,
+    fail_response: t.Optional[t.Callable[[], Response]] = None,
     fail_status: int = 403,
     pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     message: t.Optional[str] = None,

@@ -5,9 +5,7 @@ from flask_imp.security import checkpoint
 ```
 
 ```python
-checkpoint(
-    checkpoint_: t.Union[APIKeyCheckpoint, BearerCheckpoint, SessionCheckpoint]
-)
+checkpoint(checkpoint_: ValidCheckpoint)
 ```
 
 `@checkpoint(...)`

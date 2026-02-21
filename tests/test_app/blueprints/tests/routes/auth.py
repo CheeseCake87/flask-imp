@@ -20,8 +20,9 @@ def include(bp):
 
         encrypted_password = encrypt_password(password, "salt", 512, 1, "start")
 
-        result = authenticate_password("wrong", encrypted_password, "salt", 512, 1,
-                                       "start")
+        result = authenticate_password(
+            "wrong", encrypted_password, "salt", 512, 1, "start"
+        )
 
         return f"{result}"
 

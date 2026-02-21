@@ -71,49 +71,37 @@ def include(bp: ImpBlueprint):
 
     @bp.route("/must-be-logged-in/bool", methods=["GET"])
     @checkpoint(
-        SessionCheckpoint(
-            "logged_in", True
-        ).action(lazy_url_for("tests.login_failed"))
+        SessionCheckpoint("logged_in", True).action(lazy_url_for("tests.login_failed"))
     )
     def must_be_logged_in_bool():
         return render_template(bp.tmpl("security.html"), logged_in_on=True)
 
     @bp.route("/must-be-logged-in/bool/with-flash", methods=["GET"])
-    @checkpoint(SessionCheckpoint(
-        "logged_in", True
-    ).action(
-        lazy_url_for("tests.login_failed"),
-        message="Login needed"
-    ))
+    @checkpoint(
+        SessionCheckpoint("logged_in", True).action(
+            lazy_url_for("tests.login_failed"), message="Login needed"
+        )
+    )
     def must_be_logged_in_bool_with_flash():
         return render_template(bp.tmpl("security.html"), logged_in_on=True)
 
     @bp.route("/must-be-logged-in/str", methods=["GET"])
     @checkpoint(
-        SessionCheckpoint(
-            "logged_in", "li"
-        ).action(
-            lazy_url_for("tests.login_failed"))
+        SessionCheckpoint("logged_in", "li").action(lazy_url_for("tests.login_failed"))
     )
     def must_be_logged_in_str():
         return render_template(bp.tmpl("security.html"), logged_in_on="li")
 
     @bp.route("/must-be-logged-in/int", methods=["GET"])
     @checkpoint(
-        SessionCheckpoint(
-            "logged_in", 1
-        ).action(
-            lazy_url_for("tests.login_failed")
-        )
+        SessionCheckpoint("logged_in", 1).action(lazy_url_for("tests.login_failed"))
     )
     def must_be_logged_in_int():
         return render_template(bp.tmpl("security.html"), logged_in_on=1)
 
     @bp.route("/must-be-logged-in/multi", methods=["GET"])
     @checkpoint(
-        SessionCheckpoint(
-            "logged_in", [1, "li", True]
-        ).action(
+        SessionCheckpoint("logged_in", [1, "li", True]).action(
             lazy_url_for("tests.login_failed")
         )
     )
@@ -124,9 +112,7 @@ def include(bp: ImpBlueprint):
 
     @bp.route("/must-have-permissions/std", methods=["GET"])
     @checkpoint(
-        SessionCheckpoint(
-            "permissions", ["admin", "manager"]
-        ).action(
+        SessionCheckpoint("permissions", ["admin", "manager"]).action(
             lazy_url_for("tests.permission_failed")
         )
     )
@@ -135,9 +121,7 @@ def include(bp: ImpBlueprint):
 
     @bp.route("/must-have-permissions/adv", methods=["GET"])
     @checkpoint(
-        SessionCheckpoint(
-            "permissions", ["super-admin"]
-        ).action(
+        SessionCheckpoint("permissions", ["super-admin"]).action(
             lazy_url_for("tests.permission_failed")
         )
     )

@@ -127,7 +127,7 @@ def checkpoint(checkpoint_: ValidCheckpoint) -> t.Callable[..., t.Any]:
 
             # If a fail Flask Response is set, return it
             if checkpoint_.fail_response:
-                return checkpoint_.fail_response
+                return checkpoint_.fail_response()
 
             # If fail_json, return the fail_json
             if checkpoint_.fail_json:

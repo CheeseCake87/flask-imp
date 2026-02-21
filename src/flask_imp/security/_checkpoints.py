@@ -38,13 +38,13 @@ class BaseCheckpoint:
     fail_status: int = 403
     message: t.Optional[str] = None
     message_category: str = "message"
-    fail_response: t.Optional[Response] = None
+    fail_response: t.Optional[t.Callable[[], Response]] = (None,)
 
     def action(
         self,
         fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
         fail_json: t.Optional[t.Dict[str, t.Any]] = None,
-        fail_response: t.Optional[Response] = None,
+        fail_response: t.Optional[t.Callable[[], Response]] = None,
         fail_status: int = 403,
         pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
         message: t.Optional[str] = None,
@@ -71,11 +71,11 @@ class BaseCheckpoint:
 
         :param fail_url: the url to redirect to if the key value fails
         :param fail_json: JSON that is returned on failure
+        :param fail_response: a callable that returns a Flask Response on failure
         :param fail_status: the status code to return if the check fails
         :param pass_url: the url to redirect to if the key value passes
         :param message: a message to add to Flask's flash
         :param message_category: the category of the flash message
-        :param fail_response: a Flask Response to return on failure
         """
         self.pass_url = pass_url
         self.fail_url = fail_url
