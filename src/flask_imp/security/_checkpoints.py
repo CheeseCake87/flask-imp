@@ -22,6 +22,7 @@ import typing as t
 
 from flask import request
 from flask import session
+from flask import Response
 
 from .._utilities import check_against_values_allowed
 
@@ -37,11 +38,13 @@ class BaseCheckpoint:
     fail_status: int = 403
     message: t.Optional[str] = None
     message_category: str = "message"
+    fail_response: t.Optional[Response] = None
 
     def action(
         self,
         fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
         fail_json: t.Optional[t.Dict[str, t.Any]] = None,
+        fail_response: t.Optional[Response] = None,
         fail_status: int = 403,
         pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
         message: t.Optional[str] = None,
@@ -72,6 +75,7 @@ class BaseCheckpoint:
         :param pass_url: the url to redirect to if the key value passes
         :param message: a message to add to Flask's flash
         :param message_category: the category of the flash message
+        :param fail_response: a Flask Response to return on failure
         """
         self.pass_url = pass_url
         self.fail_url = fail_url
@@ -79,6 +83,7 @@ class BaseCheckpoint:
         self.fail_status = fail_status
         self.message = message
         self.message_category = message_category
+        self.fail_response = fail_response
 
         return self
 

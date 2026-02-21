@@ -109,7 +109,9 @@ def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
                 raise TypeError("Must be an instance of a Checkpoint")
 
             if checkpoint_.pass_():
+                # If fail_json is set, skip checking the pas_url
                 if not checkpoint_.fail_json:
+                    # Redirects to pass URL if defined and valid
                     if checkpoint_.pass_url:
                         setup_flash(checkpoint_.message, checkpoint_.message_category)
 
@@ -126,6 +128,10 @@ def checkpoint(checkpoint_: AnyCheckpoint) -> t.Callable[..., t.Any]:
             #
             # Must have failed to get here
             #
+
+            # If a fail Flask Response is set, return it
+            if checkpoint_.fail_response:
+                return checkpoint_.fail_response
 
             # If fail_json, return the fail_json
             if checkpoint_.fail_json:
