@@ -4,6 +4,10 @@ Unreleased
 
 - x
 
+## Version 6.1.1
+
+- checkpoint bug fix, docs fix, bump version
+
 ## Version 6.1.0
 
 Released 2026-02-21
