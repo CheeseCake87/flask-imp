@@ -1,14 +1,16 @@
 ## Version x.x.x
 
----
-
 Unreleased
 
 - x
 
-## Version 6.0.3
+## Version 6.1.0
 
----
+Released 2026-02-21
+
+- add the ability to pass a Flask Response object as a fail method on a checkpoint.
+
+## Version 6.0.3
 
 Released 2025-11-16
 
@@ -16,15 +18,11 @@ Released 2025-11-16
 
 ## Version 6.0.2
 
----
-
 Released 2025-10-21
 
 - further fixes to prevent the import of hidden and dunder files and folders
 
 ## Version 6.0.1
-
----
 
 Released 2025-10-21
 
@@ -33,7 +31,7 @@ Released 2025-10-21
 
 ## Version 6.0.0
 
----
+
 
 Released 2025-10-16
 
@@ -41,7 +39,7 @@ Released 2025-10-16
 
 ## Version 6.0.0-beta.3
 
----
+
 
 Released 2025-10-16
 
@@ -62,7 +60,7 @@ Released 2025-10-16
 
 ## Version 6.0.0-beta.2
 
----
+
 
 Released 2025-05-27
 
@@ -71,7 +69,7 @@ Released 2025-05-27
 
 ## Version 6.0.0-beta.1
 
----
+
 
 Released 2025-05-27
 
@@ -79,7 +77,7 @@ Released 2025-05-27
 
 ## Version 5.7.0
 
----
+
 
 Released 2025-02-10
 
@@ -88,7 +86,7 @@ Released 2025-02-10
 
 ## Version 5.6.0
 
----
+
 
 Released 2025-02-04
 
@@ -100,7 +98,7 @@ Released 2025-02-04
 
 ## Version 5.5.1
 
----
+
 
 Released 2024-12-04
 
@@ -110,7 +108,7 @@ Released 2024-12-04
 
 ## Version 5.5.0
 
----
+
 
 Released 2024-11-21
 
