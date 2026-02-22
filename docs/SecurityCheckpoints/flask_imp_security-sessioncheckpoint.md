@@ -16,6 +16,7 @@ SessionCheckpoint(
     pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     message: t.Optional[str] = None,
     message_category: str = "message",
+    disable_default_fail: bool = False
 )
 ```
 
@@ -99,7 +100,8 @@ IS_LOGGED_IN = SessionCheckpoint(
     values_allowed=True,
 ).action(
     pass_endpoint='blueprint.admin_page',
-    message="Already logged in"
+    message="Already logged in",
+    disable_default_fail=True
 )
 
 

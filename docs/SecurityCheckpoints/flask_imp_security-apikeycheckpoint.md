@@ -17,6 +17,7 @@ APIKeyCheckpoint(
     pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     message: t.Optional[str] = None,
     message_category: str = "message",
+    disable_default_fail: bool = False
 )
 ```
 

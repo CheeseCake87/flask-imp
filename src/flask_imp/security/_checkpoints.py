@@ -35,10 +35,11 @@ class BaseCheckpoint:
     pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None
     fail_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None
     fail_json: t.Optional[t.Dict[str, t.Any]] = None
+    fail_response: t.Optional[t.Callable[[], Response]] = (None,)
     fail_status: int = 403
     message: t.Optional[str] = None
     message_category: str = "message"
-    fail_response: t.Optional[t.Callable[[], Response]] = (None,)
+    disable_default_fail: bool = False
 
     def action(
         self,
@@ -49,6 +50,7 @@ class BaseCheckpoint:
         pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
         message: t.Optional[str] = None,
         message_category: str = "message",
+        disable_default_fail: bool = False,
     ) -> "BaseCheckpoint":
         """
         Set the actions to take for this checkpoint.
@@ -76,6 +78,7 @@ class BaseCheckpoint:
         :param pass_url: the url to redirect to if the key value passes
         :param message: a message to add to Flask's flash
         :param message_category: the category of the flash message
+        :param disable_default_fail: disable the default failure behavior
         """
         self.pass_url = pass_url
         self.fail_url = fail_url
@@ -84,6 +87,7 @@ class BaseCheckpoint:
         self.message = message
         self.message_category = message_category
         self.fail_response = fail_response
+        self.disable_default_fail = disable_default_fail
 
         return self
 

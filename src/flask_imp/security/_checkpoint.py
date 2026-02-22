@@ -149,6 +149,9 @@ def checkpoint(checkpoint_: ValidCheckpoint) -> t.Callable[..., t.Any]:
             if request.is_json:
                 return {"error": "Unauthorized"}, checkpoint_.fail_status
 
+            if checkpoint_.disable_default_fail:
+                func(*args, **kwargs)
+
             # Otherwise, abort with the specified status code
             return abort(checkpoint_.fail_status)
 

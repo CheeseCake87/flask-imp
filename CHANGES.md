@@ -4,6 +4,10 @@ Unreleased
 
 - x
 
+## Version 6.1.4
+
+- add disable_default_fail option to checkpoints
+
 ## Version 6.1.3
 
 - adjust fail_response to accept a callable to avoid out of context error

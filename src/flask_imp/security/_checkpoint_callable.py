@@ -22,6 +22,7 @@ def checkpoint_callable(
     pass_url: t.Optional[t.Union[str, t.Callable[[], t.Any]]] = None,
     message: t.Optional[str] = None,
     message_category: str = "message",
+    disable_default_fail: bool = False,
 ) -> t.Callable[..., t.Any]:
     """
     A decorator that evaluates if the passed in callable is truly.
@@ -98,6 +99,7 @@ def checkpoint_callable(
     :param pass_url: the url to redirect to if the callable passes
     :param message: if a message is specified, a flash message is shown
     :param message_category: the category of the flash message
+    :param disable_default_fail: if True, the callable will be called without default failure handling
     :return: the decorated callable, or abort(abort_status) response
     """
 
@@ -160,6 +162,9 @@ def checkpoint_callable(
                     return redirect(fail_url())
 
                 raise TypeError("Pass URL must either be a string or a partial")
+
+            if not disable_default_fail:
+                return func(*args, **kwargs)
 
             return abort(fail_status)
 
