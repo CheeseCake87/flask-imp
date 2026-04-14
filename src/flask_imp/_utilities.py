@@ -364,11 +364,15 @@ def process_scope(path: Path, scope: t.Union[t.List[str], str]) -> t.List[Path]:
 
 
 def process_folder_file_scope(
-    resources_fof: Path, scope_import: t.Dict[str, t.Union[t.List[str], str]]
+    resources_fof: Path,
+    scope_import: t.Optional[t.Dict[str, t.Union[t.List[str], str]]] = None,
 ) -> t.List[Path]:
     """
     Processes folder and file scope for import operations.
     """
+
+    if scope_import is None:
+        Exception("scope_import cannot be None")
 
     result: list[Path] = []
 

@@ -190,10 +190,10 @@ class ImpBlueprint(Blueprint):
 
         # Set defaults
         if factories is None:
-            factories = []
+            factories: list = []
         else:
             if isinstance(factories, str):
-                factories = [factories]
+                factories: list = [factories]
 
         if scope_import is None:
             scope_import = {"*": ["*"]}
