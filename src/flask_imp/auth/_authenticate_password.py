@@ -12,7 +12,7 @@ def authenticate_password(
     input_password: str,
     database_password: str,
     database_salt: str,
-    encryption_level: int = 512,
+    algorithm: t.Literal["sha256", "sha512"] = "sha512",
     pepper_length: int = 1,
     pepper_position: t.Literal["start", "end"] = "end",
     use_multiprocessing: bool = False,
@@ -28,12 +28,12 @@ def authenticate_password(
 
     - the length of the pepper used to hash the password.
     - the position of the pepper used to hash the password.
-    - the encryption level used to hash the password.
+    - the algorithm used to hash the password.
 
     :param input_password: plain password
     :param database_password: hashed password from database
     :param database_salt: salt from database
-    :param encryption_level: encryption used to generate database password
+    :param algorithm: algorithm used to generate database password
     :param pepper_length: length of pepper used to generate database password
     :param pepper_position: "start" or "end" - position of pepper used to generate database password
     :param use_multiprocessing: use multiprocessing to speed up the process (not compatible with eventlet/gevent)
@@ -52,7 +52,7 @@ def authenticate_password(
                 input_password,
                 database_password,
                 database_salt,
-                encryption_level,
+                algorithm,
                 pepper_position,
             ):
                 return True
@@ -71,7 +71,7 @@ def authenticate_password(
                     input_password,
                     database_password,
                     database_salt,
-                    encryption_level,
+                    algorithm,
                     pepper_position,
                 ),
             )

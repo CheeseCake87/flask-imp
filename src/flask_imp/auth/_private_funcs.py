@@ -35,7 +35,7 @@ def _guess_block(
     input_password: str,
     database_password: str,
     database_salt: str,
-    encryption_level: int = 512,
+    algorithm: t.Literal["sha256", "sha512"] = "sha512",
     pepper_position: t.Literal["start", "end"] = "end",
 ) -> bool:
     """
@@ -47,12 +47,12 @@ def _guess_block(
     :param input_password: the input password
     :param database_password: the database password
     :param database_salt: the database salt
-    :param encryption_level: the encryption level - defaults to 512
+    :param algorithm: sha256 | sha512 - defaults to sha512
     :param pepper_position: the pepper position - defaults to "end"
     :return: True if a match is found, False otherwise
     """
     for guess in guesses:
-        _sha = sha512() if encryption_level == 512 else sha256()
+        _sha = sha512() if algorithm == "sha512" else sha256()
         _sha.update(
             (
                 _pps(guess, input_password, database_salt)
