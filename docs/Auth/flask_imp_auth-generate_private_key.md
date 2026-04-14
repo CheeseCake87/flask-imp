@@ -5,12 +5,15 @@ from flask_imp.auth import generate_private_key
 ```
 
 ```python
-generate_private_key(hook: t.Optional[str]) -> str
+generate_private_key(
+    hook: t.Optional[str] = None,
+    algorithm: t.Literal["sha256", "sha512"] = "sha256"
+) -> str
 ```
 
 ---
 
-Generates a sha256 private key from a passed in hook value.
+Generates a sha256 or sha512 private key from a passed in hook value.
 
 If no hook is passed in, it will generate a hook using datetime.now() and a
 random number between 1 and 1000.

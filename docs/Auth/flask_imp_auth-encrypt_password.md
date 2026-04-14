@@ -8,7 +8,7 @@ from flask_imp.auth import encrypt_password
 encrypt_password(
     password: str,
     salt: str,
-    encryption_level: int = 512,
+    algorithm: t.Literal["sha256", "sha512"] = "sha512",
     pepper_length: int = 1,
     pepper_position: t.Literal["start", "end"] = "end"
 ) -> str
@@ -22,7 +22,7 @@ To be used alongside the [flask_imp.auth / authenticate_password](../Auth/flask_
 
 Takes the plain password, applies a pepper, salts it, then produces a digested sha512 or sha256 if specified.
 
-Can set the encryption level to 256 or 512, defaults to 512.
+Can set the algorithm to sha256 or sha512, defaults to sha512.
 
 Can set the pepper length, defaults to 1. Max is 3.
 
@@ -30,9 +30,11 @@ Can set the pepper position, "start" or "end", defaults to "end".
 
 **Note:**
 
-- You must inform the authenticate_password function of the pepper length used to hash the password.
-- You must inform the authenticate_password function of the position of the pepper used to hash the password.
-- You must inform the authenticate_password function of the encryption level used to hash the password.
+You must inform the authenticate_password function of:
+
+- the pepper length used to hash the password.
+- the position of the pepper used to hash the password.
+- the algorithm used to hash the password.
 
 **Encryption Scenario:**
 
@@ -47,5 +49,3 @@ Pepper position: "end"
 2. Salt is added to the end of the peppered password: "passwordA^%$*"
 3. Password is hashed: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0..."
 4. Salt and hashed password are then stored in the database.
-
-
