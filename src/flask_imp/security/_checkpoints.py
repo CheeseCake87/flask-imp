@@ -18,6 +18,7 @@ Bearer:
 
 """
 
+import secrets
 import typing as t
 
 from flask import request
@@ -152,7 +153,11 @@ class BearerCheckpoint(BaseCheckpoint):
 
     def pass_(self) -> bool:
         if auth := request.authorization:
-            if auth.type == "bearer" and auth.token == self.token:
+            if (
+                auth.type == "bearer"
+                and auth.token is not None
+                and secrets.compare_digest(auth.token, self.token)
+            ):
                 return True
 
         return False
