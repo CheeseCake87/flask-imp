@@ -178,7 +178,7 @@ class Imp:
                 # add the module to the set of imported modules
                 imported_modules.add(module)
             except ImportError as e:
-                raise ImportError(f"Error when importing {cast_import}: {e}")
+                raise ImportError(f"Error when importing {cast_import}: {e}") from e
 
         # check if each module has any valid factories, if so, pass the blueprint
         for instance_factory in factories:
@@ -392,7 +392,7 @@ class Imp:
                     self.model_registry.add(name, value)
 
         except ImportError as e:
-            raise ImportError(f"Error when importing {import_string}: {e}")
+            raise ImportError(f"Error when importing {import_string}: {e}") from e
 
     def _init_session(self) -> None:
         if isinstance(self.config.IMP_INIT_SESSION, dict):
