@@ -163,7 +163,7 @@ def checkpoint_callable(
 
                 raise TypeError("Pass URL must either be a string or a partial")
 
-            if not disable_default_fail:
+            if disable_default_fail:
                 return func(*args, **kwargs)
 
             return abort(fail_status)
