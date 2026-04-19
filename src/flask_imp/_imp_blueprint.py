@@ -220,17 +220,15 @@ class ImpBlueprint(Blueprint):
             ):  # skip hidden files / folders
                 continue
 
+            cast_import = cast_to_import_str(self.package, module_path)
+
             try:
                 # attempt to import the module
-                module = import_module(
-                    f"{self.package}.{module_path.parent.name}.{module_path.stem}"
-                )
+                module = import_module(cast_import)
                 # add the module to the set of imported modules
                 imported_modules.add(module)
             except ImportError as e:
-                raise ImportError(
-                    f"Error when importing {self.package}.{module_path.parent.name}.{module_path.stem}: {e}"
-                )
+                raise ImportError(f"Error when importing {cast_import}: {e}") from e
 
         # check if each module has any valid factories, if so, pass the blueprint
         for instance_factory in factories:
