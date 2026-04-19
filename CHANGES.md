@@ -17,6 +17,7 @@ Released 2026-04-19
 - preserve order when deduping scoped import results (`dict.fromkeys` instead of `set`)
 - URL-encode username/password when building database URIs to avoid breakage on special characters
 - chain `ImportError` re-raises with `from e` to preserve the original traceback
+- add testing for checkpoints
 
 ## Version 6.2.0
 
