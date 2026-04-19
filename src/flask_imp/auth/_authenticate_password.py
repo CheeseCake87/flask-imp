@@ -59,26 +59,26 @@ def authenticate_password(
 
         return False
 
-    thread_pool = multiprocessing.Pool(processes=pepper_length)
-    threads = []
+    with multiprocessing.Pool(processes=pepper_length) as thread_pool:
+        threads = []
 
-    for batch in batched(_guesses, 1000):
-        threads.append(
-            thread_pool.apply_async(
-                _guess_block,
-                args=(
-                    batch,
-                    input_password,
-                    database_password,
-                    database_salt,
-                    algorithm,
-                    pepper_position,
-                ),
+        for batch in batched(_guesses, 1000):
+            threads.append(
+                thread_pool.apply_async(
+                    _guess_block,
+                    args=(
+                        batch,
+                        input_password,
+                        database_password,
+                        database_salt,
+                        algorithm,
+                        pepper_position,
+                    ),
+                )
             )
-        )
 
-    for thread in threads:
-        if thread.get():
-            return True
+        for thread in threads:
+            if thread.get():
+                return True
 
     return False
