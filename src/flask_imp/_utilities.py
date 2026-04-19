@@ -372,7 +372,7 @@ def process_folder_file_scope(
     """
 
     if scope_import is None:
-        Exception("scope_import cannot be None")
+        raise ValueError("scope_import cannot be None")
 
     result: list[Path] = []
 
@@ -394,5 +394,5 @@ def process_folder_file_scope(
                 if named_scopes := process_scope(resource, scope_import[resource.name]):
                     result.extend(named_scopes)
 
-    # clear duplicates
-    return list(set(result))
+    # clear duplicates while preserving order
+    return list(dict.fromkeys(result))
