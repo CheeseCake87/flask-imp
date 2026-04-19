@@ -2,25 +2,61 @@
 
 Unreleased
 
-- x
+## Version 6.3.0
+
+Released 2026-04-19
+
+- fix missing `raise` on `scope_import is None` check in `process_folder_file_scope`
+- use context manager for `multiprocessing.Pool` in `authenticate_password` to stop worker leak
+- fix `disable_default_fail` semantics on `checkpoint_callable` — default now aborts with `fail_status`
+  when no fail handler is set (previously it silently called the protected view)
+- use `secrets.compare_digest` for bearer token comparison in `BearerCheckpoint`
+- mix `secrets.token_hex` entropy into `generate_csrf_token` output
+- `ImpBlueprint.import_resources` now routes through `cast_to_import_str`, fixing import paths for
+  nested resource folders
+- preserve order when deduping scoped import results (`dict.fromkeys` instead of `set`)
+- URL-encode username/password when building database URIs to avoid breakage on special characters
+- chain `ImportError` re-raises with `from e` to preserve the original traceback
+
+## Version 6.2.0
+
+Released 2026-04-14
+
+- auth.generate_private_key
+- auth.authenticate_password
+- auth.encrypt_password
+
+The function argument `encryption_level` has been changed to `algorithm` and has a new type of **Literal**
+
+This was done to allow for more algorithms to be added in the future.
 
 ## Version 6.1.5
 
+Released 2026-02-22
+
 - bugfix
 
-## Version 6.1.4
+## Version 6.1.4 - YANKED
+
+Released 2026-02-21
 
 - add disable_default_fail option to checkpoints
 
 ## Version 6.1.3
 
+Released 2026-02-21
+
 - adjust fail_response to accept a callable to avoid out of context error
 
 ## Version 6.1.2
 
+Released 2026-02-21
+
 - switch checkpoint type checking to protocol matching
 
 ## Version 6.1.1
+
+Released 2026-02-21
 
 - checkpoint bug fix, docs fix, bump version
 
@@ -51,15 +87,11 @@ Released 2025-10-21
 
 ## Version 6.0.0
 
-
-
 Released 2025-10-16
 
 - beta-3 + beta-2 + beta-1
 
 ## Version 6.0.0-beta.3
-
-
 
 Released 2025-10-16
 
@@ -80,8 +112,6 @@ Released 2025-10-16
 
 ## Version 6.0.0-beta.2
 
-
-
 Released 2025-05-27
 
 - bug fixes
@@ -89,15 +119,11 @@ Released 2025-05-27
 
 ## Version 6.0.0-beta.1
 
-
-
 Released 2025-05-27
 
 - Simplify `flask_imp.security.checkpoint` decorator by adding checkpoint types.
 
 ## Version 5.7.0
-
-
 
 Released 2025-02-10
 
@@ -105,8 +131,6 @@ Released 2025-02-10
 - refactored _flask_config.py
 
 ## Version 5.6.0
-
-
 
 Released 2025-02-04
 
@@ -118,8 +142,6 @@ Released 2025-02-04
 
 ## Version 5.5.1
 
-
-
 Released 2024-12-04
 
 - switched logo for emoji
@@ -127,8 +149,6 @@ Released 2024-12-04
 - updated example app
 
 ## Version 5.5.0
-
-
 
 Released 2024-11-21
 
