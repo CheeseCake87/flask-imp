@@ -1,5 +1,6 @@
 import typing as t
 from pathlib import Path
+from urllib.parse import quote
 
 
 class DatabaseConfig:
@@ -114,7 +115,7 @@ class DatabaseConfig:
             return f"{self.dialect}:///{filepath}"
 
         return (
-            f"{self.dialect}://{self.username}:"
-            f"{self.password}@{self.location}:"
+            f"{self.dialect}://{quote(self.username, safe='')}:"
+            f"{quote(self.password, safe='')}@{self.location}:"
             f"{self.port}/{self.database_name}"
         )
