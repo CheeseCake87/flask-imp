@@ -8,7 +8,7 @@ db = SQLAlchemy()
 """
 
 
-def extensions_init_slim_py() -> str:
+def extensions_init_slim_or_minimal_py() -> str:
     return """\
 from flask_imp import Imp
 

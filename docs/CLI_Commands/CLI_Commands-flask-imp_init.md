@@ -113,7 +113,10 @@ app/
 ├── templates
 │   └── index.html
 │
-└── __init__.py
+├── __init__.py
+├── config.py
+├── extensions.py
+└── globals.py
 ```
 
 ### Slim app
@@ -153,7 +156,10 @@ app/
 ├── templates
 │   └── error.html
 │
-└── __init__.py
+├── __init__.py
+├── config.py
+├── extensions.py
+└── globals.py
 ```
 
 ### Full app
@@ -203,5 +209,8 @@ app/
 ├── templates
 │   └── error.html
 │
-└── __init__.py
+├── __init__.py
+├── config.py
+├── extensions.py
+└── globals.py
 ```

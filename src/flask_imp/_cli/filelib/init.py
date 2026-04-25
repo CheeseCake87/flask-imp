@@ -1,9 +1,9 @@
-def init_full_py(app_name: str, secret_key: str) -> str:
+def init_full_py(app_name: str) -> str:
     return f"""\
 from flask import Flask
 
 from {app_name}.extensions import imp, db
-from flask_imp.config import ImpConfig, FlaskConfig, DatabaseConfig
+from {app_name}.config import FLASK_CONFIG, IMP_CONFIG
 
 
 def create_app():
@@ -13,20 +13,9 @@ def create_app():
         static_folder="static",
         template_folder="templates",
     )
+    app.config.from_object(FLASK_CONFIG.as_object())
 
-    FlaskConfig(
-        secret_key="{secret_key}",
-        app_instance=app
-    )
-
-    imp.init_app(app, ImpConfig(
-        init_session={{"logged_in": False}},
-        database_main=DatabaseConfig(
-            enabled=True,
-            dialect="sqlite"
-        )
-    ))
-
+    imp.init_app(app, IMP_CONFIG)
     imp.import_resources()
     imp.import_blueprints("blueprints")
     imp.import_models("models")
@@ -40,12 +29,12 @@ def create_app():
 """
 
 
-def init_slim_py(app_name: str, secret_key: str) -> str:
+def init_slim_py(app_name: str) -> str:
     return f"""\
 from flask import Flask
 
 from {app_name}.extensions import imp
-from flask_imp.config import ImpConfig, FlaskConfig
+from {app_name}.config import FLASK_CONFIG, IMP_CONFIG
 
 
 def create_app():
@@ -55,13 +44,9 @@ def create_app():
         static_folder="static",
         template_folder="templates",
     )
+    app.config.from_object(FLASK_CONFIG.as_object())
 
-    FlaskConfig(
-        secret_key="{secret_key}",
-        app_instance=app
-    )
-
-    imp.init_app(app, ImpConfig())
+    imp.init_app(app, IMP_CONFIG)
     imp.import_resources()
     imp.import_blueprint("www")
 
@@ -69,12 +54,12 @@ def create_app():
 """
 
 
-def init_minimal_py(secret_key: str) -> str:
+def init_minimal_py(app_name: str) -> str:
     return f"""\
 from flask import Flask
 
-from flask_imp import Imp
-from flask_imp.config import ImpConfig, FlaskConfig
+from {app_name}.extensions import imp
+from {app_name}.config import FLASK_CONFIG, IMP_CONFIG
 
 
 def create_app():
@@ -84,13 +69,9 @@ def create_app():
         static_folder="static",
         template_folder="templates",
     )
+    app.config.from_object(FLASK_CONFIG.as_object())
 
-    FlaskConfig(
-        secret_key="{secret_key}",
-        app_instance=app
-    )
-
-    imp = Imp(app, ImpConfig())
+    imp.init_app(app, IMP_CONFIG)
     imp.import_resources()
 
     return app

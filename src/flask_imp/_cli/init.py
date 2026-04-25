@@ -4,6 +4,7 @@ from pathlib import Path
 import click
 
 from .blueprint import add_blueprint
+from .filelib.globals import globals_py
 from .filelib.head_tag_generator import head_tag_generator
 from .filelib.water_css import water_css
 from .helpers import Sprinkles as Sp
@@ -14,6 +15,10 @@ def minimal_app(app_folder: Path) -> None:
     from .filelib.init import init_minimal_py
     from .filelib.templates import templates_minimal_index_html
     from .filelib.resources import resources_minimal_routes_py
+    from .filelib.config import config_init_slim_or_minimal_py
+    from .filelib.extensions import extensions_init_slim_or_minimal_py
+
+    app_name = app_folder.name
 
     # Folders
     folders = {
@@ -27,7 +32,19 @@ def minimal_app(app_folder: Path) -> None:
     files = {
         "root/__init__.py": (
             folders["root"] / "__init__.py",
-            init_minimal_py(secret_key=os.urandom(24).hex()),
+            init_minimal_py(app_name=app_name),
+        ),
+        "root/extensions.py": (
+            folders["root"] / "extensions.py",
+            extensions_init_slim_or_minimal_py(),
+        ),
+        "root/config.py": (
+            folders["root"] / "config.py",
+            config_init_slim_or_minimal_py(app_name=app_name),
+        ),
+        "root/globals.py": (
+            folders["root"] / "globals.py",
+            globals_py(secret_key=os.urandom(24).hex()),
         ),
         "static/css/main.css": (
             folders["static/css"] / "water.css",
@@ -55,10 +72,11 @@ def minimal_app(app_folder: Path) -> None:
 
 def slim_app(app_folder: Path) -> None:
     from .filelib.init import init_slim_py
-    from .filelib.extensions import extensions_init_slim_py
+    from .filelib.extensions import extensions_init_slim_or_minimal_py
     from .filelib.resources import resources_cli_py
     from .filelib.resources import resources_error_handlers_py
     from .filelib.templates import templates_error_html
+    from .filelib.config import config_init_slim_or_minimal_py
 
     app_name = app_folder.name
 
@@ -75,11 +93,19 @@ def slim_app(app_folder: Path) -> None:
     files = {
         "root/__init__.py": (
             folders["root"] / "__init__.py",
-            init_slim_py(app_name=app_name, secret_key=os.urandom(24).hex()),
+            init_slim_py(app_name=app_name),
         ),
-        "extensions/__init__.py": (
-            folders["extensions"] / "__init__.py",
-            extensions_init_slim_py(),
+        "root/extensions.py": (
+            folders["root"] / "extensions.py",
+            extensions_init_slim_or_minimal_py(),
+        ),
+        "root/config.py": (
+            folders["root"] / "config.py",
+            config_init_slim_or_minimal_py(app_name=app_name),
+        ),
+        "root/globals.py": (
+            folders["root"] / "globals.py",
+            globals_py(secret_key=os.urandom(24).hex()),
         ),
         "resources/cli/cli.py": (
             folders["resources/cli"] / "cli.py",
@@ -108,13 +134,13 @@ def slim_app(app_folder: Path) -> None:
 def full_app(app_folder: Path) -> None:
     from .filelib.init import init_full_py
     from .filelib.extensions import extensions_init_full_py
+    from .filelib.config import config_init_full_py
     from .filelib.models import models_example_user_table_py
     from .filelib.resources import resources_cli_py
     from .filelib.resources import resources_error_handlers_py
     from .filelib.resources import resources_context_processors_py
     from .filelib.resources import resources_filters_py
     from .filelib.resources import resources_routes_py
-
     from .filelib.templates import templates_error_html
 
     app_name = app_folder.name
@@ -137,11 +163,19 @@ def full_app(app_folder: Path) -> None:
     files = {
         "root/__init__.py": (
             folders["root"] / "__init__.py",
-            init_full_py(app_name=app_name, secret_key=os.urandom(24).hex()),
+            init_full_py(app_name=app_name),
         ),
-        "extensions/__init__.py": (
-            folders["extensions"] / "__init__.py",
+        "root/extensions.py": (
+            folders["root"] / "extensions.py",
             extensions_init_full_py(),
+        ),
+        "root/config.py": (
+            folders["root"] / "config.py",
+            config_init_full_py(app_name=app_name),
+        ),
+        "root/globals.py": (
+            folders["root"] / "globals.py",
+            globals_py(secret_key=os.urandom(24).hex()),
         ),
         "models/example_user_table.py": (
             folders["models"] / "example_user_table.py",

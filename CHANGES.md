@@ -2,17 +2,30 @@
 
 Unreleased
 
+## Version 6.4.0
+
+Released 2026-04-25
+
+- generated apps now have `globals.py`, `config.py` and
+  `extensions.py` this allows for separation of concerns.
+  - `globals.py` contains global variables and a good place for dotenv
+  - `config.py` contains configuration for Flask and Imp
+  - `extensions.py` contains flask extension initialisation
+
 ## Version 6.3.0
 
 Released 2026-04-19
 
 - fix missing `raise` on `scope_import is None` check in `process_folder_file_scope`
-- use context manager for `multiprocessing.Pool` in `authenticate_password` to stop worker leak
-- fix `disable_default_fail` semantics on `checkpoint_callable` — default now aborts with `fail_status`
+- use context manager for `multiprocessing.Pool` in
+  `authenticate_password` to stop worker leak
+- fix `disable_default_fail` semantics on
+  `checkpoint_callable` — default now aborts with `fail_status`
   when no fail handler is set (previously it silently called the protected view)
 - use `secrets.compare_digest` for bearer token comparison in `BearerCheckpoint`
 - mix `secrets.token_hex` entropy into `generate_csrf_token` output
-- `ImpBlueprint.import_resources` now routes through `cast_to_import_str`, fixing import paths for
+- `ImpBlueprint.import_resources` now routes through
+  `cast_to_import_str`, fixing import paths for
   nested resource folders
 - preserve order when deduping scoped import results (`dict.fromkeys` instead of `set`)
 - URL-encode username/password when building database URIs to avoid breakage on special characters
@@ -27,7 +40,8 @@ Released 2026-04-14
 - auth.authenticate_password
 - auth.encrypt_password
 
-The function argument `encryption_level` has been changed to `algorithm` and has a new type of **Literal**
+The function argument `encryption_level` has been changed to
+`algorithm` and has a new type of **Literal**
 
 This was done to allow for more algorithms to be added in the future.
 

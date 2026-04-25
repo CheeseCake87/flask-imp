@@ -37,7 +37,10 @@ app/
 ├── templates
 │   └── index.html
 │
-└── __init__.py
+├── __init__.py
+├── config.py
+├── extensions.py
+└── globals.py
 ```
 
 File: `app/__init__.py`
@@ -45,8 +48,8 @@ File: `app/__init__.py`
 ```python
 from flask import Flask
 
-from flask_imp import Imp
-from flask_imp.config import ImpConfig, FlaskConfig
+from mapp.extensions import imp
+from mapp.config import FLASK_CONFIG, IMP_CONFIG
 
 
 def create_app():
@@ -56,13 +59,9 @@ def create_app():
         static_folder="static",
         template_folder="templates",
     )
+    app.config.from_object(FLASK_CONFIG.as_object())
 
-    FlaskConfig(
-        secret_key="69df8ab38c5fd03d63a84115f4b4e9558ac2354c07dbefc4",
-        app_instance=app
-    )
-
-    imp = Imp(app, ImpConfig())
+    imp.init_app(app, IMP_CONFIG)
     imp.import_resources()
 
     return app
