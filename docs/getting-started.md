@@ -48,8 +48,8 @@ File: `app/__init__.py`
 ```python
 from flask import Flask
 
-from mapp.extensions import imp
-from mapp.config import FLASK_CONFIG, IMP_CONFIG
+from app.extensions import imp
+from app.config import FLASK_CONFIG, IMP_CONFIG
 
 
 def create_app():
