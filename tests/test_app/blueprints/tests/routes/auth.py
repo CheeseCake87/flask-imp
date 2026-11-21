@@ -1,4 +1,9 @@
-from flask_imp.auth import encrypt_password, authenticate_password
+from flask_imp.auth import (
+    hash_password_assert,
+    authenticate_password,
+    encrypt_password,
+    hash_password,
+)
 
 
 def include(bp):
@@ -37,3 +42,17 @@ def include(bp):
         )
 
         return f"{result}"
+
+    @bp.route("/auth/hash/correct", methods=["GET"])
+    def auth_test_hash_correct():
+        hashed_password = hash_password("password")
+        return f"{hash_password_assert('password', hashed_password)}"
+
+    @bp.route("/auth/hash/incorrect", methods=["GET"])
+    def auth_test_hash_incorrect():
+        hashed_password = hash_password("password")
+        return f"{hash_password_assert('wrong', hashed_password)}"
+
+    @bp.route("/auth/hash/invalid", methods=["GET"])
+    def auth_test_hash_invalid():
+        return f"{hash_password_assert('password', 'not-a-hash')}"

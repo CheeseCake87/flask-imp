@@ -157,3 +157,18 @@ def test_password_encryption_authentication_incorrect(client):
 def test_password_encryption_authentication_correct_long(client):
     response = client.get("/tests/auth/password/correct/long", follow_redirects=True)
     assert b"True" in response.data
+
+
+def test_hash_password_correct(client):
+    response = client.get("/tests/auth/hash/correct", follow_redirects=True)
+    assert b"True" in response.data
+
+
+def test_hash_password_incorrect(client):
+    response = client.get("/tests/auth/hash/incorrect", follow_redirects=True)
+    assert b"False" in response.data
+
+
+def test_hash_password_invalid_hash(client):
+    response = client.get("/tests/auth/hash/invalid", follow_redirects=True)
+    assert b"False" in response.data
