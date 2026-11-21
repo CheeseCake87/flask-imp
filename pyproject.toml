@@ -1,6 +1,6 @@
 [project]
 name = "flask-imp"
-version = "6.4.0"
+version = "6.5.0"
 description = 'A Flask auto importer that allows your Flask apps to grow big.'
 authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
 readme = "README.md"
@@ -11,8 +11,9 @@ classifiers = [
     "Framework :: Flask",
     "Natural Language :: English",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
+    'argon2-cffi',
     'click',
     'Flask',
     'Flask-SQLAlchemy',
