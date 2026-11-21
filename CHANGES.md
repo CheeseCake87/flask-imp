@@ -2,6 +2,19 @@
 
 Unreleased
 
+-
+
+## Version 6.5.0
+
+2026-11-21
+
+- bump supported Python versions to 3.11
+- add `argon2-cffi` as a dependency
+- add `hash_password` and `hash_password_assert` to `flask_imp.auth`,
+  these hash and check passwords using Argon2id
+- deprecate `encrypt_password`, `authenticate_password` and `generate_salt`,
+  these now emit a `DeprecationWarning`
+
 ## Version 6.4.0
 
 Released 2026-04-25
