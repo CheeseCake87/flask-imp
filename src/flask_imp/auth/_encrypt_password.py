@@ -1,4 +1,5 @@
 import typing as t
+import warnings
 from hashlib import sha256, sha512
 from random import choice
 from string import ascii_letters
@@ -14,6 +15,9 @@ def encrypt_password(
     pepper_position: t.Literal["start", "end"] = "end",
 ) -> str:
     """
+    .. deprecated:: 6.5.0
+        Use flask_imp.auth.hash_password instead (Argon2id). This function will be removed in a future version.
+
     Takes the plain password, applies a pepper, salts it, then produces a digested sha512 or sha256 if specified.
 
     - Can set the algorithm to sha256 or sha512, defaults to sha512.
@@ -35,6 +39,12 @@ def encrypt_password(
     :param pepper_position: str - "start" or "end" - defaults to "end"
     :return str: hash:
     """
+    warnings.warn(
+        "encrypt_password is deprecated and will be removed in a future version. "
+        "Use flask_imp.auth.hash_password instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     if pepper_length > 3:
         pepper_length = 3

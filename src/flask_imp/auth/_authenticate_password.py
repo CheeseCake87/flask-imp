@@ -1,5 +1,6 @@
 import multiprocessing
 import typing as t
+import warnings
 from itertools import product
 from string import ascii_letters
 
@@ -18,6 +19,9 @@ def authenticate_password(
     use_multiprocessing: bool = False,
 ) -> bool:
     """
+    .. deprecated:: 6.5.0
+        Use flask_imp.auth.hash_password_assert instead (Argon2id). This function will be removed in a future version.
+
     Takes the plain input password, the stored hashed password along with the stored salt
     and will try every possible combination of pepper values to find a match.
 
@@ -39,6 +43,12 @@ def authenticate_password(
     :param use_multiprocessing: use multiprocessing to speed up the process (not compatible with eventlet/gevent)
     :return: True if match, False if not
     """
+    warnings.warn(
+        "authenticate_password is deprecated and will be removed in a future version. "
+        "Use flask_imp.auth.hash_password_assert instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     if pepper_length > 3:
         pepper_length = 3
