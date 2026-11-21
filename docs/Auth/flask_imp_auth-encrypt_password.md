@@ -16,6 +16,11 @@ encrypt_password(
 
 ---
 
+```{warning}
+**Deprecated:** `encrypt_password` will be removed in a future version.
+Use [flask_imp.auth / hash_password](../Auth/flask_imp_auth-hash_password.md) instead.
+```
+
 For use in password hashing.
 
 To be used alongside the [flask_imp.auth / authenticate_password](../Auth/flask_imp_auth-authenticate_password.md) function.

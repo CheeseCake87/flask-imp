@@ -101,6 +101,8 @@ Auth/flask_imp_auth-generate_numeric_validator.md
 Auth/flask_imp_auth-generate_password.md
 Auth/flask_imp_auth-generate_private_key.md
 Auth/flask_imp_auth-generate_salt.md
+Auth/flask_imp_auth-hash_password.md
+Auth/flask_imp_auth-hash_password_assert.md
 Auth/flask_imp_auth-is_email_address_valid.md
 Auth/flask_imp_auth-is_username_valid.md
 ```

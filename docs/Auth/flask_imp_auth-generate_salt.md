@@ -10,6 +10,11 @@ generate_salt(length: int = 4) -> str
 
 ---
 
+```{warning}
+**Deprecated:** `generate_salt` will be removed in a future version.
+Use [flask_imp.auth / hash_password](../Auth/flask_imp_auth-hash_password.md) instead.
+```
+
 Generates a string of (length) characters of punctuation.
 
 The Default length is 4.

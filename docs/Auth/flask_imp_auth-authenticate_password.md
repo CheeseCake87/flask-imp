@@ -18,6 +18,11 @@ authenticate_password(
 
 ---
 
+```{warning}
+**Deprecated:** `authenticate_password` will be removed in a future version.
+Use [flask_imp.auth / hash_password_assert](../Auth/flask_imp_auth-hash_password_assert.md) instead.
+```
+
 For use in password hashing.
 
 To be used alongside the [flask_imp.auth / encrypt_password](../Auth/flask_imp_auth-encrypt_password.md) function.
