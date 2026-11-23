@@ -92,15 +92,12 @@ SecurityCheckpoints/flask_imp_security-createacheckpoint.md
 :caption: Auth
 :maxdepth: 1
 
-Auth/flask_imp_auth-authenticate_password.md
-Auth/flask_imp_auth-encrypt_password.md
 Auth/flask_imp_auth-generate_alphanumeric_validator.md
 Auth/flask_imp_auth-generate_csrf_token.md
 Auth/flask_imp_auth-generate_email_validator.md
 Auth/flask_imp_auth-generate_numeric_validator.md
 Auth/flask_imp_auth-generate_password.md
 Auth/flask_imp_auth-generate_private_key.md
-Auth/flask_imp_auth-generate_salt.md
 Auth/flask_imp_auth-hash_password.md
 Auth/flask_imp_auth-hash_password_assert.md
 Auth/flask_imp_auth-is_email_address_valid.md
@@ -113,6 +110,15 @@ Auth/flask_imp_auth-is_username_valid.md
 
 Utilities/flask_imp_utilities-lazy_url_for.md
 Utilities/flask_imp_utilities-lazy_session_get.md
+```
+
+```{toctree}
+:caption: Deprecated
+:maxdepth: 1
+
+Auth/flask_imp_auth-authenticate_password.md
+Auth/flask_imp_auth-encrypt_password.md
+Auth/flask_imp_auth-generate_salt.md
 ```
 
 ```{toctree}
